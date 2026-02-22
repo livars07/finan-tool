@@ -26,7 +26,7 @@ export default function Home() {
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer border-b-2 border-primary pb-1">
-              <LayoutDashboard className="w-4 h-4" /> Panel de Control
+              <LayoutDashboard className="w-4 h-4" /> Finanto Prospeccion v0.10
             </div>
           </nav>
           <div className="flex items-center gap-2">
