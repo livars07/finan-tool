@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Olivares Financiamiento - Gestión Hipotecaria',
+  title: 'Finanto - Gestión Hipotecaria',
   description: 'Sistema especializado en financiamiento inmobiliario y gestión de prospectos.',
 };
 
