@@ -17,9 +17,10 @@ import {
   AlertDialogHeader, AlertDialogTitle 
 } from "@/components/ui/alert-dialog";
 import { Appointment, AppointmentStatus, AppointmentType } from '@/hooks/use-appointments';
-import { User, Phone, Calendar, Clock, BookOpen, Trash2, Edit2, Save } from 'lucide-react';
+import { User, Phone, Calendar, Clock, BookOpen, Trash2, Edit2, Save, MessageCircle, Copy } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 interface Props {
   appointment: Appointment | null;
@@ -66,12 +67,34 @@ export default function AppointmentDetailsDialog({
     toast({ title: "Eliminado", description: "El registro ha sido removido exitosamente." });
   };
 
+  const copyToWhatsAppFormat = () => {
+    if (!appointment) return;
+    
+    const dateObj = parseISO(appointment.date);
+    const dateFormatted = format(dateObj, "EEEE d 'de' MMMM yyyy", { locale: es });
+    const capitalizedDate = dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
+    const timeFormatted = format12hTime(appointment.time);
+
+    const text = `Cita: ${capitalizedDate}
+Nombre: ${appointment.name}
+Producto: ${appointment.type}
+Hora: ${timeFormatted}
+Número: ${appointment.phone}`;
+
+    navigator.clipboard.writeText(text).then(() => {
+      toast({
+        title: "Copiado exitosamente",
+        description: "Datos listos para enviar por WhatsApp.",
+      });
+    });
+  };
+
   return (
     <>
       <Dialog open={open} onOpenChange={(o) => { if(!o) setIsEditing(false); onOpenChange(o); }}>
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-xl font-headline">
+            <DialogTitle className="flex items-center gap-2 text-xl font-headline text-foreground">
               <User className="text-primary w-5 h-5" />
               Detalles del Prospecto
             </DialogTitle>
@@ -81,6 +104,17 @@ export default function AppointmentDetailsDialog({
           </DialogHeader>
 
           <div className="space-y-6 py-4">
+            {!isEditing && (
+              <Button 
+                onClick={copyToWhatsAppFormat}
+                variant="outline" 
+                className="w-full border-green-500/50 text-green-500 hover:bg-green-500/10 hover:text-green-400 font-bold"
+              >
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Copiar datos para WhatsApp
+              </Button>
+            )}
+
             {isEditing ? (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -222,7 +256,7 @@ export default function AppointmentDetailsDialog({
               {isEditing ? (
                 <>
                   <Button variant="outline" onClick={() => setIsEditing(false)}>Cancelar</Button>
-                  <Button onClick={handleSave} className="bg-primary hover:bg-primary/90">
+                  <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 text-primary-foreground">
                     <Save className="w-4 h-4 mr-2" /> Guardar
                   </Button>
                 </>
