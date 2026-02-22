@@ -1,4 +1,3 @@
-
 "use client"
 
 import CreditCalculator from '@/components/calculator/CreditCalculator';
@@ -49,15 +48,13 @@ export default function Home() {
               label: 'Citas Hoy', 
               value: stats.todayCount.toString(), 
               icon: CalendarDays, 
-              color: 'text-primary',
-              subText: 'Gestión diaria'
+              color: 'text-primary'
             },
             { 
               label: 'Citas Pendientes', 
               value: stats.pendingCount.toString(), 
               icon: Wallet, 
-              color: 'text-primary',
-              subText: 'Por realizar'
+              color: 'text-primary'
             },
             { 
               label: 'Prospectos (Mes)', 
@@ -68,7 +65,7 @@ export default function Home() {
               subLabel: 'Mes pasado'
             },
             { 
-              label: 'Ventas (Mes)', 
+              label: 'Cierres', 
               value: stats.currentMonthSales.toString(), 
               icon: CheckCircle2, 
               color: 'text-green-400',
@@ -92,7 +89,6 @@ export default function Home() {
                       </div>
                     )}
                   </div>
-                  {stat.subText && <p className="text-[10px] text-muted-foreground italic leading-none">{stat.subText}</p>}
                 </div>
               </CardContent>
             </Card>
@@ -108,10 +104,10 @@ export default function Home() {
                    💡 Notas
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Sistema de gestión especializado. Los datos se sincronizan automáticamente en tiempo real.
+                  Primera version funcional, capaz de calcular mensualidades y enganche, y de gestionar citas ordenadamente, guardando los datos DENTRO DEL NAVEGADOR (proximamente a una base de datos).
                   <br />
                   <br />
-                  Factor mensualidad: 0.6982% del costo total del inmueble.
+                  Esta beta logra cumplir funciones utiles y esenciales para prospeccion, y busco en las siguientes semanas volver mas eficiente la prospeccion, gestion de citas, gestion de ventas y comisiones individuales, etc.
                 </p>
               </div>
             </div>

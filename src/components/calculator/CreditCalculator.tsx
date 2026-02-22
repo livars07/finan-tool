@@ -75,7 +75,7 @@ export default function CreditCalculator() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Calculator className="text-primary w-6 h-6" />
-            <CardTitle className="text-xl font-headline font-semibold">Calculadora Pro</CardTitle>
+            <CardTitle className="text-xl font-headline font-semibold">Calculadora rapida</CardTitle>
           </div>
           <TooltipProvider>
             <Tooltip>
@@ -94,7 +94,7 @@ export default function CreditCalculator() {
           </TooltipProvider>
         </div>
         <CardDescription className="text-muted-foreground">
-          Crédito Inmobiliario - Plazo 192 Meses
+          Plazo 192 meses - Plan Tradicional 12pp
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-6 space-y-6">
