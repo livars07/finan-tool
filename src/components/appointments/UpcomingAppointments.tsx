@@ -1,23 +1,13 @@
 "use client"
 
 import React, { useState } from 'react';
-import { Appointment, AppointmentType } from '@/hooks/use-appointments';
+import { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Calendar, Info } from "lucide-react";
-import { isToday, parseISO } from 'date-fns';
+import { Clock, Calendar, Info, CheckCircle2 } from "lucide-react";
+import { parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import {
   Dialog,
   DialogContent,
@@ -25,30 +15,23 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
 
 interface Props {
   appointments: Appointment[];
   formatDate: (date: string) => string;
-  deleteAppointment: (id: string) => void;
-  editAppointment: (id: string, updatedData: Partial<Appointment>) => void;
+  onSelect: (app: Appointment) => void;
+  updateStatus: (id: string, status: AppointmentStatus) => void;
 }
 
-export default function UpcomingAppointments({ appointments, formatDate, deleteAppointment, editAppointment }: Props) {
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [editApp, setEditApp] = useState<Appointment | null>(null);
-  const { toast } = useToast();
+export default function UpcomingAppointments({ appointments, formatDate, onSelect, updateStatus }: Props) {
+  const [finId, setFinId] = useState<string | null>(null);
+  const [status, setStatus] = useState<AppointmentStatus>('Cita Exitosa');
 
-  const handleEditSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editApp) {
-      editAppointment(editApp.id, editApp);
-      setEditApp(null);
-      toast({ title: "Cita Actualizada", description: "Los cambios han sido guardados." });
-    }
+  const isActuallyToday = (dateStr: string) => {
+    const d = parseISO(dateStr);
+    const today = new Date();
+    return d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
   };
 
   if (appointments.length === 0) {
@@ -65,7 +48,7 @@ export default function UpcomingAppointments({ appointments, formatDate, deleteA
       <Table>
         <TableHeader className="bg-muted/50">
           <TableRow>
-            <TableHead>Nombre</TableHead>
+            <TableHead>Nombre / Teléfono</TableHead>
             <TableHead>Tipo</TableHead>
             <TableHead>Fecha</TableHead>
             <TableHead>Hora</TableHead>
@@ -74,22 +57,26 @@ export default function UpcomingAppointments({ appointments, formatDate, deleteA
         </TableHeader>
         <TableBody>
           {appointments.map((app) => {
-            const isAppToday = isToday(parseISO(app.date));
+            const appToday = isActuallyToday(app.date);
             return (
               <TableRow 
                 key={app.id} 
+                onClick={() => onSelect(app)}
                 className={cn(
-                  "hover:bg-primary/5 transition-colors group relative",
-                  isAppToday && "bg-primary/10 border-l-4 border-l-primary"
+                  "hover:bg-primary/5 transition-colors cursor-pointer group relative",
+                  appToday && "bg-primary/10 border-l-4 border-l-primary"
                 )}
               >
-                <TableCell className="font-medium">
-                  {app.name}
-                  {isAppToday && (
-                    <span className="ml-2 inline-flex items-center rounded-full bg-primary/20 px-1.5 py-0.5 text-[10px] font-bold text-primary uppercase animate-pulse">
-                      Hoy
-                    </span>
-                  )}
+                <TableCell>
+                  <div className="font-medium text-sm">
+                    {app.name}
+                    {appToday && (
+                      <span className="ml-2 inline-flex items-center rounded-full bg-primary/20 px-1.5 py-0.5 text-[10px] font-bold text-primary uppercase animate-pulse">
+                        Hoy
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{app.phone}</div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-1 text-xs font-semibold text-muted-foreground">
@@ -97,7 +84,7 @@ export default function UpcomingAppointments({ appointments, formatDate, deleteA
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={isAppToday ? "default" : "secondary"} className="font-normal">
+                  <Badge variant={appToday ? "default" : "secondary"} className="font-normal">
                     {formatDate(app.date)}
                   </Badge>
                 </TableCell>
@@ -106,21 +93,18 @@ export default function UpcomingAppointments({ appointments, formatDate, deleteA
                     <Clock className="w-3 h-3" /> {app.time}
                   </div>
                 </TableCell>
-                <TableCell className="p-0">
-                  <div className="flex flex-col gap-1.5 absolute right-2 top-2 z-20">
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  {appToday && (
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="w-3 h-3 rounded-full bg-destructive hover:bg-destructive/80 p-0 border-none shadow-none"
-                      onClick={() => setDeleteId(app.id)}
-                    />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="w-3 h-3 rounded-full bg-accent hover:bg-accent/80 p-0 border-none shadow-none"
-                      onClick={() => setEditApp(app)}
-                    />
-                  </div>
+                      className="h-8 w-8 text-primary hover:bg-primary/20"
+                      onClick={() => setFinId(app.id)}
+                      title="Finalizar cita"
+                    >
+                      <CheckCircle2 className="h-5 w-5" />
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             );
@@ -128,90 +112,34 @@ export default function UpcomingAppointments({ appointments, formatDate, deleteA
         </TableBody>
       </Table>
 
-      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar esta cita?</AlertDialogTitle>
-            <AlertDialogDescription>Esta acción no se puede deshacer.</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction 
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() => {
-                if (deleteId) {
-                  deleteAppointment(deleteId);
-                  setDeleteId(null);
-                  toast({ title: "Eliminado", description: "La cita ha sido removida." });
-                }
-              }}
-            >
-              Eliminar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <Dialog open={!!editApp} onOpenChange={() => setEditApp(null)}>
-        <DialogContent className="sm:max-w-[425px]">
+      <Dialog open={!!finId} onOpenChange={() => setFinId(null)}>
+        <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle>Editar Cita</DialogTitle>
+            <DialogTitle>Finalizar cita de hoy</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleEditSubmit} className="space-y-4 pt-4">
-            <div className="space-y-2">
-              <Label>Nombre del Cliente</Label>
-              <Input 
-                value={editApp?.name || ''} 
-                onChange={e => setEditApp(prev => prev ? {...prev, name: e.target.value} : null)} 
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Teléfono</Label>
-              <Input 
-                value={editApp?.phone || ''} 
-                onChange={e => setEditApp(prev => prev ? {...prev, phone: e.target.value} : null)} 
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Fecha</Label>
-                <Input 
-                  type="date"
-                  value={editApp?.date ? parseISO(editApp.date).toISOString().split('T')[0] : ''} 
-                  onChange={e => setEditApp(prev => prev ? {...prev, date: new Date(e.target.value).toISOString()} : null)} 
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Hora</Label>
-                <Input 
-                  type="time"
-                  value={editApp?.time || ''} 
-                  onChange={e => setEditApp(prev => prev ? {...prev, time: e.target.value} : null)} 
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Tipo de Cita</Label>
-              <Select 
-                value={editApp?.type} 
-                onValueChange={v => setEditApp(prev => prev ? {...prev, type: v as AppointmentType} : null)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1ra consulta">1ra consulta</SelectItem>
-                  <SelectItem value="2da consulta">2da consulta</SelectItem>
-                  <SelectItem value="cierre">Cierre</SelectItem>
-                  <SelectItem value="asesoría post-venta">Asesoría post-venta</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setEditApp(null)}>Cancelar</Button>
-              <Button type="submit">Guardar Cambios</Button>
-            </DialogFooter>
-          </form>
+          <div className="py-4 space-y-4">
+            <p className="text-sm text-muted-foreground">Selecciona el resultado de la reunión para moverla al historial.</p>
+            <Select value={status} onValueChange={(v) => setStatus(v as AppointmentStatus)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Resultado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Cita Exitosa">Cita Exitosa</SelectItem>
+                <SelectItem value="Venta">Venta</SelectItem>
+                <SelectItem value="Reagendó">Reagendó</SelectItem>
+                <SelectItem value="Canceló">Canceló</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setFinId(null)}>Cancelar</Button>
+            <Button onClick={() => {
+              if (finId) {
+                updateStatus(finId, status);
+                setFinId(null);
+              }
+            }}>Confirmar y Archivar</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

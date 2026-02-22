@@ -39,7 +39,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
     setTime('');
     setType('1ra consulta');
     toast({
-      title: "Cita Agregada",
+      title: "Cita agregada",
       description: `Cita de ${type} para ${name} registrada.`,
     });
   };
@@ -49,7 +49,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
       <CardHeader className="py-4 border-b border-border/50">
         <div className="flex items-center gap-2">
           <UserPlus className="text-accent w-5 h-5" />
-          <CardTitle className="text-lg font-headline">Nueva Cita Rápida</CardTitle>
+          <CardTitle className="text-lg font-headline">Nueva cita rápida</CardTitle>
         </div>
       </CardHeader>
       <CardContent className="pt-6">
@@ -80,7 +80,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
                 <SelectItem value="1ra consulta">1ra consulta</SelectItem>
                 <SelectItem value="2da consulta">2da consulta</SelectItem>
                 <SelectItem value="cierre">Cierre</SelectItem>
-                <SelectItem value="asesoría post-venta">Asesoría post-venta</SelectItem>
+                <SelectItem value="seguimiento">Seguimiento</SelectItem>
               </SelectContent>
             </Select>
           </div>

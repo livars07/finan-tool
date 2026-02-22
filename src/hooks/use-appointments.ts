@@ -5,7 +5,7 @@ import { isAfter, isBefore, isToday, isTomorrow, isThisWeek, format, parseISO, s
 import { es } from 'date-fns/locale';
 
 export type AppointmentStatus = 'Reagendó' | 'Canceló' | 'Venta' | 'Cita Exitosa';
-export type AppointmentType = '1ra consulta' | '2da consulta' | 'cierre' | 'asesoría post-venta';
+export type AppointmentType = '1ra consulta' | '2da consulta' | 'cierre' | 'seguimiento';
 
 export interface Appointment {
   id: string;
@@ -15,17 +15,17 @@ export interface Appointment {
   time: string;
   type: AppointmentType;
   status?: AppointmentStatus;
+  notes?: string;
 }
 
-const STORAGE_KEY = 'olivares_fin_data_v2';
+const STORAGE_KEY = 'olivares_fin_data_v3';
 
 const generateSeedData = (): Appointment[] => {
   const data: Appointment[] = [];
-  const types: AppointmentType[] = ['1ra consulta', '2da consulta', 'cierre', 'asesoría post-venta'];
+  const types: AppointmentType[] = ['1ra consulta', '2da consulta', 'cierre', 'seguimiento'];
   const statuses: AppointmentStatus[] = ['Venta', 'Canceló', 'Reagendó', 'Cita Exitosa'];
   const names = ['Juan Pérez', 'María García', 'Carlos López', 'Ana Martínez', 'Luis Rodríguez', 'Elena Sánchez', 'Roberto Díaz', 'Sofía Castro'];
 
-  // Generar 50 citas pasadas distribuidas en los últimos 60 días para tener datos de dos meses
   for (let i = 0; i < 50; i++) {
     const randomName = names[Math.floor(Math.random() * names.length)];
     const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
@@ -39,11 +39,11 @@ const generateSeedData = (): Appointment[] => {
       date: pastDate.toISOString(),
       time: `${Math.floor(9 + Math.random() * 8)}:00`,
       type: randomType,
-      status: randomStatus
+      status: randomStatus,
+      notes: "Cliente interesado en crédito tradicional."
     });
   }
 
-  // Generar 10 citas futuras
   for (let i = 0; i < 10; i++) {
     const randomName = names[Math.floor(Math.random() * names.length)];
     const randomType = types[Math.floor(Math.random() * types.length)];
@@ -58,7 +58,8 @@ const generateSeedData = (): Appointment[] => {
       phone: `55 ${Math.floor(10000000 + Math.random() * 90000000)}`,
       date: futureDate.toISOString(),
       time: `${Math.floor(9 + Math.random() * 8)}:30`,
-      type: randomType
+      type: randomType,
+      notes: ""
     });
   }
 
@@ -112,27 +113,34 @@ export function useAppointments() {
   const upcoming = appointments
     .filter(app => {
       const appDate = startOfDay(parseISO(app.date));
-      return isAfter(appDate, startOfToday) || isToday(appDate);
+      // Una cita es próxima si es futura o es hoy Y no tiene estado
+      return (isAfter(appDate, startOfToday) || (isToday(appDate) && !app.status)) && !app.status;
     })
     .sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime());
 
   const past = appointments
     .filter(app => {
       const appDate = startOfDay(parseISO(app.date));
-      return isBefore(appDate, startOfToday) && !isToday(appDate);
+      // Una cita es pasada si su fecha ya pasó O si ya tiene un estado asignado
+      return isBefore(appDate, startOfToday) || app.status;
     })
     .sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime());
 
   const formatFriendlyDate = (dateStr: string) => {
     const d = parseISO(dateStr);
-    if (isToday(d)) return "Hoy";
+    const today = new Date();
+    if (d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear()) return "Hoy";
     if (isTomorrow(d)) return "Mañana";
     if (isThisWeek(d)) return format(d, 'EEEE', { locale: es });
     return format(d, 'dd/MM/yyyy');
   };
 
   const stats = {
-    todayCount: appointments.filter(app => isToday(parseISO(app.date))).length,
+    todayCount: appointments.filter(app => {
+      const d = parseISO(app.date);
+      const today = new Date();
+      return d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
+    }).length,
     pendingCount: upcoming.length,
     
     currentMonthProspects: appointments.filter(app => isSameMonth(parseISO(app.date), now)).length,
