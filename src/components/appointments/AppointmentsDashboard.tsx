@@ -33,7 +33,7 @@ export default function AppointmentsDashboard({
   formatFriendlyDate
 }: AppointmentsDashboardProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedApp, setSelectedApp] = useState<Appointment | null>(null);
+  const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
 
   const filterAppointments = (list: Appointment[]) => {
     if (!searchTerm) return list;
@@ -48,6 +48,10 @@ export default function AppointmentsDashboard({
 
   const filteredUpcoming = useMemo(() => filterAppointments(upcoming), [upcoming, searchTerm]);
   const filteredPast = useMemo(() => filterAppointments(past), [past, searchTerm]);
+
+  const selectedApp = useMemo(() => {
+    return appointments.find(app => app.id === selectedAppId) || null;
+  }, [appointments, selectedAppId]);
 
   return (
     <div className="space-y-6">
@@ -83,14 +87,14 @@ export default function AppointmentsDashboard({
                 <UpcomingAppointments 
                   appointments={filteredUpcoming} 
                   formatDate={formatFriendlyDate}
-                  onSelect={setSelectedApp}
+                  onSelect={(app) => setSelectedAppId(app.id)}
                   updateStatus={updateStatus}
                 />
               </TabsContent>
               <TabsContent value="past">
                 <PastAppointments 
                   appointments={filteredPast} 
-                  onSelect={setSelectedApp}
+                  onSelect={(app) => setSelectedAppId(app.id)}
                 />
               </TabsContent>
             </Tabs>
@@ -100,8 +104,8 @@ export default function AppointmentsDashboard({
 
       <AppointmentDetailsDialog 
         appointment={selectedApp} 
-        open={!!selectedApp} 
-        onOpenChange={(open) => !open && setSelectedApp(null)}
+        open={!!selectedAppId} 
+        onOpenChange={(open) => !open && setSelectedAppId(null)}
         onDelete={deleteAppointment}
         onEdit={editAppointment}
       />
