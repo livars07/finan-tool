@@ -104,10 +104,10 @@ export default function Home() {
                    💡 Notas
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Primera version funcional, capaz de calcular mensualidades y enganche, y de gestionar citas ordenadamente, guardando los datos DENTRO DEL NAVEGADOR (proximamente a una base de datos).
+                  Primera versión funcional, capaz de calcular mensualidades y enganche, y de gestionar citas ordenadamente, guardando los datos DENTRO DEL NAVEGADOR (próximamente a una base de datos).
                   <br />
                   <br />
-                  Esta beta logra cumplir funciones utiles y esenciales para prospeccion, y busco en las siguientes semanas volver mas eficiente la prospeccion, gestion de citas, gestion de ventas y comisiones individuales, etc.
+                  Esta beta logra cumplir funciones útiles y esenciales para prospección, y busco en las siguientes semanas volver más eficiente la prospección, gestión de citas, gestión de ventas y comisiones individuales, etc.
                 </p>
               </div>
             </div>

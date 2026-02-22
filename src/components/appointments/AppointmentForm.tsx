@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -20,7 +19,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
   const [phone, setPhone] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
-  const [type, setType] = useState<AppointmentType>('1er consulta');
+  const [type, setType] = useState<AppointmentType>('1ra consulta');
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -38,7 +37,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
     setPhone('');
     setDate('');
     setTime('');
-    setType('1er consulta');
+    setType('1ra consulta');
     toast({
       title: "Cita Agregada",
       description: `Cita de ${type} para ${name} registrada.`,
@@ -78,10 +77,10 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1er consulta">1er consulta</SelectItem>
+                <SelectItem value="1ra consulta">1ra consulta</SelectItem>
                 <SelectItem value="2da consulta">2da consulta</SelectItem>
-                <SelectItem value="cierre">cierre</SelectItem>
-                <SelectItem value="asesoria post-venta">asesoría post-venta</SelectItem>
+                <SelectItem value="cierre">Cierre</SelectItem>
+                <SelectItem value="asesoría post-venta">Asesoría post-venta</SelectItem>
               </SelectContent>
             </Select>
           </div>

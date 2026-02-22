@@ -66,7 +66,6 @@ export default function CreditCalculator() {
   const currentDownPayment = currentP * FACTOR_ENGANCHE;
   const currentMonthly = parseNumber(monthlyPayment);
   
-  // New functional addition: Min Income Required (Assuming Monthly * 2.85 is ~35% income)
   const minIncomeRequired = currentMonthly / INCOME_RATIO;
 
   return (
@@ -75,7 +74,7 @@ export default function CreditCalculator() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Calculator className="text-primary w-6 h-6" />
-            <CardTitle className="text-xl font-headline font-semibold">Calculadora rapida</CardTitle>
+            <CardTitle className="text-xl font-headline font-semibold">Calculadora rápida</CardTitle>
           </div>
           <TooltipProvider>
             <Tooltip>
@@ -129,7 +128,6 @@ export default function CreditCalculator() {
           </div>
         </div>
 
-        {/* Breakdown Visualization */}
         <div className="space-y-3 p-4 rounded-xl bg-muted/40 border border-border/50">
           <div className="flex justify-between items-end mb-1">
             <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest text-primary">Enganche: 3%</span>
@@ -142,7 +140,6 @@ export default function CreditCalculator() {
           </div>
         </div>
 
-        {/* New Functional Addition: Income Qualifier Card */}
         <div className="p-4 rounded-xl bg-accent/10 border border-accent/20">
           <div className="flex items-center gap-3">
             <div className="bg-accent/20 p-2 rounded-lg">

@@ -200,10 +200,10 @@ export default function UpcomingAppointments({ appointments, formatDate, deleteA
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1er consulta">1er consulta</SelectItem>
+                  <SelectItem value="1ra consulta">1ra consulta</SelectItem>
                   <SelectItem value="2da consulta">2da consulta</SelectItem>
-                  <SelectItem value="cierre">cierre</SelectItem>
-                  <SelectItem value="asesoria post-venta">asesoría post-venta</SelectItem>
+                  <SelectItem value="cierre">Cierre</SelectItem>
+                  <SelectItem value="asesoría post-venta">Asesoría post-venta</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -1,12 +1,11 @@
-
 "use client"
 
 import { useState, useEffect } from 'react';
 import { isAfter, isBefore, isToday, isTomorrow, isThisWeek, format, parseISO, startOfDay, subDays, addDays, isSameMonth, subMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-export type AppointmentStatus = 'Reagendó' | 'Canceló' | 'Venta' | 'Cita Exitosa' | 'Cita Exitosa y reagendó';
-export type AppointmentType = '1er consulta' | '2da consulta' | 'cierre' | 'asesoria post-venta';
+export type AppointmentStatus = 'Reagendó' | 'Canceló' | 'Venta' | 'Cita Exitosa';
+export type AppointmentType = '1ra consulta' | '2da consulta' | 'cierre' | 'asesoría post-venta';
 
 export interface Appointment {
   id: string;
@@ -22,9 +21,9 @@ const STORAGE_KEY = 'olivares_fin_data_v2';
 
 const generateSeedData = (): Appointment[] => {
   const data: Appointment[] = [];
-  const types: AppointmentType[] = ['1er consulta', '2da consulta', 'cierre', 'asesoria post-venta'];
+  const types: AppointmentType[] = ['1ra consulta', '2da consulta', 'cierre', 'asesoría post-venta'];
   const statuses: AppointmentStatus[] = ['Venta', 'Canceló', 'Reagendó', 'Cita Exitosa'];
-  const names = ['Juan Perez', 'Maria Garcia', 'Carlos Lopez', 'Ana Martinez', 'Luis Rodriguez', 'Elena Sanchez', 'Roberto Diaz', 'Sofia Castro'];
+  const names = ['Juan Pérez', 'María García', 'Carlos López', 'Ana Martínez', 'Luis Rodríguez', 'Elena Sánchez', 'Roberto Díaz', 'Sofía Castro'];
 
   // Generar 50 citas pasadas distribuidas en los últimos 60 días para tener datos de dos meses
   for (let i = 0; i < 50; i++) {
@@ -136,11 +135,9 @@ export function useAppointments() {
     todayCount: appointments.filter(app => isToday(parseISO(app.date))).length,
     pendingCount: upcoming.length,
     
-    // Prospectos (Citas totales en el mes)
     currentMonthProspects: appointments.filter(app => isSameMonth(parseISO(app.date), now)).length,
     lastMonthProspects: appointments.filter(app => isSameMonth(parseISO(app.date), lastMonth)).length,
 
-    // Ventas (Estado 'Venta' en el mes)
     currentMonthSales: appointments.filter(app => app.status === 'Venta' && isSameMonth(parseISO(app.date), now)).length,
     lastMonthSales: appointments.filter(app => app.status === 'Venta' && isSameMonth(parseISO(app.date), lastMonth)).length,
   };
