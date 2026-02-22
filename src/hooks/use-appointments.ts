@@ -24,6 +24,7 @@ export interface Appointment {
   type: AppointmentType;
   status?: AppointmentStatus;
   notes?: string;
+  isConfirmed?: boolean;
 }
 
 const STORAGE_KEY = 'olivares_fin_data_v4';
@@ -48,7 +49,8 @@ const generateSeedData = (): Appointment[] => {
       time: `${Math.floor(9 + Math.random() * 8).toString().padStart(2, '0')}:00`,
       type: randomType,
       status: randomStatus,
-      notes: "Cliente interesado en crédito tradicional."
+      notes: "Cliente interesado en crédito tradicional.",
+      isConfirmed: true
     });
   }
 
@@ -112,6 +114,15 @@ export function useAppointments() {
 
   const editAppointment = (id: string, updatedData: Partial<Appointment>) => {
     setAppointments(prev => prev.map(app => app.id === id ? { ...app, ...updatedData } : app));
+  };
+
+  const toggleConfirmation = (id: string) => {
+    setAppointments(prev => prev.map(app => app.id === id ? { ...app, isConfirmed: true } : app));
+  };
+
+  const resetData = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setAppointments(generateSeedData());
   };
 
   const now = new Date();
@@ -204,6 +215,8 @@ export function useAppointments() {
     updateStatus, 
     deleteAppointment,
     editAppointment,
+    toggleConfirmation,
+    resetData,
     formatFriendlyDate,
     format12hTime,
     stats, 

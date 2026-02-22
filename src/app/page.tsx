@@ -1,16 +1,49 @@
 "use client"
 
+import React, { useState } from 'react';
 import CreditCalculator from '@/components/calculator/CreditCalculator';
 import AppointmentsDashboard from '@/components/appointments/AppointmentsDashboard';
 import { Card, CardContent } from '@/components/ui/card';
-import { LayoutDashboard, Wallet, CalendarDays, Users, CheckCircle2, ShieldCheck, TrendingUp } from 'lucide-react';
+import { 
+  LayoutDashboard, 
+  Wallet, 
+  CalendarDays, 
+  Users, 
+  CheckCircle2, 
+  ShieldCheck, 
+  TrendingUp, 
+  RotateCcw 
+} from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
+import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
   const appointmentState = useAppointments();
-  const { stats, isLoaded } = appointmentState;
+  const { stats, isLoaded, resetData } = appointmentState;
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const { toast } = useToast();
 
   if (!isLoaded) return null;
+
+  const handleReset = () => {
+    resetData();
+    setShowResetConfirm(false);
+    toast({
+      title: "Sistema Reiniciado",
+      description: "Todos los datos locales han sido borrados y restaurados con datos de prueba.",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -75,7 +108,7 @@ export default function Home() {
           ].map((stat, i) => (
             <Card key={i} className="bg-card/40 border-border/50 backdrop-blur-sm hover:border-primary/30 transition-all group">
               <CardContent className="p-4 flex items-center gap-3">
-                <div className={`p-2 rounded-full bg-muted/50 ${stat.color} group-hover:scale-110 transition-transform`}>
+                <div className={`p-2 rounded-full bg-muted/50 ${stat.color}`}>
                   <stat.icon className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -133,9 +166,37 @@ export default function Home() {
           <p>© 2026 Finanto - Gestión Hipotecaria</p>
           <div className="flex items-center gap-6">
             <span className="hover:text-primary transition-colors cursor-pointer">664 694 7418</span>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 text-[10px] font-bold uppercase text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              onClick={() => setShowResetConfirm(true)}
+            >
+              <RotateCcw className="w-3 h-3 mr-1" /> Reiniciar sistema
+            </Button>
           </div>
         </div>
       </footer>
+
+      <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Confirmar reinicio total?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción borrará todas tus citas, notas y configuraciones guardadas en este navegador. Se restaurarán los datos de prueba iniciales. Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleReset}
+              className="bg-destructive text-white hover:bg-destructive/90"
+            >
+              Sí, reiniciar todo
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

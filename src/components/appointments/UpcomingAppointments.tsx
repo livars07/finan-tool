@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Calendar, Info, CheckCircle2 } from "lucide-react";
+import { Clock, Calendar, Info, CheckCircle2, AlertCircle, CheckCircle } from "lucide-react";
 import { parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAppointments } from '@/hooks/use-appointments';
 
@@ -28,8 +39,9 @@ interface Props {
 
 export default function UpcomingAppointments({ appointments, formatDate, onSelect, updateStatus, highlightedId }: Props) {
   const [finId, setFinId] = useState<string | null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
   const [status, setStatus] = useState<AppointmentStatus>('Asistencia');
-  const { format12hTime } = useAppointments();
+  const { format12hTime, toggleConfirmation } = useAppointments();
 
   const isActuallyToday = (dateStr: string) => {
     const d = parseISO(dateStr);
@@ -47,6 +59,13 @@ export default function UpcomingAppointments({ appointments, formatDate, onSelec
       </div>
     );
   }
+
+  const handleConfirmAction = () => {
+    if (confirmId) {
+      toggleConfirmation(confirmId);
+      setConfirmId(null);
+    }
+  };
 
   return (
     <div className="border rounded-md overflow-hidden relative">
@@ -92,9 +111,29 @@ export default function UpcomingAppointments({ appointments, formatDate, onSelec
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={appToday ? "default" : "secondary"} className="font-normal">
-                    {formatDate(app.date)}
-                  </Badge>
+                  <div className="flex flex-col gap-1">
+                    <Badge variant={appToday ? "default" : "secondary"} className="font-normal w-fit">
+                      {formatDate(app.date)}
+                    </Badge>
+                    {appToday && (
+                      <div onClick={(e) => e.stopPropagation()}>
+                        {app.isConfirmed ? (
+                          <div className="flex items-center gap-1 text-[10px] font-bold text-green-400 uppercase tracking-tighter">
+                            <CheckCircle className="w-3 h-3" /> Confirmada
+                          </div>
+                        ) : (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-6 px-2 text-[9px] font-bold uppercase border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10"
+                            onClick={() => setConfirmId(app.id)}
+                          >
+                            <AlertCircle className="w-2.5 h-2.5 mr-1" /> Sin confirmar
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-1 text-accent font-bold">
@@ -152,6 +191,26 @@ export default function UpcomingAppointments({ appointments, formatDate, onSelec
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!confirmId} onOpenChange={(open) => !open && setConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Confirmar asistencia del prospecto?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Marcarás esta cita como confirmada para el día de hoy. Esto ayuda a llevar un mejor control de tu agenda diaria.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Volver</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmAction}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              Sí, confirmar cita
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
