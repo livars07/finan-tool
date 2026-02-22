@@ -1,11 +1,10 @@
-
 "use client"
 
 import React, { useState } from 'react';
 import { Appointment, AppointmentType } from '@/hooks/use-appointments';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Calendar, Info, Trash2, Pencil } from "lucide-react";
+import { Clock, Calendar, Info } from "lucide-react";
 import { isToday, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -80,7 +79,7 @@ export default function UpcomingAppointments({ appointments, formatDate }: Props
               <TableRow 
                 key={app.id} 
                 className={cn(
-                  "hover:bg-primary/5 transition-colors group",
+                  "hover:bg-primary/5 transition-colors group relative",
                   isAppToday && "bg-primary/10 border-l-4 border-l-primary"
                 )}
               >
@@ -107,24 +106,20 @@ export default function UpcomingAppointments({ appointments, formatDate }: Props
                     <Clock className="w-3 h-3" /> {app.time}
                   </div>
                 </TableCell>
-                <TableCell className="relative">
-                  <div className="flex flex-col gap-1 absolute right-2 top-2 z-20">
+                <TableCell className="p-0">
+                  <div className="flex flex-col gap-1.5 absolute right-2 top-2 z-20">
                     <Button
-                      variant="destructive"
+                      variant="ghost"
                       size="icon"
-                      className="w-6 h-6 rounded-sm"
+                      className="w-3 h-3 rounded-full bg-destructive hover:bg-destructive/80 p-0 border-none shadow-none"
                       onClick={() => setDeleteId(app.id)}
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
+                    />
                     <Button
-                      variant="secondary"
+                      variant="ghost"
                       size="icon"
-                      className="w-6 h-6 rounded-sm bg-muted text-muted-foreground hover:bg-muted/80"
+                      className="w-3 h-3 rounded-full bg-accent hover:bg-accent/80 p-0 border-none shadow-none"
                       onClick={() => setEditApp(app)}
-                    >
-                      <Pencil className="w-3 h-3" />
-                    </Button>
+                    />
                   </div>
                 </TableCell>
               </TableRow>
@@ -133,7 +128,6 @@ export default function UpcomingAppointments({ appointments, formatDate }: Props
         </TableBody>
       </Table>
 
-      {/* Alertas y Diálogos */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
