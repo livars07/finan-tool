@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef } from "react"
 import { useToast } from "@/hooks/use-toast"
 import {
   Toast,
@@ -12,6 +13,19 @@ import {
 
 export function Toaster() {
   const { toasts } = useToast()
+  const lastToastCount = useRef(toasts.length)
+
+  useEffect(() => {
+    // Play sound when a new toast is added
+    if (toasts.length > lastToastCount.current) {
+      const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3")
+      audio.volume = 0.4
+      audio.play().catch(() => {
+        // Ignore browser auto-play prevention errors
+      })
+    }
+    lastToastCount.current = toasts.length
+  }, [toasts])
 
   return (
     <ToastProvider>
