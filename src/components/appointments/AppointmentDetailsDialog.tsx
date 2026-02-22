@@ -66,19 +66,28 @@ export default function AppointmentDetailsDialog({
   };
 
   const handleDelete = () => {
-    // Cerramos primero el AlertDialog para evitar conflictos de overlays bloqueados
+    // 1. Ocultamos la alerta
     setShowDeleteConfirm(false);
     
-    // Esperamos un instante mínimo para que la transición de salida inicie 
-    // y no se quede el scroll lock o el pointer-events atrapado en el body
+    // 2. Cerramos el diálogo principal inmediatamente para liberar el estado visual
+    onOpenChange(false);
+    
+    // 3. Ejecutamos la eliminación con un delay para permitir que las animaciones de Radix terminen
+    // y no se bloquee el scroll/pointer-events del body.
     setTimeout(() => {
       onDelete(appointment.id);
-      onOpenChange(false);
+      
       toast({ 
         title: "Registro eliminado", 
         description: `Se ha borrado el historial de ${appointment.name}.` 
       });
-    }, 100);
+
+      // Fallback de seguridad para asegurar que el DOM siempre sea interactivo
+      if (typeof document !== 'undefined') {
+        document.body.style.pointerEvents = 'auto';
+        document.body.style.overflow = 'auto';
+      }
+    }, 150);
   };
 
   const copyToWhatsAppFormat = () => {
@@ -107,41 +116,40 @@ Número: ${appointment.phone}`;
     <>
       <Dialog open={open} onOpenChange={(o) => { if(!o) setIsEditing(false); onOpenChange(o); }}>
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border custom-scrollbar p-0">
-          <DialogHeader className="px-6 py-4 border-b border-border/40 relative">
-            <div className="flex items-center justify-between h-7">
-              <div className="flex items-center gap-3">
-                <DialogTitle className="text-xl font-headline font-bold text-foreground leading-none">
-                  Detalles
-                </DialogTitle>
-                
-                <TooltipProvider>
-                  <Tooltip delayDuration={300}>
-                    <TooltipTrigger asChild>
-                      <div className="p-1 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground cursor-default">
-                        <Info className="h-4 w-4" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="bg-popover border-border shadow-xl">
-                      <p className="text-[10px] font-mono uppercase tracking-widest">ID: {appointment.id}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-
-              {!isEditing && (
-                <div className="flex items-center gap-3 mr-8">
-                  <Button 
-                    onClick={copyToWhatsAppFormat}
-                    variant="outline" 
-                    size="sm"
-                    className="h-7 px-3 text-[10px] border-green-500/30 text-green-500 hover:bg-green-500/10 font-bold uppercase tracking-tight flex items-center justify-center"
-                  >
-                    <MessageCircle className="w-3 h-3 mr-1.5" />
-                    Copiar datos
-                  </Button>
-                </div>
-              )}
+          <DialogHeader className="px-6 py-4 border-b border-border/40 flex flex-row items-center justify-between">
+            <div className="flex items-center gap-2">
+              <DialogTitle className="text-xl font-headline font-bold text-foreground leading-none">
+                Detalles
+              </DialogTitle>
+              
+              <TooltipProvider>
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <div className="p-1 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground cursor-default flex items-center justify-center">
+                      <Info className="h-4 w-4" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="bg-popover border-border shadow-xl">
+                    <p className="text-[10px] font-mono uppercase tracking-widest">ID: {appointment.id}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
+
+            {!isEditing && (
+              <div className="flex items-center gap-3 pr-8">
+                <Button 
+                  onClick={copyToWhatsAppFormat}
+                  variant="outline" 
+                  size="sm"
+                  className="h-7 px-3 text-[10px] border-green-500/30 text-green-500 hover:bg-green-500/10 font-bold uppercase tracking-tight flex items-center justify-center"
+                >
+                  <MessageCircle className="w-3 h-3 mr-1.5" />
+                  Copiar datos
+                </Button>
+              </div>
+            )}
+            
             <DialogDescription className="sr-only">
               Información detallada y gestión del prospecto.
             </DialogDescription>
