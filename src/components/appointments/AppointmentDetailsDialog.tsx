@@ -98,10 +98,10 @@ Número: ${appointment.phone}`;
     <>
       <Dialog open={open} onOpenChange={(o) => { if(!o) setIsEditing(false); onOpenChange(o); }}>
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border custom-scrollbar p-0">
-          <DialogHeader className="px-6 pt-6 pb-4 border-b border-border/40 relative">
+          <DialogHeader className="px-6 py-4 border-b border-border/40 relative">
             <div className="flex items-center justify-between h-7">
               <div className="flex items-center gap-3">
-                <DialogTitle className="text-xl font-headline font-bold text-foreground">
+                <DialogTitle className="text-xl font-headline font-bold text-foreground leading-none">
                   Detalles
                 </DialogTitle>
                 
@@ -120,14 +120,14 @@ Número: ${appointment.phone}`;
               </div>
 
               {!isEditing && (
-                <div className="flex items-center gap-3 mr-6">
+                <div className="flex items-center gap-3 mr-8">
                   <Button 
                     onClick={copyToWhatsAppFormat}
                     variant="outline" 
                     size="sm"
-                    className="h-7 px-2 text-[10px] border-green-500/30 text-green-500 hover:bg-green-500/10 font-bold uppercase tracking-tight"
+                    className="h-7 px-3 text-[10px] border-green-500/30 text-green-500 hover:bg-green-500/10 font-bold uppercase tracking-tight flex items-center justify-center"
                   >
-                    <MessageCircle className="w-3 h-3 mr-1" />
+                    <MessageCircle className="w-3 h-3 mr-1.5" />
                     Copiar datos
                   </Button>
                 </div>
