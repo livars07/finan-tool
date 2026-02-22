@@ -15,7 +15,7 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter, 
   AlertDialogHeader, AlertDialogTitle 
 } from "@/components/ui/alert-dialog";
-import { Appointment, AppointmentStatus, AppointmentType } from '@/hooks/use-appointments';
+import { Appointment, AppointmentStatus, AppointmentType, useAppointments } from '@/hooks/use-appointments';
 import { User, Phone, Calendar, Clock, BookOpen, Trash2, Edit2, Save } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format } from 'date-fns';
@@ -33,6 +33,7 @@ export default function AppointmentDetailsDialog({ appointment, open, onOpenChan
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [editData, setEditData] = useState<Partial<Appointment>>({});
   const { toast } = useToast();
+  const { formatFriendlyDate, format12hTime } = useAppointments();
 
   useEffect(() => {
     if (appointment) {
@@ -75,25 +76,26 @@ export default function AppointmentDetailsDialog({ appointment, open, onOpenChan
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Nombre</Label>
-                    <Input value={editData.name || ''} onChange={e => setEditData({...editData, name: e.target.value})} />
+                    <input className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" value={editData.name || ''} onChange={e => setEditData({...editData, name: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <Label>Teléfono</Label>
-                    <Input value={editData.phone || ''} onChange={e => setEditData({...editData, phone: e.target.value})} />
+                    <input className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" value={editData.phone || ''} onChange={e => setEditData({...editData, phone: e.target.value})} />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Fecha</Label>
-                    <Input 
+                    <input 
                       type="date" 
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                       value={editData.date ? parseISO(editData.date).toISOString().split('T')[0] : ''} 
-                      onChange={e => setEditData({...editData, date: new Date(e.target.value).toISOString()})} 
+                      onChange={e => setEditData({...editData, date: new Date(e.target.value + 'T12:00:00Z').toISOString()})} 
                     />
                   </div>
                   <div className="space-y-2">
                     <Label>Hora</Label>
-                    <Input type="time" value={editData.time || ''} onChange={e => setEditData({...editData, time: e.target.value})} />
+                    <input type="time" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" value={editData.time || ''} onChange={e => setEditData({...editData, time: e.target.value})} />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -114,10 +116,12 @@ export default function AppointmentDetailsDialog({ appointment, open, onOpenChan
                     <Select value={editData.status} onValueChange={v => setEditData({...editData, status: v as AppointmentStatus})}>
                       <SelectTrigger><SelectValue placeholder="Sin estado" /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Cita Exitosa">Cita Exitosa</SelectItem>
-                        <SelectItem value="Venta">Venta</SelectItem>
+                        <SelectItem value="Asistencia">Asistencia</SelectItem>
+                        <SelectItem value="No asistencia">No asistencia</SelectItem>
+                        <SelectItem value="Continuación en otra cita">Continuación en otra cita</SelectItem>
                         <SelectItem value="Reagendó">Reagendó</SelectItem>
-                        <SelectItem value="Canceló">Canceló</SelectItem>
+                        <SelectItem value="Reembolso">Reembolso</SelectItem>
+                        <SelectItem value="Apartado">Apartado</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -144,14 +148,15 @@ export default function AppointmentDetailsDialog({ appointment, open, onOpenChan
                     <Calendar className="w-4 h-4 text-primary" />
                     <div>
                       <p className="text-[10px] text-muted-foreground uppercase font-bold">Fecha</p>
-                      <p className="text-sm">{format(parseISO(appointment.date), 'dd/MM/yyyy')}</p>
+                      <p className="text-sm font-medium">{format(parseISO(appointment.date), 'dd/MM/yyyy')}</p>
+                      <p className="text-[10px] text-muted-foreground italic">{formatFriendlyDate(appointment.date)}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <Clock className="w-4 h-4 text-primary" />
                     <div>
                       <p className="text-[10px] text-muted-foreground uppercase font-bold">Hora</p>
-                      <p className="text-sm">{appointment.time}</p>
+                      <p className="text-sm font-medium">{format12hTime(appointment.time)}</p>
                     </div>
                   </div>
                 </div>

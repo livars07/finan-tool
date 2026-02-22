@@ -1,11 +1,18 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { isAfter, isBefore, isToday, isTomorrow, isYesterday, isThisWeek, format, parseISO, startOfDay, subDays, addDays, isSameMonth, subMonths, differenceInDays } from 'date-fns';
+import { isAfter, isBefore, isToday, isTomorrow, isThisWeek, format, parseISO, startOfDay, subDays, addDays, isSameMonth, subMonths, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { v4 as uuidv4 } from 'uuid';
 
-export type AppointmentStatus = 'Reagendó' | 'Canceló' | 'Venta' | 'Cita Exitosa';
+export type AppointmentStatus = 
+  | 'Asistencia' 
+  | 'No asistencia' 
+  | 'Continuación en otra cita' 
+  | 'Reagendó' 
+  | 'Reembolso' 
+  | 'Apartado';
+
 export type AppointmentType = '1ra consulta' | '2da consulta' | 'cierre' | 'seguimiento';
 
 export interface Appointment {
@@ -13,7 +20,7 @@ export interface Appointment {
   name: string;
   phone: string;
   date: string; // ISO string
-  time: string;
+  time: string; // "HH:mm" (24h internal format)
   type: AppointmentType;
   status?: AppointmentStatus;
   notes?: string;
@@ -24,7 +31,7 @@ const STORAGE_KEY = 'olivares_fin_data_v4';
 const generateSeedData = (): Appointment[] => {
   const data: Appointment[] = [];
   const types: AppointmentType[] = ['1ra consulta', '2da consulta', 'cierre', 'seguimiento'];
-  const statuses: AppointmentStatus[] = ['Venta', 'Canceló', 'Reagendó', 'Cita Exitosa'];
+  const statuses: AppointmentStatus[] = ['Asistencia', 'No asistencia', 'Continuación en otra cita', 'Reagendó', 'Reembolso', 'Apartado'];
   const names = ['Juan Pérez', 'María García', 'Carlos López', 'Ana Martínez', 'Luis Rodríguez', 'Elena Sánchez', 'Roberto Díaz', 'Sofía Castro'];
 
   for (let i = 0; i < 50; i++) {
@@ -38,7 +45,7 @@ const generateSeedData = (): Appointment[] => {
       name: `${randomName} ${i + 1}`,
       phone: `55 ${Math.floor(10000000 + Math.random() * 90000000)}`,
       date: pastDate.toISOString(),
-      time: `${Math.floor(9 + Math.random() * 8)}:00`,
+      time: `${Math.floor(9 + Math.random() * 8).toString().padStart(2, '0')}:00`,
       type: randomType,
       status: randomStatus,
       notes: "Cliente interesado en crédito tradicional."
@@ -58,7 +65,7 @@ const generateSeedData = (): Appointment[] => {
       name: `${randomName} Futuro ${i + 1}`,
       phone: `55 ${Math.floor(10000000 + Math.random() * 90000000)}`,
       date: futureDate.toISOString(),
-      time: `${Math.floor(9 + Math.random() * 8)}:30`,
+      time: `${Math.floor(9 + Math.random() * 8).toString().padStart(2, '0')}:30`,
       type: randomType,
       notes: ""
     });
@@ -116,42 +123,66 @@ export function useAppointments() {
       const appDate = startOfDay(parseISO(app.date));
       return (isAfter(appDate, startOfToday) || (isToday(appDate) && !app.status)) && !app.status;
     })
-    .sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime());
+    .sort((a, b) => {
+      const timeA = parseISO(a.date).getTime();
+      const timeB = parseISO(b.date).getTime();
+      if (timeA !== timeB) return timeA - timeB;
+      return a.time.localeCompare(b.time);
+    });
 
   const past = appointments
     .filter(app => {
       const appDate = startOfDay(parseISO(app.date));
       return isBefore(appDate, startOfToday) || app.status;
     })
-    .sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime());
+    .sort((a, b) => {
+      const timeA = parseISO(a.date).getTime();
+      const timeB = parseISO(b.date).getTime();
+      if (timeA !== timeB) return timeB - timeA;
+      return b.time.localeCompare(a.time);
+    });
 
   const formatFriendlyDate = (dateStr: string) => {
     const d = parseISO(dateStr);
     const today = startOfDay(new Date());
     const dayOfApp = startOfDay(d);
-    const diffDays = differenceInDays(today, dayOfApp);
-
+    
     if (isToday(dayOfApp)) return "Hoy";
-    if (isYesterday(dayOfApp)) return "Ayer";
-    if (diffDays === 2) return "Antier";
+    if (isTomorrow(dayOfApp)) return "Mañana";
+    
+    const diffDays = differenceInDays(dayOfApp, today);
+    if (diffDays === 2) return "Pasado mañana";
+
+    // Past dates
+    const pastDiffDays = differenceInDays(today, dayOfApp);
+    if (pastDiffDays === 1) return "Ayer";
+    if (pastDiffDays === 2) return "Antier";
     
     if (isThisWeek(dayOfApp, { locale: es })) {
-      return format(dayOfApp, 'EEEE', { locale: es });
+      return format(dayOfApp, 'EEEE', { locale: es }).charAt(0).toUpperCase() + format(dayOfApp, 'EEEE', { locale: es }).slice(1);
     }
 
-    if (diffDays > 2 && diffDays <= 7) {
+    if (pastDiffDays > 2 && pastDiffDays <= 7) {
       return `${format(dayOfApp, 'EEEE', { locale: es })} pasado`;
     }
 
-    if (diffDays > 7 && diffDays <= 14) {
+    if (pastDiffDays > 7 && pastDiffDays <= 14) {
       return "Semana pasada";
     }
 
-    if (diffDays > 14 && diffDays <= 21) {
+    if (pastDiffDays > 14 && pastDiffDays <= 21) {
       return "Semana antepasada";
     }
 
     return format(d, 'dd/MM/yyyy');
+  };
+
+  const format12hTime = (time24h: string) => {
+    if (!time24h) return '';
+    const [hours, minutes] = time24h.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const hours12 = hours % 12 || 12;
+    return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
   };
 
   const stats = {
@@ -161,8 +192,8 @@ export function useAppointments() {
     currentMonthProspects: appointments.filter(app => isSameMonth(parseISO(app.date), now)).length,
     lastMonthProspects: appointments.filter(app => isSameMonth(parseISO(app.date), lastMonth)).length,
 
-    currentMonthSales: appointments.filter(app => app.status === 'Venta' && isSameMonth(parseISO(app.date), now)).length,
-    lastMonthSales: appointments.filter(app => app.status === 'Venta' && isSameMonth(parseISO(app.date), lastMonth)).length,
+    currentMonthSales: appointments.filter(app => app.status === 'Apartado' && isSameMonth(parseISO(app.date), now)).length,
+    lastMonthSales: appointments.filter(app => app.status === 'Apartado' && isSameMonth(parseISO(app.date), lastMonth)).length,
   };
 
   return { 
@@ -173,7 +204,8 @@ export function useAppointments() {
     updateStatus, 
     deleteAppointment,
     editAppointment,
-    formatFriendlyDate, 
+    formatFriendlyDate,
+    format12hTime,
     stats, 
     isLoaded 
   };

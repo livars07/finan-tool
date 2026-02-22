@@ -15,7 +15,7 @@ const GenerateFollowUpMessageInputSchema = z.object({
   status: z
     .string()
     .describe(
-      "The status of the past appointment (e.g., 'Reagendó', 'Canceló', 'Venta', 'Cita Exitosa')."
+      "The status of the past appointment (e.g., 'Asistencia', 'No asistencia', 'Continuación en otra cita', 'Reagendó', 'Reembolso', 'Apartado')."
     ),
   clientName: z.string().describe('The name of the client for personalization.'),
   agentName: z
@@ -43,7 +43,7 @@ const generateFollowUpMessagePrompt = ai.definePrompt({
   name: 'generateFollowUpMessagePrompt',
   input: {schema: GenerateFollowUpMessageInputSchema},
   output: {schema: GenerateFollowUpMessageOutputSchema},
-  prompt: `Eres un asistente de IA especializado en generar plantillas de mensajes de seguimiento profesionales y personalizados para agentes de ventas.
+  prompt: `Eres un asistente de IA especializado en generar plantillas de mensajes de seguimiento profesionales y personalizados para agentes de ventas de Finanto (créditos hipotecarios).
 
 Genera una plantilla de mensaje de seguimiento basada en el siguiente estado de una cita pasada y los detalles proporcionados. El mensaje debe ser cordial, profesional y adaptado al estado.
 
@@ -53,16 +53,14 @@ Nombre del Cliente: {{{clientName}}}
 Nombre del Agente: {{{agentName}}}
 
 Considera los siguientes puntos al generar la plantilla:
-- Si el estado es 'Venta' o 'Cita Exitosa', el mensaje debe ser de agradecimiento y quizás preguntar si tienen alguna otra necesidad.
-- Si el estado es 'Reagendó', el mensaje debe confirmar la nueva cita y expresar entusiasmo por la próxima reunión.
-- Si el estado es 'Canceló', el mensaje debe expresar comprensión, preguntar si hay algo en lo que se pueda ayudar, y dejar la puerta abierta para futuras oportunidades.
+- 'Apartado': El mensaje debe ser de felicitación por iniciar su patrimonio y agradecer la confianza.
+- 'Asistencia': Agradecer el tiempo, resumir brevemente que fue un gusto atenderle y quedar a sus órdenes para el siguiente paso.
+- 'No asistencia': Expresar que se le extrañó en la cita y preguntar si desea reprogramar o si hubo algún inconveniente.
+- 'Continuación en otra cita': Reforzar los puntos clave vistos y mencionar que se espera con gusto la siguiente sesión para profundizar.
+- 'Reagendó': Confirmar la nueva fecha y hora, expresando entusiasmo por la reunión.
+- 'Reembolso': Mantener un tono muy profesional y empático, confirmando el trámite y dejando la puerta abierta para el futuro.
 - Mantén un tono profesional y amigable.
 - Asegúrate de incluir los nombres del cliente y del agente para personalizar el mensaje.
-
-Aquí tienes un ejemplo de cómo podría ser la salida:
-{
-  "messageTemplate": "Estimado/a [Nombre del Cliente],\n\nEsperamos que esté muy bien. Queremos agradecerle sinceramente por su tiempo el día [Fecha de la cita]. Fue un placer poder conversar sobre [Tema de la conversación].\n\nEstamos a su disposición para cualquier consulta o información adicional que pueda necesitar. No dude en contactarnos.\n\nAtentamente,\n[Nombre del Agente]"
-}
 
 Genera la plantilla de mensaje de seguimiento en español.`,
 });

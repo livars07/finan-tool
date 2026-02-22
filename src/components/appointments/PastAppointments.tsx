@@ -7,6 +7,7 @@ import { MessageSquare, ChevronDown } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { useAppointments } from '@/hooks/use-appointments';
 
 interface Props {
   appointments: Appointment[];
@@ -16,6 +17,7 @@ interface Props {
 
 export default function PastAppointments({ appointments, onSelect, formatDate }: Props) {
   const [visibleCount, setVisibleCount] = useState(20);
+  const { format12hTime } = useAppointments();
 
   if (appointments.length === 0) {
     return (
@@ -28,10 +30,12 @@ export default function PastAppointments({ appointments, onSelect, formatDate }:
 
   const getStatusColor = (status?: AppointmentStatus) => {
     switch (status) {
-      case 'Venta': return 'text-green-400 font-bold';
-      case 'Canceló': return 'text-destructive';
+      case 'Apartado': return 'text-green-400 font-bold';
+      case 'No asistencia': return 'text-destructive';
       case 'Reagendó': return 'text-primary';
-      case 'Cita Exitosa': return 'text-accent';
+      case 'Asistencia': return 'text-accent';
+      case 'Reembolso': return 'text-orange-400';
+      case 'Continuación en otra cita': return 'text-blue-400';
       default: return 'text-muted-foreground';
     }
   };
@@ -66,7 +70,7 @@ export default function PastAppointments({ appointments, onSelect, formatDate }:
                     {app.type}
                   </TableCell>
                   <TableCell className="text-muted-foreground text-xs">
-                    {formatDate(app.date)} {app.time}
+                    {formatDate(app.date)} {format12hTime(app.time)}
                   </TableCell>
                   <TableCell className={cn("text-xs", getStatusColor(app.status))}>
                     {app.status || 'N/A'}

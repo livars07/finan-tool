@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -17,6 +16,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAppointments } from '@/hooks/use-appointments';
 
 interface Props {
   appointments: Appointment[];
@@ -27,7 +27,8 @@ interface Props {
 
 export default function UpcomingAppointments({ appointments, formatDate, onSelect, updateStatus }: Props) {
   const [finId, setFinId] = useState<string | null>(null);
-  const [status, setStatus] = useState<AppointmentStatus>('Cita Exitosa');
+  const [status, setStatus] = useState<AppointmentStatus>('Asistencia');
+  const { format12hTime } = useAppointments();
 
   const isActuallyToday = (dateStr: string) => {
     const d = parseISO(dateStr);
@@ -93,7 +94,7 @@ export default function UpcomingAppointments({ appointments, formatDate, onSelec
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-1 text-accent font-bold">
-                    <Clock className="w-3 h-3" /> {app.time}
+                    <Clock className="w-3 h-3" /> {format12hTime(app.time)}
                   </div>
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
@@ -127,10 +128,12 @@ export default function UpcomingAppointments({ appointments, formatDate, onSelec
                 <SelectValue placeholder="Resultado" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Cita Exitosa">Cita Exitosa</SelectItem>
-                <SelectItem value="Venta">Venta</SelectItem>
+                <SelectItem value="Asistencia">Asistencia</SelectItem>
+                <SelectItem value="No asistencia">No asistencia</SelectItem>
+                <SelectItem value="Continuación en otra cita">Continuación en otra cita</SelectItem>
                 <SelectItem value="Reagendó">Reagendó</SelectItem>
-                <SelectItem value="Canceló">Canceló</SelectItem>
+                <SelectItem value="Reembolso">Reembolso</SelectItem>
+                <SelectItem value="Apartado">Apartado</SelectItem>
               </SelectContent>
             </Select>
           </div>
