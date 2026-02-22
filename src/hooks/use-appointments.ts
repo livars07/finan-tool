@@ -20,14 +20,12 @@ export interface Appointment {
 
 const STORAGE_KEY = 'olivares_fin_data_v2';
 
-// Generador de datos semilla
 const generateSeedData = (): Appointment[] => {
   const data: Appointment[] = [];
   const types: AppointmentType[] = ['1er consulta', '2da consulta', 'cierre', 'asesoria post-venta'];
   const statuses: AppointmentStatus[] = ['Venta', 'Canceló', 'Reagendó', 'Cita Exitosa'];
   const names = ['Juan Perez', 'Maria Garcia', 'Carlos Lopez', 'Ana Martinez', 'Luis Rodriguez', 'Elena Sanchez', 'Roberto Diaz', 'Sofia Castro'];
 
-  // 50 Citas pasadas
   for (let i = 0; i < 50; i++) {
     const randomName = names[Math.floor(Math.random() * names.length)];
     const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
@@ -45,14 +43,12 @@ const generateSeedData = (): Appointment[] => {
     });
   }
 
-  // 10 Citas pendientes
   for (let i = 0; i < 10; i++) {
     const randomName = names[Math.floor(Math.random() * names.length)];
     const randomType = types[Math.floor(Math.random() * types.length)];
-    // Algunas hoy, otras mañana, otras después
     let futureDate;
-    if (i < 3) futureDate = new Date(); // Hoy
-    else if (i < 6) futureDate = addDays(new Date(), 1); // Mañana
+    if (i < 3) futureDate = new Date(); 
+    else if (i < 6) futureDate = addDays(new Date(), 1); 
     else futureDate = addDays(new Date(), Math.floor(Math.random() * 7) + 2);
 
     data.push({
@@ -100,6 +96,14 @@ export function useAppointments() {
     setAppointments(prev => prev.map(app => app.id === id ? { ...app, status } : app));
   };
 
+  const deleteAppointment = (id: string) => {
+    setAppointments(prev => prev.filter(app => app.id !== id));
+  };
+
+  const editAppointment = (id: string, updatedData: Partial<Appointment>) => {
+    setAppointments(prev => prev.map(app => app.id === id ? { ...app, ...updatedData } : app));
+  };
+
   const now = startOfDay(new Date());
 
   const upcoming = appointments
@@ -131,5 +135,16 @@ export function useAppointments() {
     pendingCount: upcoming.length
   };
 
-  return { upcoming, past, appointments, addAppointment, updateStatus, formatFriendlyDate, stats, isLoaded };
+  return { 
+    upcoming, 
+    past, 
+    appointments, 
+    addAppointment, 
+    updateStatus, 
+    deleteAppointment,
+    editAppointment,
+    formatFriendlyDate, 
+    stats, 
+    isLoaded 
+  };
 }
