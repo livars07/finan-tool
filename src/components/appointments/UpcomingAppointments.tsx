@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -26,21 +27,29 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useAppointments } from '@/hooks/use-appointments';
 
 interface Props {
   appointments: Appointment[];
   formatDate: (date: string) => string;
+  format12hTime: (time: string) => string;
   onSelect: (app: Appointment) => void;
   updateStatus: (id: string, status: AppointmentStatus) => void;
+  toggleConfirmation: (id: string) => void;
   highlightedId?: string | null;
 }
 
-export default function UpcomingAppointments({ appointments, formatDate, onSelect, updateStatus, highlightedId }: Props) {
+export default function UpcomingAppointments({ 
+  appointments, 
+  formatDate, 
+  format12hTime, 
+  onSelect, 
+  updateStatus, 
+  toggleConfirmation, 
+  highlightedId 
+}: Props) {
   const [finId, setFinId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [status, setStatus] = useState<AppointmentStatus>('Asistencia');
-  const { format12hTime, toggleConfirmation } = useAppointments();
 
   const isActuallyToday = (dateStr: string) => {
     const d = parseISO(dateStr);

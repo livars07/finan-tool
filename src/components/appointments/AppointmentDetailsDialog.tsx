@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -15,7 +16,7 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter, 
   AlertDialogHeader, AlertDialogTitle 
 } from "@/components/ui/alert-dialog";
-import { Appointment, AppointmentStatus, AppointmentType, useAppointments } from '@/hooks/use-appointments';
+import { Appointment, AppointmentStatus, AppointmentType } from '@/hooks/use-appointments';
 import { User, Phone, Calendar, Clock, BookOpen, Trash2, Edit2, Save } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format } from 'date-fns';
@@ -26,14 +27,23 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   onDelete: (id: string) => void;
   onEdit: (id: string, data: Partial<Appointment>) => void;
+  formatFriendlyDate: (date: string) => string;
+  format12hTime: (time: string) => string;
 }
 
-export default function AppointmentDetailsDialog({ appointment, open, onOpenChange, onDelete, onEdit }: Props) {
+export default function AppointmentDetailsDialog({ 
+  appointment, 
+  open, 
+  onOpenChange, 
+  onDelete, 
+  onEdit,
+  formatFriendlyDate,
+  format12hTime
+}: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [editData, setEditData] = useState<Partial<Appointment>>({});
   const { toast } = useToast();
-  const { formatFriendlyDate, format12hTime } = useAppointments();
 
   useEffect(() => {
     if (appointment) {

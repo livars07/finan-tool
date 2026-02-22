@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -7,18 +8,17 @@ import { MessageSquare, ChevronDown } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { useAppointments } from '@/hooks/use-appointments';
 
 interface Props {
   appointments: Appointment[];
   onSelect: (app: Appointment) => void;
   formatDate: (date: string) => string;
+  format12hTime: (time: string) => string;
   highlightedId?: string | null;
 }
 
-export default function PastAppointments({ appointments, onSelect, formatDate, highlightedId }: Props) {
+export default function PastAppointments({ appointments, onSelect, formatDate, format12hTime, highlightedId }: Props) {
   const [visibleCount, setVisibleCount] = useState(20);
-  const { format12hTime } = useAppointments();
 
   if (appointments.length === 0) {
     return (

@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -155,7 +156,9 @@ export default function Home() {
               updateStatus={appointmentState.updateStatus}
               deleteAppointment={appointmentState.deleteAppointment}
               editAppointment={appointmentState.editAppointment}
+              toggleConfirmation={appointmentState.toggleConfirmation}
               formatFriendlyDate={appointmentState.formatFriendlyDate}
+              format12hTime={appointmentState.format12hTime}
             />
           </section>
         </div>

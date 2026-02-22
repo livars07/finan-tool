@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -21,7 +22,9 @@ interface AppointmentsDashboardProps {
   updateStatus: (id: string, status: AppointmentStatus) => void;
   deleteAppointment: (id: string) => void;
   editAppointment: (id: string, updatedData: Partial<Appointment>) => void;
+  toggleConfirmation: (id: string) => void;
   formatFriendlyDate: (date: string) => string;
+  format12hTime: (time: string) => string;
 }
 
 export default function AppointmentsDashboard({
@@ -32,7 +35,9 @@ export default function AppointmentsDashboard({
   updateStatus,
   deleteAppointment,
   editAppointment,
-  formatFriendlyDate
+  toggleConfirmation,
+  formatFriendlyDate,
+  format12hTime
 }: AppointmentsDashboardProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
@@ -139,8 +144,10 @@ export default function AppointmentsDashboard({
                 <UpcomingAppointments 
                   appointments={filteredUpcoming} 
                   formatDate={formatFriendlyDate}
+                  format12hTime={format12hTime}
                   onSelect={(app) => setSelectedAppId(app.id)}
                   updateStatus={updateStatus}
+                  toggleConfirmation={toggleConfirmation}
                   highlightedId={highlightedId}
                 />
               </TabsContent>
@@ -148,6 +155,7 @@ export default function AppointmentsDashboard({
                 <PastAppointments 
                   appointments={filteredPast} 
                   formatDate={formatFriendlyDate}
+                  format12hTime={format12hTime}
                   onSelect={(app) => setSelectedAppId(app.id)}
                   highlightedId={highlightedId}
                 />
@@ -163,6 +171,8 @@ export default function AppointmentsDashboard({
         onOpenChange={handleOpenChange}
         onDelete={deleteAppointment}
         onEdit={editAppointment}
+        formatFriendlyDate={formatFriendlyDate}
+        format12hTime={format12hTime}
       />
     </div>
   );
