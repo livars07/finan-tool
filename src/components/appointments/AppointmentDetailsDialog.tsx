@@ -97,17 +97,31 @@ Número: ${appointment.phone}`;
   return (
     <>
       <Dialog open={open} onOpenChange={(o) => { if(!o) setIsEditing(false); onOpenChange(o); }}>
-        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border custom-scrollbar">
+          <DialogHeader className="border-b border-border/40 pb-4 mb-4">
             <div className="flex items-center justify-between pr-8">
-              <DialogTitle className="flex items-center gap-2 text-xl font-headline text-foreground">
-                <User className="text-primary w-5 h-5" />
-                Detalles del Prospecto
-              </DialogTitle>
+              <div className="flex items-center gap-3">
+                <DialogTitle className="text-xl font-headline font-bold text-foreground">
+                  Detalles
+                </DialogTitle>
+                
+                {!isEditing && (
+                  <Button 
+                    onClick={copyToWhatsAppFormat}
+                    variant="outline" 
+                    size="sm"
+                    className="h-7 px-2 text-[10px] border-green-500/30 text-green-500 hover:bg-green-500/10 font-bold uppercase tracking-tight"
+                  >
+                    <MessageCircle className="w-3 h-3 mr-1" />
+                    Copiar datos
+                  </Button>
+                )}
+              </div>
+
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="cursor-help p-1 rounded-full hover:bg-muted transition-colors">
+                    <div className="cursor-help p-1.5 rounded-full hover:bg-muted transition-colors">
                       <Info className="h-4 w-4 text-muted-foreground" />
                     </div>
                   </TooltipTrigger>
@@ -122,18 +136,7 @@ Número: ${appointment.phone}`;
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-6 py-4">
-            {!isEditing && (
-              <Button 
-                onClick={copyToWhatsAppFormat}
-                variant="outline" 
-                className="w-full border-green-500/50 text-green-500 hover:bg-green-500/10 hover:text-green-400 font-bold"
-              >
-                <MessageCircle className="w-4 h-4 mr-2" />
-                Copiar datos para WhatsApp
-              </Button>
-            )}
-
+          <div className="space-y-6">
             {isEditing ? (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -244,44 +247,40 @@ Número: ${appointment.phone}`;
             )}
 
             <div className="space-y-2">
-              <Label className="flex items-center gap-2 text-muted-foreground">
-                📝 Notas del Cliente
+              <Label className="flex items-center gap-2 text-muted-foreground text-xs font-bold uppercase tracking-wider">
+                📝 Notas
               </Label>
               <Textarea 
-                placeholder="Escribe detalles importantes sobre este prospecto..."
-                className="min-h-[120px] bg-muted/30 focus-visible:ring-accent"
+                placeholder="Detalles importantes sobre este prospecto..."
+                className="min-h-[140px] bg-muted/30 focus-visible:ring-accent resize-none custom-scrollbar"
                 value={isEditing ? editData.notes : appointment.notes}
                 onChange={e => setEditData({...editData, notes: e.target.value})}
                 readOnly={!isEditing}
               />
-              {!isEditing && (
-                <p className="text-[10px] text-muted-foreground italic">
-                  * Haz clic en editar para modificar las notas.
-                </p>
-              )}
             </div>
           </div>
 
-          <DialogFooter className="flex flex-row justify-between sm:justify-between items-center gap-2 border-t border-border/50 pt-6">
+          <DialogFooter className="flex flex-row justify-between sm:justify-between items-center gap-2 border-t border-border/50 pt-6 mt-6">
             <Button 
               variant="ghost" 
-              className="text-destructive hover:bg-destructive/10"
+              size="sm"
+              className="text-destructive hover:bg-destructive/10 h-8 text-xs"
               onClick={() => setShowDeleteConfirm(true)}
             >
-              <Trash2 className="w-4 h-4 mr-2" /> Eliminar
+              <Trash2 className="w-3.5 h-3.5 mr-2" /> Eliminar
             </Button>
             
             <div className="flex gap-2">
               {isEditing ? (
                 <>
-                  <Button variant="outline" onClick={() => setIsEditing(false)}>Cancelar</Button>
-                  <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                    <Save className="w-4 h-4 mr-2" /> Guardar
+                  <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>Cancelar</Button>
+                  <Button size="sm" onClick={handleSave} className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold">
+                    <Save className="w-3.5 h-3.5 mr-2" /> Guardar
                   </Button>
                 </>
               ) : (
-                <Button onClick={() => setIsEditing(true)} variant="secondary">
-                  <Edit2 className="w-4 h-4 mr-2" /> Editar Información
+                <Button onClick={() => setIsEditing(true)} size="sm" variant="secondary" className="font-bold">
+                  <Edit2 className="w-3.5 h-3.5 mr-2" /> Editar
                 </Button>
               )}
             </div>
