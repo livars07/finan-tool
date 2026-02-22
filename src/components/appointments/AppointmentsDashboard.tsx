@@ -94,6 +94,7 @@ export default function AppointmentsDashboard({
               <TabsContent value="past">
                 <PastAppointments 
                   appointments={filteredPast} 
+                  formatDate={formatFriendlyDate}
                   onSelect={(app) => setSelectedAppId(app.id)}
                 />
               </TabsContent>

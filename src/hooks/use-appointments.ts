@@ -1,8 +1,7 @@
-
 "use client"
 
 import { useState, useEffect } from 'react';
-import { isAfter, isBefore, isToday, isTomorrow, isThisWeek, format, parseISO, startOfDay, subDays, addDays, isSameMonth, subMonths } from 'date-fns';
+import { isAfter, isBefore, isToday, isTomorrow, isYesterday, isThisWeek, format, parseISO, startOfDay, subDays, addDays, isSameMonth, subMonths, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -20,7 +19,7 @@ export interface Appointment {
   notes?: string;
 }
 
-const STORAGE_KEY = 'olivares_fin_data_v3';
+const STORAGE_KEY = 'olivares_fin_data_v4';
 
 const generateSeedData = (): Appointment[] => {
   const data: Appointment[] = [];
@@ -128,19 +127,35 @@ export function useAppointments() {
 
   const formatFriendlyDate = (dateStr: string) => {
     const d = parseISO(dateStr);
-    const today = new Date();
-    if (d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear()) return "Hoy";
-    if (isTomorrow(d)) return "Mañana";
-    if (isThisWeek(d)) return format(d, 'EEEE', { locale: es });
+    const today = startOfDay(new Date());
+    const dayOfApp = startOfDay(d);
+    const diffDays = differenceInDays(today, dayOfApp);
+
+    if (isToday(dayOfApp)) return "Hoy";
+    if (isYesterday(dayOfApp)) return "Ayer";
+    if (diffDays === 2) return "Antier";
+    
+    if (isThisWeek(dayOfApp, { locale: es })) {
+      return format(dayOfApp, 'EEEE', { locale: es });
+    }
+
+    if (diffDays > 2 && diffDays <= 7) {
+      return `${format(dayOfApp, 'EEEE', { locale: es })} pasado`;
+    }
+
+    if (diffDays > 7 && diffDays <= 14) {
+      return "Semana pasada";
+    }
+
+    if (diffDays > 14 && diffDays <= 21) {
+      return "Semana antepasada";
+    }
+
     return format(d, 'dd/MM/yyyy');
   };
 
   const stats = {
-    todayCount: appointments.filter(app => {
-      const d = parseISO(app.date);
-      const today = new Date();
-      return d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
-    }).length,
+    todayCount: appointments.filter(app => isToday(parseISO(app.date))).length,
     pendingCount: upcoming.length,
     
     currentMonthProspects: appointments.filter(app => isSameMonth(parseISO(app.date), now)).length,

@@ -1,11 +1,9 @@
-
 "use client"
 
 import React, { useState } from 'react';
 import { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { MessageSquare, ChevronDown } from "lucide-react";
-import { format, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
@@ -13,9 +11,10 @@ import { cn } from '@/lib/utils';
 interface Props {
   appointments: Appointment[];
   onSelect: (app: Appointment) => void;
+  formatDate: (date: string) => string;
 }
 
-export default function PastAppointments({ appointments, onSelect }: Props) {
+export default function PastAppointments({ appointments, onSelect, formatDate }: Props) {
   const [visibleCount, setVisibleCount] = useState(20);
 
   if (appointments.length === 0) {
@@ -47,8 +46,8 @@ export default function PastAppointments({ appointments, onSelect }: Props) {
             <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm">
               <TableRow>
                 <TableHead>Nombre / Teléfono</TableHead>
-                <TableHead>Fecha</TableHead>
                 <TableHead>Tipo</TableHead>
+                <TableHead>Fecha</TableHead>
                 <TableHead>Estado</TableHead>
               </TableRow>
             </TableHeader>
@@ -63,11 +62,11 @@ export default function PastAppointments({ appointments, onSelect }: Props) {
                     <div className="font-medium text-sm">{app.name}</div>
                     <div className="text-xs text-muted-foreground">{app.phone}</div>
                   </TableCell>
-                  <TableCell className="text-muted-foreground text-xs">
-                    {format(parseISO(app.date), 'dd/MM/yyyy')} {app.time}
-                  </TableCell>
                   <TableCell className="text-[10px] text-muted-foreground uppercase tracking-tight">
                     {app.type}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground text-xs">
+                    {formatDate(app.date)} {app.time}
                   </TableCell>
                   <TableCell className={cn("text-xs", getStatusColor(app.status))}>
                     {app.status || 'N/A'}
