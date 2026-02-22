@@ -16,10 +16,16 @@ import {
   AlertDialogHeader, AlertDialogTitle 
 } from "@/components/ui/alert-dialog";
 import { Appointment, AppointmentStatus, AppointmentType } from '@/hooks/use-appointments';
-import { User, Phone, Calendar, Clock, BookOpen, Trash2, Edit2, Save, MessageCircle, Copy } from 'lucide-react';
+import { User, Phone, Calendar, Clock, BookOpen, Trash2, Edit2, Save, MessageCircle, Info } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Props {
   appointment: Appointment | null;
@@ -93,12 +99,26 @@ Número: ${appointment.phone}`;
       <Dialog open={open} onOpenChange={(o) => { if(!o) setIsEditing(false); onOpenChange(o); }}>
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-xl font-headline text-foreground">
-              <User className="text-primary w-5 h-5" />
-              Detalles del Prospecto
-            </DialogTitle>
-            <DialogDescription>
-              ID: {appointment.id}
+            <div className="flex items-center justify-between pr-8">
+              <DialogTitle className="flex items-center gap-2 text-xl font-headline text-foreground">
+                <User className="text-primary w-5 h-5" />
+                Detalles del Prospecto
+              </DialogTitle>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="cursor-help p-1 rounded-full hover:bg-muted transition-colors">
+                      <Info className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="left">
+                    <p className="text-[10px] font-mono uppercase tracking-widest">ID: {appointment.id}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <DialogDescription className="sr-only">
+              Información detallada y gestión del prospecto.
             </DialogDescription>
           </DialogHeader>
 
