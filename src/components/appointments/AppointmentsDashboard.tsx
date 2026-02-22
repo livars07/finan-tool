@@ -66,7 +66,6 @@ export default function AppointmentsDashboard({
       const basicMatch = 
         normalizeStr(app.name).includes(s) || 
         app.phone.includes(s) || 
-        normalizeStr(app.type).includes(s) ||
         (app.status && normalizeStr(app.status).includes(s));
       
       if (basicMatch) return true;
@@ -86,8 +85,7 @@ export default function AppointmentsDashboard({
           monthName.includes(term) || 
           dayName.includes(term) || 
           dayNum === term ||
-          normalizeStr(app.name).includes(term) ||
-          normalizeStr(app.type).includes(term)
+          normalizeStr(app.name).includes(term)
         );
       }
 
