@@ -1,7 +1,6 @@
-
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CreditCalculator from '@/components/calculator/CreditCalculator';
 import AppointmentsDashboard from '@/components/appointments/AppointmentsDashboard';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,7 +12,11 @@ import {
   CheckCircle2, 
   ShieldCheck, 
   TrendingUp, 
-  RotateCcw 
+  RotateCcw,
+  Palette,
+  Monitor,
+  Moon,
+  Sun
 } from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
 import { Button } from '@/components/ui/button';
@@ -27,13 +30,49 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast";
+
+type Theme = 'azulado' | 'discord' | 'light';
 
 export default function Home() {
   const appointmentState = useAppointments();
   const { stats, isLoaded, resetData } = appointmentState;
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [theme, setTheme] = useState<Theme>('azulado');
   const { toast } = useToast();
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('finanto-theme') as Theme;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+  }, []);
+
+  const handleThemeChange = (newTheme: Theme) => {
+    setTheme(newTheme);
+    localStorage.setItem('finanto-theme', newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+    
+    const themeNames = {
+      azulado: 'Finanto Azulado',
+      discord: 'Discord Pro',
+      light: 'Luz Funcional'
+    };
+
+    toast({
+      title: "Tema actualizado",
+      description: `Se ha aplicado el tema ${themeNames[newTheme]}.`,
+    });
+  };
 
   if (!isLoaded) return null;
 
@@ -47,7 +86,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <header className="border-b border-border/40 bg-card/30 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -63,14 +102,32 @@ export default function Home() {
               <LayoutDashboard className="w-4 h-4" />v0.4 ( 22 de marzo )
             </div>
           </nav>
-          <div className="flex items-center gap-2">
-            <div className="hidden sm:flex flex-col items-end mr-2 text-right">
-              <span className="text-xs font-semibold text-foreground">Ejecutivo Finanto</span>
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:flex flex-col items-end text-right">
+              <span className="text-xs font-semibold text-foreground">Ejecutivo Olivares Mtz</span>
               <span className="text-[10px] text-primary uppercase tracking-tighter font-medium">Datos guardados en navegador</span>
             </div>
-            <div className="w-9 h-9 rounded-full bg-muted border border-border flex items-center justify-center">
-              <Users className="w-5 h-5 text-muted-foreground" />
-            </div>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="w-9 h-9 rounded-full bg-muted border border-border overflow-hidden">
+                  {theme === 'light' ? <Sun className="w-5 h-5" /> : theme === 'discord' ? <Moon className="w-5 h-5" /> : <Palette className="w-5 h-5 text-primary" />}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel>Personalización</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => handleThemeChange('azulado')} className="flex items-center gap-2 cursor-pointer">
+                  <div className="w-3 h-3 rounded-full bg-[#7ec1ff]" /> Finanto Azulado
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleThemeChange('discord')} className="flex items-center gap-2 cursor-pointer">
+                  <div className="w-3 h-3 rounded-full bg-[#5865f2]" /> Discord Pro
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleThemeChange('light')} className="flex items-center gap-2 cursor-pointer">
+                  <div className="w-3 h-3 rounded-full bg-[#3b82f6]" /> Luz Funcional
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>

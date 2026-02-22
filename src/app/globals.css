@@ -30,6 +30,50 @@
     --chart-5: 180 100% 80%;
     --radius: 0.75rem;
   }
+
+  [data-theme="discord"] {
+    --background: 223 7% 12%;
+    --foreground: 0 0% 100%;
+    --card: 223 7% 16%;
+    --card-foreground: 0 0% 100%;
+    --popover: 223 7% 10%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 235 86% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 223 7% 20%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 223 7% 18%;
+    --muted-foreground: 0 0% 70%;
+    --accent: 145 65% 39%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 359 82% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 223 7% 22%;
+    --input: 223 7% 22%;
+    --ring: 235 86% 65%;
+  }
+
+  [data-theme="light"] {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+  }
 }
 
 @layer base {
