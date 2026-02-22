@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -77,7 +76,7 @@ export default function AppointmentDetailsDialog({
 
     const text = `Cita: ${capitalizedDate}
 Nombre: ${appointment.name}
-Producto: ${appointment.type}
+Producto: Casa
 Hora: ${timeFormatted}
 Número: ${appointment.phone}`;
 

@@ -29,6 +29,15 @@ export interface Appointment {
 
 const STORAGE_KEY = 'olivares_fin_data_v4';
 
+const formatPhoneNumber = (phone: string) => {
+  const cleaned = ('' + phone).replace(/\D/g, '');
+  const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+  if (match) {
+    return `${match[1]} ${match[2]} ${match[3]}`;
+  }
+  return phone;
+};
+
 const generateSeedData = (): Appointment[] => {
   const data: Appointment[] = [];
   const types: AppointmentType[] = ['1ra consulta', '2da consulta', 'cierre', 'seguimiento'];
@@ -44,7 +53,7 @@ const generateSeedData = (): Appointment[] => {
     data.push({
       id: uuidv4(),
       name: `${randomName} ${i + 1}`,
-      phone: `55 ${Math.floor(10000000 + Math.random() * 90000000)}`,
+      phone: formatPhoneNumber(`55${Math.floor(10000000 + Math.random() * 90000000)}`),
       date: pastDate.toISOString(),
       time: `${Math.floor(9 + Math.random() * 8).toString().padStart(2, '0')}:00`,
       type: randomType,
@@ -65,7 +74,7 @@ const generateSeedData = (): Appointment[] => {
     data.push({
       id: uuidv4(),
       name: `${randomName} Futuro ${i + 1}`,
-      phone: `55 ${Math.floor(10000000 + Math.random() * 90000000)}`,
+      phone: formatPhoneNumber(`55${Math.floor(10000000 + Math.random() * 90000000)}`),
       date: futureDate.toISOString(),
       time: `${Math.floor(9 + Math.random() * 8).toString().padStart(2, '0')}:30`,
       type: randomType,
@@ -101,7 +110,12 @@ export function useAppointments() {
   }, [appointments, isLoaded]);
 
   const addAppointment = (newApp: Omit<Appointment, 'id'>) => {
-    setAppointments(prev => [{ ...newApp, id: uuidv4() }, ...prev]);
+    const formattedApp = {
+      ...newApp,
+      id: uuidv4(),
+      phone: formatPhoneNumber(newApp.phone)
+    };
+    setAppointments(prev => [formattedApp, ...prev]);
   };
 
   const updateStatus = (id: string, status: AppointmentStatus) => {
@@ -113,7 +127,11 @@ export function useAppointments() {
   };
 
   const editAppointment = (id: string, updatedData: Partial<Appointment>) => {
-    setAppointments(prev => prev.map(app => app.id === id ? { ...app, ...updatedData } : app));
+    const dataToUpdate = { ...updatedData };
+    if (dataToUpdate.phone) {
+      dataToUpdate.phone = formatPhoneNumber(dataToUpdate.phone);
+    }
+    setAppointments(prev => prev.map(app => app.id === id ? { ...app, ...dataToUpdate } : app));
   };
 
   const toggleConfirmation = (id: string) => {
