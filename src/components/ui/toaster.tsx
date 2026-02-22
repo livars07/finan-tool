@@ -13,19 +13,30 @@ import {
 
 export function Toaster() {
   const { toasts } = useToast()
-  const lastToastCount = useRef(toasts.length)
+  const processedToastIds = useRef(new Set<string>())
 
   useEffect(() => {
-    // Play sound when a new toast is added
-    if (toasts.length > lastToastCount.current) {
-      // Usando un sonido tipo "pop" suave y menos agudo
-      const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3")
-      audio.volume = 0.3
-      audio.play().catch(() => {
-        // Ignore browser auto-play prevention errors
-      })
-    }
-    lastToastCount.current = toasts.length
+    // Play sound for every new toast immediately
+    toasts.forEach((t) => {
+      if (!processedToastIds.current.has(t.id)) {
+        processedToastIds.current.add(t.id)
+        
+        // Instant play without logic constraints (no cooldown)
+        const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3")
+        audio.volume = 0.3
+        audio.play().catch(() => {
+          // Ignore browser auto-play prevention errors
+        })
+      }
+    })
+
+    // Housekeeping: remove IDs of toasts that are no longer in the array
+    const currentIds = new Set(toasts.map(t => t.id))
+    processedToastIds.current.forEach(id => {
+      if (!currentIds.has(id)) {
+        processedToastIds.current.delete(id)
+      }
+    })
   }, [toasts])
 
   return (

@@ -14,7 +14,6 @@ import {
   TrendingUp, 
   RotateCcw,
   Palette,
-  Monitor,
   Moon,
   Sun,
   Cpu
@@ -101,7 +100,7 @@ export default function Home() {
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer border-b-2 border-primary pb-1">
-              <LayoutDashboard className="w-4 h-4" />v0.4 ( 22 de marzo )
+              <LayoutDashboard className="w-4 h-4" />v0.5 ( 23 de marzo )
             </div>
           </nav>
           <div className="flex items-center gap-4">
@@ -123,7 +122,7 @@ export default function Home() {
                   <div className="w-3 h-3 rounded-full bg-[#7ec1ff]" /> Predeterminado
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleThemeChange('discreto')} className="flex items-center gap-2 cursor-pointer">
-                  <div className="w-3 h-3 rounded-full bg-[#1a4d2e]" /> Discreto
+                  <div className="w-3 h-3 rounded-full bg-[#5865f2]" /> Discreto
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleThemeChange('corporativo')} className="flex items-center gap-2 cursor-pointer">
                   <div className="w-3 h-3 rounded-full bg-white border border-gray-300" /> Corporativo
