@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -13,9 +14,10 @@ interface Props {
   appointments: Appointment[];
   onSelect: (app: Appointment) => void;
   formatDate: (date: string) => string;
+  highlightedId?: string | null;
 }
 
-export default function PastAppointments({ appointments, onSelect, formatDate }: Props) {
+export default function PastAppointments({ appointments, onSelect, formatDate, highlightedId }: Props) {
   const [visibleCount, setVisibleCount] = useState(20);
   const { format12hTime } = useAppointments();
 
@@ -56,27 +58,33 @@ export default function PastAppointments({ appointments, onSelect, formatDate }:
               </TableRow>
             </TableHeader>
             <TableBody>
-              {visibleAppointments.map((app) => (
-                <TableRow 
-                  key={app.id} 
-                  onClick={() => onSelect(app)}
-                  className="hover:bg-muted/30 cursor-pointer relative"
-                >
-                  <TableCell>
-                    <div className="font-medium text-sm">{app.name}</div>
-                    <div className="text-xs text-muted-foreground">{app.phone}</div>
-                  </TableCell>
-                  <TableCell className="text-[10px] text-muted-foreground uppercase tracking-tight">
-                    {app.type}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground text-xs">
-                    {formatDate(app.date)} {format12hTime(app.time)}
-                  </TableCell>
-                  <TableCell className={cn("text-xs", getStatusColor(app.status))}>
-                    {app.status || 'N/A'}
-                  </TableCell>
-                </TableRow>
-              ))}
+              {visibleAppointments.map((app) => {
+                const isHighlighted = highlightedId === app.id;
+                return (
+                  <TableRow 
+                    key={app.id} 
+                    onClick={() => onSelect(app)}
+                    className={cn(
+                      "hover:bg-primary/15 hover:scale-[1.005] transition-all cursor-pointer relative",
+                      isHighlighted && "bg-accent/20 animate-pulse border-2 border-accent/40 z-20"
+                    )}
+                  >
+                    <TableCell>
+                      <div className="font-medium text-sm">{app.name}</div>
+                      <div className="text-xs text-muted-foreground">{app.phone}</div>
+                    </TableCell>
+                    <TableCell className="text-[10px] text-muted-foreground uppercase tracking-tight">
+                      {app.type}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-xs">
+                      {formatDate(app.date)} {format12hTime(app.time)}
+                    </TableCell>
+                    <TableCell className={cn("text-xs", getStatusColor(app.status))}>
+                      {app.status || 'N/A'}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </ScrollArea>

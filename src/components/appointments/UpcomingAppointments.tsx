@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -23,9 +24,10 @@ interface Props {
   formatDate: (date: string) => string;
   onSelect: (app: Appointment) => void;
   updateStatus: (id: string, status: AppointmentStatus) => void;
+  highlightedId?: string | null;
 }
 
-export default function UpcomingAppointments({ appointments, formatDate, onSelect, updateStatus }: Props) {
+export default function UpcomingAppointments({ appointments, formatDate, onSelect, updateStatus, highlightedId }: Props) {
   const [finId, setFinId] = useState<string | null>(null);
   const [status, setStatus] = useState<AppointmentStatus>('Asistencia');
   const { format12hTime } = useAppointments();
@@ -62,13 +64,16 @@ export default function UpcomingAppointments({ appointments, formatDate, onSelec
         <TableBody>
           {appointments.map((app) => {
             const appToday = isActuallyToday(app.date);
+            const isHighlighted = highlightedId === app.id;
+            
             return (
               <TableRow 
                 key={app.id} 
                 onClick={() => onSelect(app)}
                 className={cn(
-                  "hover:bg-primary/5 transition-colors cursor-pointer group relative",
-                  appToday && "bg-primary/10 border-l-4 border-l-primary"
+                  "hover:bg-primary/15 hover:scale-[1.005] transition-all cursor-pointer group relative",
+                  appToday && "bg-primary/10 border-l-4 border-l-primary",
+                  isHighlighted && "bg-accent/20 animate-pulse border-2 border-accent/40"
                 )}
               >
                 <TableCell>

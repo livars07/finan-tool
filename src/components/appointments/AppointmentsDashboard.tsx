@@ -1,7 +1,7 @@
 
 "use client"
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import AppointmentForm from './AppointmentForm';
 import UpcomingAppointments from './UpcomingAppointments';
 import PastAppointments from './PastAppointments';
@@ -37,6 +37,7 @@ export default function AppointmentsDashboard({
 }: AppointmentsDashboardProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
   const filterAppointments = (list: Appointment[]) => {
     if (!searchTerm) return list;
@@ -50,7 +51,6 @@ export default function AppointmentsDashboard({
       const dayNum = format(appDate, 'd');
       const fullDate = format(appDate, "d 'de' MMMM", { locale: es }).toLowerCase();
       
-      // 1. Búsqueda básica en campos de texto
       const basicMatch = 
         app.name.toLowerCase().includes(s) || 
         app.phone.includes(s) || 
@@ -58,21 +58,15 @@ export default function AppointmentsDashboard({
         (app.status && app.status.toLowerCase().includes(s));
       
       if (basicMatch) return true;
-
-      // 2. Búsqueda por términos de fecha amigables ("hoy", "ayer", "semana pasada")
       if (friendlyDate.includes(s)) return true;
-
-      // 3. Búsqueda por mes o día de la semana ("enero", "lunes")
       if (monthName.includes(s)) return true;
       if (dayName.includes(s)) return true;
       if (fullDate.includes(s)) return true;
 
-      // 4. Búsqueda por "fin de semana"
       if (s === 'fin de semana' || s === 'finde') {
         if (isWeekend(appDate)) return true;
       }
 
-      // 5. Búsqueda por términos múltiples (ej: "sábado 21")
       const terms = s.split(/\s+/);
       if (terms.length > 1) {
         return terms.every(term => 
@@ -95,6 +89,14 @@ export default function AppointmentsDashboard({
   const selectedApp = useMemo(() => {
     return appointments.find(app => app.id === selectedAppId) || null;
   }, [appointments, selectedAppId]);
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open && selectedAppId) {
+      setHighlightedId(selectedAppId);
+      setTimeout(() => setHighlightedId(null), 4000);
+    }
+    if (!open) setSelectedAppId(null);
+  };
 
   return (
     <div className="space-y-6">
@@ -132,6 +134,7 @@ export default function AppointmentsDashboard({
                   formatDate={formatFriendlyDate}
                   onSelect={(app) => setSelectedAppId(app.id)}
                   updateStatus={updateStatus}
+                  highlightedId={highlightedId}
                 />
               </TabsContent>
               <TabsContent value="past">
@@ -139,6 +142,7 @@ export default function AppointmentsDashboard({
                   appointments={filteredPast} 
                   formatDate={formatFriendlyDate}
                   onSelect={(app) => setSelectedAppId(app.id)}
+                  highlightedId={highlightedId}
                 />
               </TabsContent>
             </Tabs>
@@ -149,7 +153,7 @@ export default function AppointmentsDashboard({
       <AppointmentDetailsDialog 
         appointment={selectedApp} 
         open={!!selectedAppId} 
-        onOpenChange={(open) => !open && setSelectedAppId(null)}
+        onOpenChange={handleOpenChange}
         onDelete={deleteAppointment}
         onEdit={editAppointment}
       />
