@@ -46,8 +46,8 @@ export default function Home() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
             { label: 'Citas Hoy', value: stats.todayCount.toString(), icon: CalendarDays, color: 'text-primary' },
-            { label: 'Total Prospectos', value: stats.totalProspects.toString(), icon: Users, color: 'text-accent' },
-            { label: 'Ventas Cerradas', value: stats.salesCount.toString(), icon: CheckCircle2, color: 'text-green-400' },
+            { label: 'Prospectos', value: stats.totalProspects.toString(), icon: Users, color: 'text-accent' },
+            { label: 'Cierres', value: stats.salesCount.toString(), icon: CheckCircle2, color: 'text-green-400' },
             { label: 'Citas Pendientes', value: stats.pendingCount.toString(), icon: Wallet, color: 'text-primary' },
           ].map((stat, i) => (
             <Card key={i} className="bg-card/40 border-border/50 backdrop-blur-sm hover:border-primary/30 transition-all group">
