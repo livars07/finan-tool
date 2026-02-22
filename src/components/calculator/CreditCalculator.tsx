@@ -1,25 +1,39 @@
+
 "use client"
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Calculator, RotateCcw, TrendingUp } from "lucide-react";
+import { Calculator, RotateCcw } from "lucide-react";
 
 export default function CreditCalculator() {
   const [totalPrice, setTotalPrice] = useState<string>('');
   const [downPayment, setDownPayment] = useState<string>('');
   const [monthlyPayment, setMonthlyPayment] = useState<string>('');
-  const [annualRate, setAnnualRate] = useState<string>('10.5');
-  const [termMonths, setTermMonths] = useState<string>('240');
-  const [downPaymentPercent, setDownPaymentPercent] = useState<string>('10');
+  const [annualRate, setAnnualRate] = useState<string>('7');
+  const [termMonths, setTermMonths] = useState<string>('192');
+  const [downPaymentPercent, setDownPaymentPercent] = useState<string>('3');
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('es-MX', {
       style: 'currency',
       currency: 'MXN',
+      minimumFractionDigits: 2,
     }).format(val);
+  };
+
+  const parseNumber = (val: string) => {
+    return parseFloat(val.replace(/,/g, '')) || 0;
+  };
+
+  const formatWithCommas = (val: string) => {
+    const num = val.replace(/,/g, '');
+    if (!num || isNaN(Number(num))) return '';
+    const parts = num.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return parts.join('.');
   };
 
   const calculateFrenchPayment = useCallback((monto: number, tasaAnual: number, meses: number) => {
@@ -37,10 +51,11 @@ export default function CreditCalculator() {
   }, []);
 
   const handleTotalPriceChange = (val: string) => {
-    setTotalPrice(val);
-    const p = parseFloat(val);
+    const cleanVal = val.replace(/,/g, '');
+    setTotalPrice(cleanVal);
+    const p = parseFloat(cleanVal);
     if (!isNaN(p)) {
-      const ePercent = parseFloat(downPaymentPercent) / 100 || 0.1;
+      const ePercent = parseFloat(downPaymentPercent) / 100 || 0.03;
       const e = p * ePercent;
       const m = p - e;
       const c = calculateFrenchPayment(m, parseFloat(annualRate), parseInt(termMonths));
@@ -50,8 +65,9 @@ export default function CreditCalculator() {
   };
 
   const handleDownPaymentChange = (val: string) => {
-    setDownPayment(val);
-    const e = parseFloat(val);
+    const cleanVal = val.replace(/,/g, '');
+    setDownPayment(cleanVal);
+    const e = parseFloat(cleanVal);
     const p = parseFloat(totalPrice);
     if (!isNaN(e) && !isNaN(p)) {
       const m = p - e;
@@ -61,15 +77,15 @@ export default function CreditCalculator() {
   };
 
   const handleMonthlyPaymentChange = (val: string) => {
-    setMonthlyPayment(val);
-    const c = parseFloat(val);
+    const cleanVal = val.replace(/,/g, '');
+    setMonthlyPayment(cleanVal);
+    const c = parseFloat(cleanVal);
     if (!isNaN(c)) {
       const m = calculateFrenchLoanAmount(c, parseFloat(annualRate), parseInt(termMonths));
       let e = parseFloat(downPayment);
       if (isNaN(e) || e === 0) {
-        // Assume 10% of total price: P = M / 0.9, E = 0.1P
-        const p = m / 0.9;
-        e = p * 0.1;
+        const p = m / 0.97;
+        e = p * 0.03;
         setTotalPrice(p.toFixed(2));
         setDownPayment(e.toFixed(2));
       } else {
@@ -92,7 +108,7 @@ export default function CreditCalculator() {
           <Calculator className="text-primary w-6 h-6" />
           <CardTitle className="text-xl font-headline font-semibold">Calculadora de Crédito</CardTitle>
         </div>
-        <CardDescription className="text-muted-foreground">Sistema francés de amortización para inmuebles</CardDescription>
+        <CardDescription className="text-muted-foreground">Sistema francés (7% Anual | 3% Enganche | Mensualidad 0.6982%)</CardDescription>
       </CardHeader>
       <CardContent className="pt-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -104,8 +120,8 @@ export default function CreditCalculator() {
                 id="totalPrice"
                 placeholder="0.00"
                 className="pl-7"
-                type="number"
-                value={totalPrice}
+                type="text"
+                value={formatWithCommas(totalPrice)}
                 onChange={(e) => handleTotalPriceChange(e.target.value)}
               />
             </div>
@@ -118,8 +134,8 @@ export default function CreditCalculator() {
                 id="downPayment"
                 placeholder="0.00"
                 className="pl-7"
-                type="number"
-                value={downPayment}
+                type="text"
+                value={formatWithCommas(downPayment)}
                 onChange={(e) => handleDownPaymentChange(e.target.value)}
               />
             </div>
@@ -132,8 +148,8 @@ export default function CreditCalculator() {
                 id="monthlyPayment"
                 placeholder="0.00"
                 className="pl-7 border-accent/30 focus-visible:ring-accent"
-                type="number"
-                value={monthlyPayment}
+                type="text"
+                value={formatWithCommas(monthlyPayment)}
                 onChange={(e) => handleMonthlyPaymentChange(e.target.value)}
               />
             </div>
@@ -163,10 +179,11 @@ export default function CreditCalculator() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="termMonths">Plazo (meses)</Label>
+            <Label htmlFor="termMonths">Plazo (meses, máx 192)</Label>
             <Input
               id="termMonths"
               type="number"
+              max="192"
               value={termMonths}
               onChange={(e) => setTermMonths(e.target.value)}
             />
@@ -177,7 +194,7 @@ export default function CreditCalculator() {
           <div className="flex flex-col">
             <span className="text-xs text-muted-foreground uppercase tracking-widest font-medium">Financiamiento estimado</span>
             <span className="text-2xl font-headline font-bold text-primary">
-              {formatCurrency(parseFloat(totalPrice) - parseFloat(downPayment) || 0)}
+              {formatCurrency(parseNumber(totalPrice) - parseNumber(downPayment))}
             </span>
           </div>
           <Button variant="outline" size="sm" onClick={clear} className="w-full md:w-auto">
