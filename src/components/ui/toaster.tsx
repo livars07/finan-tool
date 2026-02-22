@@ -18,8 +18,9 @@ export function Toaster() {
   useEffect(() => {
     // Play sound when a new toast is added
     if (toasts.length > lastToastCount.current) {
-      const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3")
-      audio.volume = 0.4
+      // Usando un sonido tipo "pop" suave y menos agudo
+      const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3")
+      audio.volume = 0.3
       audio.play().catch(() => {
         // Ignore browser auto-play prevention errors
       })
