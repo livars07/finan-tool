@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -71,8 +70,8 @@ export default function UpcomingAppointments({ appointments, formatDate, onSelec
                 key={app.id} 
                 onClick={() => onSelect(app)}
                 className={cn(
-                  "hover:bg-primary/15 hover:scale-[1.005] transition-all cursor-pointer group relative",
-                  appToday && "bg-primary/10 border-l-4 border-l-primary",
+                  "hover:bg-primary/10 transition-colors cursor-pointer group relative",
+                  appToday && "bg-primary/5 border-l-4 border-l-primary",
                   isHighlighted && "bg-accent/20 animate-pulse border-2 border-accent/40"
                 )}
               >
