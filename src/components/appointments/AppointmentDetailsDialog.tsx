@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -99,36 +98,40 @@ Número: ${appointment.phone}`;
     <>
       <Dialog open={open} onOpenChange={(o) => { if(!o) setIsEditing(false); onOpenChange(o); }}>
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border custom-scrollbar p-0">
-          <DialogHeader className="px-6 pt-6 pb-4 border-b border-border/40 space-y-0">
-            <div className="flex items-center gap-3">
-              <DialogTitle className="text-xl font-headline font-bold text-foreground">
-                Detalles
-              </DialogTitle>
-              
-              {!isEditing && (
-                <Button 
-                  onClick={copyToWhatsAppFormat}
-                  variant="outline" 
-                  size="sm"
-                  className="h-7 px-2 text-[10px] border-green-500/30 text-green-500 hover:bg-green-500/10 font-bold uppercase tracking-tight"
-                >
-                  <MessageCircle className="w-3 h-3 mr-1" />
-                  Copiar datos
-                </Button>
-              )}
+          <DialogHeader className="px-6 pt-6 pb-4 border-b border-border/40 relative">
+            <div className="flex items-center justify-between h-7">
+              <div className="flex items-center gap-3">
+                <DialogTitle className="text-xl font-headline font-bold text-foreground">
+                  Detalles
+                </DialogTitle>
+                
+                <TooltipProvider>
+                  <Tooltip delayDuration={300}>
+                    <TooltipTrigger asChild>
+                      <div className="cursor-help p-1 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
+                        <Info className="h-4 w-4" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="bg-popover border-border shadow-xl">
+                      <p className="text-[10px] font-mono uppercase tracking-widest">ID: {appointment.id}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
 
-              <TooltipProvider>
-                <Tooltip delayDuration={300}>
-                  <TooltipTrigger asChild>
-                    <div className="cursor-help p-1 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
-                      <Info className="h-4 w-4" />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" className="bg-popover border-border shadow-xl">
-                    <p className="text-[10px] font-mono uppercase tracking-widest">ID: {appointment.id}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              {!isEditing && (
+                <div className="flex items-center gap-3 mr-6">
+                  <Button 
+                    onClick={copyToWhatsAppFormat}
+                    variant="outline" 
+                    size="sm"
+                    className="h-7 px-2 text-[10px] border-green-500/30 text-green-500 hover:bg-green-500/10 font-bold uppercase tracking-tight"
+                  >
+                    <MessageCircle className="w-3 h-3 mr-1" />
+                    Copiar datos
+                  </Button>
+                </div>
+              )}
             </div>
             <DialogDescription className="sr-only">
               Información detallada y gestión del prospecto.
