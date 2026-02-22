@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -31,7 +32,9 @@ export default function UpcomingAppointments({ appointments, formatDate, onSelec
   const isActuallyToday = (dateStr: string) => {
     const d = parseISO(dateStr);
     const today = new Date();
-    return d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
+    return d.getDate() === today.getDate() && 
+           d.getMonth() === today.getMonth() && 
+           d.getFullYear() === today.getFullYear();
   };
 
   if (appointments.length === 0) {

@@ -1,8 +1,10 @@
+
 "use client"
 
 import { useState, useEffect } from 'react';
 import { isAfter, isBefore, isToday, isTomorrow, isThisWeek, format, parseISO, startOfDay, subDays, addDays, isSameMonth, subMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { v4 as uuidv4 } from 'uuid';
 
 export type AppointmentStatus = 'Reagendó' | 'Canceló' | 'Venta' | 'Cita Exitosa';
 export type AppointmentType = '1ra consulta' | '2da consulta' | 'cierre' | 'seguimiento';
@@ -33,7 +35,7 @@ const generateSeedData = (): Appointment[] => {
     const pastDate = subDays(new Date(), Math.floor(Math.random() * 60) + 1);
     
     data.push({
-      id: `past-${i}`,
+      id: uuidv4(),
       name: `${randomName} ${i + 1}`,
       phone: `55 ${Math.floor(10000000 + Math.random() * 90000000)}`,
       date: pastDate.toISOString(),
@@ -53,7 +55,7 @@ const generateSeedData = (): Appointment[] => {
     else futureDate = addDays(new Date(), Math.floor(Math.random() * 7) + 2);
 
     data.push({
-      id: `future-${i}`,
+      id: uuidv4(),
       name: `${randomName} Futuro ${i + 1}`,
       phone: `55 ${Math.floor(10000000 + Math.random() * 90000000)}`,
       date: futureDate.toISOString(),
@@ -91,7 +93,7 @@ export function useAppointments() {
   }, [appointments, isLoaded]);
 
   const addAppointment = (newApp: Omit<Appointment, 'id'>) => {
-    setAppointments(prev => [{ ...newApp, id: Math.random().toString(36).substr(2, 9) }, ...prev]);
+    setAppointments(prev => [{ ...newApp, id: uuidv4() }, ...prev]);
   };
 
   const updateStatus = (id: string, status: AppointmentStatus) => {
@@ -113,7 +115,6 @@ export function useAppointments() {
   const upcoming = appointments
     .filter(app => {
       const appDate = startOfDay(parseISO(app.date));
-      // Una cita es próxima si es futura o es hoy Y no tiene estado
       return (isAfter(appDate, startOfToday) || (isToday(appDate) && !app.status)) && !app.status;
     })
     .sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime());
@@ -121,7 +122,6 @@ export function useAppointments() {
   const past = appointments
     .filter(app => {
       const appDate = startOfDay(parseISO(app.date));
-      // Una cita es pasada si su fecha ya pasó O si ya tiene un estado asignado
       return isBefore(appDate, startOfToday) || app.status;
     })
     .sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime());

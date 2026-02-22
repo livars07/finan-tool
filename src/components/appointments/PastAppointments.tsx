@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -7,6 +8,7 @@ import { MessageSquare, ChevronDown } from "lucide-react";
 import { format, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
 
 interface Props {
   appointments: Appointment[];
@@ -91,8 +93,4 @@ export default function PastAppointments({ appointments, onSelect }: Props) {
       )}
     </div>
   );
-}
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(' ');
 }
