@@ -14,7 +14,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -97,11 +96,6 @@ export default function UpcomingAppointments({ appointments, formatDate, onSelec
                 <TableCell>
                   <div className="font-medium text-sm">
                     {app.name}
-                    {appToday && (
-                      <span className="ml-2 inline-flex items-center rounded-full bg-primary/20 px-1.5 py-0.5 text-[10px] font-bold text-primary uppercase animate-pulse">
-                        Hoy
-                      </span>
-                    )}
                   </div>
                   <div className="text-xs text-muted-foreground">{app.phone}</div>
                 </TableCell>
