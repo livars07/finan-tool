@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'CrediCitas Pro - Dashboard Financiero',
-  description: 'Calculadora de crédito inmobiliario y gestión de citas con IA.',
+  title: 'Olivares Financiamiento - Gestión Hipotecaria',
+  description: 'Sistema especializado en financiamiento inmobiliario y gestión de prospectos.',
 };
 
 export default function RootLayout({

@@ -3,7 +3,7 @@
 import CreditCalculator from '@/components/calculator/CreditCalculator';
 import AppointmentsDashboard from '@/components/appointments/AppointmentsDashboard';
 import { Card, CardContent } from '@/components/ui/card';
-import { LayoutDashboard, Wallet, CalendarDays, Users, CheckCircle2 } from 'lucide-react';
+import { LayoutDashboard, Wallet, CalendarDays, Users, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
 
 export default function Home() {
@@ -18,23 +18,25 @@ export default function Home() {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="bg-primary/20 p-1.5 rounded-lg border border-primary/30">
-              <LayoutDashboard className="text-primary w-6 h-6" />
+              <ShieldCheck className="text-primary w-6 h-6" />
             </div>
             <h1 className="text-xl font-headline font-bold tracking-tight text-foreground">
-              CrediCitas<span className="text-primary">Pro</span>
+              Olivares <span className="text-primary">Financiamiento</span>
             </h1>
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer border-b-2 border-primary pb-1">
-              <CalendarDays className="w-4 h-4" /> Panel de Control
+              <LayoutDashboard className="w-4 h-4" /> Panel de Control
             </div>
           </nav>
           <div className="flex items-center gap-2">
-            <div className="hidden sm:flex flex-col items-end mr-2">
-              <span className="text-xs font-semibold text-foreground">Asesor Premium</span>
-              <span className="text-[10px] text-accent uppercase tracking-tighter">Verificado</span>
+            <div className="hidden sm:flex flex-col items-end mr-2 text-right">
+              <span className="text-xs font-semibold text-foreground">Asesoría de Crédito</span>
+              <span className="text-[10px] text-primary uppercase tracking-tighter font-medium">Conexión Segura</span>
             </div>
-            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-primary to-accent border-2 border-background shadow-lg" />
+            <div className="w-9 h-9 rounded-full bg-muted border border-border flex items-center justify-center">
+              <Users className="w-5 h-5 text-muted-foreground" />
+            </div>
           </div>
         </div>
       </header>
@@ -88,9 +90,9 @@ export default function Home() {
 
       <footer className="mt-12 border-t border-border/40 py-8 bg-card/20">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm">
-          <p>© 2024 CrediCitas Pro - Gestión de Crédito Hipotecario</p>
+          <p>© 2024 Olivares Financiamiento - Gestión Hipotecaria</p>
           <div className="flex items-center gap-6">
-            <span className="hover:text-primary transition-colors cursor-pointer">Panel</span>
+            <span className="hover:text-primary transition-colors cursor-pointer">Panel Administrativo</span>
             <span className="hover:text-primary transition-colors cursor-pointer">Soporte</span>
           </div>
         </div>
