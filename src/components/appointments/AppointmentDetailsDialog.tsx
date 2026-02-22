@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -97,35 +98,33 @@ Número: ${appointment.phone}`;
   return (
     <>
       <Dialog open={open} onOpenChange={(o) => { if(!o) setIsEditing(false); onOpenChange(o); }}>
-        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border custom-scrollbar">
-          <DialogHeader className="border-b border-border/40 pb-4 mb-4">
-            <div className="flex items-center justify-between pr-8">
-              <div className="flex items-center gap-3">
-                <DialogTitle className="text-xl font-headline font-bold text-foreground">
-                  Detalles
-                </DialogTitle>
-                
-                {!isEditing && (
-                  <Button 
-                    onClick={copyToWhatsAppFormat}
-                    variant="outline" 
-                    size="sm"
-                    className="h-7 px-2 text-[10px] border-green-500/30 text-green-500 hover:bg-green-500/10 font-bold uppercase tracking-tight"
-                  >
-                    <MessageCircle className="w-3 h-3 mr-1" />
-                    Copiar datos
-                  </Button>
-                )}
-              </div>
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border custom-scrollbar p-0">
+          <DialogHeader className="px-6 pt-6 pb-4 border-b border-border/40 space-y-0">
+            <div className="flex items-center gap-3">
+              <DialogTitle className="text-xl font-headline font-bold text-foreground">
+                Detalles
+              </DialogTitle>
+              
+              {!isEditing && (
+                <Button 
+                  onClick={copyToWhatsAppFormat}
+                  variant="outline" 
+                  size="sm"
+                  className="h-7 px-2 text-[10px] border-green-500/30 text-green-500 hover:bg-green-500/10 font-bold uppercase tracking-tight"
+                >
+                  <MessageCircle className="w-3 h-3 mr-1" />
+                  Copiar datos
+                </Button>
+              )}
 
               <TooltipProvider>
-                <Tooltip>
+                <Tooltip delayDuration={300}>
                   <TooltipTrigger asChild>
-                    <div className="cursor-help p-1.5 rounded-full hover:bg-muted transition-colors">
-                      <Info className="h-4 w-4 text-muted-foreground" />
+                    <div className="cursor-help p-1 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
+                      <Info className="h-4 w-4" />
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent side="left">
+                  <TooltipContent side="bottom" className="bg-popover border-border shadow-xl">
                     <p className="text-[10px] font-mono uppercase tracking-widest">ID: {appointment.id}</p>
                   </TooltipContent>
                 </Tooltip>
@@ -136,7 +135,7 @@ Número: ${appointment.phone}`;
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-6">
+          <div className="p-6 space-y-6">
             {isEditing ? (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -186,6 +185,7 @@ Número: ${appointment.phone}`;
                         <SelectItem value="Continuación en otra cita">Continuación en otra cita</SelectItem>
                         <SelectItem value="Reagendó">Reagendó</SelectItem>
                         <SelectItem value="Reembolso">Reembolso</SelectItem>
+                        <SelectItem value="Apartado">Apartado</SelectItem>
                         <SelectItem value="Cierre">Cierre</SelectItem>
                       </SelectContent>
                     </Select>
@@ -214,7 +214,7 @@ Número: ${appointment.phone}`;
                     <div>
                       <p className="text-[10px] text-muted-foreground uppercase font-bold">Fecha</p>
                       <p className="text-sm font-medium">{format(parseISO(appointment.date), 'dd/MM/yyyy')}</p>
-                      <p className="text-[10px] text-muted-foreground italic">{formatFriendlyDate(appointment.date)}</p>
+                      <p className="text-[10px] text-muted-foreground italic font-medium mt-0.5">{formatFriendlyDate(appointment.date)}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -252,7 +252,7 @@ Número: ${appointment.phone}`;
               </Label>
               <Textarea 
                 placeholder="Detalles importantes sobre este prospecto..."
-                className="min-h-[140px] bg-muted/30 focus-visible:ring-accent resize-none custom-scrollbar"
+                className="min-h-[140px] bg-muted/30 border-border/50 focus-visible:ring-accent resize-none custom-scrollbar text-sm leading-relaxed"
                 value={isEditing ? editData.notes : appointment.notes}
                 onChange={e => setEditData({...editData, notes: e.target.value})}
                 readOnly={!isEditing}
@@ -260,11 +260,11 @@ Número: ${appointment.phone}`;
             </div>
           </div>
 
-          <DialogFooter className="flex flex-row justify-between sm:justify-between items-center gap-2 border-t border-border/50 pt-6 mt-6">
+          <DialogFooter className="flex flex-row justify-between sm:justify-between items-center gap-2 border-t border-border/50 px-6 py-4 bg-muted/10">
             <Button 
               variant="ghost" 
               size="sm"
-              className="text-destructive hover:bg-destructive/10 h-8 text-xs"
+              className="text-destructive hover:bg-destructive/10 h-8 text-xs font-bold uppercase"
               onClick={() => setShowDeleteConfirm(true)}
             >
               <Trash2 className="w-3.5 h-3.5 mr-2" /> Eliminar
