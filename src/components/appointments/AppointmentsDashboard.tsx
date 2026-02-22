@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useMemo } from 'react';
@@ -10,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { CalendarClock, Search } from 'lucide-react';
 import { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
+import { parseISO, format, isWeekend } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 interface AppointmentsDashboardProps {
   appointments: Appointment[];
@@ -37,13 +40,53 @@ export default function AppointmentsDashboard({
 
   const filterAppointments = (list: Appointment[]) => {
     if (!searchTerm) return list;
-    const s = searchTerm.toLowerCase();
-    return list.filter(app => 
-      app.name.toLowerCase().includes(s) || 
-      app.phone.includes(s) || 
-      app.type.toLowerCase().includes(s) ||
-      (app.status && app.status.toLowerCase().includes(s))
-    );
+    const s = searchTerm.toLowerCase().trim();
+    
+    return list.filter(app => {
+      const appDate = parseISO(app.date);
+      const friendlyDate = formatFriendlyDate(app.date).toLowerCase();
+      const monthName = format(appDate, 'MMMM', { locale: es }).toLowerCase();
+      const dayName = format(appDate, 'EEEE', { locale: es }).toLowerCase();
+      const dayNum = format(appDate, 'd');
+      const fullDate = format(appDate, "d 'de' MMMM", { locale: es }).toLowerCase();
+      
+      // 1. Búsqueda básica en campos de texto
+      const basicMatch = 
+        app.name.toLowerCase().includes(s) || 
+        app.phone.includes(s) || 
+        app.type.toLowerCase().includes(s) ||
+        (app.status && app.status.toLowerCase().includes(s));
+      
+      if (basicMatch) return true;
+
+      // 2. Búsqueda por términos de fecha amigables ("hoy", "ayer", "semana pasada")
+      if (friendlyDate.includes(s)) return true;
+
+      // 3. Búsqueda por mes o día de la semana ("enero", "lunes")
+      if (monthName.includes(s)) return true;
+      if (dayName.includes(s)) return true;
+      if (fullDate.includes(s)) return true;
+
+      // 4. Búsqueda por "fin de semana"
+      if (s === 'fin de semana' || s === 'finde') {
+        if (isWeekend(appDate)) return true;
+      }
+
+      // 5. Búsqueda por términos múltiples (ej: "sábado 21")
+      const terms = s.split(/\s+/);
+      if (terms.length > 1) {
+        return terms.every(term => 
+          friendlyDate.includes(term) || 
+          monthName.includes(term) || 
+          dayName.includes(term) || 
+          dayNum === term ||
+          app.name.toLowerCase().includes(term) ||
+          app.type.toLowerCase().includes(term)
+        );
+      }
+
+      return false;
+    });
   };
 
   const filteredUpcoming = useMemo(() => filterAppointments(upcoming), [upcoming, searchTerm]);
@@ -67,10 +110,10 @@ export default function AppointmentsDashboard({
               </div>
               <CardDescription className="text-muted-foreground">Monitoreo de prospectos y cierres</CardDescription>
             </div>
-            <div className="relative w-full sm:w-64">
+            <div className="relative w-full sm:w-80">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar prospecto..."
+                placeholder="Busca por nombre, tel, mes o día..."
                 className="pl-9 h-9 bg-muted/30 border-border/50 focus-visible:ring-primary"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
