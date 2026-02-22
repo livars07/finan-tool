@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -39,23 +38,31 @@ export default function AppointmentsDashboard({
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
+  const normalizeStr = (str: string) => {
+    return str
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+  };
+
   const filterAppointments = (list: Appointment[]) => {
     if (!searchTerm) return list;
-    const s = searchTerm.toLowerCase().trim();
+    const s = normalizeStr(searchTerm);
     
     return list.filter(app => {
       const appDate = parseISO(app.date);
-      const friendlyDate = formatFriendlyDate(app.date).toLowerCase();
-      const monthName = format(appDate, 'MMMM', { locale: es }).toLowerCase();
-      const dayName = format(appDate, 'EEEE', { locale: es }).toLowerCase();
+      const friendlyDate = normalizeStr(formatFriendlyDate(app.date));
+      const monthName = normalizeStr(format(appDate, 'MMMM', { locale: es }));
+      const dayName = normalizeStr(format(appDate, 'EEEE', { locale: es }));
       const dayNum = format(appDate, 'd');
-      const fullDate = format(appDate, "d 'de' MMMM", { locale: es }).toLowerCase();
+      const fullDate = normalizeStr(format(appDate, "d 'de' MMMM", { locale: es }));
       
       const basicMatch = 
-        app.name.toLowerCase().includes(s) || 
+        normalizeStr(app.name).includes(s) || 
         app.phone.includes(s) || 
-        app.type.toLowerCase().includes(s) ||
-        (app.status && app.status.toLowerCase().includes(s));
+        normalizeStr(app.type).includes(s) ||
+        (app.status && normalizeStr(app.status).includes(s));
       
       if (basicMatch) return true;
       if (friendlyDate.includes(s)) return true;
@@ -74,8 +81,8 @@ export default function AppointmentsDashboard({
           monthName.includes(term) || 
           dayName.includes(term) || 
           dayNum === term ||
-          app.name.toLowerCase().includes(term) ||
-          app.type.toLowerCase().includes(term)
+          normalizeStr(app.name).includes(term) ||
+          normalizeStr(app.type).includes(term)
         );
       }
 
