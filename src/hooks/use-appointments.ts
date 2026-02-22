@@ -1,10 +1,12 @@
+
 "use client"
 
 import { useState, useEffect } from 'react';
-import { isAfter, isBefore, isToday, isTomorrow, isThisWeek, format, parseISO, startOfDay } from 'date-fns';
+import { isAfter, isBefore, isToday, isTomorrow, isThisWeek, format, parseISO, startOfDay, subDays, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 export type AppointmentStatus = 'Reagendó' | 'Canceló' | 'Venta' | 'Cita Exitosa' | 'Cita Exitosa y reagendó';
+export type AppointmentType = '1er consulta' | '2da consulta' | 'cierre' | 'asesoria post-venta';
 
 export interface Appointment {
   id: string;
@@ -12,37 +14,78 @@ export interface Appointment {
   phone: string;
   date: string; // ISO string
   time: string;
+  type: AppointmentType;
   status?: AppointmentStatus;
 }
 
-const STORAGE_KEY = 'credicitas_pro_data';
+const STORAGE_KEY = 'olivares_fin_data_v2';
 
-const INITIAL_DATA: Appointment[] = [
-  { id: '1', name: 'Juan Perez', phone: '555-123-4567', date: new Date().toISOString(), time: '10:00', status: 'Venta' },
-  { id: '2', name: 'Maria Lopez', phone: '555-987-6543', date: new Date(Date.now() + 86400000).toISOString(), time: '15:30' },
-  { id: '3', name: 'Carlos Gomez', phone: '555-456-7890', date: new Date(Date.now() - 86400000).toISOString(), time: '09:00', status: 'Reagendó' },
-];
+// Generador de datos semilla
+const generateSeedData = (): Appointment[] => {
+  const data: Appointment[] = [];
+  const types: AppointmentType[] = ['1er consulta', '2da consulta', 'cierre', 'asesoria post-venta'];
+  const statuses: AppointmentStatus[] = ['Venta', 'Canceló', 'Reagendó', 'Cita Exitosa'];
+  const names = ['Juan Perez', 'Maria Garcia', 'Carlos Lopez', 'Ana Martinez', 'Luis Rodriguez', 'Elena Sanchez', 'Roberto Diaz', 'Sofia Castro'];
+
+  // 50 Citas pasadas
+  for (let i = 0; i < 50; i++) {
+    const randomName = names[Math.floor(Math.random() * names.length)];
+    const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+    const randomType = types[Math.floor(Math.random() * types.length)];
+    const pastDate = subDays(new Date(), Math.floor(Math.random() * 30) + 1);
+    
+    data.push({
+      id: `past-${i}`,
+      name: `${randomName} ${i + 1}`,
+      phone: `55 ${Math.floor(10000000 + Math.random() * 90000000)}`,
+      date: pastDate.toISOString(),
+      time: `${Math.floor(9 + Math.random() * 8)}:00`,
+      type: randomType,
+      status: randomStatus
+    });
+  }
+
+  // 10 Citas pendientes
+  for (let i = 0; i < 10; i++) {
+    const randomName = names[Math.floor(Math.random() * names.length)];
+    const randomType = types[Math.floor(Math.random() * types.length)];
+    // Algunas hoy, otras mañana, otras después
+    let futureDate;
+    if (i < 3) futureDate = new Date(); // Hoy
+    else if (i < 6) futureDate = addDays(new Date(), 1); // Mañana
+    else futureDate = addDays(new Date(), Math.floor(Math.random() * 7) + 2);
+
+    data.push({
+      id: `future-${i}`,
+      name: `${randomName} Futuro ${i + 1}`,
+      phone: `55 ${Math.floor(10000000 + Math.random() * 90000000)}`,
+      date: futureDate.toISOString(),
+      time: `${Math.floor(9 + Math.random() * 8)}:30`,
+      type: randomType
+    });
+  }
+
+  return data;
+};
 
 export function useAppointments() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Cargar datos al iniciar
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
         setAppointments(JSON.parse(saved));
       } catch (e) {
-        setAppointments(INITIAL_DATA);
+        setAppointments(generateSeedData());
       }
     } else {
-      setAppointments(INITIAL_DATA);
+      setAppointments(generateSeedData());
     }
     setIsLoaded(true);
   }, []);
 
-  // Guardar datos cuando cambien
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
@@ -50,7 +93,7 @@ export function useAppointments() {
   }, [appointments, isLoaded]);
 
   const addAppointment = (newApp: Omit<Appointment, 'id'>) => {
-    setAppointments(prev => [...prev, { ...newApp, id: Math.random().toString(36).substr(2, 9) }]);
+    setAppointments(prev => [{ ...newApp, id: Math.random().toString(36).substr(2, 9) }, ...prev]);
   };
 
   const updateStatus = (id: string, status: AppointmentStatus) => {
@@ -81,7 +124,6 @@ export function useAppointments() {
     return format(d, 'dd/MM/yyyy');
   };
 
-  // Estadísticas reales
   const stats = {
     todayCount: appointments.filter(app => isToday(parseISO(app.date))).length,
     totalProspects: appointments.length,
