@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Dialog, DialogContent, DialogHeader, DialogTitle, 
-  DialogFooter, DialogDescription 
+  DialogFooter, DialogDescription, DialogClose
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,28 +66,28 @@ export default function AppointmentDetailsDialog({
   };
 
   const handleDelete = () => {
-    // 1. Ocultamos la alerta
+    const idToDelete = appointment.id;
+    // 1. Cerramos el popup de confirmación primero
     setShowDeleteConfirm(false);
     
-    // 2. Cerramos el diálogo principal inmediatamente para liberar el estado visual
+    // 2. Ejecutamos la lógica de eliminación
+    onDelete(idToDelete);
+    
+    // 3. Cerramos el diálogo principal
     onOpenChange(false);
     
-    // 3. Ejecutamos la eliminación con un delay para permitir que las animaciones de Radix terminen
-    // y no se bloquee el scroll/pointer-events del body.
+    // 4. Limpieza forzada del DOM para asegurar interactividad
     setTimeout(() => {
-      onDelete(appointment.id);
-      
-      toast({ 
-        title: "Registro eliminado", 
-        description: `Se ha borrado el historial de ${appointment.name}.` 
-      });
-
-      // Fallback de seguridad para asegurar que el DOM siempre sea interactivo
       if (typeof document !== 'undefined') {
         document.body.style.pointerEvents = 'auto';
         document.body.style.overflow = 'auto';
       }
-    }, 150);
+    }, 100);
+
+    toast({ 
+      title: "Registro eliminado", 
+      description: `Se ha borrado el historial de ${appointment.name}.` 
+    });
   };
 
   const copyToWhatsAppFormat = () => {
@@ -116,7 +116,7 @@ Número: ${appointment.phone}`;
     <>
       <Dialog open={open} onOpenChange={(o) => { if(!o) setIsEditing(false); onOpenChange(o); }}>
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border custom-scrollbar p-0">
-          <DialogHeader className="px-6 py-4 border-b border-border/40 flex flex-row items-center justify-between">
+          <DialogHeader className="px-6 py-3 border-b border-border/40 flex flex-row items-center justify-between">
             <div className="flex items-center gap-2">
               <DialogTitle className="text-xl font-headline font-bold text-foreground leading-none">
                 Detalles
@@ -136,8 +136,8 @@ Número: ${appointment.phone}`;
               </TooltipProvider>
             </div>
 
-            {!isEditing && (
-              <div className="flex items-center gap-3 pr-8">
+            <div className="flex items-center gap-2">
+              {!isEditing && (
                 <Button 
                   onClick={copyToWhatsAppFormat}
                   variant="outline" 
@@ -147,8 +147,11 @@ Número: ${appointment.phone}`;
                   <MessageCircle className="w-3 h-3 mr-1.5" />
                   Copiar datos
                 </Button>
-              </div>
-            )}
+              )}
+              <DialogClose className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 transition-all hover:bg-red-600 focus:outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
+                <span className="sr-only">Cerrar</span>
+              </DialogClose>
+            </div>
             
             <DialogDescription className="sr-only">
               Información detallada y gestión del prospecto.
