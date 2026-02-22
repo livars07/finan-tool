@@ -11,7 +11,7 @@ export type AppointmentStatus =
   | 'Continuación en otra cita' 
   | 'Reagendó' 
   | 'Reembolso' 
-  | 'Apartado';
+  | 'Cierre';
 
 export type AppointmentType = '1ra consulta' | '2da consulta' | 'cierre' | 'seguimiento';
 
@@ -32,7 +32,7 @@ const STORAGE_KEY = 'olivares_fin_data_v4';
 const generateSeedData = (): Appointment[] => {
   const data: Appointment[] = [];
   const types: AppointmentType[] = ['1ra consulta', '2da consulta', 'cierre', 'seguimiento'];
-  const statuses: AppointmentStatus[] = ['Asistencia', 'No asistencia', 'Continuación en otra cita', 'Reagendó', 'Reembolso', 'Apartado'];
+  const statuses: AppointmentStatus[] = ['Asistencia', 'No asistencia', 'Continuación en otra cita', 'Reagendó', 'Reembolso', 'Cierre'];
   const names = ['Juan Pérez', 'María García', 'Carlos López', 'Ana Martínez', 'Luis Rodríguez', 'Elena Sánchez', 'Roberto Díaz', 'Sofía Castro'];
 
   for (let i = 0; i < 50; i++) {
@@ -132,7 +132,7 @@ export function useAppointments() {
   const upcoming = appointments
     .filter(app => {
       const appDate = startOfDay(parseISO(app.date));
-      return (isAfter(appDate, startOfToday) || (isToday(appDate) && !app.status)) && !app.status;
+      return (isToday(appDate) || isAfter(appDate, startOfToday)) && !app.status;
     })
     .sort((a, b) => {
       const timeA = parseISO(a.date).getTime();
@@ -164,7 +164,6 @@ export function useAppointments() {
     const diffDays = differenceInDays(dayOfApp, today);
     if (diffDays === 2) return "Pasado mañana";
 
-    // Past dates
     const pastDiffDays = differenceInDays(today, dayOfApp);
     if (pastDiffDays === 1) return "Ayer";
     if (pastDiffDays === 2) return "Antier";
@@ -203,8 +202,8 @@ export function useAppointments() {
     currentMonthProspects: appointments.filter(app => isSameMonth(parseISO(app.date), now)).length,
     lastMonthProspects: appointments.filter(app => isSameMonth(parseISO(app.date), lastMonth)).length,
 
-    currentMonthSales: appointments.filter(app => app.status === 'Apartado' && isSameMonth(parseISO(app.date), now)).length,
-    lastMonthSales: appointments.filter(app => app.status === 'Apartado' && isSameMonth(parseISO(app.date), lastMonth)).length,
+    currentMonthSales: appointments.filter(app => app.status === 'Cierre' && isSameMonth(parseISO(app.date), now)).length,
+    lastMonthSales: appointments.filter(app => app.status === 'Cierre' && isSameMonth(parseISO(app.date), lastMonth)).length,
   };
 
   return { 

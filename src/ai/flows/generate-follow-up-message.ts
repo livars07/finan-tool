@@ -15,7 +15,7 @@ const GenerateFollowUpMessageInputSchema = z.object({
   status: z
     .string()
     .describe(
-      "The status of the past appointment (e.g., 'Asistencia', 'No asistencia', 'Continuación en otra cita', 'Reagendó', 'Reembolso', 'Apartado')."
+      "The status of the past appointment (e.g., 'Asistencia', 'No asistencia', 'Continuación en otra cita', 'Reagendó', 'Reembolso', 'Cierre')."
     ),
   clientName: z.string().describe('The name of the client for personalization.'),
   agentName: z
@@ -53,7 +53,7 @@ Nombre del Cliente: {{{clientName}}}
 Nombre del Agente: {{{agentName}}}
 
 Considera los siguientes puntos al generar la plantilla:
-- 'Apartado': El mensaje debe ser de felicitación por iniciar su patrimonio y agradecer la confianza.
+- 'Cierre': El mensaje debe ser de felicitación por concretar su trámite inmobiliario y agradecer la confianza.
 - 'Asistencia': Agradecer el tiempo, resumir brevemente que fue un gusto atenderle y quedar a sus órdenes para el siguiente paso.
 - 'No asistencia': Expresar que se le extrañó en la cita y preguntar si desea reprogramar o si hubo algún inconveniente.
 - 'Continuación en otra cita': Reforzar los puntos clave vistos y mencionar que se espera con gusto la siguiente sesión para profundizar.

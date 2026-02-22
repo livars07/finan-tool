@@ -170,7 +170,7 @@ export default function UpcomingAppointments({ appointments, formatDate, onSelec
                 <SelectItem value="Continuación en otra cita">Continuación en otra cita</SelectItem>
                 <SelectItem value="Reagendó">Reagendó</SelectItem>
                 <SelectItem value="Reembolso">Reembolso</SelectItem>
-                <SelectItem value="Apartado">Apartado</SelectItem>
+                <SelectItem value="Cierre">Cierre</SelectItem>
               </SelectContent>
             </Select>
           </div>
