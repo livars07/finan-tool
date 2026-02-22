@@ -33,26 +33,26 @@
   }
 
   [data-theme="discreto"] {
-    /* Discreto - Verde Oscuro */
-    --background: 160 20% 8%;
+    /* Discreto - Estilo Discord (Grises/Azul Blurple) */
+    --background: 220 7% 21%; /* #313338 */
     --foreground: 0 0% 100%;
-    --card: 160 20% 12%;
+    --card: 225 7% 18%; /* #2b2d31 */
     --card-foreground: 0 0% 100%;
-    --popover: 160 20% 6%;
+    --popover: 225 7% 12%;
     --popover-foreground: 0 0% 100%;
-    --primary: 142 70% 45%;
-    --primary-foreground: 160 20% 5%;
-    --secondary: 160 10% 20%;
+    --primary: 235 86% 65%; /* Discord Blurple #5865f2 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 225 6% 13%; /* #1e1f22 */
     --secondary-foreground: 0 0% 100%;
-    --muted: 160 10% 15%;
-    --muted-foreground: 0 0% 70%;
-    --accent: 142 70% 45%;
-    --accent-foreground: 160 20% 5%;
-    --destructive: 0 84.2% 60.2%;
+    --muted: 225 6% 15%;
+    --muted-foreground: 215 15% 75%;
+    --accent: 142 70% 45%; /* Acento verde para estatus/online */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 359 82% 60%; /* Rojo Discord */
     --destructive-foreground: 0 0% 100%;
-    --border: 160 15% 20%;
-    --input: 160 15% 20%;
-    --ring: 142 70% 45%;
+    --border: 225 6% 15%;
+    --input: 225 6% 13%;
+    --ring: 235 86% 65%;
   }
 
   [data-theme="corporativo"] {
@@ -84,11 +84,11 @@
     --foreground: 180 100% 95%;
     --card: 222 47% 12% / 0.6;
     --card-foreground: 180 100% 95%;
-    --popover: 222 47% 8%;
+    --popover: 222 47% 8% / 0.8;
     --popover-foreground: 180 100% 95%;
     --primary: 190 100% 50%;
     --primary-foreground: 222 47% 5%;
-    --secondary: 222 30% 20%;
+    --secondary: 222 30% 20% / 0.5;
     --secondary-foreground: 180 100% 95%;
     --muted: 222 30% 15%;
     --muted-foreground: 190 50% 70%;
@@ -97,7 +97,7 @@
     --destructive: 0 100% 60%;
     --destructive-foreground: 0 0% 100%;
     --border: 190 100% 30% / 0.3;
-    --input: 222 30% 15%;
+    --input: 222 30% 15% / 0.4;
     --ring: 190 100% 50%;
     --radius: 0.15rem;
   }
@@ -116,8 +116,16 @@
     background: radial-gradient(circle at top right, hsl(222 47% 15%), hsl(222 47% 7%));
   }
   
-  [data-theme="moderno"] .bg-card {
+  [data-theme="moderno"] .bg-card,
+  [data-theme="moderno"] [role="dialog"],
+  [data-theme="moderno"] .bg-background:not(body) {
     @apply backdrop-blur-md border border-primary/20 shadow-[0_0_15px_rgba(0,183,255,0.1)];
+    background-color: hsla(222, 47%, 12%, 0.6) !important;
+  }
+
+  [data-theme="moderno"] [role="status"] {
+    @apply backdrop-blur-lg border border-primary/40 shadow-[0_0_20px_rgba(0,183,255,0.2)];
+    background-color: hsla(222, 47%, 8%, 0.7) !important;
   }
 
   [data-theme="moderno"] button:hover {
