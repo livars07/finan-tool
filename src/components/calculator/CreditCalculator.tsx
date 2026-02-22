@@ -166,7 +166,7 @@ export default function CreditCalculator() {
           <div className="flex items-center gap-2 p-2 px-3 rounded-full bg-muted border border-border/50">
             <Info className="w-3.5 h-3.5 text-muted-foreground" />
             <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-tighter">
-              Factor mensualidad: 0.006982
+              Factor mensualidad: 0.6982%
             </span>
           </div>
           <Button variant="ghost" size="sm" onClick={clear} className="text-muted-foreground hover:text-destructive h-8 px-2">
