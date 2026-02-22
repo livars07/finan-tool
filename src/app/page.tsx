@@ -40,13 +40,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast";
 
-type Theme = 'azulado' | 'discord' | 'light';
+type Theme = 'predeterminado' | 'discreto' | 'corporativo';
 
 export default function Home() {
   const appointmentState = useAppointments();
   const { stats, isLoaded, resetData } = appointmentState;
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [theme, setTheme] = useState<Theme>('azulado');
+  const [theme, setTheme] = useState<Theme>('predeterminado');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -63,9 +63,9 @@ export default function Home() {
     document.documentElement.setAttribute('data-theme', newTheme);
     
     const themeNames = {
-      azulado: 'Finanto Azulado',
-      discord: 'Discord Pro',
-      light: 'Luz Funcional'
+      predeterminado: 'Predeterminado',
+      discreto: 'Discreto',
+      corporativo: 'Corporativo'
     };
 
     toast({
@@ -111,20 +111,20 @@ export default function Home() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" className="w-9 h-9 rounded-full bg-muted border border-border overflow-hidden">
-                  {theme === 'light' ? <Sun className="w-5 h-5" /> : theme === 'discord' ? <Moon className="w-5 h-5" /> : <Palette className="w-5 h-5 text-primary" />}
+                  {theme === 'corporativo' ? <Sun className="w-5 h-5" /> : theme === 'discreto' ? <Moon className="w-5 h-5 text-primary" /> : <Palette className="w-5 h-5 text-primary" />}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuLabel>Personalización</DropdownMenuLabel>
+                <DropdownMenuLabel>Temas</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => handleThemeChange('azulado')} className="flex items-center gap-2 cursor-pointer">
-                  <div className="w-3 h-3 rounded-full bg-[#7ec1ff]" /> Finanto Azulado
+                <DropdownMenuItem onClick={() => handleThemeChange('predeterminado')} className="flex items-center gap-2 cursor-pointer">
+                  <div className="w-3 h-3 rounded-full bg-[#7ec1ff]" /> Predeterminado
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleThemeChange('discord')} className="flex items-center gap-2 cursor-pointer">
-                  <div className="w-3 h-3 rounded-full bg-[#5865f2]" /> Discord Pro
+                <DropdownMenuItem onClick={() => handleThemeChange('discreto')} className="flex items-center gap-2 cursor-pointer">
+                  <div className="w-3 h-3 rounded-full bg-[#1a4d2e]" /> Discreto
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleThemeChange('light')} className="flex items-center gap-2 cursor-pointer">
-                  <div className="w-3 h-3 rounded-full bg-[#3b82f6]" /> Luz Funcional
+                <DropdownMenuItem onClick={() => handleThemeChange('corporativo')} className="flex items-center gap-2 cursor-pointer">
+                  <div className="w-3 h-3 rounded-full bg-white border border-gray-300" /> Corporativo
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
