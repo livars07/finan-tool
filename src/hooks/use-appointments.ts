@@ -15,14 +15,39 @@ export interface Appointment {
   status?: AppointmentStatus;
 }
 
-const INITIAL_APPOINTMENTS: Appointment[] = [
+const STORAGE_KEY = 'credicitas_pro_data';
+
+const INITIAL_DATA: Appointment[] = [
   { id: '1', name: 'Juan Perez', phone: '555-123-4567', date: new Date().toISOString(), time: '10:00', status: 'Venta' },
   { id: '2', name: 'Maria Lopez', phone: '555-987-6543', date: new Date(Date.now() + 86400000).toISOString(), time: '15:30' },
   { id: '3', name: 'Carlos Gomez', phone: '555-456-7890', date: new Date(Date.now() - 86400000).toISOString(), time: '09:00', status: 'Reagendó' },
 ];
 
 export function useAppointments() {
-  const [appointments, setAppointments] = useState<Appointment[]>(INITIAL_APPOINTMENTS);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Cargar datos al iniciar
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        setAppointments(JSON.parse(saved));
+      } catch (e) {
+        setAppointments(INITIAL_DATA);
+      }
+    } else {
+      setAppointments(INITIAL_DATA);
+    }
+    setIsLoaded(true);
+  }, []);
+
+  // Guardar datos cuando cambien
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
+    }
+  }, [appointments, isLoaded]);
 
   const addAppointment = (newApp: Omit<Appointment, 'id'>) => {
     setAppointments(prev => [...prev, { ...newApp, id: Math.random().toString(36).substr(2, 9) }]);
@@ -56,5 +81,13 @@ export function useAppointments() {
     return format(d, 'dd/MM/yyyy');
   };
 
-  return { upcoming, past, addAppointment, updateStatus, formatFriendlyDate };
+  // Estadísticas reales
+  const stats = {
+    todayCount: appointments.filter(app => isToday(parseISO(app.date))).length,
+    totalProspects: appointments.length,
+    salesCount: appointments.filter(app => app.status === 'Venta').length,
+    pendingCount: upcoming.length
+  };
+
+  return { upcoming, past, appointments, addAppointment, updateStatus, formatFriendlyDate, stats, isLoaded };
 }

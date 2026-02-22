@@ -1,12 +1,18 @@
+"use client"
+
 import CreditCalculator from '@/components/calculator/CreditCalculator';
 import AppointmentsDashboard from '@/components/appointments/AppointmentsDashboard';
 import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { LayoutDashboard, Wallet, CalendarDays, TrendingUp, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Wallet, CalendarDays, Users, CheckCircle2 } from 'lucide-react';
+import { useAppointments } from '@/hooks/use-appointments';
 
 export default function Home() {
+  const { stats, isLoaded } = useAppointments();
+
+  if (!isLoaded) return null;
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Sidebar/Header Navigation Simulation */}
       <header className="border-b border-border/40 bg-card/30 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -19,14 +25,8 @@ export default function Home() {
             </h1>
           </div>
           <nav className="hidden md:flex items-center gap-6">
-            <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer">
-              <Wallet className="w-4 h-4" /> Calculadora
-            </div>
-            <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer">
-              <CalendarDays className="w-4 h-4" /> Citas
-            </div>
-            <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer">
-              <TrendingUp className="w-4 h-4" /> Estadísticas
+            <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer border-b-2 border-primary pb-1">
+              <CalendarDays className="w-4 h-4" /> Panel de Control
             </div>
           </nav>
           <div className="flex items-center gap-2">
@@ -40,13 +40,13 @@ export default function Home() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        {/* Statistics Bar */}
+        {/* Statistics Bar con Info Real */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Citas Hoy', value: '3', icon: CalendarDays, color: 'text-primary' },
-            { label: 'Tasa Promedio', value: '10.5%', icon: TrendingUp, color: 'text-accent' },
-            { label: 'Conversión', value: '24%', icon: ShieldCheck, color: 'text-green-400' },
-            { label: 'Cierres Mes', value: '8', icon: Wallet, color: 'text-primary' },
+            { label: 'Citas Hoy', value: stats.todayCount.toString(), icon: CalendarDays, color: 'text-primary' },
+            { label: 'Total Prospectos', value: stats.totalProspects.toString(), icon: Users, color: 'text-accent' },
+            { label: 'Ventas Cerradas', value: stats.salesCount.toString(), icon: CheckCircle2, color: 'text-green-400' },
+            { label: 'Citas Pendientes', value: stats.pendingCount.toString(), icon: Wallet, color: 'text-primary' },
           ].map((stat, i) => (
             <Card key={i} className="bg-card/40 border-border/50 backdrop-blur-sm hover:border-primary/30 transition-all group">
               <CardContent className="p-4 flex items-center gap-3">
@@ -63,23 +63,23 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-          {/* Section 1: Calculator (Lighter, focused UI) */}
+          {/* Section 1: Calculator */}
           <section className="xl:col-span-5">
             <div className="sticky top-24">
               <CreditCalculator />
               
               <div className="mt-6 p-6 rounded-xl border border-primary/20 bg-primary/5">
-                <h3 className="text-sm font-headline font-bold mb-2 flex items-center gap-2">
-                   <ShieldCheck className="w-4 h-4 text-primary" /> Consejos del Asesor
+                <h3 className="text-sm font-headline font-bold mb-2 flex items-center gap-2 text-primary">
+                   💡 Nota de Calificación
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Recuerda que el enganche mínimo recomendado es del 10%. Para mejores tasas hipotecarias, un enganche del 20% suele reducir significativamente los seguros obligatorios.
+                  Usa el "Ingreso Mensual Recomendado" para filtrar prospectos rápidamente. Si su ingreso es menor al calculado, es probable que necesiten un aval o un enganche mayor para calificar.
                 </p>
               </div>
             </div>
           </section>
 
-          {/* Section 2: CRM/Appointments Dashboard (Structured data) */}
+          {/* Section 2: CRM/Appointments Dashboard */}
           <section className="xl:col-span-7 space-y-8">
             <AppointmentsDashboard />
           </section>
@@ -88,10 +88,9 @@ export default function Home() {
 
       <footer className="mt-12 border-t border-border/40 py-8 bg-card/20">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm">
-          <p>© 2024 CrediCitas Pro - Dashboard de Gestión Inmobiliaria</p>
+          <p>© 2024 CrediCitas Pro - Gestión de Crédito Hipotecario</p>
           <div className="flex items-center gap-6">
-            <span className="hover:text-primary transition-colors cursor-pointer">Privacidad</span>
-            <span className="hover:text-primary transition-colors cursor-pointer">Términos</span>
+            <span className="hover:text-primary transition-colors cursor-pointer">Panel</span>
             <span className="hover:text-primary transition-colors cursor-pointer">Soporte</span>
           </div>
         </div>
