@@ -8,7 +8,6 @@ import { Clock, Calendar, Info } from "lucide-react";
 import { isToday, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { useAppointments } from '@/hooks/use-appointments';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,10 +33,11 @@ import { useToast } from "@/hooks/use-toast";
 interface Props {
   appointments: Appointment[];
   formatDate: (date: string) => string;
+  deleteAppointment: (id: string) => void;
+  editAppointment: (id: string, updatedData: Partial<Appointment>) => void;
 }
 
-export default function UpcomingAppointments({ appointments, formatDate }: Props) {
-  const { deleteAppointment, editAppointment } = useAppointments();
+export default function UpcomingAppointments({ appointments, formatDate, deleteAppointment, editAppointment }: Props) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editApp, setEditApp] = useState<Appointment | null>(null);
   const { toast } = useToast();

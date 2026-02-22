@@ -1,17 +1,34 @@
 "use client"
 
 import React from 'react';
-import { useAppointments } from '@/hooks/use-appointments';
 import AppointmentForm from './AppointmentForm';
 import UpcomingAppointments from './UpcomingAppointments';
 import PastAppointments from './PastAppointments';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CalendarClock, Users } from 'lucide-react';
+import { CalendarClock } from 'lucide-react';
+import { Appointment, AppointmentStatus, AppointmentType } from '@/hooks/use-appointments';
 
-export default function AppointmentsDashboard() {
-  const { upcoming, past, addAppointment, updateStatus, formatFriendlyDate } = useAppointments();
+interface AppointmentsDashboardProps {
+  appointments: Appointment[];
+  upcoming: Appointment[];
+  past: Appointment[];
+  addAppointment: (newApp: Omit<Appointment, 'id'>) => void;
+  updateStatus: (id: string, status: AppointmentStatus) => void;
+  deleteAppointment: (id: string) => void;
+  editAppointment: (id: string, updatedData: Partial<Appointment>) => void;
+  formatFriendlyDate: (date: string) => string;
+}
 
+export default function AppointmentsDashboard({
+  upcoming,
+  past,
+  addAppointment,
+  updateStatus,
+  deleteAppointment,
+  editAppointment,
+  formatFriendlyDate
+}: AppointmentsDashboardProps) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-6">
@@ -32,10 +49,20 @@ export default function AppointmentsDashboard() {
                 <TabsTrigger value="past">Pasadas ({past.length})</TabsTrigger>
               </TabsList>
               <TabsContent value="upcoming">
-                <UpcomingAppointments appointments={upcoming} formatDate={formatFriendlyDate} />
+                <UpcomingAppointments 
+                  appointments={upcoming} 
+                  formatDate={formatFriendlyDate}
+                  deleteAppointment={deleteAppointment}
+                  editAppointment={editAppointment}
+                />
               </TabsContent>
               <TabsContent value="past">
-                <PastAppointments appointments={past} updateStatus={updateStatus} />
+                <PastAppointments 
+                  appointments={past} 
+                  updateStatus={updateStatus}
+                  deleteAppointment={deleteAppointment}
+                  editAppointment={editAppointment}
+                />
               </TabsContent>
             </Tabs>
           </CardContent>

@@ -8,7 +8,6 @@ import { MessageSquare, ChevronDown } from "lucide-react";
 import { format, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useAppointments } from '@/hooks/use-appointments';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,10 +32,11 @@ import { useToast } from "@/hooks/use-toast";
 interface Props {
   appointments: Appointment[];
   updateStatus: (id: string, status: AppointmentStatus) => void;
+  deleteAppointment: (id: string) => void;
+  editAppointment: (id: string, updatedData: Partial<Appointment>) => void;
 }
 
-export default function PastAppointments({ appointments, updateStatus }: Props) {
-  const { deleteAppointment, editAppointment } = useAppointments();
+export default function PastAppointments({ appointments, updateStatus, deleteAppointment, editAppointment }: Props) {
   const [visibleCount, setVisibleCount] = useState(20);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editApp, setEditApp] = useState<Appointment | null>(null);
