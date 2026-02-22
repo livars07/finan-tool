@@ -2,7 +2,7 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { isAfter, isBefore, isToday, isTomorrow, isThisWeek, format, parseISO, startOfDay, subDays, addDays } from 'date-fns';
+import { isAfter, isBefore, isToday, isTomorrow, isThisWeek, format, parseISO, startOfDay, subDays, addDays, isSameMonth, subMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 export type AppointmentStatus = 'Reagendó' | 'Canceló' | 'Venta' | 'Cita Exitosa' | 'Cita Exitosa y reagendó';
@@ -26,11 +26,12 @@ const generateSeedData = (): Appointment[] => {
   const statuses: AppointmentStatus[] = ['Venta', 'Canceló', 'Reagendó', 'Cita Exitosa'];
   const names = ['Juan Perez', 'Maria Garcia', 'Carlos Lopez', 'Ana Martinez', 'Luis Rodriguez', 'Elena Sanchez', 'Roberto Diaz', 'Sofia Castro'];
 
+  // Generar 50 citas pasadas distribuidas en los últimos 60 días para tener datos de dos meses
   for (let i = 0; i < 50; i++) {
     const randomName = names[Math.floor(Math.random() * names.length)];
     const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
     const randomType = types[Math.floor(Math.random() * types.length)];
-    const pastDate = subDays(new Date(), Math.floor(Math.random() * 30) + 1);
+    const pastDate = subDays(new Date(), Math.floor(Math.random() * 60) + 1);
     
     data.push({
       id: `past-${i}`,
@@ -43,6 +44,7 @@ const generateSeedData = (): Appointment[] => {
     });
   }
 
+  // Generar 10 citas futuras
   for (let i = 0; i < 10; i++) {
     const randomName = names[Math.floor(Math.random() * names.length)];
     const randomType = types[Math.floor(Math.random() * types.length)];
@@ -104,19 +106,21 @@ export function useAppointments() {
     setAppointments(prev => prev.map(app => app.id === id ? { ...app, ...updatedData } : app));
   };
 
-  const now = startOfDay(new Date());
+  const now = new Date();
+  const startOfToday = startOfDay(now);
+  const lastMonth = subMonths(now, 1);
 
   const upcoming = appointments
     .filter(app => {
       const appDate = startOfDay(parseISO(app.date));
-      return isAfter(appDate, now) || isToday(appDate);
+      return isAfter(appDate, startOfToday) || isToday(appDate);
     })
     .sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime());
 
   const past = appointments
     .filter(app => {
       const appDate = startOfDay(parseISO(app.date));
-      return isBefore(appDate, now) && !isToday(appDate);
+      return isBefore(appDate, startOfToday) && !isToday(appDate);
     })
     .sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime());
 
@@ -130,9 +134,15 @@ export function useAppointments() {
 
   const stats = {
     todayCount: appointments.filter(app => isToday(parseISO(app.date))).length,
-    totalProspects: appointments.length,
-    salesCount: appointments.filter(app => app.status === 'Venta').length,
-    pendingCount: upcoming.length
+    pendingCount: upcoming.length,
+    
+    // Prospectos (Citas totales en el mes)
+    currentMonthProspects: appointments.filter(app => isSameMonth(parseISO(app.date), now)).length,
+    lastMonthProspects: appointments.filter(app => isSameMonth(parseISO(app.date), lastMonth)).length,
+
+    // Ventas (Estado 'Venta' en el mes)
+    currentMonthSales: appointments.filter(app => app.status === 'Venta' && isSameMonth(parseISO(app.date), now)).length,
+    lastMonthSales: appointments.filter(app => app.status === 'Venta' && isSameMonth(parseISO(app.date), lastMonth)).length,
   };
 
   return { 

@@ -1,9 +1,10 @@
+
 "use client"
 
 import CreditCalculator from '@/components/calculator/CreditCalculator';
 import AppointmentsDashboard from '@/components/appointments/AppointmentsDashboard';
 import { Card, CardContent } from '@/components/ui/card';
-import { LayoutDashboard, Wallet, CalendarDays, Users, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Wallet, CalendarDays, Users, CheckCircle2, ShieldCheck, TrendingUp } from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
 
 export default function Home() {
@@ -44,19 +45,54 @@ export default function Home() {
       <main className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Citas Hoy', value: stats.todayCount.toString(), icon: CalendarDays, color: 'text-primary' },
-            { label: 'Citas Pendientes', value: stats.pendingCount.toString(), icon: Wallet, color: 'text-primary' },
-            { label: 'Prospectos', value: stats.totalProspects.toString(), icon: Users, color: 'text-accent' },
-            { label: 'Ventas Cerradas', value: stats.salesCount.toString(), icon: CheckCircle2, color: 'text-green-400' },
+            { 
+              label: 'Citas Hoy', 
+              value: stats.todayCount.toString(), 
+              icon: CalendarDays, 
+              color: 'text-primary',
+              subText: 'Gestión diaria'
+            },
+            { 
+              label: 'Citas Pendientes', 
+              value: stats.pendingCount.toString(), 
+              icon: Wallet, 
+              color: 'text-primary',
+              subText: 'Por realizar'
+            },
+            { 
+              label: 'Prospectos (Mes)', 
+              value: stats.currentMonthProspects.toString(), 
+              icon: Users, 
+              color: 'text-accent',
+              subValue: stats.lastMonthProspects,
+              subLabel: 'Mes pasado'
+            },
+            { 
+              label: 'Ventas (Mes)', 
+              value: stats.currentMonthSales.toString(), 
+              icon: CheckCircle2, 
+              color: 'text-green-400',
+              subValue: stats.lastMonthSales,
+              subLabel: 'Mes pasado'
+            },
           ].map((stat, i) => (
             <Card key={i} className="bg-card/40 border-border/50 backdrop-blur-sm hover:border-primary/30 transition-all group">
               <CardContent className="p-4 flex items-center gap-3">
                 <div className={`p-2 rounded-full bg-muted/50 ${stat.color} group-hover:scale-110 transition-transform`}>
                   <stat.icon className="w-5 h-5" />
                 </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">{stat.label}</p>
-                  <p className="text-xl font-headline font-bold text-foreground">{stat.value}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold truncate">{stat.label}</p>
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-xl font-headline font-bold text-foreground">{stat.value}</p>
+                    {stat.subValue !== undefined && (
+                      <div className="flex items-center text-[10px] font-medium text-muted-foreground">
+                        <TrendingUp className="w-2.5 h-2.5 mr-0.5 opacity-50" />
+                        <span>{stat.subValue} <span className="opacity-50">({stat.subLabel})</span></span>
+                      </div>
+                    )}
+                  </div>
+                  {stat.subText && <p className="text-[10px] text-muted-foreground italic leading-none">{stat.subText}</p>}
                 </div>
               </CardContent>
             </Card>
