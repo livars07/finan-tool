@@ -16,7 +16,8 @@ import {
   Palette,
   Monitor,
   Moon,
-  Sun
+  Sun,
+  Cpu
 } from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
 import { Button } from '@/components/ui/button';
@@ -40,7 +41,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast";
 
-type Theme = 'predeterminado' | 'discreto' | 'corporativo';
+type Theme = 'predeterminado' | 'discreto' | 'corporativo' | 'moderno';
 
 export default function Home() {
   const appointmentState = useAppointments();
@@ -65,7 +66,8 @@ export default function Home() {
     const themeNames = {
       predeterminado: 'Predeterminado',
       discreto: 'Discreto',
-      corporativo: 'Corporativo'
+      corporativo: 'Corporativo',
+      moderno: 'Moderno'
     };
 
     toast({
@@ -111,7 +113,7 @@ export default function Home() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" className="w-9 h-9 rounded-full bg-muted border border-border overflow-hidden">
-                  {theme === 'corporativo' ? <Sun className="w-5 h-5" /> : theme === 'discreto' ? <Moon className="w-5 h-5 text-primary" /> : <Palette className="w-5 h-5 text-primary" />}
+                  {theme === 'moderno' ? <Cpu className="w-5 h-5 text-primary" /> : theme === 'corporativo' ? <Sun className="w-5 h-5" /> : theme === 'discreto' ? <Moon className="w-5 h-5 text-primary" /> : <Palette className="w-5 h-5 text-primary" />}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
@@ -125,6 +127,9 @@ export default function Home() {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleThemeChange('corporativo')} className="flex items-center gap-2 cursor-pointer">
                   <div className="w-3 h-3 rounded-full bg-white border border-gray-300" /> Corporativo
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleThemeChange('moderno')} className="flex items-center gap-2 cursor-pointer">
+                  <div className="w-3 h-3 rounded-full bg-[#00f7ff] shadow-[0_0_8px_#00f7ff]" /> Moderno
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

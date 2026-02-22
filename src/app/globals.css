@@ -77,6 +77,30 @@
     --input: 214 20% 85%;
     --ring: 215 25% 27%;
   }
+
+  [data-theme="moderno"] {
+    /* Moderno - Arch Linux Tech Style */
+    --background: 222 47% 7%;
+    --foreground: 180 100% 95%;
+    --card: 222 47% 12% / 0.6;
+    --card-foreground: 180 100% 95%;
+    --popover: 222 47% 8%;
+    --popover-foreground: 180 100% 95%;
+    --primary: 190 100% 50%;
+    --primary-foreground: 222 47% 5%;
+    --secondary: 222 30% 20%;
+    --secondary-foreground: 180 100% 95%;
+    --muted: 222 30% 15%;
+    --muted-foreground: 190 50% 70%;
+    --accent: 145 100% 50%;
+    --accent-foreground: 222 47% 5%;
+    --destructive: 0 100% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 190 100% 30% / 0.3;
+    --input: 222 30% 15%;
+    --ring: 190 100% 50%;
+    --radius: 0.15rem;
+  }
 }
 
 @layer base {
@@ -85,6 +109,19 @@
   }
   body {
     @apply bg-background text-foreground font-body antialiased;
+  }
+
+  /* Theme Moderno Specific Styles */
+  [data-theme="moderno"] body {
+    background: radial-gradient(circle at top right, hsl(222 47% 15%), hsl(222 47% 7%));
+  }
+  
+  [data-theme="moderno"] .bg-card {
+    @apply backdrop-blur-md border border-primary/20 shadow-[0_0_15px_rgba(0,183,255,0.1)];
+  }
+
+  [data-theme="moderno"] button:hover {
+    @apply shadow-[0_0_20px_rgba(0,183,255,0.4)] transition-all duration-300 scale-[1.02];
   }
 
   /* Minimalist Scrollbar */
