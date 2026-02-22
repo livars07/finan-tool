@@ -66,10 +66,19 @@ export default function AppointmentDetailsDialog({
   };
 
   const handleDelete = () => {
-    onDelete(appointment.id);
+    // Cerramos primero el AlertDialog para evitar conflictos de overlays bloqueados
     setShowDeleteConfirm(false);
-    onOpenChange(false);
-    toast({ title: "Eliminado", description: "El registro ha sido removido exitosamente." });
+    
+    // Esperamos un instante mínimo para que la transición de salida inicie 
+    // y no se quede el scroll lock o el pointer-events atrapado en el body
+    setTimeout(() => {
+      onDelete(appointment.id);
+      onOpenChange(false);
+      toast({ 
+        title: "Registro eliminado", 
+        description: `Se ha borrado el historial de ${appointment.name}.` 
+      });
+    }, 100);
   };
 
   const copyToWhatsAppFormat = () => {
