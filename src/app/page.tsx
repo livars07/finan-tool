@@ -213,9 +213,12 @@ export default function Home() {
               appointments={appointmentState.appointments}
               upcoming={appointmentState.upcoming}
               past={appointmentState.past}
+              archived={appointmentState.archived}
               addAppointment={appointmentState.addAppointment}
               updateStatus={appointmentState.updateStatus}
-              deleteAppointment={appointmentState.deleteAppointment}
+              archiveAppointment={appointmentState.archiveAppointment}
+              restoreAppointment={appointmentState.restoreAppointment}
+              permanentlyDeleteAppointment={appointmentState.permanentlyDeleteAppointment}
               editAppointment={appointmentState.editAppointment}
               toggleConfirmation={appointmentState.toggleConfirmation}
               formatFriendlyDate={appointmentState.formatFriendlyDate}

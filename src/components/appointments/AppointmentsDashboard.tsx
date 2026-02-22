@@ -1,15 +1,16 @@
-
 "use client"
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import AppointmentForm from './AppointmentForm';
 import UpcomingAppointments from './UpcomingAppointments';
 import PastAppointments from './PastAppointments';
 import AppointmentDetailsDialog from './AppointmentDetailsDialog';
+import TrashDialog from './TrashDialog';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { CalendarClock, Search } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { CalendarClock, Search, Trash2 } from 'lucide-react';
 import { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
 import { parseISO, format, isWeekend } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -18,9 +19,12 @@ interface AppointmentsDashboardProps {
   appointments: Appointment[];
   upcoming: Appointment[];
   past: Appointment[];
-  addAppointment: (newApp: Omit<Appointment, 'id'>) => void;
+  archived: Appointment[];
+  addAppointment: (newApp: Omit<Appointment, 'id' | 'isArchived'>) => void;
   updateStatus: (id: string, status: AppointmentStatus) => void;
-  deleteAppointment: (id: string) => void;
+  archiveAppointment: (id: string) => void;
+  restoreAppointment: (id: string) => void;
+  permanentlyDeleteAppointment: (id: string) => void;
   editAppointment: (id: string, updatedData: Partial<Appointment>) => void;
   toggleConfirmation: (id: string) => void;
   formatFriendlyDate: (date: string) => string;
@@ -31,9 +35,12 @@ export default function AppointmentsDashboard({
   appointments,
   upcoming,
   past,
+  archived,
   addAppointment,
   updateStatus,
-  deleteAppointment,
+  archiveAppointment,
+  restoreAppointment,
+  permanentlyDeleteAppointment,
   editAppointment,
   toggleConfirmation,
   formatFriendlyDate,
@@ -42,6 +49,7 @@ export default function AppointmentsDashboard({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  const [isTrashOpen, setIsTrashOpen] = useState(false);
 
   const normalizeStr = (str: string) => {
     return str
@@ -132,7 +140,7 @@ export default function AppointmentsDashboard({
               />
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-6">
             <Tabs defaultValue="upcoming" className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="upcoming">Próximas ({filteredUpcoming.length})</TabsTrigger>
@@ -159,6 +167,18 @@ export default function AppointmentsDashboard({
                 />
               </TabsContent>
             </Tabs>
+
+            <div className="flex justify-center pt-2 border-t border-border/40">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setIsTrashOpen(true)}
+                className="text-muted-foreground hover:text-primary group"
+              >
+                <Trash2 className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
+                Papelera ({archived.length})
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -167,9 +187,19 @@ export default function AppointmentsDashboard({
         appointment={selectedApp} 
         open={!!selectedAppId} 
         onOpenChange={handleOpenChange}
-        onDelete={deleteAppointment}
+        onDelete={archiveAppointment}
         onEdit={editAppointment}
         formatFriendlyDate={formatFriendlyDate}
+        format12hTime={format12hTime}
+      />
+
+      <TrashDialog 
+        open={isTrashOpen}
+        onOpenChange={setIsTrashOpen}
+        archivedAppointments={archived}
+        onRestore={restoreAppointment}
+        onDelete={permanentlyDeleteAppointment}
+        formatDate={formatFriendlyDate}
         format12hTime={format12hTime}
       />
     </div>

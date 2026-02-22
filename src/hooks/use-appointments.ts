@@ -25,6 +25,7 @@ export interface Appointment {
   status?: AppointmentStatus;
   notes?: string;
   isConfirmed?: boolean;
+  isArchived?: boolean; // Atributo solicitado para la papelera
 }
 
 const STORAGE_KEY = 'olivares_fin_data_v4';
@@ -59,7 +60,8 @@ const generateSeedData = (): Appointment[] => {
       type: randomType,
       status: randomStatus,
       notes: "Cliente interesado en crédito tradicional.",
-      isConfirmed: true
+      isConfirmed: true,
+      isArchived: false
     });
   }
 
@@ -78,7 +80,8 @@ const generateSeedData = (): Appointment[] => {
       date: futureDate.toISOString(),
       time: `${Math.floor(9 + Math.random() * 8).toString().padStart(2, '0')}:30`,
       type: randomType,
-      notes: ""
+      notes: "",
+      isArchived: false
     });
   }
 
@@ -109,11 +112,12 @@ export function useAppointments() {
     }
   }, [appointments, isLoaded]);
 
-  const addAppointment = (newApp: Omit<Appointment, 'id'>) => {
-    const formattedApp = {
+  const addAppointment = (newApp: Omit<Appointment, 'id' | 'isArchived'>) => {
+    const formattedApp: Appointment = {
       ...newApp,
       id: uuidv4(),
-      phone: formatPhoneNumber(newApp.phone)
+      phone: formatPhoneNumber(newApp.phone),
+      isArchived: false
     };
     setAppointments(prev => [formattedApp, ...prev]);
   };
@@ -122,7 +126,15 @@ export function useAppointments() {
     setAppointments(prev => prev.map(app => app.id === id ? { ...app, status } : app));
   };
 
-  const deleteAppointment = (id: string) => {
+  const archiveAppointment = (id: string) => {
+    setAppointments(prev => prev.map(app => app.id === id ? { ...app, isArchived: true } : app));
+  };
+
+  const restoreAppointment = (id: string) => {
+    setAppointments(prev => prev.map(app => app.id === id ? { ...app, isArchived: false } : app));
+  };
+
+  const permanentlyDeleteAppointment = (id: string) => {
     setAppointments(prev => prev.filter(app => app.id !== id));
   };
 
@@ -147,7 +159,11 @@ export function useAppointments() {
   const startOfToday = startOfDay(now);
   const lastMonth = subMonths(now, 1);
 
-  const upcoming = appointments
+  // Filtrar solo las que NO están archivadas
+  const activeAppointments = appointments.filter(app => !app.isArchived);
+  const archived = appointments.filter(app => app.isArchived);
+
+  const upcoming = activeAppointments
     .filter(app => {
       const appDate = startOfDay(parseISO(app.date));
       return (isToday(appDate) || isAfter(appDate, startOfToday)) && !app.status;
@@ -159,7 +175,7 @@ export function useAppointments() {
       return a.time.localeCompare(b.time);
     });
 
-  const past = appointments
+  const past = activeAppointments
     .filter(app => {
       const appDate = startOfDay(parseISO(app.date));
       return isBefore(appDate, startOfToday) || app.status;
@@ -214,23 +230,27 @@ export function useAppointments() {
   };
 
   const stats = {
-    todayCount: appointments.filter(app => isToday(parseISO(app.date))).length,
+    todayCount: appointments.filter(app => !app.isArchived && isToday(parseISO(app.date))).length,
     pendingCount: upcoming.length,
+    archivedCount: archived.length,
     
-    currentMonthProspects: appointments.filter(app => isSameMonth(parseISO(app.date), now)).length,
-    lastMonthProspects: appointments.filter(app => isSameMonth(parseISO(app.date), lastMonth)).length,
+    currentMonthProspects: activeAppointments.filter(app => isSameMonth(parseISO(app.date), now)).length,
+    lastMonthProspects: activeAppointments.filter(app => isSameMonth(parseISO(app.date), lastMonth)).length,
 
-    currentMonthSales: appointments.filter(app => app.status === 'Cierre' && isSameMonth(parseISO(app.date), now)).length,
-    lastMonthSales: appointments.filter(app => app.status === 'Cierre' && isSameMonth(parseISO(app.date), lastMonth)).length,
+    currentMonthSales: activeAppointments.filter(app => app.status === 'Cierre' && isSameMonth(parseISO(app.date), now)).length,
+    lastMonthSales: activeAppointments.filter(app => app.status === 'Cierre' && isSameMonth(parseISO(app.date), lastMonth)).length,
   };
 
   return { 
     upcoming, 
     past, 
+    archived,
     appointments, 
     addAppointment, 
     updateStatus, 
-    deleteAppointment,
+    archiveAppointment,
+    restoreAppointment,
+    permanentlyDeleteAppointment,
     editAppointment,
     toggleConfirmation,
     resetData,
