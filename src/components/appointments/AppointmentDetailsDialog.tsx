@@ -108,11 +108,11 @@ Número: ${appointment.phone}`;
                 <TooltipProvider>
                   <Tooltip delayDuration={300}>
                     <TooltipTrigger asChild>
-                      <div className="cursor-help p-1 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
+                      <div className="p-1 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground cursor-default">
                         <Info className="h-4 w-4" />
                       </div>
                     </TooltipTrigger>
-                    <TooltipContent side="bottom" className="bg-popover border-border shadow-xl">
+                    <TooltipContent side="right" className="bg-popover border-border shadow-xl">
                       <p className="text-[10px] font-mono uppercase tracking-widest">ID: {appointment.id}</p>
                     </TooltipContent>
                   </Tooltip>
@@ -188,7 +188,6 @@ Número: ${appointment.phone}`;
                         <SelectItem value="Continuación en otra cita">Continuación en otra cita</SelectItem>
                         <SelectItem value="Reagendó">Reagendó</SelectItem>
                         <SelectItem value="Reembolso">Reembolso</SelectItem>
-                        <SelectItem value="Apartado">Apartado</SelectItem>
                         <SelectItem value="Cierre">Cierre</SelectItem>
                       </SelectContent>
                     </Select>
