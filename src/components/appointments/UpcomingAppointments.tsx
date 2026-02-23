@@ -102,10 +102,11 @@ export default function UpcomingAppointments({
       updateStatus(finId, currentStatus, currentNotes);
 
       if (currentStatus === 'Cierre') {
+        // Importante: Guardar una copia actualizada del cliente para abrir sus detalles después
         const updatedApp = { ...app, status: currentStatus, notes: currentNotes };
         setLastClosedApp(updatedApp);
         
-        // Simulación de sonido de éxito si el navegador lo permite
+        // Simulación de sonido de éxito
         const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3");
         audio.volume = 0.5;
         audio.play().catch(() => {});
@@ -126,6 +127,7 @@ export default function UpcomingAppointments({
   const handleSuccessClose = () => {
     setShowSuccessDialog(false);
     if (lastClosedApp) {
+      // Forzar la apertura del diálogo de detalles del cliente
       onSelect(lastClosedApp);
     }
   };
@@ -315,7 +317,7 @@ Número: *${app.phone}*`;
                               }}
                               title="Finalizar cita"
                             >
-                              <CheckCircle2 className="h-5 w-5" />
+                              <CheckCircle2 className="h-5 h-5" />
                             </Button>
                           )}
                           {expanded && (
