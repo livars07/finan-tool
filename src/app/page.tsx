@@ -97,11 +97,11 @@ export default function Home() {
     return () => clearInterval(intervalId);
   }, [api, timerKey]);
 
-  // Efecto para repetir la animación de entrada de los stats cada 10 segundos
+  // Efecto para repetir la animación de entrada de los stats cada 6 segundos
   useEffect(() => {
     const interval = setInterval(() => {
       setStatsKey(prev => prev + 1);
-    }, 10000);
+    }, 6000);
     return () => clearInterval(interval);
   }, []);
 
@@ -120,6 +120,14 @@ export default function Home() {
     applyTheme(themeId);
     localStorage.setItem('finanto-theme', themeId);
     toast({ title: "Tema actualizado", description: `Se ha aplicado el tema ${themeId.replace('-', ' ').charAt(0).toUpperCase() + themeId.slice(1)}.` });
+  };
+
+  const copyFooterPhone = () => {
+    navigator.clipboard.writeText("6646947418");
+    toast({
+      title: "Número copiado",
+      description: "664 694 7418 copiado al portapapeles.",
+    });
   };
 
   if (!isLoaded) return null;
@@ -255,13 +263,7 @@ export default function Home() {
           <p>© 2026 Finanto - Ejecutivo en Financiamiento Inmobiliario</p>
           <div className="flex items-center gap-6">
             <button 
-              onClick={() => {
-                navigator.clipboard.writeText("6646947418");
-                toast({
-                  title: "Número copiado",
-                  description: "664 694 7418 copiado al portapapeles.",
-                });
-              }}
+              onClick={copyFooterPhone}
               className="flex items-center gap-2 hover:text-primary transition-colors cursor-pointer group"
             >
               <Phone className="w-3.5 h-3.5 group-hover:animate-pulse" />
@@ -326,7 +328,6 @@ export default function Home() {
           
           <ScrollArea className="flex-1 w-full">
             <div className="p-8 space-y-12 pb-20">
-              {/* Sección 1: Bienvenida */}
               <section className="space-y-6">
                 <div className="flex items-center gap-3">
                   <Rocket className="w-6 h-6 text-primary" />
@@ -349,11 +350,8 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Sección 2: Herramientas Core */}
               <section className="space-y-8">
                 <h3 className="text-xl font-bold flex items-center gap-2 border-l-4 border-l-primary pl-4">Pilares Operativos</h3>
-                
-                {/* Calculadora */}
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                   <div className="md:col-span-4 space-y-3">
                     <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 w-fit">
@@ -379,7 +377,6 @@ export default function Home() {
                   </Card>
                 </div>
 
-                {/* Agenda */}
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                   <Card className="md:col-span-8 bg-muted/20 border-border/40 shadow-none overflow-hidden order-2 md:order-1">
                     <CardContent className="p-5 space-y-4">
@@ -402,7 +399,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Sección 3: El Cierre */}
               <section className="p-8 rounded-[2rem] bg-green-500/5 border border-green-500/20 space-y-6">
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="w-7 h-7 text-green-500" />
@@ -426,7 +422,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Sección 4: Futuro y Seguridad */}
               <section className="space-y-8 pt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-4">
@@ -470,4 +465,3 @@ export default function Home() {
     </div>
   );
 }
-
