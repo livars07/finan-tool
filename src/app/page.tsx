@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -17,7 +18,10 @@ import {
   Moon,
   Sun,
   Cpu,
-  Phone
+  Phone,
+  BookOpen,
+  Info,
+  Star
 } from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
 import { Button } from '@/components/ui/button';
@@ -32,6 +36,14 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -40,6 +52,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type Theme = 'predeterminado' | 'discreto' | 'corporativo' | 'moderno';
 
@@ -47,6 +60,7 @@ export default function Home() {
   const appointmentState = useAppointments();
   const { stats, isLoaded, resetData } = appointmentState;
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const [theme, setTheme] = useState<Theme>('predeterminado');
   const { toast } = useToast();
 
@@ -254,14 +268,24 @@ export default function Home() {
               <Phone className="w-3.5 h-3.5 group-hover:animate-pulse" />
               <span>664 694 7418</span>
             </button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-8 text-[10px] font-bold uppercase text-muted-foreground hover:text-destructive hover:bg-destructive/10 backdrop-blur-md"
-              onClick={() => setShowResetConfirm(true)}
-            >
-              <RotateCcw className="w-3 h-3 mr-1" /> Reiniciar sistema
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 text-[10px] font-bold uppercase text-muted-foreground hover:text-primary hover:bg-primary/10 backdrop-blur-md"
+                onClick={() => setShowHelp(true)}
+              >
+                <BookOpen className="w-3 h-3 mr-1" /> Guía del sistema
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 text-[10px] font-bold uppercase text-muted-foreground hover:text-destructive hover:bg-destructive/10 backdrop-blur-md"
+                onClick={() => setShowResetConfirm(true)}
+              >
+                <RotateCcw className="w-3 h-3 mr-1" /> Reiniciar sistema
+              </Button>
+            </div>
           </div>
         </div>
       </footer>
@@ -285,6 +309,109 @@ export default function Home() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={showHelp} onOpenChange={setShowHelp}>
+        <DialogContent className="sm:max-w-[700px] max-h-[85vh] bg-card border-border backdrop-blur-3xl overflow-hidden flex flex-col p-0">
+          <DialogHeader className="p-6 border-b border-border/50 bg-primary/5">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-primary/20 border border-primary/30">
+                <BookOpen className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <DialogTitle className="text-2xl font-headline font-bold">Guía de Usuario - Finanto</DialogTitle>
+                <DialogDescription>Manual interactivo para el asesor hipotecario (v0.7.1)</DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          
+          <ScrollArea className="flex-1 p-8">
+            <div className="space-y-8 text-foreground/90">
+              <section className="space-y-4">
+                <h2 className="text-xl font-bold flex items-center gap-2 text-primary">
+                  ¡Bienvenido a Finanto!
+                </h2>
+                <p className="text-sm leading-relaxed">
+                  Esta es una herramienta diseñada especialmente para que los asesores hipotecarios puedan ser más rápidos, organizados y profesionales frente a sus clientes.
+                </p>
+              </section>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="bg-muted/30 border-border/50">
+                  <CardContent className="p-4 space-y-3">
+                    <h3 className="font-bold flex items-center gap-2 text-accent">
+                      <Wallet className="w-4 h-4" /> 1. Calculadora inteligente
+                    </h3>
+                    <ul className="text-xs space-y-2 list-disc pl-4 text-muted-foreground">
+                      <li><strong>Cálculos instantáneos:</strong> Solo pon el monto del crédito y el sistema te dirá la mensualidad y el enganche automáticamente.</li>
+                      <li><strong>Modo presentación:</strong> Si le das al botón de "Pantalla completa", tendrás una vista profesional para mostrar números al cliente.</li>
+                      <li><strong>Resumen WhatsApp:</strong> Copia un resumen profesional de la cotización con un solo clic.</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-muted/30 border-border/50">
+                  <CardContent className="p-4 space-y-3">
+                    <h3 className="font-bold flex items-center gap-2 text-accent">
+                      <CalendarDays className="w-4 h-4" /> 2. Control de agenda
+                    </h3>
+                    <ul className="text-xs space-y-2 list-disc pl-4 text-muted-foreground">
+                      <li><strong>Organización diaria:</strong> Mira tus citas de hoy en un panel destacado.</li>
+                      <li><strong>Confirmación:</strong> Marca si el cliente confirmó su asistencia con un clic.</li>
+                      <li><strong>Historial:</strong> Guarda qué pasó en cada cita (cierre, apartado, reagendado).</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <section className="space-y-4">
+                <h3 className="text-lg font-bold flex items-center gap-2 text-green-500">
+                  <Star className="w-5 h-5" /> 3. Celebración de éxitos
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  <strong>Recompensa por cierre:</strong> Cuando logres concretar un trámite y lo marques como "Cierre", el sistema te felicitará con un sonido y un panel especial para registrar los datos finales del éxito.
+                </p>
+              </section>
+
+              <section className="space-y-4">
+                <h3 className="text-lg font-bold flex items-center gap-2 text-primary">
+                  <Cpu className="w-5 h-5" /> 4. Asistente de mensajes IA
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  <strong>No más bloqueos:</strong> El sistema puede redactar por ti mensajes de seguimiento profesionales dependiendo de lo que haya pasado en la cita (ej. si el cliente no llegó o si ya apartó).
+                </p>
+              </section>
+
+              <Separator className="bg-border/50" />
+
+              <section className="p-4 rounded-xl bg-accent/5 border border-accent/20 space-y-3">
+                <h3 className="text-sm font-bold flex items-center gap-2 text-accent uppercase tracking-widest">
+                  <Info className="w-4 h-4" /> Información Importante
+                </h3>
+                <ul className="text-xs space-y-2 text-muted-foreground">
+                  <li className="flex gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent mt-1 shrink-0" />
+                    <span><strong>Privacidad:</strong> Toda la información se guarda únicamente en el navegador (Chrome, Edge, etc.) de tu dispositivo actual.</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent mt-1 shrink-0" />
+                    <span><strong>Recomendación:</strong> Si cambias de dispositivo o borras el historial, los datos se reiniciarán. ¡Pronto tendremos sincronización en la nube!</span>
+                  </li>
+                </ul>
+              </section>
+
+              <p className="text-center text-[10px] text-muted-foreground italic pt-4">
+                Desarrollado para que te enfoques en lo que mejor sabes hacer: ¡Cerrar créditos y ayudar a familias a tener su hogar!
+              </p>
+            </div>
+          </ScrollArea>
+          
+          <DialogFooter className="p-4 border-t border-border/50 bg-muted/20">
+            <Button onClick={() => setShowHelp(false)} className="w-full sm:w-auto font-bold">
+              Entendido
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
