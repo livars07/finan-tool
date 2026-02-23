@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -257,8 +258,15 @@ export default function Home() {
       </main>
 
       <footer className="mt-auto border-t border-border/40 py-8 bg-card/10 backdrop-blur-[20px] shrink-0">
-        <div className="container flex flex-col items-center justify-between gap-4 px-4 mx-auto text-sm md:flex-row text-muted-foreground">
-          <p>© 2026 Finanto - Ejecutivo en Financiamiento Inmobiliario</p>
+        <div className="container flex flex-col items-center justify-between gap-6 px-4 mx-auto text-sm md:flex-row text-muted-foreground">
+          <div className="flex items-center gap-4">
+            <span className="font-bold text-foreground">Finanto</span>
+            <span className="opacity-60">© 2026 - Derechos de Autor Apache</span>
+            <Separator orientation="vertical" className="h-4 bg-border/40 hidden md:block" />
+            <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase" onClick={() => setShowHelp(true)}>
+              <BookOpen className="w-3 h-3 mr-1.5" /> Guía
+            </Button>
+          </div>
           <div className="flex items-center gap-6">
             <button 
               onClick={copyFooterPhone}
@@ -268,14 +276,11 @@ export default function Home() {
               <span>664 694 7418</span>
             </button>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase" onClick={() => setShowHelp(true)}>
-                <BookOpen className="w-3 h-3 mr-1" /> Guía
-              </Button>
               <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase hover:text-destructive" onClick={() => setShowClearConfirm(true)}>
                 <Trash2 className="w-3 h-3 mr-1" /> Limpiar Todo
               </Button>
               <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase" onClick={() => setShowResetConfirm(true)}>
-                <RotateCcw className="w-3 h-3 mr-1" /> Reiniciar (Semillas)
+                <RotateCcw className="w-3 h-3 mr-1" /> Reiniciar
               </Button>
             </div>
           </div>
@@ -285,8 +290,8 @@ export default function Home() {
       <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Confirmar reinicio con semillas?</AlertDialogTitle>
-            <AlertDialogDescription>Se restaurarán los datos de prueba iniciales de la financiera. Se borrará tu información actual.</AlertDialogDescription>
+            <AlertDialogTitle>¿Confirmar reinicio?</AlertDialogTitle>
+            <AlertDialogDescription>Se restaurarán los datos de prueba iniciales. Se borrará tu información actual.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>

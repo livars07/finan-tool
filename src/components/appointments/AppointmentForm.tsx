@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -9,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PlusCircle, UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AppointmentType } from '@/hooks/use-appointments';
+import { cn } from "@/lib/utils";
 
 interface AppointmentFormProps {
   onAdd: (app: { name: string; phone: string; date: string; time: string; type: AppointmentType }) => void;
@@ -33,8 +35,6 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
       return;
     }
     
-    // FIX: Se agrega T12:00:00Z para asegurar que la fecha sea interpretada correctamente 
-    // en la zona horaria local al recuperarla, evitando que se reste un día.
     const isoDate = new Date(date + 'T12:00:00Z').toISOString();
     
     onAdd({ name, phone, date: isoDate, time, type });
@@ -54,44 +54,83 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
       <CardHeader className="py-4 border-b border-border/50">
         <div className="flex items-center gap-2">
           <UserPlus className="text-accent w-5 h-5" />
-          <CardTitle className="text-lg font-headline">Nueva cita rápida</CardTitle>
+          <CardTitle className="text-lg font-headline">Nueva Cita</CardTitle>
         </div>
       </CardHeader>
       <CardContent className="pt-6">
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-          <div className="md:col-span-1 space-y-2">
-            <Label htmlFor="name">Nombre</Label>
-            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre" className="bg-muted/30" />
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-xs uppercase font-bold text-muted-foreground/70">Nombre del Prospecto</Label>
+              <Input 
+                id="name" 
+                value={name} 
+                onChange={(e) => setName(e.target.value)} 
+                placeholder="Escribe el nombre..." 
+                className="bg-muted/30 border-border/40 text-sm placeholder:text-muted-foreground/50 h-11" 
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-xs uppercase font-bold text-muted-foreground/70">Teléfono</Label>
+              <Input 
+                id="phone" 
+                value={phone} 
+                onChange={(e) => setPhone(e.target.value)} 
+                placeholder="Ej. 664 123 4567" 
+                className="bg-muted/30 border-border/40 text-sm placeholder:text-muted-foreground/50 h-11" 
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="date" className="text-xs uppercase font-bold text-muted-foreground/70">Fecha</Label>
+              <Input 
+                id="date" 
+                type="date" 
+                value={date} 
+                onChange={(e) => setDate(e.target.value)} 
+                className={cn(
+                  "bg-muted/30 border-border/40 text-sm h-11",
+                  !date && "text-muted-foreground/50"
+                )} 
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="time" className="text-xs uppercase font-bold text-muted-foreground/70">Hora</Label>
+              <Input 
+                id="time" 
+                type="time" 
+                value={time} 
+                onChange={(e) => setTime(e.target.value)} 
+                className={cn(
+                  "bg-muted/30 border-border/40 text-sm h-11",
+                  !time && "text-muted-foreground/50"
+                )} 
+              />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="phone">Teléfono</Label>
-            <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Número" className="bg-muted/30" />
+          
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+            <div className="md:col-span-4 space-y-2">
+              <Label htmlFor="type" className="text-xs uppercase font-bold text-muted-foreground/70">Motivo de la Consulta</Label>
+              <Select value={type} onValueChange={(v) => setType(v as AppointmentType)}>
+                <SelectTrigger className="bg-muted/30 border-border/40 h-11 text-sm">
+                  <SelectValue placeholder="Selecciona el motivo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1ra consulta">1ra consulta</SelectItem>
+                  <SelectItem value="2da consulta">2da consulta</SelectItem>
+                  <SelectItem value="cierre">Cierre</SelectItem>
+                  <SelectItem value="seguimiento">Seguimiento</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button 
+              type="submit" 
+              className="bg-accent hover:bg-accent/80 text-accent-foreground font-bold shadow-lg h-11 flex items-center justify-center gap-2"
+            >
+              <PlusCircle className="h-4 w-4" />
+              <span>Registrar</span>
+            </Button>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="date">Fecha</Label>
-            <Input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="bg-muted/30" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="time">Hora</Label>
-            <Input id="time" type="time" value={time} onChange={(e) => setTime(e.target.value)} className="bg-muted/30" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="type">Motivo</Label>
-            <Select value={type} onValueChange={(v) => setType(v as AppointmentType)}>
-              <SelectTrigger className="bg-muted/30">
-                <SelectValue placeholder="Motivo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1ra consulta">1ra consulta</SelectItem>
-                <SelectItem value="2da consulta">2da consulta</SelectItem>
-                <SelectItem value="cierre">Cierre</SelectItem>
-                <SelectItem value="seguimiento">Seguimiento</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <Button type="submit" size="icon" className="bg-accent hover:bg-accent/80 text-accent-foreground font-semibold shadow-lg w-full md:w-10 h-10 flex items-center justify-center">
-            <PlusCircle className="h-5 w-5" />
-          </Button>
         </form>
       </CardContent>
     </Card>
