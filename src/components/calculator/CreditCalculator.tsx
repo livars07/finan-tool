@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -339,11 +340,41 @@ export default function CreditCalculator() {
                   </div>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-muted-foreground">Gastos de Escrituración (est. 5%):</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">Gastos de Escrituración (est. 5%):</span>
+                        <TooltipProvider>
+                          <Tooltip delayDuration={0}>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="w-4 h-4 text-muted-foreground/60 cursor-help hover:text-primary transition-colors" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-[350px] p-6 text-base leading-relaxed bg-popover border-border shadow-2xl backdrop-blur-xl">
+                              <p className="font-bold mb-2 text-primary text-lg flex items-center gap-2">
+                                <FileText className="w-5 h-5" /> ¿Qué es la Escrituración?
+                              </p>
+                              <p>¡Fundamental para el cierre! Este monto cubre la legalidad del patrimonio ante notario público e impuestos estatales. Es la inversión que garantiza que la propiedad es legalmente del cliente al 100%.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                       <span className="font-bold">{formatCurrency(currentP * 0.05)}</span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-muted-foreground">Costo de Avalúo (est.):</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">Costo de Avalúo (est.):</span>
+                        <TooltipProvider>
+                          <Tooltip delayDuration={0}>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="w-4 h-4 text-muted-foreground/60 cursor-help hover:text-primary transition-colors" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-[350px] p-6 text-base leading-relaxed bg-popover border-border shadow-2xl backdrop-blur-xl">
+                              <p className="font-bold mb-2 text-accent text-lg flex items-center gap-2">
+                                <Info className="w-5 h-5" /> ¿Por qué el Avalúo?
+                              </p>
+                              <p>Es la certificación oficial del valor real de la propiedad por un perito autorizado. Protege la inversión del cliente asegurando que el precio es justo y acorde al mercado actual.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                       <span className="font-bold">$7,500.00</span>
                     </div>
                     <div className="pt-6 border-t border-border/30">
