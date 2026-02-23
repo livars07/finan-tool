@@ -45,7 +45,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
   };
 
   return (
-    <Card className="bg-card border-border shadow-md">
+    <Card className="bg-card border-border shadow-md backdrop-blur-xl">
       <CardHeader className="py-4 border-b border-border/50">
         <div className="flex items-center gap-2">
           <UserPlus className="text-accent w-5 h-5" />
@@ -56,25 +56,25 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
           <div className="md:col-span-1 space-y-2">
             <Label htmlFor="name">Nombre</Label>
-            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre" />
+            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre" className="bg-muted/30" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="phone">Teléfono</Label>
-            <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Número" />
+            <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Número" className="bg-muted/30" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="date">Fecha</Label>
-            <Input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            <Input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="bg-muted/30" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="time">Hora</Label>
-            <Input id="time" type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+            <Input id="time" type="time" value={time} onChange={(e) => setTime(e.target.value)} className="bg-muted/30" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="type">Tipo</Label>
+            <Label htmlFor="type">Motivo</Label>
             <Select value={type} onValueChange={(v) => setType(v as AppointmentType)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Tipo" />
+              <SelectTrigger className="bg-muted/30">
+                <SelectValue placeholder="Motivo" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="1ra consulta">1ra consulta</SelectItem>
@@ -84,7 +84,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
               </SelectContent>
             </Select>
           </div>
-          <Button type="submit" className="bg-accent hover:bg-accent/80 text-accent-foreground font-semibold">
+          <Button type="submit" className="bg-accent hover:bg-accent/80 text-accent-foreground font-semibold shadow-lg">
             <PlusCircle className="mr-2 h-4 w-4" /> Agregar
           </Button>
         </form>

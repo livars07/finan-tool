@@ -16,7 +16,8 @@ import {
   Palette,
   Moon,
   Sun,
-  Cpu
+  Cpu,
+  Phone
 } from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
 import { Button } from '@/components/ui/button';
@@ -57,10 +58,10 @@ export default function Home() {
     }
   }, []);
 
-  const handleThemeChange = (newTheme: Theme) => {
-    setTheme(newTheme);
-    localStorage.setItem('finanto-theme', newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme);
+  const handleThemeChange = (themeId: Theme) => {
+    setTheme(themeId);
+    localStorage.setItem('finanto-theme', themeId);
+    document.documentElement.setAttribute('data-theme', themeId);
     
     const themeNames = {
       predeterminado: 'Predeterminado',
@@ -71,7 +72,16 @@ export default function Home() {
 
     toast({
       title: "Tema actualizado",
-      description: `Se ha aplicado el tema ${themeNames[newTheme]}.`,
+      description: `Se ha aplicado el tema ${themeNames[themeId]}.`,
+    });
+  };
+
+  const copyFooterPhone = () => {
+    navigator.clipboard.writeText("6646947418").then(() => {
+      toast({
+        title: "Copiado",
+        description: "El número telefónico ha sido copiado al portapapeles.",
+      });
     });
   };
 
@@ -88,7 +98,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
-      <header className="border-b border-border/40 sticky top-0 z-50">
+      <header className="border-b border-border/40 sticky top-0 z-50 backdrop-blur-[40px] bg-card/10">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="bg-primary/20 p-1.5 rounded-lg border border-primary/30">
@@ -111,11 +121,11 @@ export default function Home() {
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="w-9 h-9 rounded-full bg-muted border border-border overflow-hidden">
+                <Button variant="outline" size="icon" className="w-9 h-9 rounded-full bg-muted border border-border overflow-hidden backdrop-blur-md">
                   {theme === 'moderno' ? <Cpu className="w-5 h-5 text-primary" /> : theme === 'corporativo' ? <Sun className="w-5 h-5" /> : theme === 'discreto' ? <Moon className="w-5 h-5 text-primary" /> : <Palette className="w-5 h-5 text-primary" />}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 backdrop-blur-2xl">
+              <DropdownMenuContent align="end" className="w-48 backdrop-blur-2xl bg-card/20 border-border/30">
                 <DropdownMenuLabel>Temas</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => handleThemeChange('predeterminado')} className="flex items-center gap-2 cursor-pointer">
@@ -168,9 +178,9 @@ export default function Home() {
               subLabel: 'Mes pasado'
             },
           ].map((stat, i) => (
-            <Card key={i} className="bg-card border-border/50 backdrop-blur-xl hover:border-primary/30 transition-all group">
+            <Card key={i} className="bg-card/30 border-border/50 backdrop-blur-xl hover:border-primary/30 transition-all group">
               <CardContent className="p-4 flex items-center gap-3">
-                <div className={`p-2 rounded-full bg-muted/50 ${stat.color}`}>
+                <div className={`p-2 rounded-full bg-muted/50 ${stat.color} backdrop-blur-md`}>
                   <stat.icon className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -224,15 +234,21 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="mt-12 border-t border-border/40 py-8 bg-card/10 backdrop-blur-xl">
+      <footer className="mt-12 border-t border-border/40 py-8 bg-card/10 backdrop-blur-[40px]">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm">
           <p>© 2026 Finanto - Gestión Hipotecaria</p>
           <div className="flex items-center gap-6">
-            <span className="hover:text-primary transition-colors cursor-pointer">664 694 7418</span>
+            <button 
+              onClick={copyFooterPhone}
+              className="flex items-center gap-2 hover:text-primary transition-colors cursor-pointer group"
+            >
+              <Phone className="w-3.5 h-3.5 group-hover:animate-pulse" />
+              <span>664 694 7418</span>
+            </button>
             <Button 
               variant="ghost" 
               size="sm" 
-              className="h-8 text-[10px] font-bold uppercase text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              className="h-8 text-[10px] font-bold uppercase text-muted-foreground hover:text-destructive hover:bg-destructive/10 backdrop-blur-md"
               onClick={() => setShowResetConfirm(true)}
             >
               <RotateCcw className="w-3 h-3 mr-1" /> Reiniciar sistema
@@ -242,7 +258,7 @@ export default function Home() {
       </footer>
 
       <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
-        <AlertDialogContent className="backdrop-blur-3xl">
+        <AlertDialogContent className="backdrop-blur-[40px] bg-card/20 border-border/20">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Confirmar reinicio total?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -250,10 +266,10 @@ export default function Home() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel className="backdrop-blur-md">Cancelar</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleReset}
-              className="bg-destructive text-white hover:bg-destructive/90"
+              className="bg-destructive text-white hover:bg-destructive/90 shadow-lg"
             >
               Sí, reiniciar todo
             </AlertDialogAction>

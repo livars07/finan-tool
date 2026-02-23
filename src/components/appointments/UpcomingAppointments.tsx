@@ -74,12 +74,12 @@ export default function UpcomingAppointments({
   };
 
   return (
-    <div className="border rounded-md overflow-hidden relative">
+    <div className="border rounded-md overflow-hidden relative backdrop-blur-sm">
       <Table>
         <TableHeader className="bg-muted/50">
           <TableRow>
             <TableHead>Nombre / Teléfono</TableHead>
-            <TableHead>Tipo</TableHead>
+            <TableHead>Motivo</TableHead>
             <TableHead>Fecha</TableHead>
             <TableHead>Hora</TableHead>
             <TableHead className="w-12"></TableHead>
@@ -129,7 +129,7 @@ export default function UpcomingAppointments({
                           <Button 
                             variant="outline" 
                             size="sm" 
-                            className="h-5 px-1.5 text-[8px] font-bold uppercase border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10"
+                            className="h-5 px-1.5 text-[8px] font-bold uppercase border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10 backdrop-blur-md"
                             onClick={() => setConfirmId(app.id)}
                           >
                             <AlertCircle className="w-2 h-2 mr-1" /> Sin confirmar
@@ -149,7 +149,7 @@ export default function UpcomingAppointments({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-primary hover:bg-primary/20"
+                      className="h-8 w-8 text-primary hover:bg-primary/20 backdrop-blur-md"
                       onClick={() => setFinId(app.id)}
                       title="Finalizar cita"
                     >
@@ -164,14 +164,14 @@ export default function UpcomingAppointments({
       </Table>
 
       <Dialog open={!!finId} onOpenChange={() => setFinId(null)}>
-        <DialogContent className="sm:max-w-[400px]">
+        <DialogContent className="sm:max-w-[400px] backdrop-blur-[40px] bg-card/10">
           <DialogHeader>
             <DialogTitle>Finalizar cita de hoy</DialogTitle>
           </DialogHeader>
           <div className="py-4 space-y-4">
             <p className="text-sm text-muted-foreground">Selecciona el resultado de la reunión para moverla al historial.</p>
             <Select value={status} onValueChange={(v) => setStatus(v as AppointmentStatus)}>
-              <SelectTrigger>
+              <SelectTrigger className="bg-muted/30">
                 <SelectValue placeholder="Resultado" />
               </SelectTrigger>
               <SelectContent>
@@ -185,19 +185,19 @@ export default function UpcomingAppointments({
             </Select>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setFinId(null)}>Cancelar</Button>
+            <Button variant="outline" onClick={() => setFinId(null)} className="backdrop-blur-md">Cancelar</Button>
             <Button onClick={() => {
               if (finId) {
                 updateStatus(finId, status);
                 setFinId(null);
               }
-            }}>Confirmar y Archivar</Button>
+            }} className="shadow-lg">Confirmar y Archivar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <AlertDialog open={!!confirmId} onOpenChange={(open) => !open && setConfirmId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="backdrop-blur-[40px] bg-card/10 border-border/20">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Confirmar asistencia del prospecto?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -205,10 +205,10 @@ export default function UpcomingAppointments({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Volver</AlertDialogCancel>
+            <AlertDialogCancel className="backdrop-blur-md">Volver</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleConfirmAction}
-              className="bg-green-600 hover:bg-green-700 text-white"
+              className="bg-green-600 hover:bg-green-700 text-white shadow-lg"
             >
               Sí, confirmar cita
             </AlertDialogAction>

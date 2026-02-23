@@ -105,10 +105,10 @@ export const generateSeedData = (): Appointment[] => {
   for (let i = 0; i < 3; i++) {
     data.push({
       id: uuidv4(),
-      name: `${names[i]} (Hoy)`,
+      name: names[i],
       phone: "664 111 2233",
       date: now.toISOString(),
-      time: hours[i],
+      time: hours[i % hours.length],
       type: types[i % types.length],
       notes: "Cita programada para hoy."
     });
@@ -119,10 +119,10 @@ export const generateSeedData = (): Appointment[] => {
     const futureDate = addDays(now, 2);
     data.push({
       id: uuidv4(),
-      name: `${names[i+3]} (Pasado Mañana)`,
+      name: names[i+3],
       phone: "664 444 5566",
       date: futureDate.toISOString(),
-      time: hours[i+2],
+      time: hours[(i+2) % hours.length],
       type: types[i % types.length],
     });
   }
@@ -133,10 +133,10 @@ export const generateSeedData = (): Appointment[] => {
     const pastDate = subDays(lastMonth, i + 5);
     data.push({
       id: uuidv4(),
-      name: `${names[i+5]} (Histórico)`,
+      name: names[i+5],
       phone: "664 777 8899",
       date: pastDate.toISOString(),
-      time: hours[i],
+      time: hours[i % hours.length],
       type: types[i % types.length],
       status: i === 0 ? 'Cierre' : statuses[i % statuses.length],
       isConfirmed: true,

@@ -44,15 +44,15 @@ export default function PastAppointments({ appointments, onSelect, formatDate, f
 
   return (
     <div className="space-y-4">
-      <div className="border rounded-md overflow-hidden bg-card relative">
+      <div className="border rounded-md overflow-hidden bg-card/10 relative backdrop-blur-sm">
         <ScrollArea className="h-[400px]">
           <Table>
             <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm">
               <TableRow>
                 <TableHead>Nombre / Teléfono</TableHead>
-                <TableHead>Tipo</TableHead>
+                <TableHead>Motivo</TableHead>
                 <TableHead>Fecha</TableHead>
-                <TableHead>Estado</TableHead>
+                <TableHead>Resultado</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -94,7 +94,7 @@ export default function PastAppointments({ appointments, onSelect, formatDate, f
             variant="outline" 
             size="sm" 
             onClick={() => setVisibleCount(p => p + 20)}
-            className="text-xs border-dashed hover:bg-primary/10"
+            className="text-xs border-dashed hover:bg-primary/10 backdrop-blur-md"
           >
             <ChevronDown className="mr-2 h-3 w-3" /> Cargar 20 más
           </Button>

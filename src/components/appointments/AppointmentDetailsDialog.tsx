@@ -10,15 +10,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Appointment } from '@/services/appointment-service';
-import { User, Phone, Calendar, Clock, Edit2, Save, MessageCircle, Info } from 'lucide-react';
+import { User, Phone, Calendar, Clock, Edit2, Save, MessageCircle, Info, ClipboardList, CheckCircle2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import {
   Tooltip,
-  TooltipContent,
   TooltipProvider,
   TooltipTrigger,
+  TooltipContent,
 } from "@/components/ui/tooltip";
 
 interface Props {
@@ -72,7 +72,7 @@ export default function AppointmentDetailsDialog({
 
     const text = `Cita: ${capitalizedDate}
 Nombre: ${appointment.name}
-Producto: Crédito Hipotecario
+Motivo: ${appointment.type}
 Hora: ${timeFormatted}
 Número: ${appointment.phone}`;
 
@@ -89,8 +89,8 @@ Número: ${appointment.phone}`;
       } 
       onOpenChange(o); 
     }}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border p-0 shadow-2xl backdrop-blur-3xl">
-        <DialogHeader className="px-6 py-4 border-b border-border/40 flex flex-row items-center justify-between">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border p-0 shadow-2xl backdrop-blur-[40px]">
+        <DialogHeader className="px-6 py-4 border-b border-border/40 flex flex-row items-center justify-between bg-card/10">
           <div className="flex items-center gap-2">
             <DialogTitle className="text-xl font-headline font-bold text-foreground">
               Detalles
@@ -115,13 +115,13 @@ Número: ${appointment.phone}`;
                 onClick={copyToWhatsAppFormat}
                 variant="outline" 
                 size="sm"
-                className="h-8 px-3 text-[10px] border-green-500/30 text-green-500 hover:bg-green-500/10 font-bold uppercase"
+                className="h-8 px-3 text-[10px] border-green-500/30 text-green-500 hover:bg-green-500/10 font-bold uppercase backdrop-blur-md"
               >
                 <MessageCircle className="w-3.5 h-3.5 mr-1.5" />
                 Copiar
               </Button>
             )}
-            <DialogClose className="h-8 w-8 flex items-center justify-center rounded-full bg-destructive/10 text-destructive hover:bg-destructive transition-colors group">
+            <DialogClose className="h-8 w-8 flex items-center justify-center rounded-full bg-destructive/10 text-destructive hover:bg-destructive transition-colors group backdrop-blur-md border border-destructive/20">
               <span className="text-xs font-bold group-hover:text-white">✕</span>
             </DialogClose>
           </div>
@@ -134,11 +134,11 @@ Número: ${appointment.phone}`;
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Nombre</Label>
-                  <Input value={editData.name || ''} onChange={e => setEditData({...editData, name: e.target.value})} />
+                  <Input value={editData.name || ''} onChange={e => setEditData({...editData, name: e.target.value})} className="bg-muted/30" />
                 </div>
                 <div className="space-y-2">
                   <Label>Teléfono</Label>
-                  <Input value={editData.phone || ''} onChange={e => setEditData({...editData, phone: e.target.value})} />
+                  <Input value={editData.phone || ''} onChange={e => setEditData({...editData, phone: e.target.value})} className="bg-muted/30" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -148,16 +148,17 @@ Número: ${appointment.phone}`;
                     type="date" 
                     value={editData.date ? parseISO(editData.date).toISOString().split('T')[0] : ''} 
                     onChange={e => setEditData({...editData, date: new Date(e.target.value + 'T12:00:00Z').toISOString()})} 
+                    className="bg-muted/30"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Hora</Label>
-                  <Input type="time" value={editData.time || ''} onChange={e => setEditData({...editData, time: e.target.value})} />
+                  <Input type="time" value={editData.time || ''} onChange={e => setEditData({...editData, time: e.target.value})} className="bg-muted/30" />
                 </div>
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4 bg-muted/20 p-4 rounded-lg border border-border/50">
+            <div className="grid grid-cols-1 gap-4 bg-muted/20 p-4 rounded-lg border border-border/50 backdrop-blur-sm">
               <div className="flex items-center gap-3">
                 <User className="w-4 h-4 text-primary" />
                 <div>
@@ -165,13 +166,24 @@ Número: ${appointment.phone}`;
                   <p className="text-sm font-semibold">{appointment.name}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-primary" />
-                <div>
-                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Teléfono</p>
-                  <p className="text-sm">{appointment.phone || 'N/A'}</p>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center gap-3">
+                  <Phone className="w-4 h-4 text-primary" />
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold">Teléfono</p>
+                    <p className="text-sm">{appointment.phone || 'N/A'}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <ClipboardList className="w-4 h-4 text-accent" />
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold">Motivo</p>
+                    <p className="text-sm">{appointment.type}</p>
+                  </div>
                 </div>
               </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
                   <Calendar className="w-4 h-4 text-primary" />
@@ -191,6 +203,16 @@ Número: ${appointment.phone}`;
                   </div>
                 </div>
               </div>
+
+              {appointment.status && (
+                <div className="flex items-center gap-3 border-t border-border/20 pt-3">
+                  <CheckCircle2 className="w-4 h-4 text-green-400" />
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold">Resultado</p>
+                    <p className="text-sm font-bold text-green-400">{appointment.status}</p>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -198,7 +220,7 @@ Número: ${appointment.phone}`;
             <Label className="flex items-center gap-2 text-muted-foreground text-xs font-bold uppercase">📝 Notas</Label>
             <Textarea 
               placeholder="Detalles del prospecto..."
-              className="min-h-[120px] bg-muted/30 border-border/50 focus-visible:ring-primary resize-none text-sm"
+              className="min-h-[120px] bg-muted/30 border-border/50 focus-visible:ring-primary resize-none text-sm backdrop-blur-sm"
               value={isEditing ? editData.notes : appointment.notes}
               onChange={e => setEditData({...editData, notes: e.target.value})}
               readOnly={!isEditing}
@@ -206,17 +228,17 @@ Número: ${appointment.phone}`;
           </div>
         </div>
 
-        <DialogFooter className="flex flex-row justify-end items-center gap-2 border-t border-border/50 px-6 py-4 bg-muted/10">
+        <DialogFooter className="flex flex-row justify-end items-center gap-2 border-t border-border/50 px-6 py-4 bg-card/30 backdrop-blur-md">
           <div className="flex gap-2">
             {isEditing ? (
               <>
-                <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>Cancelar</Button>
-                <Button size="sm" onClick={handleSave} className="bg-primary text-primary-foreground font-bold">
+                <Button variant="outline" size="sm" onClick={() => setIsEditing(false)} className="backdrop-blur-md">Cancelar</Button>
+                <Button size="sm" onClick={handleSave} className="bg-primary text-primary-foreground font-bold shadow-lg">
                   <Save className="w-3.5 h-3.5 mr-2" /> Guardar
                 </Button>
               </>
             ) : (
-              <Button onClick={() => setIsEditing(true)} size="sm" variant="secondary" className="font-bold">
+              <Button onClick={() => setIsEditing(true)} size="sm" variant="secondary" className="font-bold backdrop-blur-md border border-border/50">
                 <Edit2 className="w-3.5 h-3.5 mr-2" /> Editar
               </Button>
             )}
