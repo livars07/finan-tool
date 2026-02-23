@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -296,7 +295,7 @@ Número: *${appointment.phone}*`;
               placeholder="Detalles importantes..."
               className={cn(
                 "bg-muted/10 border-border/30 focus-visible:ring-primary resize-none text-xs backdrop-blur-sm",
-                "h-[800px] min-h-[800px] overflow-y-auto scrollbar-thin"
+                "h-[300px] min-h-[300px] overflow-y-auto scrollbar-thin"
               )}
               value={isEditing ? editData.notes : appointment.notes}
               onChange={e => setEditData({...editData, notes: e.target.value})}

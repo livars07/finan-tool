@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -75,7 +74,7 @@ export default function PastAppointments({
     <div className="space-y-4 flex flex-col h-full">
       <div className={cn(
         "border rounded-xl overflow-hidden bg-card/10 relative backdrop-blur-sm flex-1 flex flex-col",
-        !expanded && "max-h-[400px]"
+        !expanded ? "max-h-[400px] h-[400px]" : "h-full"
       )}>
         <ScrollArea className="flex-1">
           <Table>
