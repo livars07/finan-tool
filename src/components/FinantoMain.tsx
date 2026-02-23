@@ -234,7 +234,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
               key={i} 
               className={cn(
                 "border border-transparent bg-card/30 backdrop-blur-md transition-all duration-300 hover:border-primary/40 hover:bg-card/50",
-                "animate-entrance-glow"
+                "animate-entrance-glow animate-periodic-glow"
               )}
               style={{ animationDelay: `${i * 150}ms` }}
             >

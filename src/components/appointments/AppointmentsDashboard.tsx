@@ -139,19 +139,16 @@ export default function AppointmentsDashboard({
   const DashboardContent = ({ expanded = false }: { expanded?: boolean }) => (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
       <div className={cn("flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 shrink-0", expanded && "bg-muted/10 p-6 rounded-2xl border border-border/30 backdrop-blur-md")}>
-        <TabsList className={cn(
-          "grid w-full sm:w-80 grid-cols-2 p-1.5 bg-muted/50 border border-border/20 shadow-inner",
-          "data-[state=active]:bg-background"
-        )}>
+        <TabsList className="grid w-full sm:w-80 grid-cols-2 h-10 p-1 bg-muted/40 border border-border/20 shadow-inner rounded-lg">
           <TabsTrigger 
             value="upcoming" 
-            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
+            className="h-full rounded-md text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
           >
             Próximas ({filteredUpcoming.length})
           </TabsTrigger>
           <TabsTrigger 
             value="past" 
-            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
+            className="h-full rounded-md text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
           >
             Historial ({filteredPast.length})
           </TabsTrigger>

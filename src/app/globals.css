@@ -213,6 +213,15 @@
   100% { background-color: transparent; }
 }
 
+@keyframes periodic-glow {
+  0%, 85%, 100% { background-color: transparent; border-color: transparent; }
+  92.5% { background-color: hsl(var(--primary) / 0.12); border-color: hsl(var(--primary) / 0.2); }
+}
+
 .animate-entrance-glow {
   animation: entrance-glow 0.8s ease-in-out forwards;
+}
+
+.animate-periodic-glow {
+  animation: periodic-glow 8s ease-in-out infinite;
 }
