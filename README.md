@@ -1,4 +1,4 @@
-# Finanto - Sistema de Gestión para Ejecutivos en Financiamiento Inmobiliario (v0.7.1)
+# Finanto - Sistema de Gestión para Ejecutivos en Financiamiento Inmobiliario (v1.1)
 
 Bienvenido a Finanto, la plataforma técnica diseñada para optimizar la operación diaria de los ejecutivos en financiamiento inmobiliario, garantizando rapidez, organización y un perfilamiento profesional ante los prospectos.
 

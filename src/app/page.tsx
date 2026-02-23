@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -81,20 +80,20 @@ import { cn } from "@/lib/utils";
 type Theme = 'predeterminado' | 'discreto' | 'corporativo' | 'moderno';
 
 const APP_TIPS = [
-  { icon: Calculator, title: "Calculadora Rápida", color: "text-primary", text: "Usa la calculadora rápida en caso de tener una llamada con un interesado que pregunte montos aproximados." },
+  { icon: Calculator, title: "Calculadora Rápida", color: "text-primary", text: "Usa la calculadora rapida en caso de tener una llamada con un interesado que pregunte montos aproximados." },
   { icon: ClipboardList, title: "Gestión Eficiente", color: "text-accent", text: "Nunca olvides registrar todas tus citas en el gestionador de citas, para tener un orden eficiente de fechas y datos en un solo lugar." },
   { icon: ShieldCheck, title: "Seguridad de Datos", color: "text-destructive", text: "Recuerda, tus citas son guardadas dentro de este navegador, si cambias de navegador o de dispositivo contacta al desarrollador." },
   { icon: Sparkles, title: "Próximas Mejoras", color: "text-yellow-500", text: "Esta es una versión funcional para cálculo inteligente y gestión de citas, en un futuro: datos en la nube, cuentas, monitoreo por parte de líderes y gerencia, IA para automatización de mensajes personalizados, una guía de capacitación, etc." },
-  { icon: Maximize2, title: "Calculadora Completa", color: "text-primary", text: "Usa la calculadora completa para no tantear números a la hora de tener la cita frente tuyo o al estar en una llamada extensa." },
+  { icon: Maximize2, title: "Calculadora Completa", color: "text-primary", text: "Usa la calculadora completa para no tantear números a la hora de tener la cita frente tuyo o al estar en una llamada extensa" },
   { icon: Palette, title: "Imagen Corporativa", color: "text-accent", text: "Usa el tema <<corporativo>> para mostrar pantalla a tus clientes presenciales." },
   { icon: Palette, title: "Personalización", color: "text-primary", text: "Cambia de tema en la esquina superior de este sistema web, ya sea que prefieras lo corporativo, lo ligero o vibes de hacker." },
   { icon: Copy, title: "Envío a WhatsApp", color: "text-green-500", text: "Recuerda copiar los datos de cada cliente para mandarlos por el grupo de WhatsApp: Click en la cita, click en el botón verde <<Copiar>>, y pegar datos en el chat del grupo." },
   { icon: TrendingUp, title: "Apoyo en Cierres", color: "text-accent", text: "Recuerda que la calculadora extendida sirve como apoyo para explicar la línea e información extra a la hora de intentar cerrar ventas." },
   { icon: History, title: "Historial Técnico", color: "text-muted-foreground", text: "No borres tus citas pasadas, sirven para ver tu progreso o no perderte en tu memoria a la hora de dar seguimiento." },
   { icon: FileText, title: "Memoria de Datos", color: "text-primary", text: "Recuerda anotar datos útiles del cliente en las notas de su cita para no tener que recordar, solo consultar tus datos." },
-  { icon: Calendar, title: "Control de Agenda", color: "text-accent", text: "Con una buena gestión de citas te ahorras problemas con la pérdida de números, olvidar confirmaciones, etc." },
+  { icon: Calendar, title: "Control de Agenda", color: "text-accent", text: "Con una buena gestión de citas te ahorras problemas con la perdida de números, olvidar confirmaciones, etc." },
   { icon: Copy, title: "Ahorro de Tiempo", color: "text-green-500", text: "Los botones de <<Copiar>> te pueden llegar a ahorrar mucho texto escrito y confundir datos de diferentes prospectos." },
-  { icon: Info, title: "Retroalimentación", color: "text-primary", text: "Alguna sugerencia, lo más mínima que sea, comentar al ejecutivo Olivares sin pena, lo que importa es la organización, comodidad y eficiencia de prospectadores." },
+  { icon: Info, title: "Retroalimentación", color: "text-primary", text: "Alguna sugerencia, lo mas minima que sea, comentar al ejecutivo Olivares sin pena, lo que importa es la organización, comodidad y eficiencia de prospectadores." },
   { icon: Users, title: "Perfil de Usuario", color: "text-accent", text: "Este sistema está enfocado en prospectadores, pero sirve para vendedores igualmente." },
   { icon: Target, title: "Flujo de Trabajo", color: "text-yellow-500", text: "Este sistema te ahorra el inventarte tu propio flujo de trabajo (distintos excels confusos, hojas de citas sin fin, y otras maneras de gestión)." },
   { icon: Users, title: "Cultura de Equipo", color: "text-primary", text: "La mejor forma de cooperación en equipo es una donde todos van en un mismo canal de progreso constante, no un espagueti de procesos diferentes cada uno." }
@@ -116,7 +115,6 @@ export default function Home() {
     }
   }, []);
 
-  // Auto-rotate effect for Carousel - Set to 18 seconds (18000ms)
   useEffect(() => {
     if (!api) return;
 
@@ -189,7 +187,7 @@ export default function Home() {
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer border-b-2 border-primary pb-1">
-              <LayoutDashboard className="w-4 h-4" />v0.7.1 (23 de marzo)
+              <LayoutDashboard className="w-4 h-4" />v1.1 (23 - Marzo)
             </div>
           </nav>
           <div className="flex items-center gap-4">
@@ -400,7 +398,7 @@ export default function Home() {
               </div>
               <div>
                 <DialogTitle className="text-3xl font-headline font-bold text-foreground">Guía Técnica de Finanto</DialogTitle>
-                <DialogDescription className="text-base">Manual de operación para ejecutivos en financiamiento inmobiliario (v0.7.1)</DialogDescription>
+                <DialogDescription className="text-base">Manual de operación para ejecutivos en financiamiento inmobiliario (v1.1 - 23 de Marzo)</DialogDescription>
               </div>
             </div>
           </DialogHeader>
