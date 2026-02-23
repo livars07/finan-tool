@@ -57,50 +57,46 @@ export default function AppointmentDetailsDialog({
     }
   }, [appointment]);
 
+  // Limpiador nuclear del DOM
+  const forceDOMCleanup = () => {
+    if (typeof document === 'undefined') return;
+    setTimeout(() => {
+      document.body.style.pointerEvents = 'auto';
+      document.body.style.overflow = 'auto';
+      // Eliminamos capas de bloqueo residuales de Radix
+      const residualGuards = document.querySelectorAll('[data-radix-focus-guard], [style*="pointer-events: none"]');
+      residualGuards.forEach(el => (el as HTMLElement).style.pointerEvents = 'auto');
+    }, 150);
+  };
+
   if (!appointment) return null;
 
   const handleSave = () => {
     onEdit(appointment.id, editData);
     setIsEditing(false);
-    toast({ title: "Guardado", description: "La información del cliente ha sido actualizada." });
-  };
-
-  const forceDOMCleanup = () => {
-    // Forzamos la limpieza del body para evitar que Radix deje el ratón bloqueado
-    setTimeout(() => {
-      if (typeof document !== 'undefined') {
-        document.body.style.pointerEvents = 'auto';
-        document.body.style.overflow = 'auto';
-        // Eliminamos capas invisibles de bloqueo si persisten
-        const focusGuards = document.querySelectorAll('[data-radix-focus-guard]');
-        focusGuards.forEach(el => (el as HTMLElement).remove());
-      }
-    }, 50);
+    toast({ title: "Guardado", description: "La información ha sido actualizada." });
   };
 
   const handleConfirmArchive = () => {
     const idToArchive = appointment.id;
     const name = appointment.name;
     
-    // 1. Ejecutamos la lógica de datos inmediatamente
-    onDelete(idToArchive);
-    
-    // 2. Cerramos popups
+    // Primero cerramos la UI para evitar colisiones de estado
     setShowDeleteConfirm(false);
     onOpenChange(false);
     
-    // 3. Limpiamos el DOM agresivamente
-    forceDOMCleanup();
-    
-    toast({ 
-      title: "Cita movida a papelera", 
-      description: `Se ha archivado el historial de ${name}.` 
-    });
+    // Ejecutamos la lógica de datos con un ligero retardo
+    setTimeout(() => {
+      onDelete(idToArchive);
+      forceDOMCleanup();
+      toast({ 
+        title: "Cita movida a papelera", 
+        description: `Se ha archivado el historial de ${name}.` 
+      });
+    }, 100);
   };
 
   const copyToWhatsAppFormat = () => {
-    if (!appointment) return;
-    
     const dateObj = parseISO(appointment.date);
     const dateFormatted = format(dateObj, "EEEE d 'de' MMMM yyyy", { locale: es });
     const capitalizedDate = dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
@@ -108,15 +104,12 @@ export default function AppointmentDetailsDialog({
 
     const text = `Cita: ${capitalizedDate}
 Nombre: ${appointment.name}
-Producto: Casa
+Producto: Crédito Hipotecario
 Hora: ${timeFormatted}
 Número: ${appointment.phone}`;
 
     navigator.clipboard.writeText(text).then(() => {
-      toast({
-        title: "Copiado exitosamente",
-        description: "Datos listos para enviar por WhatsApp.",
-      });
+      toast({ title: "Copiado", description: "Datos listos para WhatsApp." });
     });
   };
 
@@ -130,21 +123,20 @@ Número: ${appointment.phone}`;
         } 
         onOpenChange(o); 
       }}>
-        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border custom-scrollbar p-0">
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border p-0 shadow-2xl">
           <DialogHeader className="px-6 py-4 border-b border-border/40 flex flex-row items-center justify-between">
             <div className="flex items-center gap-2">
-              <DialogTitle className="text-xl font-headline font-bold text-foreground leading-none">
+              <DialogTitle className="text-xl font-headline font-bold text-foreground">
                 Detalles
               </DialogTitle>
-              
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <div className="p-1 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground cursor-default flex items-center justify-center">
+                    <div className="p-1 rounded-full hover:bg-muted text-muted-foreground cursor-help">
                       <Info className="h-4 w-4" />
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="bg-popover border-border shadow-xl">
+                  <TooltipContent side="right">
                     <p className="text-[10px] font-mono uppercase tracking-widest">ID: {appointment.id}</p>
                   </TooltipContent>
                 </Tooltip>
@@ -157,20 +149,17 @@ Número: ${appointment.phone}`;
                   onClick={copyToWhatsAppFormat}
                   variant="outline" 
                   size="sm"
-                  className="h-8 px-3 text-[10px] border-green-500/30 text-green-500 hover:bg-green-500/10 font-bold uppercase tracking-tight flex items-center justify-center"
+                  className="h-8 px-3 text-[10px] border-green-500/30 text-green-500 hover:bg-green-500/10 font-bold uppercase"
                 >
                   <MessageCircle className="w-3.5 h-3.5 mr-1.5" />
-                  Copiar datos
+                  Copiar
                 </Button>
               )}
-              <DialogClose className="flex h-5 w-5 items-center justify-center rounded-full bg-destructive transition-all hover:bg-destructive/90 focus:outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none border-0">
-                <span className="sr-only">Cerrar</span>
+              <DialogClose className="h-6 w-6 flex items-center justify-center rounded-full bg-destructive/10 text-destructive hover:bg-destructive transition-colors group">
+                <span className="text-xs font-bold group-hover:text-white">✕</span>
               </DialogClose>
             </div>
-            
-            <DialogDescription className="sr-only">
-              Información detallada y gestión del prospecto.
-            </DialogDescription>
+            <DialogDescription className="sr-only">Gestión de prospecto</DialogDescription>
           </DialogHeader>
 
           <div className="p-6 space-y-6">
@@ -200,34 +189,6 @@ Número: ${appointment.phone}`;
                     <Input type="time" value={editData.time || ''} onChange={e => setEditData({...editData, time: e.target.value})} />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Tipo</Label>
-                    <Select value={editData.type} onValueChange={v => setEditData({...editData, type: v as AppointmentType})}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1ra consulta">1ra consulta</SelectItem>
-                        <SelectItem value="2da consulta">2da consulta</SelectItem>
-                        <SelectItem value="cierre">Cierre</SelectItem>
-                        <SelectItem value="seguimiento">Seguimiento</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Estado</Label>
-                    <Select value={editData.status} onValueChange={v => setEditData({...editData, status: v as AppointmentStatus})}>
-                      <SelectTrigger><SelectValue placeholder="Sin estado" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Asistencia">Asistencia</SelectItem>
-                        <SelectItem value="No asistencia">No asistencia</SelectItem>
-                        <SelectItem value="Continuación en otra cita">Continuación en otra cita</SelectItem>
-                        <SelectItem value="Reagendó">Reagendó</SelectItem>
-                        <SelectItem value="Reembolso">Reembolso</SelectItem>
-                        <SelectItem value="Cierre">Cierre</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-4 bg-muted/20 p-4 rounded-lg border border-border/50">
@@ -242,7 +203,7 @@ Número: ${appointment.phone}`;
                   <Phone className="w-4 h-4 text-primary" />
                   <div>
                     <p className="text-[10px] text-muted-foreground uppercase font-bold">Teléfono</p>
-                    <p className="text-sm">{appointment.phone || 'No registrado'}</p>
+                    <p className="text-sm">{appointment.phone || 'N/A'}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -251,7 +212,6 @@ Número: ${appointment.phone}`;
                     <div>
                       <p className="text-[10px] text-muted-foreground uppercase font-bold">Fecha</p>
                       <p className="text-sm font-medium">{format(parseISO(appointment.date), 'dd/MM/yyyy')}</p>
-                      <p className="text-[10px] text-muted-foreground italic font-medium mt-0.5">{formatFriendlyDate(appointment.date)}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -262,34 +222,14 @@ Número: ${appointment.phone}`;
                     </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4 border-t border-border/50 pt-3">
-                  <div className="flex items-center gap-3">
-                    <BookOpen className="w-4 h-4 text-accent" />
-                    <div>
-                      <p className="text-[10px] text-muted-foreground uppercase font-bold">Tipo</p>
-                      <p className="text-sm">{appointment.type}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded-full border border-primary flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-primary" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-muted-foreground uppercase font-bold">Estado</p>
-                      <p className="text-sm font-bold text-primary">{appointment.status || 'Pendiente'}</p>
-                    </div>
-                  </div>
-                </div>
               </div>
             )}
 
             <div className="space-y-2">
-              <Label className="flex items-center gap-2 text-muted-foreground text-xs font-bold uppercase tracking-wider">
-                📝 Notas
-              </Label>
+              <Label className="flex items-center gap-2 text-muted-foreground text-xs font-bold uppercase">📝 Notas</Label>
               <Textarea 
-                placeholder="Detalles importantes sobre este prospecto..."
-                className="min-h-[140px] bg-muted/30 border-border/50 focus-visible:ring-accent resize-none custom-scrollbar text-sm leading-relaxed"
+                placeholder="Detalles del prospecto..."
+                className="min-h-[120px] bg-muted/30 border-border/50 focus-visible:ring-primary resize-none"
                 value={isEditing ? editData.notes : appointment.notes}
                 onChange={e => setEditData({...editData, notes: e.target.value})}
                 readOnly={!isEditing}
@@ -297,21 +237,21 @@ Número: ${appointment.phone}`;
             </div>
           </div>
 
-          <DialogFooter className="flex flex-row justify-between sm:justify-between items-center gap-2 border-t border-border/50 px-6 py-4 bg-muted/10">
+          <DialogFooter className="flex flex-row justify-between items-center gap-2 border-t border-border/50 px-6 py-4 bg-muted/10">
             <Button 
               variant="ghost" 
               size="sm"
               className="text-destructive hover:bg-destructive/10 h-8 text-xs font-bold uppercase"
               onClick={() => setShowDeleteConfirm(true)}
             >
-              <Trash2 className="w-3.5 h-3.5 mr-2" /> Borrar
+              <Trash2 className="w-3.5 h-3.5 mr-2" /> Archivar
             </Button>
             
             <div className="flex gap-2">
               {isEditing ? (
                 <>
                   <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>Cancelar</Button>
-                  <Button size="sm" onClick={handleSave} className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold">
+                  <Button size="sm" onClick={handleSave} className="bg-primary text-primary-foreground font-bold">
                     <Save className="w-3.5 h-3.5 mr-2" /> Guardar
                   </Button>
                 </>
@@ -325,21 +265,21 @@ Número: ${appointment.phone}`;
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={showDeleteConfirm} onOpenChange={(o) => { if(!o) forceDOMCleanup(); setShowDeleteConfirm(o); }}>
+      <AlertDialog open={showDeleteConfirm} onOpenChange={(o) => { if(!o) { setShowDeleteConfirm(false); forceDOMCleanup(); } }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Mover a la papelera?</AlertDialogTitle>
             <AlertDialogDescription>
-              La cita de <strong>{appointment.name}</strong> se ocultará de las listas activas. Podrás recuperarla desde la papelera más tarde.
+              La cita de <strong>{appointment.name}</strong> se ocultará de la lista activa. Podrás recuperarla desde la papelera.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => { setShowDeleteConfirm(false); forceDOMCleanup(); }}>Volver</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => { setShowDeleteConfirm(false); forceDOMCleanup(); }}>Cancelar</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleConfirmArchive}
               className="bg-destructive text-white hover:bg-destructive/90"
             >
-              Sí, archivar
+              Confirmar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
