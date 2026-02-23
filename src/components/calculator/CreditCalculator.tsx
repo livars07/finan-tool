@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,8 @@ import {
   TrendingUp,
   Receipt,
   ArrowRightLeft,
-  Coins
+  Coins,
+  Settings2
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { 
@@ -99,10 +100,16 @@ const CalculatorInputs = ({
 export default function CreditCalculator({ initialExpanded = false, onExpandedChange }: CreditCalculatorProps) {
   const [totalPrice, setTotalPrice] = useState<string>('');
   const [monthlyPayment, setMonthlyPayment] = useState<string>('');
+  
+  // Advanced simulation states (Expanded only)
+  const [extraDownPayment, setExtraDownPayment] = useState<string>('');
+  const [extraMonthlyContribution, setExtraMonthlyContribution] = useState<string>('');
+  const [customTerm, setCustomTerm] = useState<string>('192');
+
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const { toast } = useToast();
   
-  const FACTOR_MENSUALIDAD = 0.006982; 
+  const DEFAULT_FACTOR = 0.006982; 
   const FACTOR_ENGANCHE = 0.03; 
   const INCOME_RATIO = 0.35; 
 
@@ -116,7 +123,6 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
     onExpandedChange?.(isExpanded);
   }, [isExpanded, onExpandedChange]);
 
-  // Sincronizar URL con el estado del Simulador
   useEffect(() => {
     if (isExpanded) {
       window.history.pushState(null, '', '/simulador');
@@ -152,7 +158,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
     setTotalPrice(cleanVal);
     const p = parseFloat(cleanVal);
     if (!isNaN(p)) {
-      const c = p * FACTOR_MENSUALIDAD;
+      const c = p * DEFAULT_FACTOR;
       setMonthlyPayment(c.toFixed(2));
     }
   };
@@ -162,7 +168,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
     setMonthlyPayment(cleanVal);
     const c = parseFloat(cleanVal);
     if (!isNaN(c)) {
-      const p = c / FACTOR_MENSUALIDAD;
+      const p = c / DEFAULT_FACTOR;
       setTotalPrice(p.toFixed(2));
     }
   };
@@ -170,18 +176,28 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
   const clear = () => {
     setTotalPrice('');
     setMonthlyPayment('');
+    setExtraDownPayment('');
+    setExtraMonthlyContribution('');
+    setCustomTerm('192');
   };
 
+  // Calculations
   const currentP = parseNumber(totalPrice);
-  const currentDownPayment = currentP * FACTOR_ENGANCHE;
-  const currentMonthly = parseNumber(monthlyPayment);
-  const minIncomeRequired = currentMonthly / INCOME_RATIO;
+  const extraDown = parseNumber(extraDownPayment);
+  const baseDownPayment = currentP * FACTOR_ENGANCHE;
+  const totalDownPayment = baseDownPayment + extraDown;
+  
+  const currentMonthlyContribution = parseNumber(extraMonthlyContribution);
+  const baseMonthly = parseNumber(monthlyPayment);
+  const totalMonthlyLoad = baseMonthly + currentMonthlyContribution;
+  
+  const minIncomeRequired = totalMonthlyLoad / INCOME_RATIO;
   
   const estimatedClosingCosts = currentP * 0.05;
   const appraisalCost = 7500;
   const totalOperatingExpenses = estimatedClosingCosts + appraisalCost;
   const netLiquidCredit = currentP > 0 ? currentP - totalOperatingExpenses : 0;
-  const suggestedLivingBudget = minIncomeRequired > 0 ? minIncomeRequired - currentMonthly : 0;
+  const suggestedLivingBudget = minIncomeRequired > 0 ? minIncomeRequired - totalMonthlyLoad : 0;
 
   const handleCopySummary = () => {
     if (currentP <= 0) {
@@ -195,10 +211,10 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
 
     const summaryText = `Resumen de cotización de financiamiento inmobiliario:
 • Monto crédito: ${formatCurrency(currentP)}
-• Enganche (3%): ${formatCurrency(currentDownPayment)}
-• Mensualidad: ${formatCurrency(currentMonthly)}
-• Ingreso mínimo: ${formatCurrency(minIncomeRequired)}
-* Sujeto a aprobación de crédito y perfilamiento.`;
+• Enganche total (${((totalDownPayment/currentP)*100).toFixed(1)}%): ${formatCurrency(totalDownPayment)}
+• Mensualidad base: ${formatCurrency(baseMonthly)}
+${currentMonthlyContribution > 0 ? `• Aportación extra: ${formatCurrency(currentMonthlyContribution)}\n` : ''}• Ingreso mínimo: ${formatCurrency(minIncomeRequired)}
+* Proyección técnica informativa.`;
 
     navigator.clipboard.writeText(summaryText).then(() => {
       toast({
@@ -261,14 +277,10 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
 
           <div className="space-y-3 p-4 rounded-xl bg-primary/10 border border-primary/20 backdrop-blur-sm">
             <div className="flex justify-between items-end mb-1">
-              <span className="text-[10px] text-primary uppercase font-bold tracking-widest">Enganche requerido (3%)</span>
-              <span className="text-[10px] font-bold text-primary">{formatCurrency(currentDownPayment)}</span>
+              <span className="text-[10px] text-primary uppercase font-bold tracking-widest">Enganche base (3%)</span>
+              <span className="text-[10px] font-bold text-primary">{formatCurrency(baseDownPayment)}</span>
             </div>
             <Progress value={3} className="h-2 bg-secondary" />
-            <div className="flex justify-between text-[10px] font-medium text-muted-foreground pt-1">
-              <span>Crédito: {formatCurrency(currentP)}</span>
-              <span>Financiamiento: 97%</span>
-            </div>
           </div>
 
           <div className="p-4 rounded-xl bg-accent/10 border border-accent/20 backdrop-blur-sm">
@@ -307,7 +319,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
       <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
         <DialogContent 
           data-calculator-dialog="true"
-          className="max-w-none w-screen h-screen m-0 rounded-none bg-background border-none shadow-none p-0 flex flex-col overflow-hidden"
+          className="max-w-none w-screen h-screen m-0 rounded-none bg-background border-none shadow-none p-0 flex flex-col overflow-hidden z-[60]"
         >
           <DialogHeader className="px-6 py-4 border-b border-border/40 flex flex-row items-center justify-between bg-card/10 shrink-0">
             <div className="flex items-center gap-3">
@@ -316,7 +328,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
               </div>
               <div>
                 <DialogTitle className="text-xl font-headline font-bold text-foreground">Simulador Profesional de Crédito</DialogTitle>
-                <DialogDescription className="text-xs">Herramienta técnica para el perfilamiento inmobiliario y control de expedientes.</DialogDescription>
+                <DialogDescription className="text-xs">Ajuste de escenarios, gastos operativos y perfilamiento de ingresos.</DialogDescription>
               </div>
             </div>
             <DialogClose asChild>
@@ -326,8 +338,8 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
             </DialogClose>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 min-h-0">
-            <section className="bg-muted/30 p-6 rounded-2xl border border-border/50 shadow-inner shrink-0">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            <section className="bg-muted/30 p-6 rounded-2xl border border-border/50 shadow-inner">
               <CalculatorInputs 
                 isModal={true}
                 totalPrice={totalPrice}
@@ -338,136 +350,139 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
               />
             </section>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-              <div className="space-y-6">
-                <div className="p-6 rounded-2xl border border-primary/20 bg-primary/5 space-y-4 h-full flex flex-col justify-center">
-                  <div className="flex items-center gap-2 text-primary">
-                    <TrendingUp className="w-5 h-5" />
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest">Estructura del Financiamiento</h4>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              <Card className="lg:col-span-3 border-border shadow-md overflow-hidden bg-card/50">
+                <div className="p-4 border-b border-border/40 bg-muted/20 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Settings2 className="w-4 h-4 text-primary" />
+                    <h3 className="text-xs font-bold uppercase tracking-wider">Ajustes de Escenario (Opcionales)</h3>
                   </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-muted-foreground">Monto del crédito solicitado:</span>
-                      <span className="font-bold">{formatCurrency(currentP)}</span>
+                  <span className="text-[10px] text-muted-foreground uppercase font-bold italic opacity-60">Personaliza la oferta técnica</span>
+                </div>
+                <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-bold uppercase text-muted-foreground">Enganche Extra</Label>
+                    <div className="relative">
+                       <span className="absolute left-3 top-2.5 text-xs text-muted-foreground">$</span>
+                       <Input 
+                        placeholder="Ej. 50,000" 
+                        className="pl-7 bg-background h-10 text-sm"
+                        value={formatWithCommas(extraDownPayment)}
+                        onChange={(e) => setExtraDownPayment(e.target.value.replace(/,/g, ''))}
+                      />
                     </div>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-muted-foreground">Enganche requerido (3%):</span>
-                      <span className="font-bold">{formatCurrency(currentDownPayment)}</span>
+                    <p className="text-[9px] text-muted-foreground">Reduce el financiamiento inicial.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-bold uppercase text-muted-foreground">Aportación Mensual Extra</Label>
+                    <div className="relative">
+                       <span className="absolute left-3 top-2.5 text-xs text-muted-foreground">$</span>
+                       <Input 
+                        placeholder="Ej. 2,000" 
+                        className="pl-7 bg-background h-10 text-sm"
+                        value={formatWithCommas(extraMonthlyContribution)}
+                        onChange={(e) => setExtraMonthlyContribution(e.target.value.replace(/,/g, ''))}
+                      />
                     </div>
-                    <div className="pt-4 border-t border-border/30">
-                      <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-tight">Inversión Mensual Fija</span>
-                      <p className="text-3xl font-bold text-primary mt-1">{formatCurrency(currentMonthly)}</p>
-                    </div>
+                    <p className="text-[9px] text-muted-foreground">Aumenta el pago a capital sugerido.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-bold uppercase text-muted-foreground">Plazo (Meses)</Label>
+                    <Input 
+                      type="number" 
+                      placeholder="192" 
+                      className="bg-background h-10 text-sm"
+                      value={customTerm}
+                      onChange={(e) => setCustomTerm(e.target.value)}
+                    />
+                    <p className="text-[9px] text-muted-foreground">Predeterminado: 192 meses.</p>
                   </div>
                 </div>
-              </div>
+              </Card>
 
               <div className="space-y-6">
-                <div className="p-6 rounded-2xl border border-accent/20 bg-accent/5 space-y-4 h-full flex flex-col justify-center">
-                  <div className="flex items-center gap-2 text-accent">
-                    <Receipt className="w-5 h-5" />
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest">Gastos y Saldos Líquidos</h4>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center text-sm">
-                      <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground">Gastos de escrituración (est. 5%):</span>
-                        <TooltipProvider>
-                          <Tooltip delayDuration={0}>
-                            <TooltipTrigger asChild>
-                              <HelpCircle className="w-4 h-4 text-muted-foreground/60 cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-[350px] p-6 text-base leading-relaxed bg-popover border-border shadow-2xl backdrop-blur-md">
-                              <p className="font-bold mb-2 text-accent text-lg flex items-center gap-2">
-                                <FileText className="w-5 h-5" /> ¿Qué es la escrituración?
-                              </p>
-                              <p>Cubre la legalidad del patrimonio ante notario e impuestos estatales. Es la inversión que garantiza la propiedad al 100%.</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                      <span className="font-bold">{formatCurrency(estimatedClosingCosts)}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm">
-                      <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground">Costo de avalúo pericial:</span>
-                        <TooltipProvider>
-                          <Tooltip delayDuration={0}>
-                            <TooltipTrigger asChild>
-                              <HelpCircle className="w-4 h-4 text-muted-foreground/60 cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-[350px] p-6 text-base leading-relaxed bg-popover border-border shadow-2xl backdrop-blur-md">
-                              <p className="font-bold mb-2 text-accent text-lg flex items-center gap-2">
-                                <Info className="w-5 h-5" /> ¿Por qué el avalúo?
-                              </p>
-                              <p>Certificación oficial del valor real de la propiedad por un perito autorizado para proteger su inversión.</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                      <span className="font-bold">{formatCurrency(appraisalCost)}</span>
-                    </div>
-                    
-                    <div className="pt-3 border-t border-border/30 space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-tight">Desembolso inicial total</span>
-                        <span className="text-base font-bold text-accent">{formatCurrency(currentDownPayment + totalOperatingExpenses)}</span>
-                      </div>
-                      <div className="bg-accent/10 p-3 rounded-xl border border-accent/20">
-                        <div className="flex items-center gap-2 text-accent mb-1">
-                          <ArrowRightLeft className="w-3.5 h-3.5" />
-                          <span className="text-[10px] font-bold uppercase tracking-wider">Monto líquido restante</span>
-                        </div>
-                        <p className="text-xl font-bold text-foreground">{formatCurrency(netLiquidCredit)}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-6 flex flex-col">
-                <div className="p-6 rounded-2xl border-2 border-secondary bg-secondary/20 space-y-4 flex-1 flex flex-col justify-center shadow-lg transition-all">
+                 <div className="p-6 rounded-2xl border-2 border-secondary bg-secondary/20 space-y-4 shadow-lg h-full flex flex-col justify-center">
                   <div className="flex items-center gap-2">
                     <ShieldAlert className="w-5 h-5 text-secondary-foreground" />
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-secondary-foreground">Perfilamiento Operativo</h4>
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-secondary-foreground">Perfilamiento</h4>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <div>
-                      <p className="text-[10px] text-primary uppercase font-bold mb-1">Ingreso mínimo comprobable</p>
+                      <p className="text-[10px] text-primary uppercase font-bold mb-1">Ingreso mín. comprobable</p>
                       <p className="text-2xl font-bold text-foreground">{formatCurrency(minIncomeRequired)}</p>
                     </div>
-                    
-                    <div className="p-4 bg-secondary/30 rounded-xl border border-secondary/40 shadow-inner">
-                      <div className="flex items-center gap-2 text-secondary-foreground mb-1">
-                        <Coins className="w-3.5 h-3.5" />
-                        <span className="text-[10px] font-bold uppercase tracking-tight">Presupuesto de vida sugerido</span>
-                      </div>
+                    <div className="p-3 bg-secondary/30 rounded-xl border border-secondary/40 shadow-inner">
+                      <span className="text-[10px] font-bold uppercase tracking-tight text-secondary-foreground block mb-1">Presupuesto vida sug.</span>
                       <p className="text-lg font-bold text-foreground">{formatCurrency(suggestedLivingBudget)}</p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-[10px] uppercase font-bold">
-                        <span className="text-secondary-foreground">Ratio de endeudamiento sano</span>
-                        <span className="text-primary font-bold">35% DTI</span>
-                      </div>
-                      <Progress value={35} className="h-2 bg-secondary" />
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+                <div className="p-6 rounded-2xl border border-primary/20 bg-primary/5 space-y-4">
+                  <div className="flex items-center gap-2 text-primary">
+                    <TrendingUp className="w-5 h-5" />
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest">Estructura del Financiamiento</h4>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground">Monto Crédito</span>
+                      <p className="font-bold">{formatCurrency(currentP)}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground">Enganche Total</span>
+                      <p className="font-bold text-primary">{formatCurrency(totalDownPayment)}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground">Mensualidad Base</span>
+                      <p className="font-bold">{formatCurrency(baseMonthly)}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground">Carga Mensual</span>
+                      <p className="font-bold text-primary">{formatCurrency(totalMonthlyLoad)}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6 rounded-2xl border border-accent/20 bg-accent/5 space-y-4">
+                  <div className="flex items-center gap-2 text-accent">
+                    <Receipt className="w-5 h-5" />
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest">Gastos Operativos</h4>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground">Escrituración (est.)</span>
+                      <p className="font-bold">{formatCurrency(estimatedClosingCosts)}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground">Avalúo Pericial</span>
+                      <p className="font-bold">{formatCurrency(appraisalCost)}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground">Inversión Inicial</span>
+                      <p className="font-bold text-accent">{formatCurrency(totalDownPayment + totalOperatingExpenses)}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground">Saldo Líquido</span>
+                      <p className="font-bold text-accent">{formatCurrency(netLiquidCredit)}</p>
+                    </div>
+                  </div>
+                </div>
+            </div>
           </div>
 
-          <div className="p-6 border-t border-border/20 shrink-0 bg-background/50 backdrop-blur-md">
+          <div className="p-6 border-t border-border/20 bg-background/50 backdrop-blur-md">
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2 p-2 px-4 rounded-xl bg-muted border border-border/50">
-                  <FileText className="w-4 h-4 text-primary" />
-                  <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Plan Tradicional 192 Meses</span>
+                  <Coins className="w-4 h-4 text-primary" />
+                  <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Plan Amortización Variable</span>
                 </div>
                 <div className="text-[9px] text-muted-foreground/60 leading-tight hidden xl:block">
-                  * Proyección informativa basada en factor mensualidad fijo de 0.6982%. <br />
-                  Sujeto a cambios según perfil crediticio e institución financiera.
+                  * Cálculos dinámicos basados en entradas de usuario. <br />
+                  La viabilidad depende del buró de crédito y antigüedad laboral.
                 </div>
               </div>
 
@@ -475,7 +490,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                 <Button 
                   onClick={handleCopySummary}
                   variant="outline"
-                  className="flex-1 md:flex-none h-12 px-6 border-green-500 text-green-500 hover:bg-green-500/5 font-bold text-base rounded-xl transition-all"
+                  className="flex-1 md:flex-none h-12 px-6 border-green-500 text-green-500 hover:bg-green-500/5 font-bold text-base rounded-xl"
                 >
                   <Copy className="w-4 h-4 mr-2" /> Copiar Resumen
                 </Button>
@@ -484,7 +499,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                   onClick={clear}
                   className="h-12 px-4 text-muted-foreground hover:text-destructive rounded-xl"
                 >
-                  <RotateCcw className="w-4 h-4 mr-2" /> Limpiar
+                  <RotateCcw className="w-4 h-4 mr-2" /> Limpiar Todo
                 </Button>
               </div>
             </div>

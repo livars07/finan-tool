@@ -43,7 +43,7 @@ export interface Appointment {
   isConfirmed?: boolean;
 }
 
-const STORAGE_KEY = 'FINANTO_DATA_V07';
+const STORAGE_KEY = 'FINANTO_DATA_V1.1_50SEED';
 
 /**
  * Guarda la lista de citas en el almacenamiento local (localStorage).
@@ -110,79 +110,54 @@ export const updateAppointment = (id: string, partialData: Partial<Appointment>)
 };
 
 /**
- * Genera datos de prueba realistas.
+ * Genera datos de prueba realistas (50 registros).
  */
 export const generateSeedData = (): Appointment[] => {
   const data: Appointment[] = [];
-  const firstNames = ['Juan', 'María', 'Carlos', 'Ana', 'Luis', 'Elena', 'Roberto', 'Sofía', 'Diego', 'Lucía'];
-  const lastNames = ['Pérez', 'García', 'López', 'Martínez', 'Rodríguez', 'Gómez', 'Díaz', 'Ruiz', 'Torres', 'Morales'];
+  const firstNames = ['Juan', 'María', 'Carlos', 'Ana', 'Luis', 'Elena', 'Roberto', 'Sofía', 'Diego', 'Lucía', 'Fernando', 'Gabriela', 'Ricardo', 'Patricia', 'Héctor', 'Isabel', 'Jorge', 'Mónica', 'Andrés', 'Carmen'];
+  const lastNames = ['Pérez', 'García', 'López', 'Martínez', 'Rodríguez', 'Gómez', 'Díaz', 'Ruiz', 'Torres', 'Morales', 'Vázquez', 'Jiménez', 'Castro', 'Ortiz', 'Álvarez', 'Flores', 'Ramos', 'Gutiérrez', 'Reyes', 'Blanco'];
   const types: AppointmentType[] = ['1ra consulta', '2da consulta', 'Cierre', 'Seguimiento'];
   const products: AppointmentProduct[] = ['Casa', 'Departamento', 'Terreno', 'Transporte', 'Préstamo'];
   const statuses: AppointmentStatus[] = ['Asistencia', 'No asistencia', 'Continuación en otra cita', 'Reagendó', 'Reembolso', 'Cierre', 'Apartado'];
-  const hours = ['09:00', '10:30', '12:00', '14:30', '16:00', '17:30'];
+  const hours = ['09:00', '10:00', '11:30', '13:00', '14:30', '16:00', '17:30', '19:00'];
 
   const now = new Date();
 
-  // 3 Citas para Hoy
-  for (let i = 0; i < 3; i++) {
+  // 25 Citas Próximas (Hoy y Futuro)
+  for (let i = 0; i < 25; i++) {
+    const daysAhead = Math.floor(i / 5); // 5 citas por día aprox
+    const futureDate = addDays(now, daysAhead);
+    const isTodayApp = isToday(futureDate);
+    
     data.push({
       id: uuidv4(),
-      name: `${firstNames[i]} ${lastNames[i]} (Test)`,
-      phone: "664 111 2233",
-      date: now.toISOString(),
+      name: `${firstNames[i % firstNames.length]} ${lastNames[i % lastNames.length]}`,
+      phone: `664 ${Math.floor(100+Math.random()*900)} ${Math.floor(1000+Math.random()*9000)}`,
+      date: futureDate.toISOString(),
       time: hours[i % hours.length],
       type: types[i % types.length],
       product: products[i % products.length],
-      notes: "Prospecto de prueba para el día de hoy."
+      isConfirmed: isTodayApp ? Math.random() > 0.5 : false,
+      notes: `Nota de seguimiento #${i + 1}: Interesado en ${products[i % products.length]}. Requiere perfilamiento completo.`
     });
   }
 
-  // 2 Citas Pendientes (Mañana y Pasado)
-  for (let i = 0; i < 2; i++) {
-    const futureDate = addDays(now, i + 1);
+  // 25 Citas Pasadas (Historial)
+  for (let i = 0; i < 25; i++) {
+    const pastDate = subDays(now, i + 1);
     data.push({
       id: uuidv4(),
-      name: `${firstNames[i+3]} ${lastNames[i+3]} (Test)`,
-      phone: "664 444 5566",
-      date: futureDate.toISOString(),
-      time: hours[(i+2) % hours.length],
-      type: types[i % types.length],
-      product: products[(i+2) % products.length],
-      notes: "Cita programada a futuro."
-    });
-  }
-
-  // 5 Citas del mes pasado (Historial)
-  const lastMonth = subMonths(now, 1);
-  for (let i = 0; i < 5; i++) {
-    const pastDate = subDays(lastMonth, i + 5);
-    data.push({
-      id: uuidv4(),
-      name: `${firstNames[i+5]} ${lastNames[i+5]} (Test)`,
-      phone: "664 777 8899",
+      name: `${firstNames[(i + 5) % firstNames.length]} ${lastNames[(i + 5) % lastNames.length]}`,
+      phone: `664 ${Math.floor(100+Math.random()*900)} ${Math.floor(1000+Math.random()*9000)}`,
       date: pastDate.toISOString(),
       time: hours[i % hours.length],
       type: types[i % types.length],
       product: products[i % products.length],
       status: statuses[i % statuses.length],
       isConfirmed: true,
-      notes: "Historial del mes pasado."
+      notes: `Registro histórico #${i + 1}. El cliente mostró interés pero ${statuses[i % statuses.length].toLowerCase()}.`
     });
   }
-
-  // Una cita adicional con estado 'Apartado' para demostración
-  data.push({
-    id: uuidv4(),
-    name: "Alejandro Ruiz (Test)",
-    phone: "664 999 0011",
-    date: subDays(now, 2).toISOString(),
-    time: "11:00",
-    type: "2da consulta",
-    product: "Casa",
-    status: "Apartado",
-    isConfirmed: true,
-    notes: "Cliente interesado, ya realizó el apartado."
-  });
   
   saveToDisk(data);
   return data;
@@ -203,7 +178,7 @@ export const calculateStats = (appointments: Appointment[]) => {
     }).length,
     currentMonthProspects: appointments.filter(a => {
       const d = parseISO(a.date);
-      return isSameMonth(d, now) || isAfter(d, now);
+      return isSameMonth(d, now) || (isAfter(d, now) && isSameMonth(d, now));
     }).length,
     lastMonthProspects: appointments.filter(a => isSameMonth(parseISO(a.date), lastMonth)).length,
     currentMonthSales: appointments.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), now)).length,
