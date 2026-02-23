@@ -2,18 +2,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { 
-  isToday, 
-  isAfter, 
-  isBefore, 
-  startOfDay, 
-  parseISO, 
-  isTomorrow, 
-  format, 
-  differenceInDays,
-  isSameMonth,
-  subDays,
-  addDays,
-  isSameYear
+  isToday, isAfter, isBefore, startOfDay, parseISO, 
+  format, differenceInDays, isSameMonth, isSameYear, subMonths
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import * as Service from '@/services/appointment-service';
@@ -59,6 +49,11 @@ export function useAppointments() {
     setAppointments(seed);
   };
 
+  const clearAll = () => {
+    Service.saveToDisk([]);
+    setAppointments([]);
+  };
+
   const upcoming = useMemo(() => {
     const today = startOfDay(new Date());
     return appointments
@@ -93,32 +88,21 @@ export function useAppointments() {
     const d = parseISO(dateStr);
     const day = startOfDay(d);
     const today = startOfDay(new Date());
-    
     const diff = differenceInDays(day, today);
 
-    // Casos especiales directos
     if (diff === 0) return "Hoy";
     if (diff === 1) return "Mañana";
     if (diff === 2) return "Pasado mañana";
     if (diff === -1) return "Ayer";
     if (diff === -2) return "Antier";
 
-    // Casos de la semana pasada o próxima semana
     if (diff > 2 && diff < 7) return `Este ${format(d, 'EEEE', { locale: es })}`;
     if (diff < -2 && diff > -7) return `${format(d, 'EEEE', { locale: es })} pasado`;
 
-    // Mismo mes: "Lunes 09"
     if (isSameMonth(day, today) && isSameYear(day, today)) {
-      return format(d, "EEEE d", { locale: es }).charAt(0).toUpperCase() + format(d, "EEEE d", { locale: es }).slice(1);
+      const f = format(d, "EEEE d", { locale: es });
+      return f.charAt(0).toUpperCase() + f.slice(1);
     }
-
-    // Diferente mes
-    if (isBefore(day, today)) {
-      const monthDiff = differenceInDays(today, day);
-      if (monthDiff < 60 && !isSameMonth(day, today)) return "Mes pasado";
-      if (monthDiff >= 60) return `Hace ${Math.floor(monthDiff/30)} meses`;
-    }
-
     return format(d, 'dd/MM/yyyy');
   };
 
@@ -133,19 +117,8 @@ export function useAppointments() {
   const stats = useMemo(() => Service.calculateStats(appointments), [appointments]);
 
   return {
-    appointments,
-    upcoming,
-    past,
-    addAppointment,
-    updateStatus,
-    editAppointment,
-    toggleConfirmation,
-    resetData,
-    formatFriendlyDate,
-    format12hTime,
-    stats,
-    isLoaded
+    appointments, upcoming, past, addAppointment, updateStatus, editAppointment,
+    toggleConfirmation, resetData, clearAll, formatFriendlyDate, format12hTime,
+    stats, isLoaded
   };
 }
-
-export type { Appointment, AppointmentStatus, AppointmentType };
