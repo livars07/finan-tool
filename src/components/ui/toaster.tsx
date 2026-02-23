@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useEffect, useRef } from "react"
@@ -21,9 +22,13 @@ export function Toaster() {
       if (!processedToastIds.current.has(t.id)) {
         processedToastIds.current.add(t.id)
         
-        // Instant play without logic constraints (no cooldown)
-        const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3")
-        audio.volume = 0.3
+        // Determinar el sonido basado en la variante (error vs normal)
+        const soundUrl = t.variant === 'destructive' 
+          ? "https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3" // Sonido de alerta/error
+          : "https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"; // Sonido de éxito/info
+          
+        const audio = new Audio(soundUrl)
+        audio.volume = t.variant === 'destructive' ? 0.5 : 0.3
         audio.play().catch(() => {
           // Ignore browser auto-play prevention errors
         })
