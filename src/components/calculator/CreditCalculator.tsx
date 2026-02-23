@@ -49,7 +49,7 @@ const CalculatorInputs = ({
   onMonthlyChange: (val: string) => void,
   formatWithCommas: (val: string) => string
 }) => (
-  <div className={isModal ? "grid grid-cols-1 md:grid-cols-2 gap-8" : "grid grid-cols-1 md:grid-cols-2 gap-4"}>
+  <div className={isModal ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "grid grid-cols-1 md:grid-cols-2 gap-4"}>
     <div className="space-y-2">
       <Label htmlFor={isModal ? "totalPriceModal" : "totalPrice"} className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
         Monto del crédito (P)
@@ -57,12 +57,12 @@ const CalculatorInputs = ({
       <div className="relative flex items-center">
         <span className={cn(
           "absolute left-3 font-bold pointer-events-none",
-          isModal ? "text-2xl text-muted-foreground top-1/2 -translate-y-1/2" : "text-muted-foreground top-2.5"
+          isModal ? "text-xl text-muted-foreground top-1/2 -translate-y-1/2" : "text-muted-foreground top-2.5"
         )}>$</span>
         <Input
           id={isModal ? "totalPriceModal" : "totalPrice"}
           placeholder="0.00"
-          className={isModal ? "pl-9 font-bold text-3xl bg-muted/20 h-16" : "pl-7 font-semibold text-lg bg-muted/20"}
+          className={isModal ? "pl-9 font-bold text-2xl bg-muted/20 h-14" : "pl-7 font-semibold text-lg bg-muted/20"}
           type="text"
           value={formatWithCommas(totalPrice)}
           onChange={(e) => onPriceChange(e.target.value)}
@@ -76,12 +76,12 @@ const CalculatorInputs = ({
       <div className="relative flex items-center">
         <span className={cn(
           "absolute left-3 font-bold pointer-events-none",
-          isModal ? "text-2xl text-accent top-1/2 -translate-y-1/2" : "text-accent top-2.5"
+          isModal ? "text-xl text-accent top-1/2 -translate-y-1/2" : "text-accent top-2.5"
         )}>$</span>
         <Input
           id={isModal ? "monthlyPaymentModal" : "monthlyPayment"}
           placeholder="0.00"
-          className={isModal ? "pl-9 border-accent/30 focus-visible:ring-accent font-bold text-3xl text-accent bg-accent/5 h-16" : "pl-7 border-accent/30 focus-visible:ring-accent font-bold text-lg text-accent bg-accent/5"}
+          className={isModal ? "pl-9 border-accent/30 focus-visible:ring-accent font-bold text-2xl text-accent bg-accent/5 h-14" : "pl-7 border-accent/30 focus-visible:ring-accent font-bold text-lg text-accent bg-accent/5"}
           type="text"
           value={formatWithCommas(monthlyPayment)}
           onChange={(e) => onMonthlyChange(e.target.value)}
@@ -283,25 +283,25 @@ export default function CreditCalculator() {
           data-calculator-dialog="true"
           className="max-w-none w-screen h-screen m-0 rounded-none bg-background border-none shadow-none p-0 flex flex-col overflow-hidden"
         >
-          <DialogHeader className="px-10 py-6 border-b border-border/40 flex flex-row items-center justify-between bg-card/10 shrink-0">
-            <div className="flex items-center gap-4">
-              <div className="bg-primary/20 p-3 rounded-2xl border border-primary/30">
-                <Calculator className="text-primary w-8 h-8" />
+          <DialogHeader className="px-6 py-4 border-b border-border/40 flex flex-row items-center justify-between bg-card/10 shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/20 p-2 rounded-xl border border-primary/30">
+                <Calculator className="text-primary w-6 h-6" />
               </div>
               <div>
-                <DialogTitle className="text-2xl font-headline font-bold text-foreground">Simulador Profesional de Crédito</DialogTitle>
-                <DialogDescription className="text-sm">Herramienta técnica para el perfilamiento inmobiliario y control de expedientes.</DialogDescription>
+                <DialogTitle className="text-xl font-headline font-bold text-foreground">Simulador Profesional de Crédito</DialogTitle>
+                <DialogDescription className="text-xs">Herramienta técnica para el perfilamiento inmobiliario y control de expedientes.</DialogDescription>
               </div>
             </div>
             <DialogClose asChild>
-              <Button variant="ghost" size="icon" className="rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors h-12 w-12">
-                <X className="w-6 h-6" />
+              <Button variant="ghost" size="icon" className="rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors h-10 w-10">
+                <X className="w-5 h-5" />
               </Button>
             </DialogClose>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto p-10 space-y-10">
-            <section className="bg-muted/30 p-10 rounded-3xl border border-border/50 shadow-inner">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            <section className="bg-muted/30 p-6 rounded-2xl border border-border/50 shadow-inner">
               <CalculatorInputs 
                 isModal={true}
                 totalPrice={totalPrice}
@@ -312,14 +312,14 @@ export default function CreditCalculator() {
               />
             </section>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-stretch">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
               <div className="space-y-6">
-                <div className="p-8 rounded-3xl border border-primary/20 bg-primary/5 space-y-6 h-full flex flex-col justify-center">
-                  <div className="flex items-center gap-3 text-primary">
-                    <TrendingUp className="w-6 h-6" />
-                    <h4 className="text-xs font-bold uppercase tracking-widest">Estructura del Financiamiento</h4>
+                <div className="p-6 rounded-2xl border border-primary/20 bg-primary/5 space-y-4 h-full flex flex-col justify-center">
+                  <div className="flex items-center gap-2 text-primary">
+                    <TrendingUp className="w-5 h-5" />
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest">Estructura del Financiamiento</h4>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-muted-foreground">Monto del crédito solicitado:</span>
                       <span className="font-bold">{formatCurrency(currentP)}</span>
@@ -328,21 +328,21 @@ export default function CreditCalculator() {
                       <span className="text-muted-foreground">Enganche requerido (3%):</span>
                       <span className="font-bold">{formatCurrency(currentDownPayment)}</span>
                     </div>
-                    <div className="pt-6 border-t border-border/30">
-                      <span className="text-xs text-muted-foreground font-semibold uppercase tracking-tight">Inversión Mensual Fija</span>
-                      <p className="text-4xl font-bold text-primary mt-1">{formatCurrency(currentMonthly)}</p>
+                    <div className="pt-4 border-t border-border/30">
+                      <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-tight">Inversión Mensual Fija</span>
+                      <p className="text-3xl font-bold text-primary mt-1">{formatCurrency(currentMonthly)}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-6">
-                <div className="p-8 rounded-3xl border border-accent/20 bg-accent/5 space-y-6 h-full flex flex-col justify-center">
-                  <div className="flex items-center gap-3 text-accent">
-                    <Receipt className="w-6 h-6" />
-                    <h4 className="text-xs font-bold uppercase tracking-widest">Gastos y Saldos Líquidos</h4>
+                <div className="p-6 rounded-2xl border border-accent/20 bg-accent/5 space-y-4 h-full flex flex-col justify-center">
+                  <div className="flex items-center gap-2 text-accent">
+                    <Receipt className="w-5 h-5" />
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest">Gastos y Saldos Líquidos</h4>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <div className="flex justify-between items-center text-sm">
                       <div className="flex items-center gap-2">
                         <span className="text-muted-foreground">Gastos de escrituración (est. 5%):</span>
@@ -382,20 +382,17 @@ export default function CreditCalculator() {
                       <span className="font-bold">{formatCurrency(appraisalCost)}</span>
                     </div>
                     
-                    <div className="pt-4 border-t border-border/30 space-y-3">
+                    <div className="pt-3 border-t border-border/30 space-y-3">
                       <div className="flex justify-between items-center">
-                        <span className="text-xs text-muted-foreground font-semibold uppercase tracking-tight">Desembolso inicial total</span>
-                        <span className="text-lg font-bold text-accent">{formatCurrency(currentDownPayment + totalOperatingExpenses)}</span>
+                        <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-tight">Desembolso inicial total</span>
+                        <span className="text-base font-bold text-accent">{formatCurrency(currentDownPayment + totalOperatingExpenses)}</span>
                       </div>
                       <div className="bg-accent/10 p-3 rounded-xl border border-accent/20">
                         <div className="flex items-center gap-2 text-accent mb-1">
                           <ArrowRightLeft className="w-3.5 h-3.5" />
                           <span className="text-[10px] font-bold uppercase tracking-wider">Monto líquido restante</span>
                         </div>
-                        <p className="text-2xl font-bold text-foreground">{formatCurrency(netLiquidCredit)}</p>
-                        <p className="text-[9px] text-muted-foreground mt-1 italic">
-                          Capital disponible tras cubrir gastos operativos del crédito.
-                        </p>
+                        <p className="text-xl font-bold text-foreground">{formatCurrency(netLiquidCredit)}</p>
                       </div>
                     </div>
                   </div>
@@ -403,24 +400,23 @@ export default function CreditCalculator() {
               </div>
 
               <div className="space-y-6 flex flex-col">
-                <div className="p-8 rounded-3xl border border-yellow-500/20 bg-yellow-500/5 space-y-6 flex-1">
-                  <div className="flex items-center gap-3 text-yellow-500">
-                    <ShieldAlert className="w-6 h-6" />
-                    <h4 className="text-xs font-bold uppercase tracking-widest">Perfilamiento Operativo</h4>
+                <div className="p-6 rounded-2xl border border-yellow-500/20 bg-yellow-500/5 space-y-4 flex-1 flex flex-col justify-center">
+                  <div className="flex items-center gap-2 text-yellow-500">
+                    <ShieldAlert className="w-5 h-5" />
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest">Perfilamiento Operativo</h4>
                   </div>
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     <div>
-                      <p className="text-[10px] text-muted-foreground uppercase font-bold mb-2">Ingreso mínimo comprobable</p>
-                      <p className="text-3xl font-bold text-foreground">{formatCurrency(minIncomeRequired)}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1">Ingreso mínimo comprobable</p>
+                      <p className="text-2xl font-bold text-foreground">{formatCurrency(minIncomeRequired)}</p>
                     </div>
                     
-                    <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
-                      <div className="flex items-center gap-2 text-yellow-500 mb-1">
-                        <Coins className="w-4 h-4" />
+                    <div className="p-3 bg-white/5 rounded-xl border border-white/10">
+                      <div className="flex items-center gap-2 text-yellow-500 mb-0.5">
+                        <Coins className="w-3.5 h-3.5" />
                         <span className="text-[10px] font-bold uppercase">Presupuesto de vida sugerido</span>
                       </div>
-                      <p className="text-xl font-bold">{formatCurrency(suggestedLivingBudget)}</p>
-                      <p className="text-[10px] text-muted-foreground mt-1">Capital libre mensual proyectado tras pago de mensualidad.</p>
+                      <p className="text-lg font-bold">{formatCurrency(suggestedLivingBudget)}</p>
                     </div>
 
                     <div className="space-y-2">
@@ -428,21 +424,20 @@ export default function CreditCalculator() {
                         <span>Ratio de endeudamiento sano</span>
                         <span>35% DTI</span>
                       </div>
-                      <Progress value={35} className="h-2 bg-yellow-500/20" />
-                      <p className="text-[10px] text-muted-foreground leading-snug">El ingreso mensual debe ser al menos 2.8 veces mayor a la mensualidad para una aprobación técnica saludable.</p>
+                      <Progress value={35} className="h-1.5 bg-yellow-500/20" />
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-6 pt-4 border-t border-border/20 items-center justify-between">
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2 p-3 px-5 rounded-2xl bg-muted border border-border/50">
+            <div className="flex flex-col md:flex-row gap-4 pt-4 border-t border-border/20 items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 p-2 px-4 rounded-xl bg-muted border border-border/50">
                   <FileText className="w-4 h-4 text-primary" />
-                  <span className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Plan Tradicional 192 Meses</span>
+                  <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Plan Tradicional 192 Meses</span>
                 </div>
-                <div className="text-xs text-muted-foreground/60 leading-tight hidden xl:block">
+                <div className="text-[9px] text-muted-foreground/60 leading-tight hidden xl:block">
                   * Proyección informativa basada en factor mensualidad fijo de 0.6982%. <br />
                   Sujeto a cambios según perfil crediticio e institución financiera.
                 </div>
@@ -452,16 +447,16 @@ export default function CreditCalculator() {
                 <Button 
                   onClick={handleCopySummary}
                   variant="outline"
-                  className="flex-1 md:flex-none h-14 px-8 border-green-500 text-green-500 hover:bg-green-500/5 font-bold text-lg rounded-2xl transition-all"
+                  className="flex-1 md:flex-none h-12 px-6 border-green-500 text-green-500 hover:bg-green-500/5 font-bold text-base rounded-xl transition-all"
                 >
-                  <Copy className="w-5 h-5 mr-3" /> Copiar Resumen
+                  <Copy className="w-4 h-4 mr-2" /> Copiar Resumen
                 </Button>
                 <Button 
                   variant="ghost" 
                   onClick={clear}
-                  className="h-14 px-6 text-muted-foreground hover:text-destructive rounded-2xl"
+                  className="h-12 px-4 text-muted-foreground hover:text-destructive rounded-xl"
                 >
-                  <RotateCcw className="w-5 h-5 mr-2" /> Limpiar Todo
+                  <RotateCcw className="w-4 h-4 mr-2" /> Limpiar
                 </Button>
               </div>
             </div>
