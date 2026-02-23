@@ -54,6 +54,54 @@
     --calendar-filter: none;
   }
 
+  [data-theme="corporativo-v2"] {
+    color-scheme: light;
+    --background: 210 33% 99%;
+    --foreground: 215 25% 27%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 27%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 27%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 215 25% 27%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 199 89% 48%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 217 91% 60%;
+    --radius: 0.375rem;
+    --calendar-filter: none;
+  }
+
+  [data-theme="moderno"] {
+    color-scheme: dark;
+    --background: 222 47% 7%;
+    --foreground: 210 100% 90%; /* Azul distintivo */
+    --card: 222 47% 12% / 0.3;
+    --card-foreground: 210 100% 90%;
+    --popover: 222 47% 8% / 0.5;
+    --popover-foreground: 210 100% 90%;
+    --primary: 210 100% 50%; /* Azul brillante */
+    --primary-foreground: 222 47% 5%;
+    --secondary: 222 30% 20% / 0.25;
+    --secondary-foreground: 210 100% 90%;
+    --muted: 222 30% 15% / 0.2;
+    --muted-foreground: 210 50% 70%;
+    --accent: 190 100% 50%;
+    --accent-foreground: 222 47% 5%;
+    --border: 210 100% 30% / 0.2;
+    --input: 222 30% 15% / 0.3;
+    --ring: 210 100% 50%;
+    --radius: 0.15rem;
+    --calendar-filter: invert(1) hue-rotate(200deg);
+  }
+
   [data-theme="discreto"] {
     color-scheme: dark;
     --background: 220 7% 21%;
@@ -76,29 +124,6 @@
     --input: 225 6% 13% / 0.5;
     --ring: 235 86% 65%;
     --calendar-filter: invert(1);
-  }
-
-  [data-theme="moderno"] {
-    color-scheme: dark;
-    --background: 222 47% 7%;
-    --foreground: 180 100% 95%;
-    --card: 222 47% 12% / 0.3;
-    --card-foreground: 180 100% 95%;
-    --popover: 222 47% 8% / 0.5;
-    --popover-foreground: 180 100% 95%;
-    --primary: 190 100% 50%;
-    --primary-foreground: 222 47% 5%;
-    --secondary: 222 30% 20% / 0.25;
-    --secondary-foreground: 180 100% 95%;
-    --muted: 222 30% 15% / 0.2;
-    --muted-foreground: 190 50% 70%;
-    --accent: 145 100% 50%;
-    --accent-foreground: 222 47% 5%;
-    --border: 190 100% 30% / 0.2;
-    --input: 222 30% 15% / 0.3;
-    --ring: 190 100% 50%;
-    --radius: 0.15rem;
-    --calendar-filter: invert(1) hue-rotate(180deg);
   }
 
   [data-theme="elegante"] {
