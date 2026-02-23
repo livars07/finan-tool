@@ -148,25 +148,28 @@
     --calendar-filter: invert(1);
   }
 
-  [data-theme="neon"] {
+  [data-theme="comunidad"] {
     color-scheme: dark;
-    --background: 280 50% 5%;
-    --foreground: 280 20% 95%;
-    --card: 280 50% 10% / 0.5;
-    --card-foreground: 280 20% 95%;
-    --popover: 280 50% 8% / 0.6;
-    --popover-foreground: 280 20% 95%;
-    --primary: 320 100% 60%; /* Rosa */
-    --primary-foreground: 280 50% 5%;
-    --secondary: 280 50% 20%;
+    --background: 223 7% 20%; /* Discord Dark Gray */
+    --foreground: 210 20% 98%;
+    --card: 223 7% 24% / 0.6;
+    --card-foreground: 210 20% 98%;
+    --popover: 223 7% 18% / 0.8;
+    --popover-foreground: 210 20% 98%;
+    --primary: 235 86% 65%; /* Blurple */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 223 7% 30%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 280 50% 12%;
-    --muted-foreground: 320 40% 80%;
-    --accent: 180 100% 50%; /* Cyan Neón */
-    --accent-foreground: 280 50% 5%;
-    --border: 320 100% 40% / 0.3;
-    --ring: 320 100% 60%;
-    --radius: 0.25rem;
+    --muted: 223 7% 15% / 0.4;
+    --muted-foreground: 215 15% 75%;
+    --accent: 142 70% 45%; /* Discord Green */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 359 82% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 223 7% 28% / 0.4;
+    --input: 223 7% 15% / 0.3;
+    --ring: 235 86% 65%;
+    --radius: 0.5rem;
     --calendar-filter: invert(1);
   }
 

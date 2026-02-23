@@ -52,7 +52,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import * as Service from '@/services/appointment-service';
 
-type Theme = 'predeterminado' | 'corporativo' | 'corporativo-v2' | 'moderno' | 'discreto' | 'olivares' | 'neon' | 'gelido';
+type Theme = 'predeterminado' | 'corporativo' | 'corporativo-v2' | 'moderno' | 'discreto' | 'olivares' | 'comunidad' | 'gelido';
 
 const APP_TIPS = [
   { icon: Calculator, title: "Calculadora Rápida", color: "text-primary", text: "Usa la calculadora rapida en caso de tener una llamada con un interesado que pregunte montos aproximados." },
@@ -201,7 +201,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   { id: 'moderno', label: 'Moderno', icon: Cpu, color: 'bg-cyan-500' },
                   { id: 'discreto', label: 'Discreto', icon: Moon, color: 'bg-slate-700' },
                   { id: 'olivares', label: 'Olivares', icon: Crown, color: 'bg-yellow-600' },
-                  { id: 'neon', label: 'Neón', icon: Zap, color: 'bg-pink-500' },
+                  { id: 'comunidad', label: 'Comunidad', icon: MessageSquare, color: 'bg-indigo-500' },
                   { id: 'gelido', label: 'Gélido', icon: Snowflake, color: 'bg-blue-300' },
                 ].map((t) => (
                   <DropdownMenuItem key={t.id} onClick={() => handleThemeChange(t.id as Theme)} className="flex items-center gap-2 cursor-pointer">
