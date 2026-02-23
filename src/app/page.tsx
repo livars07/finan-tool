@@ -96,7 +96,6 @@ export default function Home() {
     return () => clearInterval(intervalId);
   }, [api, timerKey]);
 
-  // Efecto para repetir la animación de entrada de los stats cada 6 segundos
   useEffect(() => {
     const interval = setInterval(() => {
       setStatsKey(prev => prev + 1);

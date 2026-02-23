@@ -87,7 +87,6 @@ export default function UpcomingAppointments({
       const currentNotes = finNotes;
       const clientName = app.name;
 
-      // Importante: Guardamos la referencia ANTES de que desaparezca de la lista por el updateStatus
       if (currentStatus === 'Cierre') {
         setLastClosedApp(app);
       }
@@ -141,7 +140,7 @@ export default function UpcomingAppointments({
               <TableRow>
                 <TableHead>Nombre / Teléfono</TableHead>
                 <TableHead>Motivo</TableHead>
-                <TableHead>Fecha</TableHead>
+                <TableHead>Fecha / Estado</TableHead>
                 <TableHead>Hora</TableHead>
                 <TableHead className="w-12"></TableHead>
               </TableRow>
@@ -156,37 +155,37 @@ export default function UpcomingAppointments({
                     key={app.id} 
                     onClick={() => onSelect(app)}
                     className={cn(
-                      "hover:bg-primary/10 transition-colors cursor-pointer group relative",
+                      "hover:bg-primary/10 transition-colors cursor-pointer group relative h-16",
                       appToday && "bg-primary/5 border-l-4 border-l-primary",
                       isHighlighted && "bg-accent/20 animate-pulse border-2 border-accent/40"
                     )}
                   >
-                    <TableCell>
-                      <div className="font-medium text-sm">
+                    <TableCell className="align-middle">
+                      <div className="font-medium text-sm leading-tight">
                         {app.name}
                       </div>
                       <div 
                         onClick={(e) => copyPhone(e, app.phone)}
-                        className="text-xs text-muted-foreground hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1 group/phone"
+                        className="text-[10px] text-muted-foreground hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1 group/phone"
                       >
                         {app.phone}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="align-middle">
                       <div className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-tight">
                         <Info className="w-3 h-3" /> {app.type}
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col gap-1">
+                    <TableCell className="align-middle">
+                      <div className="flex flex-col justify-center min-h-[2.5rem]">
                         <span className={cn(
-                          "text-[10px] font-bold uppercase tracking-wider",
+                          "text-[10px] font-bold uppercase tracking-wider leading-none mb-1",
                           appToday ? "text-primary" : "text-muted-foreground"
                         )}>
                           {formatDate(app.date)}
                         </span>
                         {appToday && (
-                          <div onClick={(e) => e.stopPropagation()}>
+                          <div onClick={(e) => e.stopPropagation()} className="h-5 flex items-center">
                             {app.isConfirmed ? (
                               <div className="flex items-center gap-1 text-[9px] font-bold text-green-400 uppercase tracking-tighter">
                                 <CheckCircle className="w-2.5 h-2.5" /> Confirmada
@@ -195,22 +194,22 @@ export default function UpcomingAppointments({
                               <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="h-5 px-1.5 text-[8px] font-bold uppercase border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10 backdrop-blur-md"
+                                className="h-5 px-1.5 py-0 text-[8px] font-bold uppercase border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10 backdrop-blur-md"
                                 onClick={() => setConfirmId(app.id)}
                               >
-                                <AlertCircle className="w-2 h-2 mr-1" /> Sin confirmar
+                                <AlertCircle className="w-2 h-2 mr-1" /> Confirmar
                               </Button>
                             )}
                           </div>
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="align-middle">
                       <div className="flex items-center gap-1 text-accent font-bold text-[10px]">
                         <Clock className="w-3 h-3" /> {format12hTime(app.time)}
                       </div>
                     </TableCell>
-                    <TableCell onClick={(e) => e.stopPropagation()}>
+                    <TableCell className="align-middle" onClick={(e) => e.stopPropagation()}>
                       {appToday && (
                         <Button
                           variant="ghost"
@@ -235,7 +234,6 @@ export default function UpcomingAppointments({
         )}
       </div>
 
-      {/* Los diálogos se mueven aquí para que siempre se rendericen independientemente de la lista */}
       <Dialog open={!!finId} onOpenChange={() => setFinId(null)}>
         <DialogContent className="sm:max-w-[500px] backdrop-blur-[20px] bg-card/10">
           <DialogHeader>
