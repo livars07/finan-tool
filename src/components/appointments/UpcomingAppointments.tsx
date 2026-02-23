@@ -150,7 +150,6 @@ export default function UpcomingAppointments({
       const capitalizedDate = dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
       const timeFormatted = format12hTime(app.time);
       
-      // Formato WhatsApp Bold
       const dateBold = `*${capitalizedDate}*`;
       const timeBold = `*${timeFormatted}*`;
       const confirmedBold = app.isConfirmed ? ' *(Confirmado)*' : '';
@@ -178,7 +177,6 @@ Número: ${app.phone}`;
     const todayConfirmed = allAppointments.filter(a => isActuallyToday(a.date) && a.isConfirmed).length;
     const tomorrowTotal = allAppointments.filter(a => isActuallyTomorrow(a.date)).length;
 
-    // Formato WhatsApp Bold para números
     const reportText = `✅Ventas: *${todaySales}*
 ✅Citas para hoy: *${todayTotal}*
 ✅Citas confirmadas: *${todayConfirmed}*
@@ -326,16 +324,16 @@ Número: ${app.phone}`;
       </div>
 
       <Dialog open={!!finId} onOpenChange={() => setFinId(null)}>
-        <DialogContent className="sm:max-w-[500px] bg-card border-border shadow-xl">
+        <DialogContent className="sm:max-w-[500px] bg-card border-border shadow-xl backdrop-blur-[12px]">
           <DialogHeader>
-            <DialogTitle>Finalizar cita de hoy</DialogTitle>
-            <DialogDescription>Indica el resultado de la reunión y registra acuerdos importantes.</DialogDescription>
+            <DialogTitle className="text-foreground">Finalizar cita de hoy</DialogTitle>
+            <DialogDescription className="text-muted-foreground">Indica el resultado de la reunión y registra acuerdos importantes.</DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-4">
             <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase">Resultado final</Label>
+              <Label className="text-xs font-bold uppercase text-muted-foreground">Resultado final</Label>
               <Select value={status} onValueChange={(v) => setStatus(v as AppointmentStatus)}>
-                <SelectTrigger className={cn("bg-muted/30", status === 'Cierre' && "border-green-500 text-green-500 bg-green-500/5")}>
+                <SelectTrigger className={cn("bg-muted/30 border-border/40", status === 'Cierre' && "border-green-500 text-green-600 bg-green-500/5")}>
                   <SelectValue placeholder="Selecciona resultado" />
                 </SelectTrigger>
                 <SelectContent>
@@ -350,18 +348,18 @@ Número: ${app.phone}`;
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase">Notas de la cita</Label>
+              <Label className="text-xs font-bold uppercase text-muted-foreground">Notas de la cita</Label>
               <Textarea 
                 placeholder="Escribe acuerdos, montos o próximos pasos aquí..." 
-                className="bg-muted/30 min-h-[150px] resize-none"
+                className="bg-muted/30 border-border/40 min-h-[150px] resize-none text-foreground"
                 value={finNotes}
                 onChange={(e) => setFinNotes(e.target.value)}
               />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setFinId(null)}>Cancelar</Button>
-            <Button onClick={handleFinalize} className={cn("shadow-lg", status === 'Cierre' && "bg-green-600 hover:bg-green-700")}>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setFinId(null)} className="border-border">Cancelar</Button>
+            <Button onClick={handleFinalize} className={cn("shadow-lg font-bold", status === 'Cierre' ? "bg-green-600 hover:bg-green-700 text-white" : "bg-primary text-primary-foreground")}>
               {status === 'Cierre' ? '¡Confirmar cierre!' : 'Confirmar y archivar'}
             </Button>
           </DialogFooter>
@@ -369,47 +367,51 @@ Número: ${app.phone}`;
       </Dialog>
 
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent className="sm:max-w-[550px] bg-green-950/90 border-green-500/50 text-white backdrop-blur-md shadow-xl">
-          <DialogHeader className="flex flex-col items-center text-center space-y-4">
-            <div className="relative">
-              <div className="absolute inset-0 bg-green-400 blur-xl opacity-20 animate-pulse"></div>
-              <div className="bg-green-500/20 p-4 rounded-full border border-green-400/30">
-                <Trophy className="w-16 h-16 text-green-400" />
+        <DialogContent className={cn(
+          "sm:max-w-[550px] border shadow-2xl backdrop-blur-md overflow-hidden p-0",
+          "data-[theme^=corporativo]:bg-white/95 data-[theme^=corporativo]:border-green-200",
+          "bg-green-950/90 border-green-500/50 text-white"
+        )}>
+          <div className="p-8 space-y-6">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-green-400 blur-2xl opacity-20 animate-pulse"></div>
+                <div className="bg-green-500/20 p-5 rounded-full border border-green-400/30 relative z-10">
+                  <Trophy className="w-16 h-16 text-green-500 dark:text-green-400" />
+                </div>
               </div>
+              <DialogTitle className="text-3xl font-headline font-bold flex items-center gap-3 data-[theme^=corporativo]:text-green-800">
+                <PartyPopper className="text-yellow-500" /> ¡FELICIDADES! <PartyPopper className="text-yellow-500" />
+              </DialogTitle>
+              <DialogDescription className="text-lg text-center mx-auto data-[theme^=corporativo]:text-muted-foreground text-green-100">
+                Has concretado el crédito de <strong className="data-[theme^=corporativo]:text-foreground text-white">{lastClosedApp?.name}</strong> con éxito.
+              </DialogDescription>
             </div>
-            <DialogTitle className="text-3xl font-headline font-bold text-white flex items-center gap-3">
-              <PartyPopper className="text-yellow-400" /> ¡FELICIDADES POR EL CIERRE! <PartyPopper className="text-yellow-400" />
-            </DialogTitle>
-            <DialogDescription className="text-green-100 text-lg text-center mx-auto">
-              Has concretado el crédito de <strong>{lastClosedApp?.name}</strong> con éxito.
-            </DialogDescription>
-          </DialogHeader>
 
-          <div className="py-6 space-y-6">
-            <div className="bg-white/5 border border-white/10 p-5 rounded-2xl space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-widest text-green-400 flex items-center gap-2">
+            <div className="bg-green-500/10 border border-green-500/20 p-6 rounded-2xl space-y-4">
+              <h4 className="text-xs font-bold uppercase tracking-widest text-green-600 dark:text-green-400 flex items-center gap-2">
                 <Sparkles className="w-4 h-4" /> Checklist de cierre
               </h4>
-              <p className="text-sm text-green-50/80 leading-relaxed">
+              <p className="text-sm data-[theme^=corporativo]:text-muted-foreground text-green-50/80 leading-relaxed">
                 Asegúrate de registrar en las notas los siguientes datos para el expediente actualizado:
               </p>
-              <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-medium text-white">
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Monto del Crédito Final</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Comisiones</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Fecha de firma</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Anota cada detalle útil</li>
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-bold data-[theme^=corporativo]:text-foreground">
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600" /> Monto del Crédito Final</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600" /> Comisiones</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600" /> Fecha de firma</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600" /> Anota cada detalle útil</li>
               </ul>
             </div>
             
-            <p className="text-center text-[10px] text-green-200/60 uppercase font-bold">
+            <p className="text-center text-[10px] data-[theme^=corporativo]:text-muted-foreground/60 text-green-200/60 uppercase font-bold tracking-tighter">
               Este cierre se ha registrado en tus estadísticas mensuales
             </p>
           </div>
 
-          <DialogFooter className="sm:justify-center">
+          <DialogFooter className="p-6 bg-muted/30 border-t border-border/20 sm:justify-center">
             <Button 
               onClick={handleSuccessClose}
-              className="bg-white text-green-900 hover:bg-green-50 font-bold px-10 h-12 rounded-xl text-lg transition-all transform hover:scale-105"
+              className="bg-green-600 hover:bg-green-700 text-white font-bold px-12 h-14 rounded-2xl text-xl shadow-xl transition-all transform hover:scale-105 active:scale-95"
             >
               Continuar
             </Button>
@@ -418,18 +420,18 @@ Número: ${app.phone}`;
       </Dialog>
 
       <AlertDialog open={!!confirmId} onOpenChange={(open) => !open && setConfirmId(null)}>
-        <AlertDialogContent className="bg-card border-border shadow-xl">
+        <AlertDialogContent className="bg-card border-border shadow-xl backdrop-blur-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Confirmar asistencia del prospecto?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-foreground">¿Confirmar asistencia del prospecto?</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
               Marcarás esta cita como confirmada para el día de hoy. Esto ayuda a llevar un mejor control de tu agenda diaria.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Volver</AlertDialogCancel>
+            <AlertDialogCancel className="border-border">Volver</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleConfirmAction}
-              className="bg-green-600 hover:bg-green-700 text-white shadow-lg"
+              className="bg-green-600 hover:bg-green-700 text-white shadow-lg font-bold"
             >
               Sí, confirmar cita
             </AlertDialogAction>
