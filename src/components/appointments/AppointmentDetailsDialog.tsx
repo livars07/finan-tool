@@ -114,8 +114,8 @@ Número: *${appointment.phone}*`;
       } 
       onOpenChange(o); 
     }}>
-      <DialogContent className="sm:max-w-[480px] bg-card border-border p-0 shadow-xl backdrop-blur-md z-[70] overflow-hidden">
-        <DialogHeader className="px-6 py-3 border-b border-border/40 flex flex-row items-center justify-between bg-card/10">
+      <DialogContent className="sm:max-w-[520px] bg-card border-border p-0 shadow-xl backdrop-blur-md z-[70] overflow-hidden flex flex-col max-h-[95vh]">
+        <DialogHeader className="px-6 py-3 border-b border-border/40 flex flex-row items-center justify-between bg-card/10 shrink-0">
           <div className="flex items-center gap-2">
             <DialogTitle className="text-lg font-headline font-bold text-foreground">
               {isEditing ? 'Editar Registro' : 'Detalles'}
@@ -152,7 +152,7 @@ Número: *${appointment.phone}*`;
           </div>
         </DialogHeader>
 
-        <div className="px-6 py-4 space-y-4">
+        <div className="px-6 py-4 space-y-4 overflow-y-auto flex-1">
           {isEditing ? (
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
@@ -235,7 +235,7 @@ Número: *${appointment.phone}*`;
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-3 bg-muted/10 p-4 rounded-xl border border-border/30 backdrop-blur-sm">
+            <div className="grid grid-cols-1 gap-3 bg-muted/10 p-4 rounded-xl border border-border/30 backdrop-blur-sm shrink-0">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-primary/10 rounded-lg"><User className="w-4 h-4 text-primary" /></div>
                 <div>
@@ -290,13 +290,13 @@ Número: *${appointment.phone}*`;
             </div>
           )}
 
-          <div className="space-y-1.5">
-            <Label className="flex items-center gap-2 text-muted-foreground text-[10px] font-bold uppercase tracking-wider">📝 Notas del Prospecto</Label>
+          <div className="space-y-1.5 flex-1 flex flex-col min-h-0">
+            <Label className="flex items-center gap-2 text-muted-foreground text-[10px] font-bold uppercase tracking-wider shrink-0">📝 Notas del Prospecto</Label>
             <Textarea 
               placeholder="Detalles importantes..."
               className={cn(
-                "bg-muted/10 border-border/30 focus-visible:ring-primary resize-none text-xs backdrop-blur-sm",
-                isEditing ? "min-h-[80px]" : "min-h-[60px]"
+                "bg-muted/10 border-border/30 focus-visible:ring-primary resize-none text-xs backdrop-blur-sm flex-1",
+                "h-[300px] overflow-y-auto"
               )}
               value={isEditing ? editData.notes : appointment.notes}
               onChange={e => setEditData({...editData, notes: e.target.value})}
@@ -305,7 +305,7 @@ Número: *${appointment.phone}*`;
           </div>
         </div>
 
-        <DialogFooter className="flex flex-row justify-end items-center gap-2 border-t border-border/30 px-6 py-3 bg-card/10 backdrop-blur-sm">
+        <DialogFooter className="flex flex-row justify-end items-center gap-2 border-t border-border/30 px-6 py-3 bg-card/10 backdrop-blur-sm shrink-0">
           <div className="flex gap-2">
             {isEditing ? (
               <>
