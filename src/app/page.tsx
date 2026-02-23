@@ -34,8 +34,7 @@ import {
   Calendar,
   Copy,
   Percent,
-  Clock,
-  MessageCircle
+  Clock
 } from 'lucide-react';
 import { Separator } from "@/components/ui/separator";
 import { useAppointments } from '@/hooks/use-appointments';

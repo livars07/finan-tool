@@ -27,4 +27,14 @@ Bienvenido a Finanto, la plataforma técnica diseñada para optimizar la operaci
 *   **Recomendación de Respaldo**: Se recomienda no borrar el historial o caché del navegador para mantener la integridad de la base de datos local hasta que se implemente la sincronización en servidor.
 
 ---
-*Finanto: Herramienta de alta precisión para el cierre de créditos y la consolidación del patrimonio familiar.*
+
+## 🚀 Sugerencias de Mejora (IA Advisor)
+
+Como asistente técnico, sugiero las siguientes optimizaciones de interfaz y funcionalidad para futuras versiones (enfocadas en frontend):
+
+1. **Gráficos de Rendimiento**: Integrar `shadcn/ui charts` para visualizar la tasa de conversión de prospectos a cierres directamente en el Dashboard.
+2. **Exportación Técnica**: Añadir un botón para descargar la base de datos local en formato CSV o JSON, permitiendo al ejecutivo llevar un respaldo físico en Excel.
+3. **Comparador de Escenarios**: Permitir guardar dos cotizaciones en la calculadora para mostrarlas lado a lado al cliente, facilitando la toma de decisiones.
+4. **Sistema de Alertas Visuales**: Implementar indicadores de color (badges) que parpadeen cuando una cita esté a menos de 15 minutos de comenzar.
+5. **Personalización de Marca**: Opción para que el ejecutivo cargue temporalmente el logo de su desarrollo inmobiliario específico para el "Modo Presentación".
+6. **Buscador con Filtros**: Refinar la búsqueda de citas para filtrar específicamente por "Cierres" o "Pendientes de Confirmar".
