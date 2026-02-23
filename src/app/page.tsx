@@ -311,37 +311,37 @@ export default function Home() {
       </AlertDialog>
 
       <Dialog open={showHelp} onOpenChange={setShowHelp}>
-        <DialogContent className="sm:max-w-[700px] max-h-[85vh] bg-card border-border backdrop-blur-3xl overflow-hidden flex flex-col p-0">
-          <DialogHeader className="p-6 border-b border-border/50 bg-primary/5">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-primary/20 border border-primary/30">
-                <BookOpen className="w-6 h-6 text-primary" />
+        <DialogContent className="sm:max-w-[750px] max-h-[90vh] bg-card border-border backdrop-blur-3xl overflow-hidden flex flex-col p-0 shadow-2xl">
+          <DialogHeader className="p-8 border-b border-border/50 bg-primary/5">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-2xl bg-primary/20 border border-primary/30">
+                <BookOpen className="w-7 h-7 text-primary" />
               </div>
               <div>
-                <DialogTitle className="text-2xl font-headline font-bold">Guía de Usuario - Finanto</DialogTitle>
-                <DialogDescription>Manual interactivo para el asesor hipotecario (v0.7.1)</DialogDescription>
+                <DialogTitle className="text-3xl font-headline font-bold">Guía de Usuario - Finanto</DialogTitle>
+                <DialogDescription className="text-base">Manual interactivo para el asesor hipotecario (v0.7.1)</DialogDescription>
               </div>
             </div>
           </DialogHeader>
           
-          <ScrollArea className="flex-1 p-8">
-            <div className="space-y-8 text-foreground/90">
+          <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+            <div className="space-y-10 text-foreground/90 pb-8">
               <section className="space-y-4">
-                <h2 className="text-xl font-bold flex items-center gap-2 text-primary">
+                <h2 className="text-2xl font-bold flex items-center gap-2 text-primary">
                   ¡Bienvenido a Finanto!
                 </h2>
-                <p className="text-sm leading-relaxed">
+                <p className="text-base leading-relaxed text-muted-foreground">
                   Esta es una herramienta diseñada especialmente para que los asesores hipotecarios puedan ser más rápidos, organizados y profesionales frente a sus clientes.
                 </p>
               </section>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="bg-muted/30 border-border/50">
-                  <CardContent className="p-4 space-y-3">
-                    <h3 className="font-bold flex items-center gap-2 text-accent">
-                      <Wallet className="w-4 h-4" /> 1. Calculadora inteligente
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <Card className="bg-muted/30 border-border/50 shadow-sm">
+                  <CardContent className="p-6 space-y-4">
+                    <h3 className="text-lg font-bold flex items-center gap-2 text-accent">
+                      <Wallet className="w-5 h-5" /> 1. Calculadora inteligente
                     </h3>
-                    <ul className="text-xs space-y-2 list-disc pl-4 text-muted-foreground">
+                    <ul className="text-sm space-y-3 list-disc pl-5 text-muted-foreground">
                       <li><strong>Cálculos instantáneos:</strong> Solo pon el monto del crédito y el sistema te dirá la mensualidad y el enganche automáticamente.</li>
                       <li><strong>Modo presentación:</strong> Si le das al botón de "Pantalla completa", tendrás una vista profesional para mostrar números al cliente.</li>
                       <li><strong>Resumen WhatsApp:</strong> Copia un resumen profesional de la cotización con un solo clic.</li>
@@ -349,12 +349,12 @@ export default function Home() {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-muted/30 border-border/50">
-                  <CardContent className="p-4 space-y-3">
-                    <h3 className="font-bold flex items-center gap-2 text-accent">
-                      <CalendarDays className="w-4 h-4" /> 2. Control de agenda
+                <Card className="bg-muted/30 border-border/50 shadow-sm">
+                  <CardContent className="p-6 space-y-4">
+                    <h3 className="text-lg font-bold flex items-center gap-2 text-accent">
+                      <CalendarDays className="w-5 h-5" /> 2. Control de agenda
                     </h3>
-                    <ul className="text-xs space-y-2 list-disc pl-4 text-muted-foreground">
+                    <ul className="text-sm space-y-3 list-disc pl-5 text-muted-foreground">
                       <li><strong>Organización diaria:</strong> Mira tus citas de hoy en un panel destacado.</li>
                       <li><strong>Confirmación:</strong> Marca si el cliente confirmó su asistencia con un clic.</li>
                       <li><strong>Historial:</strong> Guarda qué pasó en cada cita (cierre, apartado, reagendado).</li>
@@ -363,50 +363,50 @@ export default function Home() {
                 </Card>
               </div>
 
-              <section className="space-y-4">
-                <h3 className="text-lg font-bold flex items-center gap-2 text-green-500">
-                  <Star className="w-5 h-5" /> 3. Celebración de éxitos
+              <section className="space-y-4 bg-green-500/5 p-6 rounded-2xl border border-green-500/20">
+                <h3 className="text-xl font-bold flex items-center gap-2 text-green-500">
+                  <Star className="w-6 h-6" /> 3. Celebración de éxitos
                 </h3>
-                <p className="text-sm text-muted-foreground">
-                  <strong>Recompensa por cierre:</strong> Cuando logres concretar un trámite y lo marques como "Cierre", el sistema te felicitará con un sonido y un panel especial para registrar los datos finales del éxito.
+                <p className="text-base text-muted-foreground leading-relaxed">
+                  <strong>Recompensa por cierre:</strong> Cuando logres concretar un trámite y lo marques como "Cierre", el sistema te felicitará con un sonido y un panel especial para registrar los datos finales del éxito. No olvides anotar el monto final y las comisiones.
                 </p>
               </section>
 
-              <section className="space-y-4">
-                <h3 className="text-lg font-bold flex items-center gap-2 text-primary">
-                  <Cpu className="w-5 h-5" /> 4. Asistente de mensajes IA
+              <section className="space-y-4 bg-primary/5 p-6 rounded-2xl border border-primary/20">
+                <h3 className="text-xl font-bold flex items-center gap-2 text-primary">
+                  <Cpu className="w-6 h-6" /> 4. Asistente de mensajes IA
                 </h3>
-                <p className="text-sm text-muted-foreground">
-                  <strong>No más bloqueos:</strong> El sistema puede redactar por ti mensajes de seguimiento profesionales dependiendo de lo que haya pasado en la cita (ej. si el cliente no llegó o si ya apartó).
+                <p className="text-base text-muted-foreground leading-relaxed">
+                  <strong>No más bloqueos:</strong> El sistema puede redactar por ti mensajes de seguimiento profesionales dependiendo de lo que haya pasado en la cita (ej. si el cliente no llegó o si ya apartó). Puedes copiarlos y pegarlos directamente en WhatsApp.
                 </p>
               </section>
 
               <Separator className="bg-border/50" />
 
-              <section className="p-4 rounded-xl bg-accent/5 border border-accent/20 space-y-3">
+              <section className="p-6 rounded-2xl bg-accent/5 border border-accent/20 space-y-4">
                 <h3 className="text-sm font-bold flex items-center gap-2 text-accent uppercase tracking-widest">
-                  <Info className="w-4 h-4" /> Información Importante
+                  <Info className="w-5 h-5" /> Información Importante
                 </h3>
-                <ul className="text-xs space-y-2 text-muted-foreground">
-                  <li className="flex gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent mt-1 shrink-0" />
-                    <span><strong>Privacidad:</strong> Toda la información se guarda únicamente en el navegador (Chrome, Edge, etc.) de tu dispositivo actual.</span>
+                <ul className="text-sm space-y-3 text-muted-foreground">
+                  <li className="flex gap-3">
+                    <div className="w-2 h-2 rounded-full bg-accent mt-1.5 shrink-0" />
+                    <span><strong>Privacidad:</strong> Toda la información se guarda únicamente en el navegador de tu dispositivo actual. Nadie fuera de este equipo puede ver tus datos.</span>
                   </li>
-                  <li className="flex gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent mt-1 shrink-0" />
+                  <li className="flex gap-3">
+                    <div className="w-2 h-2 rounded-full bg-accent mt-1.5 shrink-0" />
                     <span><strong>Recomendación:</strong> Si cambias de dispositivo o borras el historial, los datos se reiniciarán. ¡Pronto tendremos sincronización en la nube!</span>
                   </li>
                 </ul>
               </section>
 
-              <p className="text-center text-[10px] text-muted-foreground italic pt-4">
+              <p className="text-center text-xs text-muted-foreground italic pt-6 border-t border-border/20">
                 Desarrollado para que te enfoques en lo que mejor sabes hacer: ¡Cerrar créditos y ayudar a familias a tener su hogar!
               </p>
             </div>
-          </ScrollArea>
+          </div>
           
-          <DialogFooter className="p-4 border-t border-border/50 bg-muted/20">
-            <Button onClick={() => setShowHelp(false)} className="w-full sm:w-auto font-bold">
+          <DialogFooter className="p-6 border-t border-border/50 bg-muted/20">
+            <Button onClick={() => setShowHelp(false)} className="w-full sm:w-auto font-bold h-12 px-8 text-lg">
               Entendido
             </Button>
           </DialogFooter>
