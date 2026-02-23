@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Appointment, AppointmentStatus } from '@/services/appointment-service';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Clock, Calendar, Info, CheckCircle2, AlertCircle, CheckCircle, Trophy, PartyPopper, Sparkles, Copy, ClipboardCheck } from "lucide-react";
-import { parseISO, format, addDays } from 'date-fns';
+import { parseISO, format, addDays, isToday } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -62,11 +62,7 @@ export default function UpcomingAppointments({
   const { toast } = useToast();
 
   const isActuallyToday = (dateStr: string) => {
-    const d = parseISO(dateStr);
-    const today = new Date();
-    return d.getDate() === today.getDate() && 
-           d.getMonth() === today.getMonth() && 
-           d.getFullYear() === today.getFullYear();
+    return isToday(parseISO(dateStr));
   };
 
   const isActuallyTomorrow = (dateStr: string) => {
@@ -153,10 +149,11 @@ export default function UpcomingAppointments({
       const capitalizedDate = dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
       const timeFormatted = format12hTime(app.time);
       
+      const motivoLine = app.type === '1ra consulta' ? '' : `Motivo: ${app.type}\n`;
+
       return `Cita: ${capitalizedDate}
 Nombre: ${app.name}
-Motivo: ${app.type}
-Producto: ${app.product || 'N/A'}
+${motivoLine}Producto: ${app.product || 'N/A'}
 Hora: ${timeFormatted}
 Número: ${app.phone}`;
     }).join('\n\n');
