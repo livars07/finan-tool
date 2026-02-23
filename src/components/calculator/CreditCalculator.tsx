@@ -300,8 +300,8 @@ export default function CreditCalculator() {
             </DialogClose>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            <section className="bg-muted/30 p-6 rounded-2xl border border-border/50 shadow-inner">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 min-h-0">
+            <section className="bg-muted/30 p-6 rounded-2xl border border-border/50 shadow-inner shrink-0">
               <CalculatorInputs 
                 isModal={true}
                 totalPrice={totalPrice}
@@ -430,8 +430,10 @@ export default function CreditCalculator() {
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="flex flex-col md:flex-row gap-4 pt-4 border-t border-border/20 items-center justify-between">
+          <div className="p-6 border-t border-border/20 shrink-0 bg-background/50 backdrop-blur-md">
+            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2 p-2 px-4 rounded-xl bg-muted border border-border/50">
                   <FileText className="w-4 h-4 text-primary" />
