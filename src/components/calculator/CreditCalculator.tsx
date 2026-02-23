@@ -151,12 +151,10 @@ export default function CreditCalculator() {
   const currentMonthly = parseNumber(monthlyPayment);
   const minIncomeRequired = currentMonthly / INCOME_RATIO;
   
-  // Gastos y saldos adicionales solicitados
   const estimatedClosingCosts = currentP * 0.05;
   const appraisalCost = 7500;
   const totalOperatingExpenses = estimatedClosingCosts + appraisalCost;
   const netLiquidCredit = currentP > 0 ? currentP - totalOperatingExpenses : 0;
-  const estimatedPropertyValue = currentP > 0 ? currentP / 0.97 : 0;
   const suggestedLivingBudget = minIncomeRequired > 0 ? minIncomeRequired - currentMonthly : 0;
 
   const handleCopySummary = () => {
@@ -325,22 +323,6 @@ export default function CreditCalculator() {
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-muted-foreground">Monto del crédito solicitado:</span>
                       <span className="font-bold">{formatCurrency(currentP)}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm">
-                      <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground">Valor comercial estimado:</span>
-                        <TooltipProvider>
-                          <Tooltip delayDuration={0}>
-                            <TooltipTrigger asChild>
-                              <HelpCircle className="w-4 h-4 text-muted-foreground/60 cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-[300px] p-4 text-sm bg-popover border-border backdrop-blur-xl">
-                              <p>Estimación del valor del inmueble basándose en que el crédito otorgado representa el 97% del costo total de adquisición.</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                      <span className="font-bold text-primary">{formatCurrency(estimatedPropertyValue)}</span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-muted-foreground">Enganche requerido (3%):</span>
