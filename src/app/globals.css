@@ -37,13 +37,13 @@
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100% / 0.8;
     --popover-foreground: 222 47% 11%;
-    --primary: 221 83% 53%;
+    --primary: 221 83% 53%; /* Azul Corporativo Intenso */
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 80%; /* Riel visible en blanco */
+    --secondary: 210 40% 80%;
     --secondary-foreground: 222 47% 11%;
     --muted: 210 40% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 190 90% 45%;
+    --accent: 199 89% 48%; /* Azul Cielo */
     --accent-foreground: 210 40% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -144,31 +144,6 @@
     --accent-foreground: 222 47% 5%;
     --border: 45 90% 40% / 0.15;
     --ring: 45 90% 50%;
-    --radius: 0.5rem;
-    --calendar-filter: invert(1);
-  }
-
-  [data-theme="comunidad"] {
-    color-scheme: dark;
-    --background: 223 7% 20%; /* Discord Dark Gray */
-    --foreground: 210 20% 98%;
-    --card: 223 7% 24% / 0.6;
-    --card-foreground: 210 20% 98%;
-    --popover: 223 7% 18% / 0.8;
-    --popover-foreground: 210 20% 98%;
-    --primary: 235 86% 65%; /* Blurple */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 223 7% 30%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 223 7% 15% / 0.4;
-    --muted-foreground: 215 15% 75%;
-    --accent: 142 70% 45%; /* Discord Green */
-    --accent-foreground: 0 0% 100%;
-    --destructive: 359 82% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 223 7% 28% / 0.4;
-    --input: 223 7% 15% / 0.3;
-    --ring: 235 86% 65%;
     --radius: 0.5rem;
     --calendar-filter: invert(1);
   }

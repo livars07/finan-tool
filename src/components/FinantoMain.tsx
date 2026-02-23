@@ -52,7 +52,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import * as Service from '@/services/appointment-service';
 
-type Theme = 'predeterminado' | 'corporativo' | 'corporativo-v2' | 'moderno' | 'discreto' | 'olivares' | 'comunidad' | 'gelido';
+type Theme = 'predeterminado' | 'corporativo' | 'corporativo-v2' | 'moderno' | 'discreto' | 'olivares' | 'gelido';
 
 const APP_TIPS = [
   { icon: Calculator, title: "Calculadora Rápida", color: "text-primary", text: "Usa la calculadora rapida en caso de tener una llamada con un interesado que pregunte montos aproximados." },
@@ -188,7 +188,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" className="w-9 h-9 rounded-full bg-muted border border-border overflow-hidden backdrop-blur-md">
-                  {theme === 'moderno' ? <Cpu className="w-5 h-5 text-primary" /> : theme.startsWith('corporativo') ? <Sun className="w-5 h-5 text-primary" /> : theme === 'discreto' ? <Moon className="w-5 h-5 text-primary" /> : theme === 'olivares' ? <Crown className="w-5 h-5 text-primary" /> : <Palette className="w-5 h-5 text-primary" />}
+                  {theme === 'moderno' ? <Cpu className="w-5 h-5 text-primary" /> : theme.startsWith('corporativo') ? <Sun className="w-5 h-5 text-primary" /> : theme === 'discreto' ? <Moon className="w-5 h-5 text-primary" /> : theme === 'olivares' ? <Crown className="w-5 h-5 text-primary" /> : theme === 'gelido' ? <Snowflake className="w-5 h-5 text-primary" /> : <Palette className="w-5 h-5 text-primary" />}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 backdrop-blur-lg bg-popover border-border/30">
@@ -201,7 +201,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   { id: 'moderno', label: 'Moderno', icon: Cpu, color: 'bg-cyan-500' },
                   { id: 'discreto', label: 'Discreto', icon: Moon, color: 'bg-slate-700' },
                   { id: 'olivares', label: 'Olivares', icon: Crown, color: 'bg-yellow-600' },
-                  { id: 'comunidad', label: 'Comunidad', icon: MessageSquare, color: 'bg-indigo-500' },
                   { id: 'gelido', label: 'Gélido', icon: Snowflake, color: 'bg-blue-300' },
                 ].map((t) => (
                   <DropdownMenuItem key={t.id} onClick={() => handleThemeChange(t.id as Theme)} className="flex items-center gap-2 cursor-pointer">
