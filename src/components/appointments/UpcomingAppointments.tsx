@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Appointment, AppointmentStatus } from '@/services/appointment-service';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { 
@@ -99,27 +99,30 @@ export default function UpcomingAppointments({
       const currentNotes = finNotes;
       const clientName = app.name;
 
+      // Actualizar estado global
       updateStatus(finId, currentStatus, currentNotes);
 
       if (currentStatus === 'Cierre') {
-        // Importante: Guardar una copia actualizada del cliente para abrir sus detalles después
         const updatedApp = { ...app, status: currentStatus, notes: currentNotes };
         setLastClosedApp(updatedApp);
         
-        // Simulación de sonido de éxito
-        const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3");
-        audio.volume = 0.5;
-        audio.play().catch(() => {});
-
-        setShowSuccessDialog(true);
+        // Cerrar el diálogo de edición primero
+        setFinId(null);
+        
+        // Pequeño retardo para evitar conflictos de foco de Radix UI
+        setTimeout(() => {
+          const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3");
+          audio.volume = 0.4;
+          audio.play().catch(() => {});
+          setShowSuccessDialog(true);
+        }, 300);
       } else {
+        setFinId(null);
         toast({
           title: "Cita finalizada",
           description: `${clientName} movido al historial con resultado: ${currentStatus}.`,
         });
       }
-
-      setFinId(null);
       setFinNotes('');
     }
   };
@@ -127,8 +130,10 @@ export default function UpcomingAppointments({
   const handleSuccessClose = () => {
     setShowSuccessDialog(false);
     if (lastClosedApp) {
-      // Forzar la apertura del diálogo de detalles del cliente
-      onSelect(lastClosedApp);
+      // Forzar la apertura del detalle del cliente después de un breve momento
+      setTimeout(() => {
+        onSelect(lastClosedApp);
+      }, 200);
     }
   };
 
