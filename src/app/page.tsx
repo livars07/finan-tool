@@ -117,7 +117,7 @@ export default function Home() {
     resetData();
     setShowResetConfirm(false);
     toast({
-      title: "Sistema reiniciado",
+      title: "Sistema de Financiamiento reiniciado",
       description: "Todos los datos locales han sido borrados y restaurados con datos de prueba.",
     });
   };
@@ -152,7 +152,7 @@ export default function Home() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 backdrop-blur-2xl bg-popover border-border/30">
-                <DropdownMenuLabel className="text-foreground/80 dark:text-foreground">Temas</DropdownMenuLabel>
+                <DropdownMenuLabel className="text-foreground/80 dark:text-foreground">Temas de Ejecutivos</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => handleThemeChange('predeterminado')} className="flex items-center gap-2 cursor-pointer text-foreground/80 dark:text-foreground">
                   <div className="w-3 h-3 rounded-full bg-[#7ec1ff]" /> Predeterminado
@@ -238,7 +238,7 @@ export default function Home() {
                    💡 Perfilamiento Profesional (v0.7.1)
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Utilice la calculadora para proyecciones en tiempo real durante llamadas o consultas presenciales. 
+                  Utilice la calculadora para proyecciones en tiempo real durante llamadas o consultas presenciales de financiamiento. 
                   <br />
                   <br />
                   Este sistema garantiza la <strong>privacidad técnica</strong> al almacenar los datos exclusivamente en este equipo.
@@ -318,7 +318,7 @@ export default function Home() {
 
       <Dialog open={showHelp} onOpenChange={setShowHelp}>
         <DialogContent className="sm:max-w-[750px] max-h-[90vh] bg-card border-border backdrop-blur-3xl overflow-hidden flex flex-col p-0 shadow-2xl">
-          <DialogHeader className="p-8 border-b border-border/50 bg-primary/5">
+          <DialogHeader className="p-8 border-b border-border/50 bg-primary/5 shrink-0">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-2xl bg-primary/20 border border-primary/30">
                 <BookOpen className="w-7 h-7 text-primary" />
@@ -331,7 +331,7 @@ export default function Home() {
           </DialogHeader>
           
           <ScrollArea className="flex-1 p-8">
-            <div className="space-y-10 text-foreground/90 pb-8">
+            <div className="space-y-10 text-foreground/90 pb-12">
               <section className="space-y-4">
                 <h2 className="text-2xl font-bold flex items-center gap-2 text-primary">
                   Introducción al Sistema
@@ -348,9 +348,9 @@ export default function Home() {
                       <Wallet className="w-5 h-5" /> 1. Calculadora de Precisión
                     </h3>
                     <ul className="text-sm space-y-3 list-disc pl-5 text-muted-foreground">
-                      <li><strong>Perfilamiento en llamada:</strong> Determine montos aproximados de forma inmediata para prospectos por teléfono.</li>
-                      <li><strong>Tanteo Financiero:</strong> Realice ajustes de montos en tiempo real frente al cliente para encontrar su capacidad de pago ideal.</li>
-                      <li><strong>Independencia Tecnológica:</strong> Herramienta optimizada para operar sin dependencia de conexión a servidores externos.</li>
+                      <li><strong>Perfilamiento en tiempo real:</strong> Determine montos aproximados de forma inmediata para interesados por teléfono.</li>
+                      <li><strong>Tanteo Financiero:</strong> Realice ajustes de montos frente al cliente para encontrar su capacidad ideal durante la 1ra consulta.</li>
+                      <li><strong>Independencia de Red:</strong> Herramienta optimizada para operar sin dependencia de conexión a servidores externos.</li>
                     </ul>
                   </CardContent>
                 </Card>
@@ -361,9 +361,9 @@ export default function Home() {
                       <CalendarDays className="w-5 h-5" /> 2. Gestión de Agenda
                     </h3>
                     <ul className="text-sm space-y-3 list-disc pl-5 text-muted-foreground">
-                      <li><strong>Optimización de Tiempos:</strong> El sistema prioriza las citas del día para maximizar la productividad.</li>
-                      <li><strong>Control de Traslados:</strong> Valide la confirmación de asistencia para optimizar la logística y evitar tiempos muertos.</li>
-                      <li><strong>Historial de Interacción:</strong> Centraliza cada acuerdo y resultado de cita para un seguimiento robusto.</li>
+                      <li><strong>Priorización Diaria:</strong> El sistema organiza las citas del día para maximizar la productividad operativa.</li>
+                      <li><strong>Optimización Logística:</strong> Valide la confirmación de asistencia para evitar tiempos muertos y desplazamientos en vano.</li>
+                      <li><strong>Trazabilidad de Prospectos:</strong> Centraliza cada acuerdo y resultado de cita para un seguimiento robusto.</li>
                     </ul>
                   </CardContent>
                 </Card>
@@ -374,16 +374,16 @@ export default function Home() {
                   <ClipboardList className="w-6 h-6" /> 3. Administración de Cierres y Datos
                 </h3>
                 <p className="text-base text-muted-foreground leading-relaxed">
-                  Al concretar un trámite, el panel de <strong>Registro de Datos Críticos</strong> permite asegurar la integridad del expediente. Es fundamental capturar el monto final del crédito, las comisiones devengadas y la fecha de firma para mantener un control administrativo impecable.
+                  Al concretar un trámite, el panel de <strong>Registro de Datos Críticos</strong> permite asegurar la integridad del expediente. Es fundamental capturar el monto final del crédito, las comisiones y la fecha de firma para mantener un control administrativo impecable.
                 </p>
               </section>
 
               <section className="space-y-4 bg-accent/5 p-6 rounded-2xl border border-accent/20">
                 <h3 className="text-xl font-bold flex items-center gap-2 text-accent">
-                  <Target className="w-6 h-6" /> 4. Productividad Operativa
+                  <Target className="w-6 h-6" /> 4. Productividad y Control
                 </h3>
                 <p className="text-base text-muted-foreground leading-relaxed">
-                  El sistema monitorea automáticamente su desempeño mensual. Compare sus cierres y prospectos con periodos anteriores para identificar áreas de oportunidad y mantener un flujo constante de expedientes.
+                  El sistema monitorea automáticamente su desempeño mensual. Compare sus cierres y prospectos con periodos anteriores para identificar áreas de oportunidad y mantener un flujo constante de expedientes de financiamiento.
                 </p>
               </section>
 
@@ -400,18 +400,18 @@ export default function Home() {
                   </li>
                   <li className="flex gap-3">
                     <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
-                    <span><strong>Respaldo:</strong> No borre el historial si desea conservar sus registros. La sincronización en servidor es una funcionalidad planeada para futuras versiones.</span>
+                    <span><strong>Respaldo Técnico:</strong> No borre el historial si desea conservar sus registros. La sincronización en servidor es una funcionalidad planeada para el futuro.</span>
                   </li>
                 </ul>
               </section>
 
               <p className="text-center text-xs text-muted-foreground italic pt-6 border-t border-border/20">
-                Finanto: Diseñado para el ejecutivo que prioriza el control técnico y el cierre efectivo.
+                Finanto: Diseñado para el ejecutivo que prioriza el control técnico y el cierre efectivo en financiamiento inmobiliario.
               </p>
             </div>
           </ScrollArea>
           
-          <DialogFooter className="p-6 border-t border-border/50 bg-muted/20">
+          <DialogFooter className="p-6 border-t border-border/50 bg-muted/20 shrink-0">
             <Button onClick={() => setShowHelp(false)} className="w-full sm:w-auto font-bold h-12 px-8 text-lg">
               Entendido
             </Button>
@@ -421,4 +421,3 @@ export default function Home() {
     </div>
   );
 }
-

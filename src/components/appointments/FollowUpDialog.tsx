@@ -35,7 +35,7 @@ export default function FollowUpDialog({ appointment, open, onOpenChange }: Prop
       const res = await generateFollowUpMessage({
         status: appointment.status || 'Cita Exitosa',
         clientName: appointment.name,
-        agentName: 'Asesor CrediCitas',
+        agentName: 'Ejecutivo Finanto',
       });
       setMessage(res.messageTemplate);
     } catch (err) {
