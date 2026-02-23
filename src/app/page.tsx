@@ -1,7 +1,7 @@
 
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import CreditCalculator from '@/components/calculator/CreditCalculator';
 import AppointmentsDashboard from '@/components/appointments/AppointmentsDashboard';
 import { Card, CardContent } from '@/components/ui/card';
@@ -23,7 +23,18 @@ import {
   Info,
   Star,
   ClipboardList,
-  Target
+  Target,
+  Calculator,
+  Maximize2,
+  Receipt,
+  Sparkles,
+  History,
+  UserCheck,
+  FileText,
+  ArrowRightLeft,
+  Calendar,
+  Copy,
+  Percent
 } from 'lucide-react';
 import { Separator } from "@/components/ui/separator";
 import { useAppointments } from '@/hooks/use-appointments';
@@ -54,10 +65,41 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from "@/components/ui/carousel"
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 type Theme = 'predeterminado' | 'discreto' | 'corporativo' | 'moderno';
+
+const APP_TIPS = [
+  { icon: Calculator, title: "Perfilamiento Rápido", color: "text-primary", text: "Usa la calculadora en llamadas iniciales para filtrar prospectos interesados." },
+  { icon: ShieldCheck, title: "Privacidad Total", color: "text-accent", text: "Tus datos son privados y residen en este navegador. No borres el historial." },
+  { icon: Phone, title: "Confirmación de Citas", color: "text-yellow-500", text: "Llama 1 hora antes para confirmar y evitar desplazamientos innecesarios." },
+  { icon: Maximize2, title: "Modo Presentación", color: "text-primary", text: "Usa el modo pantalla completa para mostrar proyecciones profesionales al cliente." },
+  { icon: Receipt, title: "Registro de Cierres", color: "text-green-500", text: "Anota siempre la comisión y monto final para tus estadísticas mensuales." },
+  { icon: Sparkles, title: "Seguimiento IA", color: "text-accent", text: "Copia los mensajes de seguimiento tras cada cita para ganar agilidad en WhatsApp." },
+  { icon: History, title: "Trazabilidad Técnica", color: "text-muted-foreground", text: "No borres citas pasadas; sirven para auditar tu progreso y tasa de conversión." },
+  { icon: UserCheck, title: "Ingreso Mínimo", color: "text-primary", text: "Explica al cliente el ratio del 35% (DTI) para generar confianza financiera." },
+  { icon: FileText, title: "Gastos Notariales", color: "text-accent", text: "Menciona el 5% estimado de escrituración al inicio para evitar sorpresas al cierre." },
+  { icon: ArrowRightLeft, title: "Tanteo de Montos", color: "text-yellow-500", text: "Ajusta la mensualidad en tiempo real para encontrar el crédito ideal del cliente." },
+  { icon: Calendar, title: "Agenda Priorizada", color: "text-primary", text: "Revisa tus citas 'Hoy' cada mañana para planear tu ruta de ventas inmobiliarias." },
+  { icon: Copy, title: "Copiado Veloz", color: "text-green-500", text: "Usa el botón 'Copiar' en el simulador para enviar fichas técnicas por móvil." },
+  { icon: RotateCcw, title: "Mantenimiento Local", color: "text-destructive", text: "Usa el botón de reiniciar solo si deseas limpiar tu base de datos de trabajo." },
+  { icon: Palette, title: "Estética Profesional", color: "text-accent", text: "Cambia al tema 'Corporativo' en sesiones presenciales para una imagen sobria." },
+  { icon: ClipboardList, title: "Acuerdos de Firma", color: "text-primary", text: "Escribe acuerdos específicos en 'Notas' para no olvidar compromisos técnicos." },
+  { icon: TrendingUp, title: "Métricas de Éxito", color: "text-green-500", text: "Compara tus cierres con el mes pasado para medir tu crecimiento como ejecutivo." },
+  { icon: CheckCircle2, title: "Actualización Real", color: "text-accent", text: "Marca el estatus de la cita apenas termine la reunión para no perder datos." },
+  { icon: Percent, title: "Factor Mensualidad", color: "text-yellow-500", text: "Recuerda que el 0.6982% es una constante competitiva de nuestro plan." },
+  { icon: Info, title: "Avalúo Pericial", color: "text-primary", text: "Explica que el avalúo protege la inversión legal del cliente y de la financiera." },
+  { icon: Target, title: "Optimización Logística", color: "text-green-500", text: "Menos citas canceladas equivalen a más tiempo efectivo para prospección." }
+];
 
 export default function Home() {
   const appointmentState = useAppointments();
@@ -65,6 +107,7 @@ export default function Home() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [theme, setTheme] = useState<Theme>('predeterminado');
+  const [api, setApi] = useState<CarouselApi>();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -73,6 +116,17 @@ export default function Home() {
       applyTheme(savedTheme);
     }
   }, []);
+
+  // Auto-rotate effect for Carousel
+  useEffect(() => {
+    if (!api) return;
+
+    const intervalId = setInterval(() => {
+      api.scrollNext();
+    }, 10000);
+
+    return () => clearInterval(intervalId);
+  }, [api]);
 
   const applyTheme = (themeId: Theme) => {
     setTheme(themeId);
@@ -172,7 +226,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-1 container mx-auto px-4 py-6 md:py-10 flex flex-col justify-start">
+      <main className="flex-1 container mx-auto px-4 py-6 md:py-12 flex flex-col">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 shrink-0">
           {[
             { 
@@ -229,20 +283,42 @@ export default function Home() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start flex-1">
           <section className="xl:col-span-5">
-            <div className="sticky top-24">
+            <div className="sticky top-24 space-y-6">
               <CreditCalculator />
-              <div className="mt-6 p-6 rounded-xl border border-primary/20 bg-primary/5 backdrop-blur-md">
-                <h3 className="text-sm font-headline font-bold mb-2 flex items-center gap-2 text-primary">
-                   💡 Perfilamiento Profesional (v0.7.1)
-                </h3>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Utilice la calculadora para proyecciones en tiempo real durante llamadas o consultas presenciales de financiamiento inmobiliario. 
-                  <br />
-                  <br />
-                  Este sistema garantiza la <strong>privacidad técnica</strong> al almacenar los datos exclusivamente en este equipo de trabajo.
-                </p>
+              
+              <div className="relative p-6 rounded-xl border border-primary/20 bg-primary/5 backdrop-blur-md overflow-hidden group">
+                <Carousel 
+                  setApi={setApi}
+                  className="w-full"
+                  opts={{
+                    align: "start",
+                    loop: true,
+                  }}
+                >
+                  <CarouselContent>
+                    {APP_TIPS.map((tip, index) => (
+                      <CarouselItem key={index}>
+                        <div className="space-y-2">
+                          <h3 className={cn("text-sm font-headline font-bold flex items-center gap-2", tip.color)}>
+                            <tip.icon className="w-4 h-4" /> {tip.title}
+                          </h3>
+                          <p className="text-xs text-muted-foreground leading-relaxed min-h-[3rem]">
+                            {tip.text}
+                          </p>
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <div className="flex items-center justify-end gap-2 mt-4">
+                    <CarouselPrevious className="static translate-y-0 h-8 w-8 bg-transparent border-primary/20 hover:bg-primary/10" />
+                    <CarouselNext className="static translate-y-0 h-8 w-8 bg-transparent border-primary/20 hover:bg-primary/10" />
+                  </div>
+                </Carousel>
+                <div className="absolute top-2 right-4 text-[9px] font-bold text-primary/30 uppercase tracking-tighter">
+                  Tip de Productividad
+                </div>
               </div>
             </div>
           </section>
@@ -317,7 +393,7 @@ export default function Home() {
       </AlertDialog>
 
       <Dialog open={showHelp} onOpenChange={setShowHelp}>
-        <DialogContent className="sm:max-w-[750px] h-[90vh] bg-card border-border backdrop-blur-3xl flex flex-col p-0 shadow-2xl overflow-hidden">
+        <DialogContent className="sm:max-w-[750px] max-h-[90vh] bg-card border-border backdrop-blur-3xl flex flex-col p-0 shadow-2xl overflow-hidden">
           <DialogHeader className="p-8 border-b border-border/50 bg-primary/5 shrink-0">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-2xl bg-primary/20 border border-primary/30">
@@ -330,8 +406,8 @@ export default function Home() {
             </div>
           </DialogHeader>
           
-          <div className="flex-1 overflow-y-auto p-8 min-h-0">
-            <div className="space-y-10 text-foreground/90 pb-12">
+          <div className="flex-1 overflow-y-auto min-h-0">
+            <div className="p-8 space-y-10 text-foreground/90 pb-12">
               <section className="space-y-4">
                 <h2 className="text-2xl font-bold flex items-center gap-2 text-primary">
                   Introducción al Sistema
