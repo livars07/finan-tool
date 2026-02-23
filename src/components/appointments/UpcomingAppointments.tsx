@@ -235,7 +235,7 @@ export default function UpcomingAppointments({
       </div>
 
       <Dialog open={!!finId} onOpenChange={() => setFinId(null)}>
-        <DialogContent className="sm:max-w-[500px] backdrop-blur-[20px] bg-card/10">
+        <DialogContent className="sm:max-w-[500px] bg-card border-border shadow-2xl">
           <DialogHeader>
             <DialogTitle>Finalizar cita de hoy</DialogTitle>
             <DialogDescription>Indica el resultado de la reunión y registra acuerdos importantes.</DialogDescription>
@@ -269,7 +269,7 @@ export default function UpcomingAppointments({
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setFinId(null)} className="backdrop-blur-md">Cancelar</Button>
+            <Button variant="outline" onClick={() => setFinId(null)}>Cancelar</Button>
             <Button onClick={handleFinalize} className={cn("shadow-lg", status === 'Cierre' && "bg-green-600 hover:bg-green-700")}>
               {status === 'Cierre' ? '¡Confirmar cierre!' : 'Confirmar y archivar'}
             </Button>
@@ -327,7 +327,7 @@ export default function UpcomingAppointments({
       </Dialog>
 
       <AlertDialog open={!!confirmId} onOpenChange={(open) => !open && setConfirmId(null)}>
-        <AlertDialogContent className="backdrop-blur-[20px] bg-card/20 border-border/20">
+        <AlertDialogContent className="bg-card border-border shadow-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Confirmar asistencia del prospecto?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -335,7 +335,7 @@ export default function UpcomingAppointments({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="backdrop-blur-md">Volver</AlertDialogCancel>
+            <AlertDialogCancel>Volver</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleConfirmAction}
               className="bg-green-600 hover:bg-green-700 text-white shadow-lg"
