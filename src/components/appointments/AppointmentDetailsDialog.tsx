@@ -21,6 +21,7 @@ import { User, Phone, Calendar, Clock, Edit2, Save, MessageCircle, Info, Clipboa
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 import {
   Tooltip,
   TooltipProvider,
