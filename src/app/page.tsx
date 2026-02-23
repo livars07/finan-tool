@@ -100,7 +100,7 @@ export default function Home() {
     resetData();
     setShowResetConfirm(false);
     toast({
-      title: "Sistema Reiniciado",
+      title: "Sistema reiniciado",
       description: "Todos los datos locales han sido borrados y restaurados con datos de prueba.",
     });
   };
@@ -119,13 +119,13 @@ export default function Home() {
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer border-b-2 border-primary pb-1">
-              <LayoutDashboard className="w-4 h-4" />v0.7.1 ( 23 de marzo )
+              <LayoutDashboard className="w-4 h-4" />v0.7.1 (23 de marzo)
             </div>
           </nav>
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex flex-col items-end text-right">
               <span className="text-xs font-semibold text-foreground">Ejecutivo Olivares Mtz</span>
-              <span className="text-[10px] text-primary uppercase tracking-tighter font-medium">Datos guardados en navegador</span>
+              <span className="text-[10px] text-primary uppercase tracking-tighter font-medium">Datos guardados en el navegador</span>
             </div>
             
             <DropdownMenu>
@@ -135,18 +135,18 @@ export default function Home() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 backdrop-blur-2xl bg-popover border-border/30">
-                <DropdownMenuLabel>Temas</DropdownMenuLabel>
+                <DropdownMenuLabel className="text-foreground/80 dark:text-foreground">Temas</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => handleThemeChange('predeterminado')} className="flex items-center gap-2 cursor-pointer">
+                <DropdownMenuItem onClick={() => handleThemeChange('predeterminado')} className="flex items-center gap-2 cursor-pointer text-foreground/80 dark:text-foreground">
                   <div className="w-3 h-3 rounded-full bg-[#7ec1ff]" /> Predeterminado
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleThemeChange('discreto')} className="flex items-center gap-2 cursor-pointer">
+                <DropdownMenuItem onClick={() => handleThemeChange('discreto')} className="flex items-center gap-2 cursor-pointer text-foreground/80 dark:text-foreground">
                   <div className="w-3 h-3 rounded-full bg-[#5865f2]" /> Discreto
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleThemeChange('corporativo')} className="flex items-center gap-2 cursor-pointer">
+                <DropdownMenuItem onClick={() => handleThemeChange('corporativo')} className="flex items-center gap-2 cursor-pointer text-foreground/80 dark:text-foreground">
                   <div className="w-3 h-3 rounded-full bg-slate-400 border border-gray-300" /> Corporativo
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleThemeChange('moderno')} className="flex items-center gap-2 cursor-pointer">
+                <DropdownMenuItem onClick={() => handleThemeChange('moderno')} className="flex items-center gap-2 cursor-pointer text-foreground/80 dark:text-foreground">
                   <div className="w-3 h-3 rounded-full bg-[#00f7ff] shadow-[0_0_8px_#00f7ff]" /> Moderno
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -159,19 +159,19 @@ export default function Home() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
             { 
-              label: 'Citas Hoy', 
+              label: 'Citas hoy', 
               value: stats.todayCount.toString(), 
               icon: CalendarDays, 
               color: 'text-primary'
             },
             { 
-              label: 'Citas Pendientes', 
+              label: 'Citas pendientes', 
               value: stats.pendingCount.toString(), 
               icon: Wallet, 
               color: 'text-primary'
             },
             { 
-              label: 'Prospectos (Mes)', 
+              label: 'Prospectos (mes)', 
               value: stats.currentMonthProspects.toString(), 
               icon: Users, 
               color: 'text-accent',
@@ -215,10 +215,10 @@ export default function Home() {
               <CreditCalculator />
               <div className="mt-6 p-6 rounded-xl border border-primary/20 bg-primary/5 backdrop-blur-md">
                 <h3 className="text-sm font-headline font-bold mb-2 flex items-center gap-2 text-primary">
-                   💡 Nota de Sistema (v0.7.1)
+                   💡 Nota del sistema (v0.7.1)
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Esta versión incluye el nuevo <strong>"Panel de Felicitación por Cierre"</strong> y una calculadora optimizada para pantallas grandes.
+                  Esta versión incluye el nuevo <strong>"Panel de felicitación por cierre"</strong> y una calculadora optimizada para pantallas grandes.
                   <br />
                   <br />
                   Toda tu información se guarda de forma privada en este navegador para que puedas trabajar con rapidez y seguridad.
@@ -245,7 +245,7 @@ export default function Home() {
 
       <footer className="mt-12 border-t border-border/40 py-8 bg-card/10 backdrop-blur-[20px]">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm">
-          <p>© 2026 Finanto - Tu Asistente Digital de Crédito</p>
+          <p>© 2026 Finanto - Tu asistente digital de crédito</p>
           <div className="flex items-center gap-6">
             <button 
               onClick={copyFooterPhone}

@@ -81,7 +81,7 @@ export default function UpcomingAppointments({
       toggleConfirmation(confirmId);
       setConfirmId(null);
       toast({
-        title: "Asistencia Confirmada",
+        title: "Asistencia confirmada",
         description: `Se ha confirmado la asistencia de ${app?.name}.`,
       });
     }
@@ -109,7 +109,7 @@ export default function UpcomingAppointments({
         setShowSuccessDialog(true);
       } else {
         toast({
-          title: "Cita Finalizada",
+          title: "Cita finalizada",
           description: `${clientName} movido al historial con resultado: ${currentStatus}.`,
         });
       }
@@ -240,7 +240,7 @@ export default function UpcomingAppointments({
           </DialogHeader>
           <div className="py-4 space-y-4">
             <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase">Resultado Final</Label>
+              <Label className="text-xs font-bold uppercase">Resultado final</Label>
               <span className="sr-only">Selección de estatus de cita</span>
               <Select value={status} onValueChange={(v) => setStatus(v as AppointmentStatus)}>
                 <SelectTrigger className={cn("bg-muted/30", status === 'Cierre' && "border-green-500 text-green-500 bg-green-500/5")}>
@@ -258,7 +258,7 @@ export default function UpcomingAppointments({
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase">Notas de la Cita</Label>
+              <Label className="text-xs font-bold uppercase">Notas de la cita</Label>
               <Textarea 
                 placeholder="Escribe acuerdos, montos o próximos pasos aquí..." 
                 className="bg-muted/30 min-h-[150px] resize-none"
@@ -270,7 +270,7 @@ export default function UpcomingAppointments({
           <DialogFooter>
             <Button variant="outline" onClick={() => setFinId(null)} className="backdrop-blur-md">Cancelar</Button>
             <Button onClick={handleFinalize} className={cn("shadow-lg", status === 'Cierre' && "bg-green-600 hover:bg-green-700")}>
-              {status === 'Cierre' ? '¡Confirmar Cierre!' : 'Confirmar y Archivar'}
+              {status === 'Cierre' ? '¡Confirmar cierre!' : 'Confirmar y archivar'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -296,7 +296,7 @@ export default function UpcomingAppointments({
           <div className="py-6 space-y-6">
             <div className="bg-white/5 border border-white/10 p-5 rounded-2xl space-y-4">
               <h4 className="text-xs font-bold uppercase tracking-widest text-green-400 flex items-center gap-2">
-                <Sparkles className="w-4 h-4" /> Checklist de Cierre
+                <Sparkles className="w-4 h-4" /> Checklist de cierre
               </h4>
               <p className="text-sm text-green-50/80 leading-relaxed">
                 Asegúrate de registrar en las notas los siguientes datos para el expediente actualizado:
@@ -304,13 +304,13 @@ export default function UpcomingAppointments({
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-medium text-white">
                 <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Monto del Crédito Final</li>
                 <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Comisiones</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> fecha de firma</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Fecha de firma</li>
                 <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Y cualquier detalle importante del cliente</li>
               </ul>
             </div>
             
             <p className="text-center text-[10px] text-green-200/60 uppercase font-bold">
-              ESTE CIERRE SE HA REGISTRADO EN TUS ESTADÍSTICAS MENSUALES
+              Este cierre se ha registrado en tus estadísticas mensuales
             </p>
           </div>
 
