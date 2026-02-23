@@ -197,7 +197,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                 {[
                   { id: 'predeterminado', label: 'Predeterminado', icon: Palette, color: 'bg-primary' },
                   { id: 'corporativo', label: 'Corporativo', icon: Sun, color: 'bg-blue-600' },
-                  { id: 'corporativo-v2', label: 'Corporativo v2', icon: ShieldCheck, color: 'bg-emerald-500' },
+                  { id: 'corporativo-v2', label: 'Corporativo v2', icon: ShieldCheck, color: 'bg-sky-500' },
                   { id: 'moderno', label: 'Moderno', icon: Cpu, color: 'bg-cyan-500' },
                   { id: 'discreto', label: 'Discreto', icon: Moon, color: 'bg-slate-700' },
                   { id: 'olivares', label: 'Olivares', icon: Crown, color: 'bg-yellow-600' },
@@ -348,7 +348,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
           <DialogHeader className="p-8 border-b shrink-0 border-border/50 bg-primary/5">
             <div className="flex items-center gap-4">
               <div className="p-4 border border-primary/30 rounded-2xl bg-primary/20">
-                <BookOpen className="w-8 h-8 text-primary" />
+                < BookOpen className="w-8 h-8 text-primary" />
               </div>
               <div>
                 <DialogTitle className="text-3xl font-bold font-headline">Manual Técnico de Finanto</DialogTitle>

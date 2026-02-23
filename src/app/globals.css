@@ -56,24 +56,24 @@
 
   [data-theme="corporativo-v2"] {
     color-scheme: light;
-    --background: 80 25% 96%; /* Verde menta extremadamente pálido */
-    --foreground: 142 80% 12%;
+    --background: 210 40% 98%; /* Fondo Azul Glacial Pálido */
+    --foreground: 222 47% 11%;
     --card: 0 0% 100% / 0.7;
-    --card-foreground: 142 80% 15%;
+    --card-foreground: 222 47% 15%;
     --popover: 0 0% 100% / 0.8;
-    --popover-foreground: 142 80% 15%;
+    --popover-foreground: 222 47% 15%;
     --primary: 142 76% 36%; /* Verde Bosque Vibrante */
     --primary-foreground: 0 0% 100%;
-    --secondary: 48 90% 80%; /* Amarillo riel visible */
-    --secondary-foreground: 142 80% 15%;
-    --muted: 142 20% 92%;
+    --secondary: 210 30% 90%; /* Azul Riel Suave */
+    --secondary-foreground: 222 47% 15%;
+    --muted: 210 20% 95%;
     --muted-foreground: 142 20% 40%;
-    --accent: 45 100% 50%; /* Amarillo Oro / Ámbar llamativo */
-    --accent-foreground: 142 80% 10%;
+    --accent: 45 100% 50%; /* Amarillo Oro / Ámbar (Mantenido) */
+    --accent-foreground: 222 47% 10%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 142 30% 85%;
-    --input: 142 30% 85%;
+    --border: 210 20% 88%;
+    --input: 210 20% 88%;
     --ring: 142 76% 36%;
     --radius: 0.75rem;
     --calendar-filter: none;
