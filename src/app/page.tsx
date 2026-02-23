@@ -34,7 +34,9 @@ import {
   ArrowRightLeft,
   Calendar,
   Copy,
-  Percent
+  Percent,
+  Clock,
+  MessageCircle
 } from 'lucide-react';
 import { Separator } from "@/components/ui/separator";
 import { useAppointments } from '@/hooks/use-appointments';
@@ -79,26 +81,23 @@ import { cn } from "@/lib/utils";
 type Theme = 'predeterminado' | 'discreto' | 'corporativo' | 'moderno';
 
 const APP_TIPS = [
-  { icon: Calculator, title: "Perfilamiento Rápido", color: "text-primary", text: "Usa la calculadora en llamadas iniciales para filtrar prospectos interesados." },
-  { icon: ShieldCheck, title: "Privacidad Total", color: "text-accent", text: "Tus datos son privados y residen en este navegador. No borres el historial." },
-  { icon: Phone, title: "Confirmación de Citas", color: "text-yellow-500", text: "Llama 1 hora antes para confirmar y evitar desplazamientos innecesarios." },
-  { icon: Maximize2, title: "Modo Presentación", color: "text-primary", text: "Usa el modo pantalla completa para mostrar proyecciones profesionales al cliente." },
-  { icon: Receipt, title: "Registro de Cierres", color: "text-green-500", text: "Anota siempre la comisión y monto final para tus estadísticas mensuales." },
-  { icon: Sparkles, title: "Seguimiento IA", color: "text-accent", text: "Copia los mensajes de seguimiento tras cada cita para ganar agilidad en WhatsApp." },
-  { icon: History, title: "Trazabilidad Técnica", color: "text-muted-foreground", text: "No borres citas pasadas; sirven para auditar tu progreso y tasa de conversión." },
-  { icon: UserCheck, title: "Ingreso Mínimo", color: "text-primary", text: "Explica al cliente el ratio del 35% (DTI) para generar confianza financiera." },
-  { icon: FileText, title: "Gastos Notariales", color: "text-accent", text: "Menciona el 5% estimado de escrituración al inicio para evitar sorpresas al cierre." },
-  { icon: ArrowRightLeft, title: "Tanteo de Montos", color: "text-yellow-500", text: "Ajusta la mensualidad en tiempo real para encontrar el crédito ideal del cliente." },
-  { icon: Calendar, title: "Agenda Priorizada", color: "text-primary", text: "Revisa tus citas 'Hoy' cada mañana para planear tu ruta de ventas inmobiliarias." },
-  { icon: Copy, title: "Copiado Veloz", color: "text-green-500", text: "Usa el botón 'Copiar' en el simulador para enviar fichas técnicas por móvil." },
-  { icon: RotateCcw, title: "Mantenimiento Local", color: "text-destructive", text: "Usa el botón de reiniciar solo si deseas limpiar tu base de datos de trabajo." },
-  { icon: Palette, title: "Estética Profesional", color: "text-accent", text: "Cambia al tema 'Corporativo' en sesiones presenciales para una imagen sobria." },
-  { icon: ClipboardList, title: "Acuerdos de Firma", color: "text-primary", text: "Escribe acuerdos específicos en 'Notas' para no olvidar compromisos técnicos." },
-  { icon: TrendingUp, title: "Métricas de Éxito", color: "text-green-500", text: "Compara tus cierres con el mes pasado para medir tu crecimiento como ejecutivo." },
-  { icon: CheckCircle2, title: "Actualización Real", color: "text-accent", text: "Marca el estatus de la cita apenas termine la reunión para no perder datos." },
-  { icon: Percent, title: "Factor Mensualidad", color: "text-yellow-500", text: "Recuerda que el 0.6982% es una constante competitiva de nuestro plan." },
-  { icon: Info, title: "Avalúo Pericial", color: "text-primary", text: "Explica que el avalúo protege la inversión legal del cliente y de la financiera." },
-  { icon: Target, title: "Optimización Logística", color: "text-green-500", text: "Menos citas canceladas equivalen a más tiempo efectivo para prospección." }
+  { icon: Calculator, title: "Calculadora Rápida", color: "text-primary", text: "Usa la calculadora rápida en caso de tener una llamada con un interesado que pregunte montos aproximados." },
+  { icon: ClipboardList, title: "Gestión Eficiente", color: "text-accent", text: "Nunca olvides registrar todas tus citas en el gestionador de citas, para tener un orden eficiente de fechas y datos en un solo lugar." },
+  { icon: ShieldCheck, title: "Seguridad de Datos", color: "text-destructive", text: "Recuerda, tus citas son guardadas dentro de este navegador, si cambias de navegador o de dispositivo contacta al desarrollador." },
+  { icon: Sparkles, title: "Próximas Mejoras", color: "text-yellow-500", text: "Esta es una versión funcional para cálculo inteligente y gestión de citas, en un futuro: datos en la nube, cuentas, monitoreo por parte de líderes y gerencia, IA para automatización de mensajes personalizados, una guía de capacitación, etc." },
+  { icon: Maximize2, title: "Calculadora Completa", color: "text-primary", text: "Usa la calculadora completa para no tantear números a la hora de tener la cita frente tuyo o al estar en una llamada extensa." },
+  { icon: Palette, title: "Imagen Corporativa", color: "text-accent", text: "Usa el tema <<corporativo>> para mostrar pantalla a tus clientes presenciales." },
+  { icon: Palette, title: "Personalización", color: "text-primary", text: "Cambia de tema en la esquina superior de este sistema web, ya sea que prefieras lo corporativo, lo ligero o vibes de hacker." },
+  { icon: Copy, title: "Envío a WhatsApp", color: "text-green-500", text: "Recuerda copiar los datos de cada cliente para mandarlos por el grupo de WhatsApp: Click en la cita, click en el botón verde <<Copiar>>, y pegar datos en el chat del grupo." },
+  { icon: TrendingUp, title: "Apoyo en Cierres", color: "text-accent", text: "Recuerda que la calculadora extendida sirve como apoyo para explicar la línea e información extra a la hora de intentar cerrar ventas." },
+  { icon: History, title: "Historial Técnico", color: "text-muted-foreground", text: "No borres tus citas pasadas, sirven para ver tu progreso o no perderte en tu memoria a la hora de dar seguimiento." },
+  { icon: FileText, title: "Memoria de Datos", color: "text-primary", text: "Recuerda anotar datos útiles del cliente en las notas de su cita para no tener que recordar, solo consultar tus datos." },
+  { icon: Calendar, title: "Control de Agenda", color: "text-accent", text: "Con una buena gestión de citas te ahorras problemas con la pérdida de números, olvidar confirmaciones, etc." },
+  { icon: Copy, title: "Ahorro de Tiempo", color: "text-green-500", text: "Los botones de <<Copiar>> te pueden llegar a ahorrar mucho texto escrito y confundir datos de diferentes prospectos." },
+  { icon: Info, title: "Retroalimentación", color: "text-primary", text: "Alguna sugerencia, lo más mínima que sea, comentar al ejecutivo Olivares sin pena, lo que importa es la organización, comodidad y eficiencia de prospectadores." },
+  { icon: Users, title: "Perfil de Usuario", color: "text-accent", text: "Este sistema está enfocado en prospectadores, pero sirve para vendedores igualmente." },
+  { icon: Target, title: "Flujo de Trabajo", color: "text-yellow-500", text: "Este sistema te ahorra el inventarte tu propio flujo de trabajo (distintos excels confusos, hojas de citas sin fin, y otras maneras de gestión)." },
+  { icon: Users, title: "Cultura de Equipo", color: "text-primary", text: "La mejor forma de cooperación en equipo es una donde todos van en un mismo canal de progreso constante, no un espagueti de procesos diferentes cada uno." }
 ];
 
 export default function Home() {
@@ -117,13 +116,13 @@ export default function Home() {
     }
   }, []);
 
-  // Auto-rotate effect for Carousel
+  // Auto-rotate effect for Carousel - Set to 18 seconds (18000ms)
   useEffect(() => {
     if (!api) return;
 
     const intervalId = setInterval(() => {
       api.scrollNext();
-    }, 10000);
+    }, 18000);
 
     return () => clearInterval(intervalId);
   }, [api]);
@@ -424,9 +423,8 @@ export default function Home() {
                       <Wallet className="w-5 h-5" /> 1. Calculadora de Precisión
                     </h3>
                     <ul className="text-sm space-y-3 list-disc pl-5 text-muted-foreground">
-                      <li><strong>Perfilamiento profesional:</strong> Determine montos aproximados de forma inmediata para interesados vía telefónica.</li>
-                      <li><strong>Presentación Profesional:</strong> Realice ajustes de montos frente al cliente en tiempo real durante la 1ra consulta sin depender de conexión.</li>
-                      <li><strong>Independencia Técnica:</strong> Herramienta optimizada para operar y "tantear" montos sin depender de servidores externos.</li>
+                      <li><strong>Perfilamiento profesional:</strong> Determine montos aproximados de forma inmediata para interesados vía telefónica o mostrándoles proyecciones reales en la 1ra consulta sin depender de conexión.</li>
+                      <li><strong>Tanteo Financiero:</strong> Ajuste montos en tiempo real frente al cliente para encontrar la mensualidad ideal.</li>
                     </ul>
                   </CardContent>
                 </Card>
@@ -437,9 +435,8 @@ export default function Home() {
                       <CalendarDays className="w-5 h-5" /> 2. Gestión de Agenda
                     </h3>
                     <ul className="text-sm space-y-3 list-disc pl-5 text-muted-foreground">
-                      <li><strong>Priorización Diaria:</strong> El sistema organiza las citas del día para maximizar la productividad operativa del ejecutivo.</li>
+                      <li><strong>Priorización Diaria:</strong> El sistema organiza las citas del día para maximizar la productividad operativa.</li>
                       <li><strong>Optimización Logística:</strong> Valide la confirmación de asistencia para evitar tiempos muertos y desplazamientos innecesarios.</li>
-                      <li><strong>Trazabilidad de Prospectos:</strong> Centraliza cada acuerdo y resultado de cita para un seguimiento robusto del crédito.</li>
                     </ul>
                   </CardContent>
                 </Card>
@@ -447,10 +444,10 @@ export default function Home() {
 
               <section className="space-y-4 bg-primary/5 p-6 rounded-2xl border border-primary/20">
                 <h3 className="text-xl font-bold flex items-center gap-2 text-primary">
-                  <ClipboardList className="w-6 h-6" /> 3. Administración de Cierres y Datos
+                  <ClipboardList className="w-6 h-6" /> 3. Administración de Datos Críticos
                 </h3>
                 <p className="text-base text-muted-foreground leading-relaxed">
-                  Al concretar un trámite, el panel de <strong>Registro de Datos Críticos</strong> permite asegurar la integridad del expediente. Es fundamental capturar el monto final del crédito, las comisiones y la fecha de firma para mantener un control administrativo impecable.
+                  Al concretar un trámite, es fundamental asegurar la integridad del expediente capturando el monto final del crédito, las comisiones y la fecha de firma. Esta disciplina técnica garantiza un control administrativo impecable.
                 </p>
               </section>
 
@@ -459,7 +456,7 @@ export default function Home() {
                   <Target className="w-6 h-6" /> 4. Productividad y Control
                 </h3>
                 <p className="text-base text-muted-foreground leading-relaxed">
-                  El sistema monitorea automáticamente su desempeño mensual. Compare sus cierres y prospectos con periodos anteriores para identificar áreas de oportunidad y mantener un flujo constante de expedientes de financiamiento inmobiliario.
+                  El sistema monitorea automáticamente su desempeño mensual. Compare sus cierres y prospectos con periodos anteriores para identificar áreas de oportunidad en su flujo de financiamiento inmobiliario.
                 </p>
               </section>
 
@@ -472,11 +469,7 @@ export default function Home() {
                 <ul className="text-sm space-y-3 text-muted-foreground">
                   <li className="flex gap-3">
                     <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
-                    <span><strong>Seguridad Local:</strong> Los datos residen exclusivamente en su navegador. Esto garantiza que la información sensible de clientes sea totalmente privada.</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
-                    <span><strong>Respaldo Técnico:</strong> No borre el historial si desea conservar sus registros. El sistema opera de forma local para mayor rapidez y privacidad.</span>
+                    <span><strong>Seguridad Local:</strong> Los datos residen exclusivamente en su navegador, garantizando total privacidad sobre la información sensible de sus prospectos.</span>
                   </li>
                 </ul>
               </section>
