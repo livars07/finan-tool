@@ -31,25 +31,31 @@
 
   [data-theme="corporativo"] {
     color-scheme: light;
-    /* Corporativo - Gris desaturado de baja luz */
-    --background: 210 15% 95%;
+    /* Corporativo - Gris desaturado de baja luz para evitar exceso de brillo */
+    --background: 210 15% 92%;
     --foreground: 222 20% 20%;
     --card: 0 0% 100% / 0.8;
     --card-foreground: 222 20% 20%;
-    --popover: 0 0% 100% / 0.95;
-    --popover-foreground: 222 20% 20%;
-    --primary: 215 40% 45%; /* Azul grisáceo desaturado */
+    
+    /* Popups oscuros para evitar exceso de luz */
+    --popover: 222 20% 15% / 0.95;
+    --popover-foreground: 0 0% 100%;
+    
+    --primary: 215 40% 45%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 20% 90%;
+    --secondary: 210 20% 88%;
     --secondary-foreground: 222 20% 20%;
-    --muted: 210 20% 85%;
-    --muted-foreground: 215 10% 40%;
-    --accent: 160 30% 50%; /* Verde desaturado */
+    --muted: 210 20% 80%;
+    
+    /* Texto gris pasa a celeste en modo corporativo */
+    --muted-foreground: 190 70% 60%; 
+    
+    --accent: 160 30% 50%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 50% 50%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214 10% 85%;
-    --input: 214 10% 85%;
+    --border: 214 10% 82%;
+    --input: 214 10% 82%;
     --ring: 215 40% 45%;
     --calendar-filter: none;
   }

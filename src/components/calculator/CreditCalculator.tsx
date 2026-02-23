@@ -348,7 +348,8 @@ export default function CreditCalculator() {
                 <div className="space-y-3">
                   <Button 
                     onClick={handleCopySummary}
-                    className="w-full h-12 bg-primary text-primary-foreground font-bold shadow-lg shadow-primary/20"
+                    variant="outline"
+                    className="w-full h-12 border-green-500 text-green-500 hover:bg-transparent font-bold shadow-lg shadow-green-500/10"
                   >
                     <Copy className="w-4 h-4 mr-2" /> Copiar Resumen para Cliente
                   </Button>
