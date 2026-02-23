@@ -2,7 +2,6 @@
  * @fileOverview Servicio de Gestión de Datos - Finanto
  * 
  * Centraliza la persistencia y lógica de negocio.
- * Se han eliminado las funciones de archivado y borrado permanente para simplificar el flujo.
  */
 
 import { v4 as uuidv4 } from 'uuid';
@@ -23,7 +22,6 @@ export type AppointmentStatus =
   | 'No asistencia' 
   | 'Continuación en otra cita' 
   | 'Reagendó' 
-  | 'Apartado' 
   | 'Reembolso' 
   | 'Cierre';
 
@@ -115,7 +113,7 @@ export const generateSeedData = (): Appointment[] => {
   const firstNames = ['Juan', 'María', 'Carlos', 'Ana', 'Luis', 'Elena', 'Roberto', 'Sofía', 'Diego', 'Lucía'];
   const lastNames = ['Pérez', 'García', 'López', 'Martínez', 'Rodríguez', 'Gómez', 'Díaz', 'Ruiz', 'Torres', 'Morales'];
   const types: AppointmentType[] = ['1ra consulta', '2da consulta', 'Cierre', 'Seguimiento'];
-  const statuses: AppointmentStatus[] = ['Asistencia', 'No asistencia', 'Continuación en otra cita', 'Reagendó', 'Apartado', 'Reembolso', 'Cierre'];
+  const statuses: AppointmentStatus[] = ['Asistencia', 'No asistencia', 'Continuación en otra cita', 'Reagendó', 'Reembolso', 'Cierre'];
   const hours = ['09:00', '10:30', '12:00', '14:30', '16:00', '17:30'];
 
   const now = new Date();
@@ -158,7 +156,7 @@ export const generateSeedData = (): Appointment[] => {
       date: pastDate.toISOString(),
       time: hours[i % hours.length],
       type: types[i % types.length],
-      status: i === 0 ? 'Apartado' : statuses[i % statuses.length],
+      status: statuses[i % statuses.length],
       isConfirmed: true,
       notes: "Historial del mes pasado."
     });

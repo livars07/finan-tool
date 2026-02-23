@@ -191,7 +191,6 @@ Número: ${appointment.phone}`;
                       <SelectItem value="No asistencia">No asistencia</SelectItem>
                       <SelectItem value="Continuación en otra cita">Continuación en otra cita</SelectItem>
                       <SelectItem value="Reagendó">Reagendó</SelectItem>
-                      <SelectItem value="Apartado">Apartado</SelectItem>
                       <SelectItem value="Reembolso">Reembolso</SelectItem>
                       <SelectItem value="Cierre">Cierre</SelectItem>
                     </SelectContent>
