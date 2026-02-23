@@ -245,7 +245,16 @@ export default function Home() {
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm">
           <p>© 2026 Finanto - Ejecutivo en Financiamiento Inmobiliario</p>
           <div className="flex items-center gap-6">
-            <button className="flex items-center gap-2 hover:text-primary transition-colors cursor-pointer group">
+            <button 
+              onClick={() => {
+                navigator.clipboard.writeText("6646947418");
+                toast({
+                  title: "Número copiado",
+                  description: "664 694 7418 copiado al portapapeles.",
+                });
+              }}
+              className="flex items-center gap-2 hover:text-primary transition-colors cursor-pointer group"
+            >
               <Phone className="w-3.5 h-3.5 group-hover:animate-pulse" />
               <span>664 694 7418</span>
             </button>
