@@ -74,9 +74,9 @@ export default function PastAppointments({
     <div className="space-y-4 flex flex-col h-full">
       <div className={cn(
         "border rounded-xl overflow-hidden bg-card/10 relative backdrop-blur-sm flex-1 flex flex-col",
-        !expanded ? "max-h-[400px] h-[400px]" : "h-full"
+        !expanded ? "h-[400px]" : "h-full"
       )}>
-        <ScrollArea className="flex-1">
+        <ScrollArea className="flex-1 scrollbar-thin">
           <Table>
             <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm">
               <TableRow>

@@ -8,8 +8,7 @@ import {
   CheckCircle, Trophy, PartyPopper, Sparkles, Copy, 
   ClipboardCheck, Phone, Box, ChevronRight 
 } from "lucide-react";
-import { parseISO, format, addDays, isToday } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { parseISO, isToday, addDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -188,7 +187,7 @@ Número: *${app.phone}*`;
     <div className="space-y-4 flex flex-col h-full">
       <div className={cn(
         "border rounded-xl overflow-hidden relative backdrop-blur-sm bg-card/20 flex-1 flex flex-col",
-        !expanded ? "max-h-[400px] h-[400px]" : "h-full"
+        !expanded ? "h-[400px]" : "h-full"
       )}>
         {appointments.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-muted-foreground bg-muted/10 h-full">
@@ -196,7 +195,7 @@ Número: *${app.phone}*`;
             <p className="text-sm font-bold uppercase tracking-widest opacity-40">No hay citas programadas</p>
           </div>
         ) : (
-          <ScrollArea className="flex-1">
+          <ScrollArea className="flex-1 scrollbar-thin">
             <Table>
               <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm">
                 <TableRow>
@@ -394,7 +393,7 @@ Número: *${app.phone}*`;
               <Label className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Acuerdos y Notas</Label>
               <Textarea 
                 placeholder="Escribe montos, fechas o acuerdos aquí..." 
-                className="bg-muted/10 border-border/30 min-h-[120px] resize-none text-xs"
+                className="bg-muted/10 border-border/30 min-h-[120px] resize-none text-xs scrollbar-thin"
                 value={finNotes}
                 onChange={(e) => setFinNotes(e.target.value)}
               />

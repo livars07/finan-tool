@@ -166,7 +166,6 @@
     @apply border-border shadow-xl !important;
   }
 
-  /* Estilo específico para errores en tema corporativo y predeterminado */
   [data-theme="corporativo"] [role="status"].destructive,
   :root:not([data-theme]) [role="status"].destructive {
     background-color: hsla(var(--destructive) / 0.15) !important;
@@ -189,6 +188,22 @@
     cursor: pointer;
     opacity: 0.6;
     transition: opacity 0.2s;
+  }
+
+  /* Minimalist Scrollbar Styles */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 10px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.5);
   }
 }
 

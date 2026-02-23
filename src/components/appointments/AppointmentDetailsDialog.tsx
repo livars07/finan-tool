@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Dialog, DialogContent, DialogHeader, DialogTitle, 
-  DialogFooter, DialogDescription, DialogClose
+  DialogFooter, DialogClose
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct } from '@/services/appointment-service';
-import { User, Phone, Calendar, Clock, Edit2, Save, MessageCircle, Info, ClipboardList, CheckCircle2, Box } from 'lucide-react';
+import { User, Phone, Clock, Edit2, Save, MessageCircle, Info, ClipboardList, CheckCircle2, Box } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -43,7 +43,6 @@ export default function AppointmentDetailsDialog({
   open, 
   onOpenChange, 
   onEdit,
-  formatFriendlyDate,
   format12hTime
 }: Props) {
   const [isEditing, setIsEditing] = useState(false);
@@ -294,8 +293,8 @@ Número: *${appointment.phone}*`;
             <Textarea 
               placeholder="Detalles importantes..."
               className={cn(
-                "bg-muted/10 border-border/30 focus-visible:ring-primary resize-none text-xs backdrop-blur-sm",
-                "h-[300px] min-h-[300px] overflow-y-auto scrollbar-thin"
+                "bg-muted/10 border-border/30 focus-visible:ring-primary resize-none text-xs backdrop-blur-sm scrollbar-thin",
+                "h-[300px] min-h-[300px] overflow-y-auto"
               )}
               value={isEditing ? editData.notes : appointment.notes}
               onChange={e => setEditData({...editData, notes: e.target.value})}
