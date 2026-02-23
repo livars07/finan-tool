@@ -105,6 +105,7 @@ export default function UpcomingAppointments({
         const updatedApp = { ...app, status: currentStatus, notes: currentNotes };
         setLastClosedApp(updatedApp);
         
+        // Simulación de sonido de éxito si el navegador lo permite
         const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3");
         audio.volume = 0.5;
         audio.play().catch(() => {});
