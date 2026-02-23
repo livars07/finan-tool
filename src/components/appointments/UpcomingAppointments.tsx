@@ -25,6 +25,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 interface Props {
   appointments: Appointment[];
@@ -48,6 +49,7 @@ export default function UpcomingAppointments({
   const [finId, setFinId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [status, setStatus] = useState<AppointmentStatus>('Asistencia');
+  const { toast } = useToast();
 
   const isActuallyToday = (dateStr: string) => {
     const d = parseISO(dateStr);
@@ -71,6 +73,16 @@ export default function UpcomingAppointments({
       toggleConfirmation(confirmId);
       setConfirmId(null);
     }
+  };
+
+  const copyPhone = (e: React.MouseEvent, phone: string) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(phone).then(() => {
+      toast({
+        title: "Número copiado",
+        description: `${phone} se ha copiado al portapapeles.`,
+      });
+    });
   };
 
   return (
@@ -104,7 +116,12 @@ export default function UpcomingAppointments({
                   <div className="font-medium text-sm">
                     {app.name}
                   </div>
-                  <div className="text-xs text-muted-foreground">{app.phone}</div>
+                  <div 
+                    onClick={(e) => copyPhone(e, app.phone)}
+                    className="text-xs text-muted-foreground hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1 group/phone"
+                  >
+                    {app.phone}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-tight">

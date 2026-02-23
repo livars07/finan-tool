@@ -7,6 +7,7 @@ import { MessageSquare, ChevronDown } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { useToast } from "@/hooks/use-toast";
 
 interface Props {
   appointments: Appointment[];
@@ -18,6 +19,7 @@ interface Props {
 
 export default function PastAppointments({ appointments, onSelect, formatDate, format12hTime, highlightedId }: Props) {
   const [visibleCount, setVisibleCount] = useState(20);
+  const { toast } = useToast();
 
   if (appointments.length === 0) {
     return (
@@ -38,6 +40,16 @@ export default function PastAppointments({ appointments, onSelect, formatDate, f
       case 'Continuación en otra cita': return 'text-blue-400';
       default: return 'text-muted-foreground';
     }
+  };
+
+  const copyPhone = (e: React.MouseEvent, phone: string) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(phone).then(() => {
+      toast({
+        title: "Número copiado",
+        description: `${phone} se ha copiado al portapapeles.`,
+      });
+    });
   };
 
   const visibleAppointments = appointments.slice(0, visibleCount);
@@ -69,7 +81,12 @@ export default function PastAppointments({ appointments, onSelect, formatDate, f
                   >
                     <TableCell>
                       <div className="font-medium text-sm">{app.name}</div>
-                      <div className="text-xs text-muted-foreground">{app.phone}</div>
+                      <div 
+                        onClick={(e) => copyPhone(e, app.phone)}
+                        className="text-xs text-muted-foreground hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1 group/phone"
+                      >
+                        {app.phone}
+                      </div>
                     </TableCell>
                     <TableCell className="text-[10px] text-muted-foreground uppercase tracking-tight">
                       {app.type}

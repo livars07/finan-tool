@@ -64,6 +64,16 @@ export default function AppointmentDetailsDialog({
     toast({ title: "Guardado", description: "La información ha sido actualizada." });
   };
 
+  const copyPhoneOnly = () => {
+    if (!appointment.phone) return;
+    navigator.clipboard.writeText(appointment.phone).then(() => {
+      toast({
+        title: "Número copiado",
+        description: `${appointment.phone} listo para usar.`,
+      });
+    });
+  };
+
   const copyToWhatsAppFormat = () => {
     const dateObj = parseISO(appointment.date);
     const dateFormatted = format(dateObj, "EEEE d 'de' MMMM yyyy", { locale: es });
@@ -168,11 +178,14 @@ Número: ${appointment.phone}`;
               </div>
               
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-3">
-                  <Phone className="w-4 h-4 text-primary" />
+                <div 
+                  onClick={copyPhoneOnly}
+                  className="flex items-center gap-3 cursor-pointer group/phone"
+                >
+                  <Phone className="w-4 h-4 text-primary group-hover/phone:scale-110 transition-transform" />
                   <div>
                     <p className="text-[10px] text-muted-foreground uppercase font-bold">Teléfono</p>
-                    <p className="text-sm">{appointment.phone || 'N/A'}</p>
+                    <p className="text-sm group-hover/phone:text-primary transition-colors">{appointment.phone || 'N/A'}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
