@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -100,26 +101,30 @@ export default function UpcomingAppointments({
       const currentNotes = finNotes;
       const clientName = app.name;
 
-      if (currentStatus === 'Cierre') {
-        setLastClosedApp(app);
-        // Mostrar éxito inmediatamente después del update
-        setTimeout(() => setShowSuccessDialog(true), 100);
-      }
-
+      // Actualizamos inmediatamente el estado para persistencia
       updateStatus(finId, currentStatus, currentNotes);
-      setFinId(null);
-      setFinNotes('');
 
       if (currentStatus === 'Cierre') {
+        // Obtenemos la versión actualizada del objeto (con el nuevo estatus)
+        const updatedApp = { ...app, status: currentStatus, notes: currentNotes };
+        setLastClosedApp(updatedApp);
+        
+        // Sonido de éxito
         const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3");
         audio.volume = 0.5;
         audio.play().catch(() => {});
+
+        // Mostramos el popup de felicitaciones
+        setShowSuccessDialog(true);
       } else {
         toast({
           title: "Cita finalizada",
           description: `${clientName} movido al historial con resultado: ${currentStatus}.`,
         });
       }
+
+      setFinId(null);
+      setFinNotes('');
     }
   };
 
@@ -426,21 +431,21 @@ Número: *${app.phone}*`;
 
             <div className="bg-green-500/10 border border-green-500/20 p-6 rounded-2xl space-y-4">
               <h4 className="text-xs font-bold uppercase tracking-widest text-green-400 flex items-center gap-2">
-                <Sparkles className="w-4 h-4" /> Checklist de cierre
+                <Sparkles className="w-4 h-4" /> Recomendaciones de cierre
               </h4>
               <p className="text-sm text-green-50/80 leading-relaxed">
-                Asegúrate de registrar en las notas los siguientes datos para el expediente actualizado:
+                Para garantizar la integridad administrativa del expediente, asegúrate de haber registrado:
               </p>
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-bold text-white">
                 <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Monto del Crédito Final</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Comisiones</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Fecha de firma</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Anota cada detalle útil</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Cálculo de Comisiones</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Fecha estimada de Firma</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Notas de acuerdos verbales</li>
               </ul>
             </div>
             
             <p className="text-center text-[10px] text-green-200/60 uppercase font-bold tracking-tighter">
-              Este cierre se ha registrado en tus estadísticas mensuales
+              Puedes editar estos detalles a continuación en el registro del cliente.
             </p>
           </div>
 
