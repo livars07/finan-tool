@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useMemo } from 'react';
@@ -62,7 +61,8 @@ export default function AppointmentsDashboard({
       const basicMatch = 
         normalizeStr(app.name).includes(s) || 
         app.phone.includes(s) || 
-        (app.status && normalizeStr(app.status).includes(s));
+        (app.status && normalizeStr(app.status).includes(s)) ||
+        (app.product && normalizeStr(app.product).includes(s));
       
       if (basicMatch) return true;
       if (friendlyDate.includes(s)) return true;
@@ -105,7 +105,7 @@ export default function AppointmentsDashboard({
             <div className="relative w-full sm:w-80">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Busca por nombre, mes o día..."
+                placeholder="Nombre, producto, mes o día..."
                 className="pl-9 h-9 bg-muted/30 border-border/50 focus-visible:ring-primary"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
