@@ -62,7 +62,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-xs uppercase font-bold text-muted-foreground/70">Nombre del Prospecto</Label>
+              <Label htmlFor="name" className="text-xs uppercase font-bold text-muted-foreground/70">Nombre</Label>
               <Input 
                 id="name" 
                 value={name} 
