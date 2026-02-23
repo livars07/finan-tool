@@ -52,7 +52,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import * as Service from '@/services/appointment-service';
 
-type Theme = 'predeterminado' | 'corporativo' | 'moderno' | 'discreto' | 'olivares' | 'gelido';
+type Theme = 'corporativo' | 'tranquilo' | 'moderno' | 'discreto' | 'olivares' | 'gelido';
 
 const APP_TIPS = [
   { icon: Calculator, title: "Calculadora Rápida", color: "text-primary", text: "Usa la calculadora rapida en caso de tener una llamada con un interesado que pregunte montos aproximados." },
@@ -85,7 +85,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showHelp, setShowHelp] = useState(initialSection === 'guia');
   const [isSimulatorExpanded, setIsSimulatorExpanded] = useState(initialSection === 'simulador');
-  const [theme, setTheme] = useState<Theme>('predeterminado');
+  const [theme, setTheme] = useState<Theme>('corporativo');
   const [api, setApi] = useState<CarouselApi>();
   const [timerKey, setTimerKey] = useState(0);
   const [statsKey, setStatsKey] = useState(0);
@@ -93,7 +93,11 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('finanto-theme') as Theme;
-    if (savedTheme) applyTheme(savedTheme === 'corporativo-v2' ? 'corporativo' : savedTheme);
+    if (savedTheme) {
+      applyTheme(savedTheme);
+    } else {
+      applyTheme('corporativo');
+    }
 
     if (!initialSection) {
       const existing = Service.getFromDisk();
@@ -103,7 +107,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
     }
   }, [initialSection]);
 
-  // Actualizar Título de Página
   useEffect(() => {
     if (showHelp) {
       document.title = "Guía";
@@ -127,7 +130,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
     return () => clearInterval(interval);
   }, []);
 
-  // Sincronizar URL con el estado de la Guía
   useEffect(() => {
     if (showHelp) {
       window.history.pushState(null, '', '/guia');
@@ -145,8 +147,11 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const applyTheme = (themeId: Theme) => {
     setTheme(themeId);
     document.documentElement.setAttribute('data-theme', themeId);
-    if (themeId.startsWith('corporativo')) document.documentElement.classList.remove('dark');
-    else document.documentElement.classList.add('dark');
+    if (themeId === 'corporativo') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
   };
 
   const handleThemeChange = (themeId: Theme) => {
@@ -207,8 +212,8 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                 <DropdownMenuLabel className="text-foreground">Temas de Ejecutivos</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {[
-                  { id: 'predeterminado', label: 'Predeterminado', icon: Palette, color: 'bg-primary' },
                   { id: 'corporativo', label: 'Corporativo', icon: Sun, color: 'bg-blue-600' },
+                  { id: 'tranquilo', label: 'Tranquilo', icon: Palette, color: 'bg-primary' },
                   { id: 'moderno', label: 'Moderno', icon: Cpu, color: 'bg-cyan-500' },
                   { id: 'discreto', label: 'Discreto', icon: Moon, color: 'bg-slate-700' },
                   { id: 'olivares', label: 'Olivares', icon: Crown, color: 'bg-yellow-600' },

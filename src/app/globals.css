@@ -4,34 +4,8 @@
 
 @layer base {
   :root {
-    color-scheme: dark;
-    /* Predeterminado - Celeste Dark */
-    --background: 197 15% 15%;
-    --foreground: 0 0% 100%;
-    --card: 197 15% 18% / 0.5;
-    --card-foreground: 0 0% 100%;
-    --popover: 197 15% 12% / 0.7;
-    --popover-foreground: 0 0% 100%;
-    --primary: 205 71% 66%;
-    --primary-foreground: 197 15% 10%;
-    --secondary: 197 15% 28%; /* Más oscuro para contraste de rieles */
-    --secondary-foreground: 0 0% 100%;
-    --muted: 197 10% 20% / 0.3;
-    --muted-foreground: 0 0% 70%;
-    --accent: 180 85% 49%;
-    --accent-foreground: 197 15% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 197 15% 25% / 0.15;
-    --input: 197 15% 25% / 0.2;
-    --ring: 205 71% 66%;
-    --radius: 0.75rem;
-    --calendar-filter: invert(1);
-  }
-
-  [data-theme="corporativo"] {
     color-scheme: light;
-    --background: 210 60% 96%; /* Azul Glacial más marcado */
+    --background: 210 60% 96%; /* Azul Glacial base */
     --foreground: 222 47% 11%;
     --card: 0 0% 100% / 0.7;
     --card-foreground: 222 47% 15%;
@@ -39,7 +13,7 @@
     --popover-foreground: 222 47% 15%;
     --primary: 142 76% 36%; /* Verde Bosque */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 50% 88%; /* Azul Riel más visible */
+    --secondary: 210 50% 88%; /* Azul Riel / Gestión de citas */
     --secondary-foreground: 222 47% 15%;
     --muted: 210 30% 94%;
     --muted-foreground: 210 40% 30%; /* Azul para texto secundario */
@@ -54,6 +28,31 @@
     --calendar-filter: none;
   }
 
+  [data-theme="tranquilo"] {
+    color-scheme: dark;
+    --background: 197 15% 15%;
+    --foreground: 0 0% 100%;
+    --card: 197 15% 18% / 0.5;
+    --card-foreground: 0 0% 100%;
+    --popover: 197 15% 12% / 0.7;
+    --popover-foreground: 0 0% 100%;
+    --primary: 205 71% 66%;
+    --primary-foreground: 197 15% 10%;
+    --secondary: 197 15% 28%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 197 10% 20% / 0.3;
+    --muted-foreground: 0 0% 70%;
+    --accent: 180 85% 49%;
+    --accent-foreground: 197 15% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 197 15% 25% / 0.15;
+    --input: 197 15% 25% / 0.2;
+    --ring: 205 71% 66%;
+    --radius: 0.75rem;
+    --calendar-filter: invert(1);
+  }
+
   [data-theme="moderno"] {
     color-scheme: dark;
     --background: 222 47% 5%;
@@ -64,7 +63,7 @@
     --popover-foreground: 180 100% 50%;
     --primary: 210 100% 55%;
     --primary-foreground: 222 47% 5%;
-    --secondary: 222 47% 18%; /* Riel oscuro */
+    --secondary: 222 47% 18%;
     --secondary-foreground: 45 100% 85%;
     --muted: 222 30% 15% / 0.2;
     --muted-foreground: 180 40% 70%;
@@ -87,7 +86,7 @@
     --popover-foreground: 0 0% 98%;
     --primary: 235 86% 65%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 7% 35%; /* Gris pizarra */
+    --secondary: 220 7% 35%;
     --secondary-foreground: 0 0% 100%;
     --muted: 225 6% 15% / 0.4;
     --muted-foreground: 215 15% 75%;
@@ -111,7 +110,7 @@
     --popover-foreground: 0 0% 100%;
     --primary: 45 90% 50%; /* Oro */
     --primary-foreground: 222 47% 5%;
-    --secondary: 222 47% 24%; /* Azul noche profundo para rieles */
+    --secondary: 222 47% 24%;
     --secondary-foreground: 0 0% 100%;
     --muted: 222 47% 12%;
     --muted-foreground: 45 30% 70%;
@@ -150,12 +149,8 @@
   * { @apply border-border; }
   body { @apply bg-background text-foreground font-body antialiased transition-colors duration-300; }
   
-  /* Header dinámico según tema - Blur reducido un 40% de 20px a 12px */
   header { @apply backdrop-blur-[12px] bg-card/10 !important; }
   
-  /* Diálogos y Popups Globales con Desenfoque Moderno */
-  /* Se excluye el simulador de pantalla completa mediante el atributo data-calculator-dialog */
-  /* Blur reducido un 40% (20px -> 12px) y sombra reducida un 40% (2xl -> xl) */
   [role="dialog"]:not([data-calculator-dialog="true"]), 
   [role="status"] { 
     @apply backdrop-blur-[12px] !important; 
@@ -163,9 +158,11 @@
     @apply shadow-xl !important;
   }
 
-  [data-theme^="corporativo"] [role="dialog"]:not([data-calculator-dialog="true"]),
-  [data-theme^="corporativo"] [role="status"] {
-    background-color: rgba(230, 242, 255, 0.85) !important; /* Tono azul glacial translúcido */
+  [data-theme="corporativo"] [role="dialog"]:not([data-calculator-dialog="true"]),
+  [data-theme="corporativo"] [role="status"],
+  :root:not([data-theme]) [role="dialog"]:not([data-calculator-dialog="true"]),
+  :root:not([data-theme]) [role="status"] {
+    background-color: rgba(230, 242, 255, 0.85) !important;
     @apply border-border shadow-xl !important;
   }
 
