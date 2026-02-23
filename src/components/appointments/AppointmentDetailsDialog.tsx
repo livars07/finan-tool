@@ -114,7 +114,7 @@ Número: *${appointment.phone}*`;
       } 
       onOpenChange(o); 
     }}>
-      <DialogContent className="sm:max-w-[520px] bg-card border-border p-0 shadow-xl backdrop-blur-md z-[70] overflow-hidden flex flex-col max-h-[95vh]">
+      <DialogContent className="sm:max-w-[550px] bg-card border-border p-0 shadow-xl backdrop-blur-md z-[70] overflow-hidden flex flex-col max-h-[95vh]">
         <DialogHeader className="px-6 py-3 border-b border-border/40 flex flex-row items-center justify-between bg-card/10 shrink-0">
           <div className="flex items-center gap-2">
             <DialogTitle className="text-lg font-headline font-bold text-foreground">
@@ -152,7 +152,7 @@ Número: *${appointment.phone}*`;
           </div>
         </DialogHeader>
 
-        <div className="px-6 py-4 space-y-4 overflow-y-auto flex-1">
+        <div className="px-6 py-4 space-y-4 overflow-y-auto flex-1 scrollbar-thin">
           {isEditing ? (
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
@@ -296,7 +296,7 @@ Número: *${appointment.phone}*`;
               placeholder="Detalles importantes..."
               className={cn(
                 "bg-muted/10 border-border/30 focus-visible:ring-primary resize-none text-xs backdrop-blur-sm flex-1",
-                "h-[300px] overflow-y-auto"
+                "h-[650px] overflow-y-auto scrollbar-thin"
               )}
               value={isEditing ? editData.notes : appointment.notes}
               onChange={e => setEditData({...editData, notes: e.target.value})}
