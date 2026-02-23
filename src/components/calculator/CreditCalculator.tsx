@@ -2,7 +2,6 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -35,6 +34,10 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+
+interface CreditCalculatorProps {
+  initialExpanded?: boolean;
+}
 
 const CalculatorInputs = ({ 
   isModal = false, 
@@ -93,11 +96,10 @@ const CalculatorInputs = ({
   </div>
 );
 
-export default function CreditCalculator() {
+export default function CreditCalculator({ initialExpanded = false }: CreditCalculatorProps) {
   const [totalPrice, setTotalPrice] = useState<string>('');
   const [monthlyPayment, setMonthlyPayment] = useState<string>('');
-  const [isExpanded, setIsExpanded] = useState(false);
-  const searchParams = useSearchParams();
+  const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const { toast } = useToast();
   
   const FACTOR_MENSUALIDAD = 0.006982; 
@@ -105,10 +107,10 @@ export default function CreditCalculator() {
   const INCOME_RATIO = 0.35; 
 
   useEffect(() => {
-    if (searchParams.get('section') === 'simulador') {
+    if (initialExpanded) {
       setIsExpanded(true);
     }
-  }, [searchParams]);
+  }, [initialExpanded]);
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('es-MX', {
