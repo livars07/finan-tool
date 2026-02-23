@@ -61,6 +61,7 @@ export default function UpcomingAppointments({
   const isActuallyToday = (dateStr: string) => {
     const d = parseISO(dateStr);
     const today = new Date();
+    // Comparación robusta de día/mes/año local para evitar bugs de UTC
     return d.getDate() === today.getDate() && 
            d.getMonth() === today.getMonth() && 
            d.getFullYear() === today.getFullYear();

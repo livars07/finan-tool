@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -33,7 +32,12 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
       });
       return;
     }
-    onAdd({ name, phone, date: new Date(date).toISOString(), time, type });
+    
+    // FIX: Se agrega T12:00:00Z para asegurar que la fecha sea interpretada correctamente 
+    // en la zona horaria local al recuperarla, evitando que se reste un día.
+    const isoDate = new Date(date + 'T12:00:00Z').toISOString();
+    
+    onAdd({ name, phone, date: isoDate, time, type });
     setName('');
     setPhone('');
     setDate('');
