@@ -159,11 +159,28 @@
   }
 
   [data-theme="corporativo"] [role="dialog"]:not([data-calculator-dialog="true"]),
-  [data-theme="corporativo"] [role="status"],
+  [data-theme="corporativo"] [role="status"]:not(.destructive),
   :root:not([data-theme]) [role="dialog"]:not([data-calculator-dialog="true"]),
-  :root:not([data-theme]) [role="status"] {
+  :root:not([data-theme]) [role="status"]:not(.destructive) {
     background-color: rgba(230, 242, 255, 0.85) !important;
     @apply border-border shadow-xl !important;
+  }
+
+  /* Estilo específico para errores en tema corporativo y predeterminado */
+  [data-theme="corporativo"] [role="status"].destructive,
+  :root:not([data-theme]) [role="status"].destructive {
+    background-color: hsla(var(--destructive) / 0.15) !important;
+    border-color: hsl(var(--destructive)) !important;
+    color: hsl(var(--destructive)) !important;
+    backdrop-filter: blur(12px) !important;
+    @apply shadow-lg !important;
+  }
+
+  [data-theme="corporativo"] [role="status"].destructive p,
+  [data-theme="corporativo"] [role="status"].destructive div,
+  :root:not([data-theme]) [role="status"].destructive p,
+  :root:not([data-theme]) [role="status"].destructive div {
+    color: hsl(var(--destructive)) !important;
   }
 
   input[type="date"]::-webkit-calendar-picker-indicator,
