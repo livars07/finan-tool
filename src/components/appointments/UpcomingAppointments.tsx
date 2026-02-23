@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -332,20 +331,22 @@ Número: ${app.phone}`;
           <div className="py-4 space-y-4">
             <div className="space-y-2">
               <Label className="text-xs font-bold uppercase text-muted-foreground">Resultado final</Label>
-              <Select value={status} onValueChange={(v) => setStatus(v as AppointmentStatus)}>
-                <SelectTrigger className={cn("bg-muted/30 border-border/40", status === 'Cierre' && "border-green-500 text-green-600 bg-green-500/5")}>
-                  <SelectValue placeholder="Selecciona resultado" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Asistencia">Asistencia</SelectItem>
-                  <SelectItem value="No asistencia">No asistencia</SelectItem>
-                  <SelectItem value="Continuación en otra cita">Continuación en otra cita</SelectItem>
-                  <SelectItem value="Reagendó">Reagendó</SelectItem>
-                  <SelectItem value="Reembolso">Reembolso</SelectItem>
-                  <SelectItem value="Cierre">✨ Cierre ✨</SelectItem>
-                  <SelectItem value="Apartado">Apartado</SelectItem>
-                </SelectContent>
-              </Select>
+              <select 
+                value={status} 
+                onChange={(e) => setStatus(e.target.value as AppointmentStatus)}
+                className={cn(
+                  "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+                  status === 'Cierre' && "border-green-500 text-green-600 bg-green-500/5"
+                )}
+              >
+                <option value="Asistencia">Asistencia</option>
+                <option value="No asistencia">No asistencia</option>
+                <option value="Continuación en otra cita">Continuación en otra cita</option>
+                <option value="Reagendó">Reagendó</option>
+                <option value="Reembolso">Reembolso</option>
+                <option value="Cierre">✨ Cierre ✨</option>
+                <option value="Apartado">Apartado</option>
+              </select>
             </div>
             <div className="space-y-2">
               <Label className="text-xs font-bold uppercase text-muted-foreground">Notas de la cita</Label>
@@ -367,48 +368,44 @@ Número: ${app.phone}`;
       </Dialog>
 
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent className={cn(
-          "sm:max-w-[550px] border shadow-2xl backdrop-blur-md overflow-hidden p-0",
-          "data-[theme^=corporativo]:bg-white/95 data-[theme^=corporativo]:border-green-200",
-          "bg-green-950/90 border-green-500/50 text-white"
-        )}>
+        <DialogContent className="sm:max-w-[550px] border shadow-2xl backdrop-blur-md overflow-hidden p-0 bg-green-950 border-green-500/50 text-white">
           <div className="p-8 space-y-6">
             <div className="flex flex-col items-center text-center space-y-4">
               <div className="relative">
                 <div className="absolute inset-0 bg-green-400 blur-2xl opacity-20 animate-pulse"></div>
                 <div className="bg-green-500/20 p-5 rounded-full border border-green-400/30 relative z-10">
-                  <Trophy className="w-16 h-16 text-green-500 dark:text-green-400" />
+                  <Trophy className="w-16 h-16 text-green-400" />
                 </div>
               </div>
-              <DialogTitle className="text-3xl font-headline font-bold flex items-center gap-3 data-[theme^=corporativo]:text-green-800">
+              <DialogTitle className="text-3xl font-headline font-bold flex items-center gap-3 text-white">
                 <PartyPopper className="text-yellow-500" /> ¡FELICIDADES! <PartyPopper className="text-yellow-500" />
               </DialogTitle>
-              <DialogDescription className="text-lg text-center mx-auto data-[theme^=corporativo]:text-muted-foreground text-green-100">
-                Has concretado el crédito de <strong className="data-[theme^=corporativo]:text-foreground text-white">{lastClosedApp?.name}</strong> con éxito.
+              <DialogDescription className="text-lg text-center mx-auto text-green-100">
+                Has concretado el crédito de <strong className="text-white">{lastClosedApp?.name}</strong> con éxito.
               </DialogDescription>
             </div>
 
             <div className="bg-green-500/10 border border-green-500/20 p-6 rounded-2xl space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-widest text-green-600 dark:text-green-400 flex items-center gap-2">
+              <h4 className="text-xs font-bold uppercase tracking-widest text-green-400 flex items-center gap-2">
                 <Sparkles className="w-4 h-4" /> Checklist de cierre
               </h4>
-              <p className="text-sm data-[theme^=corporativo]:text-muted-foreground text-green-50/80 leading-relaxed">
+              <p className="text-sm text-green-50/80 leading-relaxed">
                 Asegúrate de registrar en las notas los siguientes datos para el expediente actualizado:
               </p>
-              <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-bold data-[theme^=corporativo]:text-foreground">
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600" /> Monto del Crédito Final</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600" /> Comisiones</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600" /> Fecha de firma</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600" /> Anota cada detalle útil</li>
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-bold text-white">
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Monto del Crédito Final</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Comisiones</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Fecha de firma</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Anota cada detalle útil</li>
               </ul>
             </div>
             
-            <p className="text-center text-[10px] data-[theme^=corporativo]:text-muted-foreground/60 text-green-200/60 uppercase font-bold tracking-tighter">
+            <p className="text-center text-[10px] text-green-200/60 uppercase font-bold tracking-tighter">
               Este cierre se ha registrado en tus estadísticas mensuales
             </p>
           </div>
 
-          <DialogFooter className="p-6 bg-muted/30 border-t border-border/20 sm:justify-center">
+          <DialogFooter className="p-6 bg-green-900/50 border-t border-green-800/50 sm:justify-center">
             <Button 
               onClick={handleSuccessClose}
               className="bg-green-600 hover:bg-green-700 text-white font-bold px-12 h-14 rounded-2xl text-xl shadow-xl transition-all transform hover:scale-105 active:scale-95"
