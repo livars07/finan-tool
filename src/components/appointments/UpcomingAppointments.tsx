@@ -288,7 +288,7 @@ export default function UpcomingAppointments({
             <DialogTitle className="text-3xl font-headline font-bold text-white flex items-center gap-3">
               <PartyPopper className="text-yellow-400" /> ¡FELICIDADES POR EL CIERRE! <PartyPopper className="text-yellow-400" />
             </DialogTitle>
-            <DialogDescription className="text-green-100 text-lg">
+            <DialogDescription className="text-green-100 text-lg text-center mx-auto">
               Has concretado el crédito de <strong>{lastClosedApp?.name}</strong> con éxito.
             </DialogDescription>
           </DialogHeader>
@@ -305,7 +305,7 @@ export default function UpcomingAppointments({
                 <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Monto del Crédito Final</li>
                 <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Comisiones</li>
                 <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Fecha de firma</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Y cualquier detalle importante del cliente</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Anota cada detalle útil</li>
               </ul>
             </div>
             
