@@ -54,7 +54,7 @@ export default function UpcomingAppointments({
   const [status, setStatus] = useState<AppointmentStatus>('Asistencia');
   const [finNotes, setFinNotes] = useState('');
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [lastClosedName, setLastClosedName] = useState('');
+  const [lastClosedApp, setLastClosedApp] = useState<Appointment | null>(null);
   
   const { toast } = useToast();
 
@@ -90,21 +90,22 @@ export default function UpcomingAppointments({
   const handleFinalize = () => {
     if (finId) {
       const app = appointments.find(a => a.id === finId);
+      if (!app) return;
+      
       const currentStatus = status;
       const currentNotes = finNotes;
-      const clientName = app?.name || '';
+      const clientName = app.name;
 
       updateStatus(finId, currentStatus, currentNotes);
       setFinId(null);
       setFinNotes('');
 
       if (currentStatus === 'Cierre') {
-        // Play success sound
         const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3");
         audio.volume = 0.5;
         audio.play().catch(() => {});
         
-        setLastClosedName(clientName);
+        setLastClosedApp(app);
         setShowSuccessDialog(true);
       } else {
         toast({
@@ -112,6 +113,13 @@ export default function UpcomingAppointments({
           description: `${clientName} movido al historial con resultado: ${currentStatus}.`,
         });
       }
+    }
+  };
+
+  const handleSuccessClose = () => {
+    setShowSuccessDialog(false);
+    if (lastClosedApp) {
+      onSelect(lastClosedApp);
     }
   };
 
@@ -233,6 +241,7 @@ export default function UpcomingAppointments({
           <div className="py-4 space-y-4">
             <div className="space-y-2">
               <Label className="text-xs font-bold uppercase">Resultado Final</Label>
+              <span className="sr-only">Selección de estatus de cita</span>
               <Select value={status} onValueChange={(v) => setStatus(v as AppointmentStatus)}>
                 <SelectTrigger className={cn("bg-muted/30", status === 'Cierre' && "border-green-500 text-green-500 bg-green-500/5")}>
                   <SelectValue placeholder="Selecciona resultado" />
@@ -267,7 +276,6 @@ export default function UpcomingAppointments({
         </DialogContent>
       </Dialog>
 
-      {/* Celebratory Success Dialog for Cierre */}
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <DialogContent className="sm:max-w-[550px] bg-green-950/90 border-green-500/50 text-white backdrop-blur-xl">
           <DialogHeader className="flex flex-col items-center text-center space-y-4">
@@ -281,7 +289,7 @@ export default function UpcomingAppointments({
               <PartyPopper className="text-yellow-400" /> ¡FELICIDADES POR EL CIERRE! <PartyPopper className="text-yellow-400" />
             </DialogTitle>
             <DialogDescription className="text-green-100 text-lg">
-              Has concretado el crédito de <strong>{lastClosedName}</strong> con éxito.
+              Has concretado el crédito de <strong>{lastClosedApp?.name}</strong> con éxito.
             </DialogDescription>
           </DialogHeader>
 
@@ -291,13 +299,13 @@ export default function UpcomingAppointments({
                 <Sparkles className="w-4 h-4" /> Checklist de Cierre
               </h4>
               <p className="text-sm text-green-50/80 leading-relaxed">
-                Asegúrate de haber registrado en las notas del cliente los siguientes datos específicos para tu reporte:
+                Asegúrate de registrar en las notas los siguientes datos para el expediente actualizado:
               </p>
-              <ul className="grid grid-cols-2 gap-3 text-xs font-medium text-white">
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-medium text-white">
                 <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Monto del Crédito Final</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Institución Financiera</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Fecha Estimada de Firma</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Comisión Pactada (%)</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Comisiones</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> fecha de firma</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Y cualquier detalle importante del cliente</li>
               </ul>
             </div>
             
@@ -308,10 +316,10 @@ export default function UpcomingAppointments({
 
           <DialogFooter className="sm:justify-center">
             <Button 
-              onClick={() => setShowSuccessDialog(false)}
+              onClick={handleSuccessClose}
               className="bg-white text-green-900 hover:bg-green-50 font-bold px-10 h-12 rounded-xl text-lg transition-all transform hover:scale-105"
             >
-              Continuar Ganando
+              Continuar
             </Button>
           </DialogFooter>
         </DialogContent>
