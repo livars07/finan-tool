@@ -88,7 +88,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
-      <header className="border-b border-border/40 bg-card/30 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b border-border/40 sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="bg-primary/20 p-1.5 rounded-lg border border-primary/30">
@@ -115,7 +115,7 @@ export default function Home() {
                   {theme === 'moderno' ? <Cpu className="w-5 h-5 text-primary" /> : theme === 'corporativo' ? <Sun className="w-5 h-5" /> : theme === 'discreto' ? <Moon className="w-5 h-5 text-primary" /> : <Palette className="w-5 h-5 text-primary" />}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align="end" className="w-48 backdrop-blur-2xl">
                 <DropdownMenuLabel>Temas</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => handleThemeChange('predeterminado')} className="flex items-center gap-2 cursor-pointer">
@@ -168,7 +168,7 @@ export default function Home() {
               subLabel: 'Mes pasado'
             },
           ].map((stat, i) => (
-            <Card key={i} className="bg-card/40 border-border/50 backdrop-blur-sm hover:border-primary/30 transition-all group">
+            <Card key={i} className="bg-card border-border/50 backdrop-blur-xl hover:border-primary/30 transition-all group">
               <CardContent className="p-4 flex items-center gap-3">
                 <div className={`p-2 rounded-full bg-muted/50 ${stat.color}`}>
                   <stat.icon className="w-5 h-5" />
@@ -194,15 +194,15 @@ export default function Home() {
           <section className="xl:col-span-5">
             <div className="sticky top-24">
               <CreditCalculator />
-              <div className="mt-6 p-6 rounded-xl border border-primary/20 bg-primary/5">
+              <div className="mt-6 p-6 rounded-xl border border-primary/20 bg-primary/5 backdrop-blur-md">
                 <h3 className="text-sm font-headline font-bold mb-2 flex items-center gap-2 text-primary">
                    💡 Notas
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Primera versión funcional, capaz de calcular mensualidades y enganche, y de gestionar citas ordenadamente, guardando los datos DENTRO DEL NAVEGADOR (próximamente a una base de datos).
+                  Versión v0.5 con sistema de fechas naturales y visuales mejorados. Los datos se guardan localmente para máxima velocidad.
                   <br />
                   <br />
-                  Esta beta logra cumplir funciones útiles y esenciales para prospección, y busco en las siguientes semanas volver más eficiente la prospección, gestión de citas, gestión de ventas y comisiones individuales, etc.
+                  Esta herramienta está optimizada para el flujo de trabajo hipotecario diario, permitiendo cálculos rápidos y gestión de agenda en un solo lugar.
                 </p>
               </div>
             </div>
@@ -213,12 +213,8 @@ export default function Home() {
               appointments={appointmentState.appointments}
               upcoming={appointmentState.upcoming}
               past={appointmentState.past}
-              archived={appointmentState.archived}
               addAppointment={appointmentState.addAppointment}
               updateStatus={appointmentState.updateStatus}
-              archiveAppointment={appointmentState.archiveAppointment}
-              restoreAppointment={appointmentState.restoreAppointment}
-              permanentlyDeleteAppointment={appointmentState.permanentlyDeleteAppointment}
               editAppointment={appointmentState.editAppointment}
               toggleConfirmation={appointmentState.toggleConfirmation}
               formatFriendlyDate={appointmentState.formatFriendlyDate}
@@ -228,7 +224,7 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="mt-12 border-t border-border/40 py-8 bg-card/20">
+      <footer className="mt-12 border-t border-border/40 py-8 bg-card/10 backdrop-blur-xl">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm">
           <p>© 2026 Finanto - Gestión Hipotecaria</p>
           <div className="flex items-center gap-6">
@@ -246,11 +242,11 @@ export default function Home() {
       </footer>
 
       <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
-        <AlertDialogContent>
+        <AlertDialogContent className="backdrop-blur-3xl">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Confirmar reinicio total?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción borrará todas tus citas, notas y configuraciones guardadas en este navegador. Se restaurarán los datos de prueba iniciales. Esta acción no se puede deshacer.
+              Esta acción borrará todas tus citas, notas y configuraciones guardadas en este navegador. Se restaurarán los datos de prueba iniciales.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -5,12 +5,10 @@ import AppointmentForm from './AppointmentForm';
 import UpcomingAppointments from './UpcomingAppointments';
 import PastAppointments from './PastAppointments';
 import AppointmentDetailsDialog from './AppointmentDetailsDialog';
-import TrashDialog from './TrashDialog';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { CalendarClock, Search, Trash2 } from 'lucide-react';
+import { CalendarClock, Search } from 'lucide-react';
 import { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
 import { parseISO, format, isWeekend } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -19,12 +17,8 @@ interface AppointmentsDashboardProps {
   appointments: Appointment[];
   upcoming: Appointment[];
   past: Appointment[];
-  archived: Appointment[];
-  addAppointment: (newApp: Omit<Appointment, 'id' | 'isArchived'>) => void;
+  addAppointment: (newApp: Omit<Appointment, 'id'>) => void;
   updateStatus: (id: string, status: AppointmentStatus) => void;
-  archiveAppointment: (id: string) => void;
-  restoreAppointment: (id: string) => void;
-  permanentlyDeleteAppointment: (id: string) => void;
   editAppointment: (id: string, updatedData: Partial<Appointment>) => void;
   toggleConfirmation: (id: string) => void;
   formatFriendlyDate: (date: string) => string;
@@ -35,12 +29,8 @@ export default function AppointmentsDashboard({
   appointments,
   upcoming,
   past,
-  archived,
   addAppointment,
   updateStatus,
-  archiveAppointment,
-  restoreAppointment,
-  permanentlyDeleteAppointment,
   editAppointment,
   toggleConfirmation,
   formatFriendlyDate,
@@ -49,7 +39,6 @@ export default function AppointmentsDashboard({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
-  const [isTrashOpen, setIsTrashOpen] = useState(false);
 
   const normalizeStr = (str: string) => {
     return str
@@ -68,8 +57,6 @@ export default function AppointmentsDashboard({
       const friendlyDate = normalizeStr(formatFriendlyDate(app.date));
       const monthName = normalizeStr(format(appDate, 'MMMM', { locale: es }));
       const dayName = normalizeStr(format(appDate, 'EEEE', { locale: es }));
-      const dayNum = format(appDate, 'd');
-      const fullDate = normalizeStr(format(appDate, "d 'de' MMMM", { locale: es }));
       
       const basicMatch = 
         normalizeStr(app.name).includes(s) || 
@@ -80,22 +67,6 @@ export default function AppointmentsDashboard({
       if (friendlyDate.includes(s)) return true;
       if (monthName.includes(s)) return true;
       if (dayName.includes(s)) return true;
-      if (fullDate.includes(s)) return true;
-
-      if (s === 'fin de semana' || s === 'finde') {
-        if (isWeekend(appDate)) return true;
-      }
-
-      const terms = s.split(/\s+/);
-      if (terms.length > 1) {
-        return terms.every(term => 
-          friendlyDate.includes(term) || 
-          monthName.includes(term) || 
-          dayName.includes(term) || 
-          dayNum === term ||
-          normalizeStr(app.name).includes(term)
-        );
-      }
 
       return false;
     });
@@ -121,7 +92,7 @@ export default function AppointmentsDashboard({
       <div className="grid grid-cols-1 gap-6">
         <AppointmentForm onAdd={addAppointment} />
 
-        <Card className="shadow-2xl bg-card border-border border-l-4 border-l-primary">
+        <Card className="shadow-2xl bg-card border-border border-l-4 border-l-primary overflow-hidden">
           <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
@@ -133,7 +104,7 @@ export default function AppointmentsDashboard({
             <div className="relative w-full sm:w-80">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Busca por nombre, tel, mes o día..."
+                placeholder="Busca por nombre, mes o día..."
                 className="pl-9 h-9 bg-muted/30 border-border/50 focus-visible:ring-primary"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -167,18 +138,6 @@ export default function AppointmentsDashboard({
                 />
               </TabsContent>
             </Tabs>
-
-            <div className="flex justify-center pt-2 border-t border-border/40">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => setIsTrashOpen(true)}
-                className="text-muted-foreground hover:text-primary group"
-              >
-                <Trash2 className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
-                Papelera ({archived.length})
-              </Button>
-            </div>
           </CardContent>
         </Card>
       </div>
@@ -187,19 +146,8 @@ export default function AppointmentsDashboard({
         appointment={selectedApp} 
         open={!!selectedAppId} 
         onOpenChange={handleOpenChange}
-        onDelete={archiveAppointment}
         onEdit={editAppointment}
         formatFriendlyDate={formatFriendlyDate}
-        format12hTime={format12hTime}
-      />
-
-      <TrashDialog 
-        open={isTrashOpen}
-        onOpenChange={setIsTrashOpen}
-        archivedAppointments={archived}
-        onRestore={restoreAppointment}
-        onDelete={permanentlyDeleteAppointment}
-        formatDate={formatFriendlyDate}
         format12hTime={format12hTime}
       />
     </div>

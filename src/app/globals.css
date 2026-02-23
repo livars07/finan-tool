@@ -7,22 +7,22 @@
     /* Predeterminado - Celeste */
     --background: 197 15% 15%;
     --foreground: 0 0% 100%;
-    --card: 197 15% 18%;
+    --card: 197 15% 18% / 0.5;
     --card-foreground: 0 0% 100%;
-    --popover: 197 15% 12%;
+    --popover: 197 15% 12% / 0.7;
     --popover-foreground: 0 0% 100%;
     --primary: 205 71% 66%;
     --primary-foreground: 197 15% 10%;
-    --secondary: 197 10% 25%;
+    --secondary: 197 10% 25% / 0.4;
     --secondary-foreground: 0 0% 100%;
-    --muted: 197 10% 20%;
+    --muted: 197 10% 20% / 0.3;
     --muted-foreground: 0 0% 70%;
     --accent: 180 85% 49%;
     --accent-foreground: 197 15% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 197 15% 25%;
-    --input: 197 15% 25%;
+    --border: 197 15% 25% / 0.3;
+    --input: 197 15% 25% / 0.4;
     --ring: 205 71% 66%;
     --chart-1: 205 71% 66%;
     --chart-2: 180 85% 49%;
@@ -33,71 +33,46 @@
   }
 
   [data-theme="discreto"] {
-    /* Discreto - Estilo Discord (Grises/Azul Blurple) */
-    --background: 220 7% 21%; /* #313338 */
+    --background: 220 7% 21%;
     --foreground: 0 0% 100%;
-    --card: 225 7% 18%; /* #2b2d31 */
+    --card: 225 7% 18% / 0.45;
     --card-foreground: 0 0% 100%;
-    --popover: 225 7% 12%;
+    --popover: 225 7% 12% / 0.75;
     --popover-foreground: 0 0% 100%;
-    --primary: 235 86% 65%; /* Discord Blurple #5865f2 */
+    --primary: 235 86% 65%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 225 6% 13%; /* #1e1f22 */
+    --secondary: 225 6% 13% / 0.4;
     --secondary-foreground: 0 0% 100%;
-    --muted: 225 6% 15%;
+    --muted: 225 6% 15% / 0.3;
     --muted-foreground: 215 15% 75%;
-    --accent: 142 70% 45%; /* Acento verde para estatus/online */
+    --accent: 142 70% 45%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 359 82% 60%; /* Rojo Discord */
+    --destructive: 359 82% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 225 6% 15%;
-    --input: 225 6% 13%;
+    --border: 225 6% 15% / 0.3;
+    --input: 225 6% 13% / 0.4;
     --ring: 235 86% 65%;
   }
 
-  [data-theme="corporativo"] {
-    /* Corporativo - Gris Funcional */
-    --background: 210 15% 94%;
-    --foreground: 215 25% 15%;
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
-    --primary: 215 25% 27%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 15% 88%;
-    --secondary-foreground: 215 25% 20%;
-    --muted: 210 15% 88%;
-    --muted-foreground: 215 15% 40%;
-    --accent: 215 25% 27%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214 20% 85%;
-    --input: 214 20% 85%;
-    --ring: 215 25% 27%;
-  }
-
   [data-theme="moderno"] {
-    /* Moderno - Arch Linux Tech Style */
     --background: 222 47% 7%;
     --foreground: 180 100% 95%;
-    --card: 222 47% 12% / 0.4;
+    --card: 222 47% 12% / 0.3;
     --card-foreground: 180 100% 95%;
-    --popover: 222 47% 8% / 0.6;
+    --popover: 222 47% 8% / 0.5;
     --popover-foreground: 180 100% 95%;
     --primary: 190 100% 50%;
     --primary-foreground: 222 47% 5%;
-    --secondary: 222 30% 20% / 0.3;
+    --secondary: 222 30% 20% / 0.25;
     --secondary-foreground: 180 100% 95%;
-    --muted: 222 30% 15%;
+    --muted: 222 30% 15% / 0.2;
     --muted-foreground: 190 50% 70%;
     --accent: 145 100% 50%;
     --accent-foreground: 222 47% 5%;
     --destructive: 0 100% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 190 100% 30% / 0.3;
-    --input: 222 30% 15% / 0.4;
+    --border: 190 100% 30% / 0.2;
+    --input: 222 30% 15% / 0.3;
     --ring: 190 100% 50%;
     --radius: 0.15rem;
   }
@@ -111,25 +86,12 @@
     @apply bg-background text-foreground font-body antialiased;
   }
 
-  /* Theme Moderno Specific Styles */
-  [data-theme="moderno"] body {
-    background: radial-gradient(circle at top right, hsl(222 47% 15%), hsl(222 47% 7%));
-  }
-  
-  [data-theme="moderno"] .bg-card,
-  [data-theme="moderno"] [role="dialog"],
-  [data-theme="moderno"] .bg-background:not(body) {
-    @apply backdrop-blur-xl border border-primary/20 shadow-[0_0_20px_rgba(0,183,255,0.15)];
-    background-color: hsla(222, 47%, 12%, 0.35) !important;
+  header {
+    @apply backdrop-blur-2xl bg-card/10 !important;
   }
 
-  [data-theme="moderno"] [role="status"] {
-    @apply backdrop-blur-2xl border border-primary/40 shadow-[0_0_30px_rgba(0,183,255,0.25)];
-    background-color: hsla(222, 47%, 8%, 0.4) !important;
-  }
-
-  [data-theme="moderno"] button:hover {
-    @apply shadow-[0_0_20px_rgba(0,183,255,0.4)] transition-all duration-300 scale-[1.02];
+  [role="dialog"], [role="status"] {
+    @apply backdrop-blur-3xl !important;
   }
 
   /* Minimalist Scrollbar */
@@ -148,7 +110,6 @@
     background: hsl(var(--primary) / 0.4);
   }
   
-  /* Firefox */
   * {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--muted)) transparent;

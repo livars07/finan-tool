@@ -9,60 +9,38 @@ import {
   parseISO, 
   isTomorrow, 
   format, 
-  differenceInDays 
+  differenceInDays,
+  isSameMonth,
+  subDays,
+  addDays,
+  isSameYear
 } from 'date-fns';
+import { es } from 'date-fns/locale';
 import * as Service from '@/services/appointment-service';
 import { Appointment, AppointmentStatus, AppointmentType } from '@/services/appointment-service';
 
-/**
- * Hook useAppointments
- * 
- * Este hook es el puente entre los componentes de React y nuestro Servicio de Datos.
- * Se encarga de que React se entere cuando los datos cambian para redibujar la pantalla.
- */
 export function useAppointments() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Al iniciar la app, cargamos lo que hay en el disco
   useEffect(() => {
     const saved = Service.getFromDisk();
     if (saved.length > 0) {
       setAppointments(saved);
     } else {
-      // Si no hay nada, creamos datos de prueba con la nueva lógica seed avanzada
       const seed = Service.generateSeedData();
       setAppointments(seed);
     }
     setIsLoaded(true);
   }, []);
 
-  // --- ACCIONES (Que llaman al servicio centralizado y actualizan el estado de React) ---
-
-  const addAppointment = (data: Omit<Appointment, 'id' | 'isArchived'>) => {
+  const addAppointment = (data: Omit<Appointment, 'id'>) => {
     const updated = Service.createAppointment(data);
     setAppointments(updated);
   };
 
   const updateStatus = (id: string, status: AppointmentStatus) => {
     const updated = Service.updateAppointment(id, { status });
-    setAppointments(updated);
-  };
-
-  const archiveAppointment = (id: string) => {
-    // Marcamos como archivado para que se mueva a la papelera
-    const updated = Service.updateAppointment(id, { isArchived: true });
-    setAppointments(updated);
-  };
-
-  const restoreAppointment = (id: string) => {
-    // Restauramos de la papelera
-    const updated = Service.updateAppointment(id, { isArchived: false });
-    setAppointments(updated);
-  };
-
-  const permanentlyDeleteAppointment = (id: string) => {
-    const updated = Service.deletePermanently(id);
     setAppointments(updated);
   };
 
@@ -81,17 +59,11 @@ export function useAppointments() {
     setAppointments(seed);
   };
 
-  // --- FILTRADO DE LISTAS (Manejado con isArchived) ---
-
-  const activeAppointments = useMemo(() => appointments.filter(a => !a.isArchived), [appointments]);
-  const archived = useMemo(() => appointments.filter(a => a.isArchived), [appointments]);
-
   const upcoming = useMemo(() => {
     const today = startOfDay(new Date());
-    return activeAppointments
+    return appointments
       .filter(a => {
         const d = startOfDay(parseISO(a.date));
-        // Próximas: Hoy o futuro que no tengan resultado (status) asignado
         return (isToday(d) || isAfter(d, today)) && !a.status;
       })
       .sort((a, b) => {
@@ -100,14 +72,13 @@ export function useAppointments() {
         if (dateA !== dateB) return dateA - dateB;
         return a.time.localeCompare(b.time);
       });
-  }, [activeAppointments]);
+  }, [appointments]);
 
   const past = useMemo(() => {
     const today = startOfDay(new Date());
-    return activeAppointments
+    return appointments
       .filter(a => {
         const d = startOfDay(parseISO(a.date));
-        // Pasadas: Días anteriores o citas que ya tienen un resultado asignado
         return isBefore(d, today) || !!a.status;
       })
       .sort((a, b) => {
@@ -116,16 +87,38 @@ export function useAppointments() {
         if (dateA !== dateB) return dateB - dateA;
         return b.time.localeCompare(a.time);
       });
-  }, [activeAppointments]);
-
-  // --- HELPERS VISUALES ---
+  }, [appointments]);
 
   const formatFriendlyDate = (dateStr: string) => {
     const d = parseISO(dateStr);
     const day = startOfDay(d);
-    if (isToday(day)) return "Hoy";
-    if (isTomorrow(day)) return "Mañana";
-    if (differenceInDays(startOfDay(new Date()), day) === 1) return "Ayer";
+    const today = startOfDay(new Date());
+    
+    const diff = differenceInDays(day, today);
+
+    // Casos especiales directos
+    if (diff === 0) return "Hoy";
+    if (diff === 1) return "Mañana";
+    if (diff === 2) return "Pasado mañana";
+    if (diff === -1) return "Ayer";
+    if (diff === -2) return "Antier";
+
+    // Casos de la semana pasada o próxima semana
+    if (diff > 2 && diff < 7) return `Este ${format(d, 'EEEE', { locale: es })}`;
+    if (diff < -2 && diff > -7) return `${format(d, 'EEEE', { locale: es })} pasado`;
+
+    // Mismo mes: "Lunes 09"
+    if (isSameMonth(day, today) && isSameYear(day, today)) {
+      return format(d, "EEEE d", { locale: es }).charAt(0).toUpperCase() + format(d, "EEEE d", { locale: es }).slice(1);
+    }
+
+    // Diferente mes
+    if (isBefore(day, today)) {
+      const monthDiff = differenceInDays(today, day);
+      if (monthDiff < 60 && !isSameMonth(day, today)) return "Mes pasado";
+      if (monthDiff >= 60) return `Hace ${Math.floor(monthDiff/30)} meses`;
+    }
+
     return format(d, 'dd/MM/yyyy');
   };
 
@@ -143,12 +136,8 @@ export function useAppointments() {
     appointments,
     upcoming,
     past,
-    archived,
     addAppointment,
     updateStatus,
-    archiveAppointment,
-    restoreAppointment,
-    permanentlyDeleteAppointment,
     editAppointment,
     toggleConfirmation,
     resetData,
