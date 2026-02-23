@@ -1,6 +1,8 @@
+
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -95,11 +97,18 @@ export default function CreditCalculator() {
   const [totalPrice, setTotalPrice] = useState<string>('');
   const [monthlyPayment, setMonthlyPayment] = useState<string>('');
   const [isExpanded, setIsExpanded] = useState(false);
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   
   const FACTOR_MENSUALIDAD = 0.006982; 
   const FACTOR_ENGANCHE = 0.03; 
   const INCOME_RATIO = 0.35; 
+
+  useEffect(() => {
+    if (searchParams.get('section') === 'simulador') {
+      setIsExpanded(true);
+    }
+  }, [searchParams]);
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('es-MX', {

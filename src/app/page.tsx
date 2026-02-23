@@ -1,6 +1,8 @@
+
 "use client"
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import CreditCalculator from '@/components/calculator/CreditCalculator';
 import AppointmentsDashboard from '@/components/appointments/AppointmentsDashboard';
 import { Card, CardContent } from '@/components/ui/card';
@@ -74,8 +76,9 @@ const APP_TIPS = [
   { icon: Users, title: "Cultura de Equipo", color: "text-primary", text: "La mejor forma de cooperación en equipo es una donde todos van en un mismo canal de progreso constante, no un espagueti de procesos diferentes cada uno." }
 ];
 
-export default function Home() {
+function FinantoApp() {
   const appointmentState = useAppointments();
+  const searchParams = useSearchParams();
   const { stats, isLoaded, resetData, clearAll } = appointmentState;
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -90,12 +93,17 @@ export default function Home() {
     const savedTheme = localStorage.getItem('finanto-theme') as Theme;
     if (savedTheme) applyTheme(savedTheme);
 
-    // Auto-show help if first time (no appointments in disk)
-    const existing = Service.getFromDisk();
-    if (existing.length === 0) {
+    // Prioridad 1: URL Param
+    if (searchParams.get('section') === 'guia') {
       setShowHelp(true);
+    } else {
+      // Prioridad 2: Auto-show help if first time (no appointments in disk)
+      const existing = Service.getFromDisk();
+      if (existing.length === 0) {
+        setShowHelp(true);
+      }
     }
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     if (!api) return;
@@ -480,3 +488,28 @@ export default function Home() {
     </div>
   );
 }
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><Loader2 className="w-10 h-10 animate-spin text-primary" /></div>}>
+      <FinantoApp />
+    </Suspense>
+  );
+}
+
+const Loader2 = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+  </svg>
+);
