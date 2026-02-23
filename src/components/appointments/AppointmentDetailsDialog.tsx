@@ -65,39 +65,34 @@ export default function AppointmentDetailsDialog({
     toast({ title: "Guardado", description: "La información del cliente ha sido actualizada." });
   };
 
-  // Función crítica para limpiar el bloqueo del DOM de Radix/Shadcn
   const forceDOMCleanup = () => {
     setTimeout(() => {
       if (typeof document !== 'undefined') {
         document.body.style.pointerEvents = 'auto';
         document.body.style.overflow = 'auto';
-        // Eliminar cualquier overlay residual si existiera
         const overlays = document.querySelectorAll('[data-radix-focus-guard]');
         overlays.forEach(el => (el as HTMLElement).style.display = 'none');
       }
-    }, 150);
+    }, 100);
   };
 
   const handleConfirmArchive = () => {
     const idToArchive = appointment.id;
     const name = appointment.name;
     
-    // 1. Cerramos el diálogo de confirmación
+    // Cerramos alertas antes de ejecutar logica
     setShowDeleteConfirm(false);
-    
-    // 2. Cerramos el diálogo principal de detalles inmediatamente
     onOpenChange(false);
     
-    // 3. Ejecutamos la lógica de archivado (Papelera)
-    onDelete(idToArchive);
-    
-    // 4. Limpieza forzada del DOM para asegurar interactividad total
-    forceDOMCleanup();
-
-    toast({ 
-      title: "Cita movida a papelera", 
-      description: `Se ha archivado el historial de ${name}.` 
-    });
+    // Pequeño retardo para que las animaciones de cierre no choquen con el re-renderizado
+    setTimeout(() => {
+      onDelete(idToArchive);
+      forceDOMCleanup();
+      toast({ 
+        title: "Cita movida a papelera", 
+        description: `Se ha archivado el historial de ${name}.` 
+      });
+    }, 150);
   };
 
   const copyToWhatsAppFormat = () => {
@@ -127,6 +122,7 @@ Número: ${appointment.phone}`;
       <Dialog open={open} onOpenChange={(o) => { 
         if(!o) {
           setIsEditing(false);
+          setShowDeleteConfirm(false); // Resetear estado de borrado siempre al cerrar
           forceDOMCleanup();
         } 
         onOpenChange(o); 
@@ -335,7 +331,7 @@ Número: ${appointment.phone}`;
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => forceDOMCleanup()}>Volver</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => { setShowDeleteConfirm(false); forceDOMCleanup(); }}>Volver</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleConfirmArchive}
               className="bg-destructive text-white hover:bg-destructive/90"
