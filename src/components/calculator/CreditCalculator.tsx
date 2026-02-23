@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -353,7 +352,7 @@ export default function CreditCalculator() {
                               <HelpCircle className="w-4 h-4 text-muted-foreground/60 cursor-help" />
                             </TooltipTrigger>
                             <TooltipContent className="max-w-[350px] p-6 text-base leading-relaxed bg-popover border-border shadow-2xl backdrop-blur-xl">
-                              <p className="font-bold mb-2 text-primary text-lg flex items-center gap-2">
+                              <p className="font-bold mb-2 text-accent text-lg flex items-center gap-2">
                                 <FileText className="w-5 h-5" /> ¿Qué es la escrituración?
                               </p>
                               <p>Cubre la legalidad del patrimonio ante notario e impuestos estatales. Es la inversión que garantiza la propiedad al 100%.</p>
@@ -401,8 +400,8 @@ export default function CreditCalculator() {
               </div>
 
               <div className="space-y-6 flex flex-col">
-                <div className="p-6 rounded-2xl border border-yellow-500/20 bg-yellow-500/5 space-y-4 flex-1 flex flex-col justify-center">
-                  <div className="flex items-center gap-2 text-yellow-500">
+                <div className="p-6 rounded-2xl border border-secondary/20 bg-secondary/5 space-y-4 flex-1 flex flex-col justify-center">
+                  <div className="flex items-center gap-2 text-secondary">
                     <ShieldAlert className="w-5 h-5" />
                     <h4 className="text-[10px] font-bold uppercase tracking-widest">Perfilamiento Operativo</h4>
                   </div>
@@ -413,7 +412,7 @@ export default function CreditCalculator() {
                     </div>
                     
                     <div className="p-3 bg-white/5 rounded-xl border border-white/10">
-                      <div className="flex items-center gap-2 text-yellow-500 mb-0.5">
+                      <div className="flex items-center gap-2 text-secondary mb-0.5">
                         <Coins className="w-3.5 h-3.5" />
                         <span className="text-[10px] font-bold uppercase">Presupuesto de vida sugerido</span>
                       </div>
@@ -425,7 +424,7 @@ export default function CreditCalculator() {
                         <span>Ratio de endeudamiento sano</span>
                         <span>35% DTI</span>
                       </div>
-                      <Progress value={35} className="h-1.5 bg-yellow-500/20" />
+                      <Progress value={35} className="h-1.5 bg-secondary/20" />
                     </div>
                   </div>
                 </div>

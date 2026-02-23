@@ -128,15 +128,17 @@
 
   [data-theme="elegante"] {
     color-scheme: dark;
-    --background: 222 47% 11%;
+    --background: 222 47% 8%;
     --foreground: 0 0% 100%;
-    --card: 222 47% 15% / 0.5;
+    --card: 222 47% 15% / 0.4;
     --card-foreground: 0 0% 100%;
-    --primary: 45 90% 50%;
+    --primary: 45 90% 50%; /* Oro */
     --primary-foreground: 222 47% 5%;
-    --accent: 45 90% 60%;
+    --secondary: 215 80% 60%; /* Azul Real */
+    --secondary-foreground: 222 47% 5%;
+    --accent: 155 85% 45%; /* Esmeralda */
     --accent-foreground: 222 47% 5%;
-    --border: 45 90% 30% / 0.2;
+    --border: 45 90% 40% / 0.15;
     --ring: 45 90% 50%;
     --calendar-filter: invert(1);
   }
