@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -8,6 +7,8 @@ import { Clock, Calendar, Info, CheckCircle2, AlertCircle, CheckCircle } from "l
 import { parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -33,7 +34,7 @@ interface Props {
   formatDate: (date: string) => string;
   format12hTime: (time: string) => string;
   onSelect: (app: Appointment) => void;
-  updateStatus: (id: string, status: AppointmentStatus) => void;
+  updateStatus: (id: string, status: AppointmentStatus, notes?: string) => void;
   toggleConfirmation: (id: string) => void;
   highlightedId?: string | null;
 }
@@ -50,6 +51,7 @@ export default function UpcomingAppointments({
   const [finId, setFinId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [status, setStatus] = useState<AppointmentStatus>('Asistencia');
+  const [finNotes, setFinNotes] = useState('');
   const { toast } = useToast();
 
   const isActuallyToday = (dateStr: string) => {
@@ -84,8 +86,9 @@ export default function UpcomingAppointments({
   const handleFinalize = () => {
     if (finId) {
       const app = appointments.find(a => a.id === finId);
-      updateStatus(finId, status);
+      updateStatus(finId, status, finNotes);
       setFinId(null);
+      setFinNotes('');
       toast({
         title: "Cita Finalizada",
         description: `${app?.name} movido al historial con resultado: ${status}.`,
@@ -185,7 +188,10 @@ export default function UpcomingAppointments({
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 text-primary hover:bg-primary/20 backdrop-blur-md"
-                      onClick={() => setFinId(app.id)}
+                      onClick={() => {
+                        setFinId(app.id);
+                        setFinNotes(app.notes || '');
+                      }}
                       title="Finalizar cita"
                     >
                       <CheckCircle2 className="h-5 w-5" />
@@ -204,21 +210,33 @@ export default function UpcomingAppointments({
             <DialogTitle>Finalizar cita de hoy</DialogTitle>
           </DialogHeader>
           <div className="py-4 space-y-4">
-            <p className="text-sm text-muted-foreground">Selecciona el resultado de la reunión para moverla al historial.</p>
-            <Select value={status} onValueChange={(v) => setStatus(v as AppointmentStatus)}>
-              <SelectTrigger className="bg-muted/30">
-                <SelectValue placeholder="Resultado" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Asistencia">Asistencia</SelectItem>
-                <SelectItem value="No asistencia">No asistencia</SelectItem>
-                <SelectItem value="Continuación en otra cita">Continuación en otra cita</SelectItem>
-                <SelectItem value="Reagendó">Reagendó</SelectItem>
-                <SelectItem value="Reembolso">Reembolso</SelectItem>
-                <SelectItem value="Cierre">Cierre</SelectItem>
-                <SelectItem value="Apartado">Apartado</SelectItem>
-              </SelectContent>
-            </Select>
+            <p className="text-sm text-muted-foreground">Selecciona el resultado y añade notas del cierre.</p>
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase">Resultado</Label>
+              <Select value={status} onValueChange={(v) => setStatus(v as AppointmentStatus)}>
+                <SelectTrigger className="bg-muted/30">
+                  <SelectValue placeholder="Resultado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Asistencia">Asistencia</SelectItem>
+                  <SelectItem value="No asistencia">No asistencia</SelectItem>
+                  <SelectItem value="Continuación en otra cita">Continuación en otra cita</SelectItem>
+                  <SelectItem value="Reagendó">Reagendó</SelectItem>
+                  <SelectItem value="Reembolso">Reembolso</SelectItem>
+                  <SelectItem value="Cierre">Cierre</SelectItem>
+                  <SelectItem value="Apartado">Apartado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase">Notas de Seguimiento</Label>
+              <Textarea 
+                placeholder="Escribe detalles importantes aquí..." 
+                className="bg-muted/30 min-h-[100px] resize-none"
+                value={finNotes}
+                onChange={(e) => setFinNotes(e.target.value)}
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setFinId(null)} className="backdrop-blur-md">Cancelar</Button>

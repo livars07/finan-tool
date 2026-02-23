@@ -18,7 +18,7 @@ interface AppointmentsDashboardProps {
   upcoming: Appointment[];
   past: Appointment[];
   addAppointment: (newApp: Omit<Appointment, 'id'>) => void;
-  updateStatus: (id: string, status: AppointmentStatus) => void;
+  updateStatus: (id: string, status: AppointmentStatus, notes?: string) => void;
   editAppointment: (id: string, updatedData: Partial<Appointment>) => void;
   toggleConfirmation: (id: string) => void;
   formatFriendlyDate: (date: string) => string;

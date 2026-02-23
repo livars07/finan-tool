@@ -49,7 +49,7 @@ const CalculatorInputs = ({
   <div className={isModal ? "grid grid-cols-1 md:grid-cols-2 gap-8" : "grid grid-cols-1 md:grid-cols-2 gap-4"}>
     <div className="space-y-2">
       <Label htmlFor={isModal ? "totalPriceModal" : "totalPrice"} className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-        Precio del Inmueble (P)
+        Monto del Crédito (P)
       </Label>
       <div className="relative">
         <span className="absolute left-3 top-2.5 text-muted-foreground">$</span>
@@ -153,7 +153,7 @@ export default function CreditCalculator() {
     }
 
     const summaryText = `Resumen de Cotización Hipotecaria:
-• Valor Inmueble: ${formatCurrency(currentP)}
+• Monto Crédito: ${formatCurrency(currentP)}
 • Enganche (3%): ${formatCurrency(currentDownPayment)}
 • Mensualidad: ${formatCurrency(currentMonthly)}
 * Sujeto a aprobación de crédito.`;
@@ -224,7 +224,7 @@ export default function CreditCalculator() {
             </div>
             <Progress value={3} className="h-2 bg-primary/20" />
             <div className="flex justify-between text-[10px] font-medium text-muted-foreground pt-1">
-              <span>Inmueble: {formatCurrency(currentP)}</span>
+              <span>Crédito: {formatCurrency(currentP)}</span>
               <span>Financiamiento: 97%</span>
             </div>
           </div>
@@ -305,7 +305,7 @@ export default function CreditCalculator() {
                   </div>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-muted-foreground">Valor del Inmueble:</span>
+                      <span className="text-muted-foreground">Monto del Crédito:</span>
                       <span className="font-bold">{formatCurrency(currentP)}</span>
                     </div>
                     <div className="flex justify-between items-center text-sm">

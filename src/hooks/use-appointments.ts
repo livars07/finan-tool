@@ -39,8 +39,8 @@ export function useAppointments() {
     setAppointments(updated);
   };
 
-  const updateStatus = (id: string, status: AppointmentStatus) => {
-    const updated = Service.updateAppointment(id, { status });
+  const updateStatus = (id: string, status: AppointmentStatus, notes?: string) => {
+    const updated = Service.updateAppointment(id, { status, notes });
     setAppointments(updated);
   };
 
