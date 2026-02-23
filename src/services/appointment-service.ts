@@ -28,6 +28,8 @@ export type AppointmentStatus =
 
 export type AppointmentType = '1ra consulta' | '2da consulta' | 'Cierre' | 'Seguimiento';
 
+export type AppointmentProduct = 'Casa' | 'Departamento' | 'Terreno' | 'Transporte' | 'Préstamo';
+
 export interface Appointment {
   id: string;
   name: string;
@@ -35,6 +37,7 @@ export interface Appointment {
   date: string;
   time: string;
   type: AppointmentType;
+  product?: AppointmentProduct;
   status?: AppointmentStatus;
   notes?: string;
   isConfirmed?: boolean;
@@ -114,6 +117,7 @@ export const generateSeedData = (): Appointment[] => {
   const firstNames = ['Juan', 'María', 'Carlos', 'Ana', 'Luis', 'Elena', 'Roberto', 'Sofía', 'Diego', 'Lucía'];
   const lastNames = ['Pérez', 'García', 'López', 'Martínez', 'Rodríguez', 'Gómez', 'Díaz', 'Ruiz', 'Torres', 'Morales'];
   const types: AppointmentType[] = ['1ra consulta', '2da consulta', 'Cierre', 'Seguimiento'];
+  const products: AppointmentProduct[] = ['Casa', 'Departamento', 'Terreno', 'Transporte', 'Préstamo'];
   const statuses: AppointmentStatus[] = ['Asistencia', 'No asistencia', 'Continuación en otra cita', 'Reagendó', 'Reembolso', 'Cierre', 'Apartado'];
   const hours = ['09:00', '10:30', '12:00', '14:30', '16:00', '17:30'];
 
@@ -128,6 +132,7 @@ export const generateSeedData = (): Appointment[] => {
       date: now.toISOString(),
       time: hours[i % hours.length],
       type: types[i % types.length],
+      product: products[i % products.length],
       notes: "Prospecto de prueba para el día de hoy."
     });
   }
@@ -142,6 +147,7 @@ export const generateSeedData = (): Appointment[] => {
       date: futureDate.toISOString(),
       time: hours[(i+2) % hours.length],
       type: types[i % types.length],
+      product: products[(i+1) % products.length],
       notes: "Cita programada a futuro."
     });
   }
@@ -157,6 +163,7 @@ export const generateSeedData = (): Appointment[] => {
       date: pastDate.toISOString(),
       time: hours[i % hours.length],
       type: types[i % types.length],
+      product: products[i % products.length],
       status: statuses[i % statuses.length],
       isConfirmed: true,
       notes: "Historial del mes pasado."
@@ -171,6 +178,7 @@ export const generateSeedData = (): Appointment[] => {
     date: subDays(now, 2).toISOString(),
     time: "11:00",
     type: "2da consulta",
+    product: "Casa",
     status: "Apartado",
     isConfirmed: true,
     notes: "Cliente interesado, ya realizó el apartado."

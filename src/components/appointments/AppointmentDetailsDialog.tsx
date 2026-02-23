@@ -16,8 +16,8 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Appointment, AppointmentStatus, AppointmentType } from '@/services/appointment-service';
-import { User, Phone, Calendar, Clock, Edit2, Save, MessageCircle, Info, ClipboardList, CheckCircle2 } from 'lucide-react';
+import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct } from '@/services/appointment-service';
+import { User, Phone, Calendar, Clock, Edit2, Save, MessageCircle, Info, ClipboardList, CheckCircle2, Box } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -91,6 +91,7 @@ export default function AppointmentDetailsDialog({
     const text = `Cita: ${capitalizedDate}
 Nombre: ${appointment.name}
 Motivo: ${appointment.type}
+Producto: ${appointment.product || 'N/A'}
 Hora: ${timeFormatted}
 Número: ${appointment.phone}`;
 
@@ -179,6 +180,27 @@ Número: ${appointment.phone}`;
                   </Select>
                 </div>
                 <div className="space-y-2">
+                  <Label>Producto</Label>
+                  <Select 
+                    value={editData.product || 'Casa'} 
+                    onValueChange={(v) => setEditData({...editData, product: v as AppointmentProduct})}
+                  >
+                    <SelectTrigger className="bg-muted/30">
+                      <SelectValue placeholder="Producto" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Casa">Casa</SelectItem>
+                      <SelectItem value="Departamento">Departamento</SelectItem>
+                      <SelectItem value="Terreno">Terreno</SelectItem>
+                      <SelectItem value="Transporte">Transporte</SelectItem>
+                      <SelectItem value="Préstamo">Préstamo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
                   <Label>Resultado</Label>
                   <Select 
                     value={editData.status || 'Asistencia'} 
@@ -198,9 +220,6 @@ Número: ${appointment.phone}`;
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Fecha</Label>
                   <Input 
@@ -210,6 +229,9 @@ Número: ${appointment.phone}`;
                     className="bg-muted/30"
                   />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Hora</Label>
                   <Input type="time" value={editData.time || ''} onChange={e => setEditData({...editData, time: e.target.value})} className="bg-muted/30" />
@@ -248,13 +270,10 @@ Número: ${appointment.phone}`;
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
-                  <Calendar className="w-4 h-4 text-primary" />
-                  <div className="flex flex-col">
-                    <p className="text-[10px] text-muted-foreground uppercase font-bold leading-tight">Fecha</p>
-                    <p className="text-xs font-medium">{formatFriendlyDate(appointment.date)}</p>
-                    <p className="text-[10px] text-muted-foreground/60 font-mono tracking-tighter">
-                      {format(parseISO(appointment.date), 'yyyy-MM-dd')}
-                    </p>
+                  <Box className="w-4 h-4 text-primary" />
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold">Producto</p>
+                    <p className="text-sm font-medium">{appointment.product || 'Casa'}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -263,6 +282,17 @@ Número: ${appointment.phone}`;
                     <p className="text-[10px] text-muted-foreground uppercase font-bold">Hora</p>
                     <p className="text-xs font-medium">{format12hTime(appointment.time)}</p>
                   </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Calendar className="w-4 h-4 text-primary" />
+                <div className="flex flex-col">
+                  <p className="text-[10px] text-muted-foreground uppercase font-bold leading-tight">Fecha</p>
+                  <p className="text-xs font-medium">{formatFriendlyDate(appointment.date)}</p>
+                  <p className="text-[10px] text-muted-foreground/60 font-mono tracking-tighter">
+                    {format(parseISO(appointment.date), 'yyyy-MM-dd')}
+                  </p>
                 </div>
               </div>
 

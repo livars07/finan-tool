@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react';
-import { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
+import { Appointment, AppointmentStatus } from '@/services/appointment-service';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Clock, Calendar, Info, CheckCircle2, AlertCircle, CheckCircle, Trophy, PartyPopper, Sparkles, Copy, ClipboardCheck } from "lucide-react";
 import { parseISO, format, addDays } from 'date-fns';
@@ -156,6 +156,7 @@ export default function UpcomingAppointments({
       return `Cita: ${capitalizedDate}
 Nombre: ${app.name}
 Motivo: ${app.type}
+Producto: ${app.product || 'N/A'}
 Hora: ${timeFormatted}
 Número: ${app.phone}`;
     }).join('\n\n');
