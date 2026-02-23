@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -69,7 +70,7 @@ const CalculatorInputs = ({
           <Label htmlFor={isModal ? "totalPriceModal" : "totalPrice"} className="text-xs font-bold text-primary uppercase tracking-wider">
             Monto del crédito (P)
           </Label>
-          <span className="text-[9px] font-bold text-muted-foreground/60 uppercase">Enganche: 3%</span>
+          <span className="text-[9px] font-bold text-muted-foreground/60 uppercase">Enganche Base: 3%</span>
         </div>
         <div className="relative flex items-center">
           <span className={cn(
@@ -89,9 +90,9 @@ const CalculatorInputs = ({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label htmlFor={isModal ? "monthlyPaymentModal" : "monthlyPayment"} className="text-xs font-bold text-accent uppercase tracking-wider">
-            Mensualidad
+            Mensualidad Total
           </Label>
-          <span className="text-[9px] font-bold text-muted-foreground/60 uppercase">Factor: {displayFactor}%</span>
+          <span className="text-[9px] font-bold text-muted-foreground/60 uppercase">Factor Base: {displayFactor}%</span>
         </div>
         <div className="relative flex items-center">
           <span className={cn(
@@ -123,12 +124,12 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const { toast } = useToast();
   
-  const DEFAULT_FACTOR = 0.006982; 
+  const BASE_FACTOR = 0.006982; 
   const FACTOR_ENGANCHE = 0.03; 
   const INCOME_RATIO = 0.35; 
 
   const currentTerm = parseInt(customTerm) || 192;
-  const effectiveFactor = DEFAULT_FACTOR * (192 / currentTerm);
+  const effectiveFactor = BASE_FACTOR * (192 / currentTerm);
 
   useEffect(() => {
     if (initialExpanded) {
@@ -150,23 +151,6 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
     }
   }, [isExpanded]);
 
-  // Recalcular cuando cambia el plazo
-  useEffect(() => {
-    const p = parseFloat(totalPrice.replace(/,/g, ''));
-    if (!isNaN(p)) {
-      const c = p * effectiveFactor;
-      setMonthlyPayment(c.toFixed(2));
-    }
-  }, [customTerm, effectiveFactor]);
-
-  const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat('es-MX', {
-      style: 'currency',
-      currency: 'MXN',
-      minimumFractionDigits: 2,
-    }).format(val);
-  };
-
   const parseNumber = (val: string) => {
     return parseFloat(val.replace(/,/g, '')) || 0;
   };
@@ -179,25 +163,77 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
     return parts.join('.');
   };
 
+  const formatCurrency = (val: number) => {
+    return new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency: 'MXN',
+      minimumFractionDigits: 2,
+    }).format(val);
+  };
+
+  // Lógica de cálculo dinámico
   const handleTotalPriceChange = (val: string) => {
     const cleanVal = val.replace(/,/g, '');
     setTotalPrice(cleanVal);
     const p = parseFloat(cleanVal);
+    const ed = parseNumber(extraDownPayment);
     if (!isNaN(p)) {
-      const c = p * effectiveFactor;
-      setMonthlyPayment(c.toFixed(2));
+      const netP = Math.max(0, p - ed);
+      const c = netP * effectiveFactor;
+      const totalMonthly = c + parseNumber(extraMonthlyContribution);
+      setMonthlyPayment(totalMonthly.toFixed(2));
     }
   };
 
   const handleMonthlyPaymentChange = (val: string) => {
     const cleanVal = val.replace(/,/g, '');
     setMonthlyPayment(cleanVal);
-    const c = parseFloat(cleanVal);
-    if (!isNaN(c)) {
-      const p = c / effectiveFactor;
+    const totalC = parseFloat(cleanVal);
+    const extraC = parseNumber(extraMonthlyContribution);
+    if (!isNaN(totalC)) {
+      const baseC = Math.max(0, totalC - extraC);
+      const netP = baseC / effectiveFactor;
+      const p = netP + parseNumber(extraDownPayment);
       setTotalPrice(p.toFixed(2));
     }
   };
+
+  const handleExtraDownChange = (val: string) => {
+    const cleanVal = val.replace(/,/g, '');
+    setExtraDownPayment(cleanVal);
+    // Al dar más enganche, se descuenta el financiamiento y baja la mensualidad
+    const p = parseNumber(totalPrice);
+    const ed = parseFloat(cleanVal) || 0;
+    const netP = Math.max(0, p - ed);
+    const c = netP * effectiveFactor;
+    const totalMonthly = c + parseNumber(extraMonthlyContribution);
+    setMonthlyPayment(totalMonthly.toFixed(2));
+  };
+
+  const handleExtraMonthlyChange = (val: string) => {
+    const cleanVal = val.replace(/,/g, '');
+    setExtraMonthlyContribution(cleanVal);
+    // Al agregar mensualidad extra, se ajusta el financiamiento para mantener el equilibrio si es necesario,
+    // o simplemente actualiza la carga total. En este modelo, actualizamos la mensualidad total.
+    const p = parseNumber(totalPrice);
+    const ed = parseNumber(extraDownPayment);
+    const netP = Math.max(0, p - ed);
+    const baseC = netP * effectiveFactor;
+    const totalMonthly = baseC + (parseFloat(cleanVal) || 0);
+    setMonthlyPayment(totalMonthly.toFixed(2));
+  };
+
+  // Recalcular cuando cambia el plazo
+  useEffect(() => {
+    const p = parseNumber(totalPrice);
+    const ed = parseNumber(extraDownPayment);
+    const netP = Math.max(0, p - ed);
+    if (netP > 0) {
+      const baseC = netP * effectiveFactor;
+      const totalMonthly = baseC + parseNumber(extraMonthlyContribution);
+      setMonthlyPayment(totalMonthly.toFixed(2));
+    }
+  }, [customTerm, effectiveFactor]);
 
   const clear = () => {
     setTotalPrice('');
@@ -207,26 +243,28 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
     setCustomTerm('192');
   };
 
-  // Calculations
-  const currentP = parseNumber(totalPrice);
+  // Cálculos para la vista de resultados
+  const rawP = parseNumber(totalPrice);
   const extraDown = parseNumber(extraDownPayment);
-  const baseDownPayment = currentP * FACTOR_ENGANCHE;
+  const netFinancing = Math.max(0, rawP - extraDown);
+  
+  const baseDownPayment = rawP * FACTOR_ENGANCHE;
   const totalDownPayment = baseDownPayment + extraDown;
   
-  const currentMonthlyContribution = parseNumber(extraMonthlyContribution);
-  const baseMonthly = parseNumber(monthlyPayment);
-  const totalMonthlyLoad = baseMonthly + currentMonthlyContribution;
+  const currentExtraMonthly = parseNumber(extraMonthlyContribution);
+  const baseMonthly = netFinancing * effectiveFactor;
+  const totalMonthlyLoad = baseMonthly + currentExtraMonthly;
   
   const minIncomeRequired = totalMonthlyLoad / INCOME_RATIO;
   
-  const estimatedClosingCosts = currentP * 0.05;
+  const estimatedClosingCosts = netFinancing * 0.05;
   const appraisalCost = 7500;
   const totalOperatingExpenses = estimatedClosingCosts + appraisalCost;
-  const netLiquidCredit = currentP > 0 ? currentP - totalOperatingExpenses : 0;
+  const netLiquidCredit = netFinancing > 0 ? netFinancing - totalOperatingExpenses : 0;
   const suggestedLivingBudget = minIncomeRequired > 0 ? minIncomeRequired - totalMonthlyLoad : 0;
 
   const handleCopySummary = () => {
-    if (currentP <= 0) {
+    if (rawP <= 0) {
       toast({
         title: "Calculadora vacía",
         description: "Ingresa un monto para copiar el resumen.",
@@ -236,12 +274,13 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
     }
 
     const summaryText = `Resumen de cotización de financiamiento inmobiliario:
-• Monto crédito: ${formatCurrency(currentP)}
+• Valor de Referencia: ${formatCurrency(rawP)}
+• Monto a Financiar Neto: ${formatCurrency(netFinancing)}
 • Plazo: ${currentTerm} meses
-• Enganche total: ${formatCurrency(totalDownPayment)}
-• Mensualidad base: ${formatCurrency(baseMonthly)}
-${currentMonthlyContribution > 0 ? `• Aportación extra: ${formatCurrency(currentMonthlyContribution)}\n` : ''}• Carga mensual total: ${formatCurrency(totalMonthlyLoad)}
-• Ingreso mínimo req.: ${formatCurrency(minIncomeRequired)}
+• Enganche Total: ${formatCurrency(totalDownPayment)}
+• Mensualidad Base: ${formatCurrency(baseMonthly)}
+${currentExtraMonthly > 0 ? `• Aportación Extra: ${formatCurrency(currentExtraMonthly)}\n` : ''}• Carga Mensual Total: ${formatCurrency(totalMonthlyLoad)}
+• Ingreso Mínimo Req.: ${formatCurrency(minIncomeRequired)}
 * Proyección técnica informativa.`;
 
     navigator.clipboard.writeText(summaryText).then(() => {
@@ -272,8 +311,8 @@ ${currentMonthlyContribution > 0 ? `• Aportación extra: ${formatCurrency(curr
                   <TooltipContent className="max-w-[250px] p-4 text-xs backdrop-blur-md bg-card/80 border-border/30 shadow-lg">
                     <p className="font-semibold mb-1">Modelo de negocio:</p>
                     <ul className="space-y-1 list-disc pl-3">
-                      <li>Enganche base: 3% del crédito</li>
-                      <li>Mensualidad: { (effectiveFactor * 100).toFixed(4) }% del valor P</li>
+                      <li>Enganche base: 3% del monto P</li>
+                      <li>Mensualidad: { (effectiveFactor * 100).toFixed(4) }% del financiamiento</li>
                       <li>Plazo estándar: 192 meses</li>
                     </ul>
                   </TooltipContent>
@@ -306,10 +345,10 @@ ${currentMonthlyContribution > 0 ? `• Aportación extra: ${formatCurrency(curr
 
           <div className="space-y-3 p-4 rounded-xl bg-primary/10 border border-primary/20 backdrop-blur-sm">
             <div className="flex justify-between items-end mb-1">
-              <span className="text-[10px] text-primary uppercase font-bold tracking-widest">Enganche base (3%)</span>
-              <span className="text-[10px] font-bold text-primary">{formatCurrency(baseDownPayment)}</span>
+              <span className="text-[10px] text-primary uppercase font-bold tracking-widest">Inversión Inicial (Enganche)</span>
+              <span className="text-[10px] font-bold text-primary">{formatCurrency(totalDownPayment)}</span>
             </div>
-            <Progress value={3} className="h-2 bg-secondary" />
+            <Progress value={Math.min(100, (totalDownPayment / (rawP || 1)) * 100)} className="h-2 bg-secondary" />
           </div>
 
           <div className="p-4 rounded-xl bg-accent/10 border border-accent/20 backdrop-blur-sm">
@@ -319,7 +358,7 @@ ${currentMonthlyContribution > 0 ? `• Aportación extra: ${formatCurrency(curr
               </div>
               <div className="space-y-0.5">
                 <span className="text-[10px] text-accent uppercase font-bold flex items-center gap-1">
-                  Ingreso mensual recomendado
+                  Ingreso mensual comprobable
                 </span>
                 <p className="text-xl font-bold text-foreground">
                   {formatCurrency(minIncomeRequired)}
@@ -388,7 +427,7 @@ ${currentMonthlyContribution > 0 ? `• Aportación extra: ${formatCurrency(curr
                       <Settings2 className="w-4 h-4 text-primary" />
                       <h3 className="text-xs font-bold uppercase tracking-wider">Ajustes de Escenario (Personalización)</h3>
                     </div>
-                    <span className="text-[10px] text-muted-foreground uppercase font-bold italic opacity-60">Impacto directo en montos</span>
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold italic opacity-60">Impacto en el financiamiento</span>
                   </div>
                   <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="space-y-2">
@@ -399,10 +438,10 @@ ${currentMonthlyContribution > 0 ? `• Aportación extra: ${formatCurrency(curr
                           placeholder="Ej. 50,000" 
                           className="pl-7 bg-background h-10 text-sm border-primary/20"
                           value={formatWithCommas(extraDownPayment)}
-                          onChange={(e) => setExtraDownPayment(e.target.value.replace(/,/g, ''))}
+                          onChange={(e) => handleExtraDownChange(e.target.value)}
                         />
                       </div>
-                      <p className="text-[9px] text-muted-foreground">Incrementa tu inversión inicial.</p>
+                      <p className="text-[9px] text-muted-foreground">Descuenta el monto a financiar.</p>
                     </div>
                     <div className="space-y-2">
                       <Label className="text-[10px] font-bold uppercase text-muted-foreground">Aportación Extra Mensual</Label>
@@ -412,10 +451,10 @@ ${currentMonthlyContribution > 0 ? `• Aportación extra: ${formatCurrency(curr
                           placeholder="Ej. 2,000" 
                           className="pl-7 bg-background h-10 text-sm border-accent/20"
                           value={formatWithCommas(extraMonthlyContribution)}
-                          onChange={(e) => setExtraMonthlyContribution(e.target.value.replace(/,/g, ''))}
+                          onChange={(e) => handleExtraMonthlyChange(e.target.value)}
                         />
                       </div>
-                      <p className="text-[9px] text-muted-foreground">Simula pagos a capital.</p>
+                      <p className="text-[9px] text-muted-foreground">Suma a la carga de pago mensual.</p>
                     </div>
                     <div className="space-y-2">
                       <Label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1">
@@ -428,7 +467,7 @@ ${currentMonthlyContribution > 0 ? `• Aportación extra: ${formatCurrency(curr
                         value={customTerm}
                         onChange={(e) => setCustomTerm(e.target.value)}
                       />
-                      <p className="text-[9px] text-muted-foreground">Afecta el factor de mensualidad.</p>
+                      <p className="text-[9px] text-muted-foreground">Altera el factor de mensualidad.</p>
                     </div>
                   </div>
                 </Card>
@@ -464,8 +503,8 @@ ${currentMonthlyContribution > 0 ? `• Aportación extra: ${formatCurrency(curr
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <span className="text-[10px] uppercase font-bold text-muted-foreground">Crédito (P)</span>
-                        <p className="font-bold text-lg">{formatCurrency(currentP)}</p>
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground">Monto Base</span>
+                        <p className="font-bold text-lg">{formatCurrency(rawP)}</p>
                       </div>
                       <div className="space-y-1">
                         <span className="text-[10px] uppercase font-bold text-muted-foreground">Enganche Final</span>
@@ -492,7 +531,7 @@ ${currentMonthlyContribution > 0 ? `• Aportación extra: ${formatCurrency(curr
                         <div className="flex items-center gap-1">
                           <span className="text-[10px] uppercase font-bold text-muted-foreground">Escrituración</span>
                           <Tooltip>
-                            <TooltipTrigger><Info className="w-3 h-3 text-muted-foreground/40" /></TooltipTrigger>
+                            <TooltipTrigger asChild><Info className="w-3 h-3 text-muted-foreground/40 cursor-help" /></TooltipTrigger>
                             <TooltipContent>Cálculo estimado del 5% para gastos notariales e impuestos.</TooltipContent>
                           </Tooltip>
                         </div>
@@ -502,7 +541,7 @@ ${currentMonthlyContribution > 0 ? `• Aportación extra: ${formatCurrency(curr
                         <div className="flex items-center gap-1">
                           <span className="text-[10px] uppercase font-bold text-muted-foreground">Avalúo</span>
                           <Tooltip>
-                            <TooltipTrigger><Info className="w-3 h-3 text-muted-foreground/40" /></TooltipTrigger>
+                            <TooltipTrigger asChild><Info className="w-3 h-3 text-muted-foreground/40 cursor-help" /></TooltipTrigger>
                             <TooltipContent>Costo fijo aproximado del avalúo pericial del inmueble.</TooltipContent>
                           </Tooltip>
                         </div>
@@ -516,7 +555,7 @@ ${currentMonthlyContribution > 0 ? `• Aportación extra: ${formatCurrency(curr
                         <div className="flex items-center gap-1">
                           <span className="text-[10px] uppercase font-bold text-muted-foreground">Saldo Líquido</span>
                           <Tooltip>
-                            <TooltipTrigger><Info className="w-3 h-3 text-muted-foreground/40" /></TooltipTrigger>
+                            <TooltipTrigger asChild><Info className="w-3 h-3 text-muted-foreground/40 cursor-help" /></TooltipTrigger>
                             <TooltipContent>Monto de crédito que queda disponible tras cubrir los gastos operativos.</TooltipContent>
                           </Tooltip>
                         </div>
@@ -537,7 +576,7 @@ ${currentMonthlyContribution > 0 ? `• Aportación extra: ${formatCurrency(curr
                 </div>
                 <div className="text-[9px] text-muted-foreground/60 leading-tight hidden xl:block">
                   * Los montos pueden variar según el perfil crediticio. <br />
-                  Factor de referencia: { (effectiveFactor * 100).toFixed(4) }%
+                  Factor Base: { (effectiveFactor * 100).toFixed(4) }%
                 </div>
               </div>
 
