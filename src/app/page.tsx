@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -116,14 +117,14 @@ export default function Home() {
     resetData();
     setShowResetConfirm(false);
     toast({
-      title: "Sistema de Financiamiento reiniciado",
+      title: "Sistema de Financiamiento inmobiliario reiniciado",
       description: "Todos los datos locales han sido borrados y restaurados con datos de prueba.",
     });
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
-      <header className="border-b border-border/40 sticky top-0 z-50 backdrop-blur-[20px] bg-card/10">
+    <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
+      <header className="border-b border-border/40 sticky top-0 z-50 backdrop-blur-[20px] bg-card/10 shrink-0">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="bg-primary/20 p-1.5 rounded-lg border border-primary/30">
@@ -171,8 +172,8 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <main className="flex-1 container mx-auto px-4 py-6 md:py-10 flex flex-col justify-start">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 shrink-0">
           {[
             { 
               label: 'Citas hoy', 
@@ -237,16 +238,16 @@ export default function Home() {
                    💡 Perfilamiento Profesional (v0.7.1)
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Utilice la calculadora para proyecciones en tiempo real durante llamadas o consultas presenciales de financiamiento. 
+                  Utilice la calculadora para proyecciones en tiempo real durante llamadas o consultas presenciales de financiamiento inmobiliario. 
                   <br />
                   <br />
-                  Este sistema garantiza la <strong>privacidad técnica</strong> al almacenar los datos exclusivamente en este equipo.
+                  Este sistema garantiza la <strong>privacidad técnica</strong> al almacenar los datos exclusivamente en este equipo de trabajo.
                 </p>
               </div>
             </div>
           </section>
 
-          <section className="xl:col-span-7 space-y-8">
+          <section className="xl:col-span-7 space-y-8 pb-10">
             <AppointmentsDashboard 
               appointments={appointmentState.appointments}
               upcoming={appointmentState.upcoming}
@@ -262,7 +263,7 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="mt-12 border-t border-border/40 py-8 bg-card/10 backdrop-blur-[20px]">
+      <footer className="mt-auto border-t border-border/40 py-8 bg-card/10 backdrop-blur-[20px] shrink-0">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm">
           <p>© 2026 Finanto - Ejecutivo en Financiamiento Inmobiliario</p>
           <div className="flex items-center gap-6">
@@ -300,7 +301,7 @@ export default function Home() {
           <AlertDialogHeader>
             <AlertDialogTitle>¿Confirmar reinicio total?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción borrará todas tus citas, notas y configuraciones guardadas en este navegador. Se restaurarán los datos de prueba iniciales.
+              Esta acción borrará todas tus citas, notas y configuraciones guardadas en este navegador. Se restaurarán los datos de prueba iniciales de la financiera inmobiliaria.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -329,14 +330,14 @@ export default function Home() {
             </div>
           </DialogHeader>
           
-          <div className="flex-1 overflow-y-auto p-8 min-h-0 scrollbar-thin">
+          <div className="flex-1 overflow-y-auto p-8 min-h-0">
             <div className="space-y-10 text-foreground/90 pb-12">
               <section className="space-y-4">
                 <h2 className="text-2xl font-bold flex items-center gap-2 text-primary">
                   Introducción al Sistema
                 </h2>
                 <p className="text-base leading-relaxed text-muted-foreground">
-                  Finanto es una plataforma técnica diseñada para optimizar la eficiencia operativa del ejecutivo. Facilita el perfilamiento rápido de prospectos y garantiza una administración impecable de la agenda diaria.
+                  Finanto es una plataforma técnica diseñada para optimizar la eficiencia operativa del ejecutivo. Facilita el perfilamiento rápido de prospectos y garantiza una administración técnica de los créditos inmobiliarios.
                 </p>
               </section>
 
@@ -347,9 +348,9 @@ export default function Home() {
                       <Wallet className="w-5 h-5" /> 1. Calculadora de Precisión
                     </h3>
                     <ul className="text-sm space-y-3 list-disc pl-5 text-muted-foreground">
-                      <li><strong>Perfilamiento en tiempo real:</strong> Determine montos aproximados de forma inmediata para interesados por teléfono.</li>
-                      <li><strong>Tanteo Financiero:</strong> Realice ajustes de montos frente al cliente para encontrar su capacidad ideal durante la 1ra consulta.</li>
-                      <li><strong>Independencia de Red:</strong> Herramienta optimizada para operar sin dependencia de conexión a servidores externos.</li>
+                      <li><strong>Perfilamiento profesional:</strong> Determine montos aproximados de forma inmediata para interesados vía telefónica.</li>
+                      <li><strong>Presentación Profesional:</strong> Realice ajustes de montos frente al cliente en tiempo real durante la 1ra consulta sin depender de conexión.</li>
+                      <li><strong>Independencia Técnica:</strong> Herramienta optimizada para operar y "tantear" montos sin depender de servidores externos.</li>
                     </ul>
                   </CardContent>
                 </Card>
@@ -360,9 +361,9 @@ export default function Home() {
                       <CalendarDays className="w-5 h-5" /> 2. Gestión de Agenda
                     </h3>
                     <ul className="text-sm space-y-3 list-disc pl-5 text-muted-foreground">
-                      <li><strong>Priorización Diaria:</strong> El sistema organiza las citas del día para maximizar la productividad operativa.</li>
-                      <li><strong>Optimización Logística:</strong> Valide la confirmación de asistencia para evitar tiempos muertos y desplazamientos en vano.</li>
-                      <li><strong>Trazabilidad de Prospectos:</strong> Centraliza cada acuerdo y resultado de cita para un seguimiento robusto.</li>
+                      <li><strong>Priorización Diaria:</strong> El sistema organiza las citas del día para maximizar la productividad operativa del ejecutivo.</li>
+                      <li><strong>Optimización Logística:</strong> Valide la confirmación de asistencia para evitar tiempos muertos y desplazamientos innecesarios.</li>
+                      <li><strong>Trazabilidad de Prospectos:</strong> Centraliza cada acuerdo y resultado de cita para un seguimiento robusto del crédito.</li>
                     </ul>
                   </CardContent>
                 </Card>
@@ -382,7 +383,7 @@ export default function Home() {
                   <Target className="w-6 h-6" /> 4. Productividad y Control
                 </h3>
                 <p className="text-base text-muted-foreground leading-relaxed">
-                  El sistema monitorea automáticamente su desempeño mensual. Compare sus cierres y prospectos con periodos anteriores para identificar áreas de oportunidad y mantener un flujo constante de expedientes de financiamiento.
+                  El sistema monitorea automáticamente su desempeño mensual. Compare sus cierres y prospectos con periodos anteriores para identificar áreas de oportunidad y mantener un flujo constante de expedientes de financiamiento inmobiliario.
                 </p>
               </section>
 
@@ -395,17 +396,17 @@ export default function Home() {
                 <ul className="text-sm space-y-3 text-muted-foreground">
                   <li className="flex gap-3">
                     <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
-                    <span><strong>Seguridad Local:</strong> Los datos residen exclusivamente en su navegador. Esto garantiza que la información sensible de clientes sea privada.</span>
+                    <span><strong>Seguridad Local:</strong> Los datos residen exclusivamente en su navegador. Esto garantiza que la información sensible de clientes sea totalmente privada.</span>
                   </li>
                   <li className="flex gap-3">
                     <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
-                    <span><strong>Respaldo Técnico:</strong> No borre el historial si desea conservar sus registros. La sincronización en servidor es una funcionalidad planeada para el futuro.</span>
+                    <span><strong>Respaldo Técnico:</strong> No borre el historial si desea conservar sus registros. El sistema opera de forma local para mayor rapidez y privacidad.</span>
                   </li>
                 </ul>
               </section>
 
               <p className="text-center text-xs text-muted-foreground italic pt-6 border-t border-border/20">
-                Finanto: Diseñado para el ejecutivo en financiamiento inmobiliario que prioriza el control técnico y el cierre efectivo.
+                Finanto: Diseñado para el ejecutivo en financiamiento inmobiliario que prioriza el control técnico y el cierre efectivo del patrimonio familiar.
               </p>
             </div>
           </div>
