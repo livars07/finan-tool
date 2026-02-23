@@ -158,6 +158,29 @@ export default function UpcomingAppointments({
     });
   };
 
+  const copyAllToday = () => {
+    const todayApps = appointments.filter(app => isActuallyToday(app.date));
+    if (todayApps.length === 0) return;
+
+    const reportText = todayApps.map(app => {
+      const timeFormatted = format12hTime(app.time);
+      const confirmedText = app.isConfirmed ? ' *(Confirmado)*' : '';
+      const motivoLine = app.type === '1ra consulta' ? '' : `\nMotivo: *${app.type}*`;
+      
+      return `📌 *${app.name}*
+Hora: *${timeFormatted}*${confirmedText}${motivoLine}
+Producto: *${app.product || 'N/A'}*
+Número: *${app.phone}*`;
+    }).join('\n\n---\n\n');
+
+    navigator.clipboard.writeText(reportText).then(() => {
+      toast({
+        title: "Citas de hoy copiadas",
+        description: `${todayApps.length} citas listas para enviar.`,
+      });
+    });
+  };
+
   const hasTodayApps = appointments.some(app => isActuallyToday(app.date));
 
   const TableHeaderRow = () => (
