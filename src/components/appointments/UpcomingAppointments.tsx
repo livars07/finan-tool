@@ -62,7 +62,7 @@ export default function UpcomingAppointments({
   const [status, setStatus] = useState<AppointmentStatus>('Asistencia');
   const [finNotes, setFinNotes] = useState('');
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [lastClosedApp, setLastClosedApp] = useState<Appointment | null>(null);
+  const [lastFinishedApp, setLastFinishedApp] = useState<Appointment | null>(null);
   
   const { toast } = useToast();
 
@@ -101,15 +101,13 @@ export default function UpcomingAppointments({
 
       // Actualizar estado global
       updateStatus(finId, currentStatus, currentNotes);
+      
+      const updatedApp = { ...app, status: currentStatus, notes: currentNotes };
+      setLastFinishedApp(updatedApp);
+      setFinId(null);
 
       if (currentStatus === 'Cierre') {
-        const updatedApp = { ...app, status: currentStatus, notes: currentNotes };
-        setLastClosedApp(updatedApp);
-        
-        // Cerrar el diálogo de edición primero
-        setFinId(null);
-        
-        // Pequeño retardo para evitar conflictos de foco de Radix UI
+        // Retardo para evitar conflictos de foco de Radix UI y mostrar el popup verde
         setTimeout(() => {
           const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3");
           audio.volume = 0.4;
@@ -117,11 +115,14 @@ export default function UpcomingAppointments({
           setShowSuccessDialog(true);
         }, 300);
       } else {
-        setFinId(null);
-        toast({
-          title: "Cita finalizada",
-          description: `${clientName} movido al historial con resultado: ${currentStatus}.`,
-        });
+        // Si no es cierre, abrir detalles directamente
+        setTimeout(() => {
+          onSelect(updatedApp);
+          toast({
+            title: "Cita finalizada",
+            description: `${clientName} movido al historial.`,
+          });
+        }, 300);
       }
       setFinNotes('');
     }
@@ -129,10 +130,9 @@ export default function UpcomingAppointments({
 
   const handleSuccessClose = () => {
     setShowSuccessDialog(false);
-    if (lastClosedApp) {
-      // Forzar la apertura del detalle del cliente después de un breve momento
+    if (lastFinishedApp) {
       setTimeout(() => {
-        onSelect(lastClosedApp);
+        onSelect(lastFinishedApp);
       }, 200);
     }
   };
@@ -430,7 +430,7 @@ Número: *${app.phone}*`;
                 <PartyPopper className="text-yellow-500" /> ¡FELICIDADES! <PartyPopper className="text-yellow-500" />
               </DialogTitle>
               <DialogDescription className="text-lg text-center mx-auto text-green-100">
-                Has concretado el crédito de <strong className="text-white">{lastClosedApp?.name}</strong> con éxito.
+                Has concretado el crédito de <strong className="text-white">{lastFinishedApp?.name}</strong> con éxito.
               </DialogDescription>
             </div>
 
