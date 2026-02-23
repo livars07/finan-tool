@@ -446,7 +446,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   <h3 className="text-2xl font-bold font-headline">El Sello del Cierre</h3>
                 </div>
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  Cuando concretes una operación, marca la cita con el estatus <span className="font-bold text-green-500">✨ Cierre ✨</span>. Esto activará el checklist administrativo para que no olvides registrar:
+                  Al concretar una operación y marcar <span className="font-bold text-green-500">✨ Cierre ✨</span>, el sistema activará automáticamente el expediente técnico. No olvides registrar en las notas:
                 </p>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                   {[
