@@ -3,13 +3,18 @@
 import React, { useState } from 'react';
 import { Appointment, AppointmentStatus } from '@/services/appointment-service';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Clock, Calendar, Info, CheckCircle2, AlertCircle, CheckCircle, Trophy, PartyPopper, Sparkles, Copy, ClipboardCheck } from "lucide-react";
+import { 
+  Clock, Calendar, Info, CheckCircle2, AlertCircle, 
+  CheckCircle, Trophy, PartyPopper, Sparkles, Copy, 
+  ClipboardCheck, Phone, Box, ChevronRight 
+} from "lucide-react";
 import { parseISO, format, addDays, isToday } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Dialog,
   DialogContent,
@@ -28,7 +33,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
 interface Props {
@@ -40,6 +44,7 @@ interface Props {
   updateStatus: (id: string, status: AppointmentStatus, notes?: string) => void;
   toggleConfirmation: (id: string) => void;
   highlightedId?: string | null;
+  expanded?: boolean;
 }
 
 export default function UpcomingAppointments({ 
@@ -50,7 +55,8 @@ export default function UpcomingAppointments({
   onSelect, 
   updateStatus, 
   toggleConfirmation, 
-  highlightedId 
+  highlightedId,
+  expanded = false
 }: Props) {
   const [finId, setFinId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
@@ -133,43 +139,6 @@ export default function UpcomingAppointments({
     });
   };
 
-  const copyAllToday = () => {
-    const todayApps = appointments.filter(app => isActuallyToday(app.date));
-    if (todayApps.length === 0) {
-      toast({
-        title: "Sin citas para hoy",
-        description: "No hay citas programadas para el día de hoy que copiar.",
-      });
-      return;
-    }
-
-    const formattedApps = todayApps.map(app => {
-      const dateObj = parseISO(app.date);
-      const dateFormatted = format(dateObj, "EEEE d 'de' MMMM yyyy", { locale: es });
-      const capitalizedDate = dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
-      const timeFormatted = format12hTime(app.time);
-      
-      const dateBold = `*${capitalizedDate}*`;
-      const timeBold = `*${timeFormatted}*`;
-      const confirmedBold = app.isConfirmed ? ' *(Confirmado)*' : '';
-      
-      const motivoLine = app.type === '1ra consulta' ? '' : `Motivo: ${app.type}\n`;
-
-      return `Cita: ${dateBold}
-Nombre: ${app.name}
-${motivoLine}Producto: ${app.product || 'N/A'}
-Hora: ${timeBold}${confirmedBold}
-Número: ${app.phone}`;
-    }).join('\n\n');
-
-    navigator.clipboard.writeText(formattedApps).then(() => {
-      toast({
-        title: "Citas de hoy copiadas",
-        description: `Se han copiado ${todayApps.length} citas al portapapeles.`,
-      });
-    });
-  };
-
   const copyDailyReport = () => {
     const todaySales = allAppointments.filter(a => isActuallyToday(a.date) && a.status === 'Cierre').length;
     const todayTotal = allAppointments.filter(a => isActuallyToday(a.date)).length;
@@ -191,122 +160,170 @@ Número: ${app.phone}`;
 
   const hasTodayApps = appointments.some(app => isActuallyToday(app.date));
 
+  const TableHeaderRow = () => (
+    <TableRow className="bg-muted/50 sticky top-0 z-10 shadow-sm">
+      <TableHead className={expanded ? "w-[250px]" : ""}>Nombre / Teléfono</TableHead>
+      {expanded && <TableHead>Contacto</TableHead>}
+      <TableHead>Motivo</TableHead>
+      {expanded && <TableHead>Producto</TableHead>}
+      <TableHead>Fecha / Estado</TableHead>
+      <TableHead>Hora</TableHead>
+      <TableHead className="w-12 text-center">Acciones</TableHead>
+    </TableRow>
+  );
+
   return (
-    <div className="space-y-4">
-      <div className="border rounded-md overflow-hidden relative backdrop-blur-sm">
+    <div className="space-y-4 flex flex-col h-full">
+      <div className="border rounded-xl overflow-hidden relative backdrop-blur-sm bg-card/20 flex-1 flex flex-col">
         {appointments.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground bg-muted/20">
-            <Calendar className="w-12 h-12 mb-2 opacity-20" />
-            <p className="text-sm font-medium">No hay citas programadas.</p>
+          <div className="flex flex-col items-center justify-center py-20 text-muted-foreground bg-muted/10 h-full">
+            <Calendar className="w-16 h-16 mb-4 opacity-10" />
+            <p className="text-sm font-bold uppercase tracking-widest opacity-40">No hay citas programadas</p>
           </div>
         ) : (
-          <Table>
-            <TableHeader className="bg-muted/50">
-              <TableRow>
-                <TableHead>Nombre / Teléfono</TableHead>
-                <TableHead>Motivo</TableHead>
-                <TableHead>Fecha / Estado</TableHead>
-                <TableHead>Hora</TableHead>
-                <TableHead className="w-12"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {appointments.map((app) => {
-                const appToday = isActuallyToday(app.date);
-                const isHighlighted = highlightedId === app.id;
-                
-                return (
-                  <TableRow 
-                    key={app.id} 
-                    onClick={() => onSelect(app)}
-                    className={cn(
-                      "hover:bg-primary/10 transition-colors cursor-pointer group relative h-16",
-                      appToday && "bg-primary/5 border-l-4 border-l-primary",
-                      isHighlighted && "bg-accent/20 animate-pulse border-2 border-accent/40"
-                    )}
-                  >
-                    <TableCell className="align-middle">
-                      <div className="font-medium text-sm leading-tight">
-                        {app.name}
-                      </div>
-                      <div 
-                        onClick={(e) => copyPhone(e, app.phone)}
-                        className="text-[10px] text-muted-foreground hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1 group/phone"
-                      >
-                        {app.phone}
-                      </div>
-                    </TableCell>
-                    <TableCell className="align-middle">
-                      <div className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-tight">
-                        <Info className="w-3 h-3" /> {app.type}
-                      </div>
-                    </TableCell>
-                    <TableCell className="align-middle">
-                      <div className="flex flex-col justify-center min-h-[2.5rem]">
-                        <span className={cn(
-                          "text-[10px] font-bold uppercase tracking-wider leading-none mb-1",
-                          appToday ? "text-primary" : "text-muted-foreground"
-                        )}>
-                          {formatDate(app.date)}
-                        </span>
-                        {appToday && (
-                          <div onClick={(e) => e.stopPropagation()} className="h-5 flex items-center">
-                            {app.isConfirmed ? (
-                              <div className="flex items-center gap-1 text-[9px] font-bold text-green-400 uppercase tracking-tighter">
-                                <CheckCircle className="w-2.5 h-2.5" /> Confirmada
-                              </div>
-                            ) : (
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="h-5 px-1.5 py-0 text-[8px] font-bold uppercase border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10 backdrop-blur-md"
-                                onClick={() => setConfirmId(app.id)}
-                              >
-                                <AlertCircle className="w-2 h-2 mr-1" /> Confirmar
-                              </Button>
-                            )}
+          <ScrollArea className="flex-1">
+            <Table>
+              <TableHeader>
+                <TableHeaderRow />
+              </TableHeader>
+              <TableBody>
+                {appointments.map((app) => {
+                  const appToday = isActuallyToday(app.date);
+                  const isHighlighted = highlightedId === app.id;
+                  
+                  return (
+                    <TableRow 
+                      key={app.id} 
+                      onClick={() => onSelect(app)}
+                      className={cn(
+                        "hover:bg-primary/10 transition-colors cursor-pointer group relative h-16",
+                        appToday && "bg-primary/5 border-l-4 border-l-primary",
+                        isHighlighted && "bg-accent/20 animate-pulse border-2 border-accent/40"
+                      )}
+                    >
+                      <TableCell className="align-middle">
+                        <div className="font-bold text-sm leading-tight text-foreground">
+                          {app.name}
+                        </div>
+                        {!expanded && (
+                          <div 
+                            onClick={(e) => copyPhone(e, app.phone)}
+                            className="text-[10px] text-muted-foreground hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1 group/phone mt-0.5"
+                          >
+                            <Phone className="w-2.5 h-2.5" /> {app.phone}
                           </div>
                         )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="align-middle">
-                      <div className="flex items-center gap-1 text-accent font-bold text-[10px]">
-                        <Clock className="w-3 h-3" /> {format12hTime(app.time)}
-                      </div>
-                    </TableCell>
-                    <TableCell className="align-middle" onClick={(e) => e.stopPropagation()}>
-                      {appToday && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-primary hover:bg-primary/20 backdrop-blur-md"
-                          onClick={() => {
-                            setFinId(app.id);
-                            setFinNotes(app.notes || '');
-                            setStatus('Asistencia');
-                          }}
-                          title="Finalizar cita"
-                        >
-                          <CheckCircle2 className="h-5 w-5" />
-                        </Button>
+                      </TableCell>
+                      
+                      {expanded && (
+                        <TableCell className="align-middle">
+                          <div 
+                            onClick={(e) => copyPhone(e, app.phone)}
+                            className="flex items-center gap-2 text-xs font-medium hover:text-primary transition-colors cursor-pointer"
+                          >
+                            <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                              <Phone className="w-3.5 h-3.5" />
+                            </div>
+                            {app.phone}
+                          </div>
+                        </TableCell>
                       )}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+
+                      <TableCell className="align-middle">
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
+                          <Info className="w-3 h-3 text-primary/60" /> {app.type}
+                        </div>
+                      </TableCell>
+
+                      {expanded && (
+                        <TableCell className="align-middle">
+                          <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+                            <Box className="w-3.5 h-3.5 text-accent" /> {app.product || 'N/A'}
+                          </div>
+                        </TableCell>
+                      )}
+
+                      <TableCell className="align-middle">
+                        <div className="flex flex-col justify-center">
+                          <span className={cn(
+                            "text-[10px] font-bold uppercase tracking-wider leading-none mb-1.5",
+                            appToday ? "text-primary" : "text-muted-foreground"
+                          )}>
+                            {formatDate(app.date)}
+                          </span>
+                          {appToday && (
+                            <div onClick={(e) => e.stopPropagation()} className="h-5 flex items-center">
+                              {app.isConfirmed ? (
+                                <div className="flex items-center gap-1 text-[9px] font-bold text-green-400 uppercase tracking-tighter bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
+                                  <CheckCircle className="w-2.5 h-2.5" /> Confirmada
+                                </div>
+                              ) : (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-5 px-2 py-0 text-[8px] font-bold uppercase border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10 backdrop-blur-md"
+                                  onClick={() => setConfirmId(app.id)}
+                                >
+                                  <AlertCircle className="w-2.5 h-2.5 mr-1" /> Confirmar
+                                </Button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      
+                      <TableCell className="align-middle">
+                        <div className="flex items-center gap-1.5 text-accent font-bold text-[10px] bg-accent/5 w-fit px-2 py-1 rounded-md border border-accent/20">
+                          <Clock className="w-3 h-3" /> {format12hTime(app.time)}
+                        </div>
+                      </TableCell>
+                      
+                      <TableCell className="align-middle text-center" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-center gap-1">
+                          {appToday && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-primary hover:bg-primary/20 backdrop-blur-md"
+                              onClick={() => {
+                                setFinId(app.id);
+                                setFinNotes(app.notes || '');
+                                setStatus('Asistencia');
+                              }}
+                              title="Finalizar cita"
+                            >
+                              <CheckCircle2 className="h-5 w-5" />
+                            </Button>
+                          )}
+                          {expanded && (
+                             <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-primary transition-colors"
+                              onClick={() => onSelect(app)}
+                            >
+                              <ChevronRight className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </ScrollArea>
         )}
       </div>
 
-      <div className="flex flex-wrap justify-end gap-2 pt-2">
+      <div className="flex flex-wrap justify-end gap-3 pt-2 shrink-0">
         <Button 
           variant="outline" 
           size="sm" 
           onClick={copyDailyReport}
-          className="text-[10px] font-bold uppercase tracking-widest border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 h-8 gap-2"
+          className="text-[10px] font-bold uppercase tracking-widest border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 h-9 gap-2 px-4"
         >
-          <ClipboardCheck className="w-3.5 h-3.5" />
+          <ClipboardCheck className="w-4 h-4" />
           Copiar Reporte Diario
         </Button>
         {hasTodayApps && (
@@ -314,16 +331,16 @@ Número: ${app.phone}`;
             variant="outline" 
             size="sm" 
             onClick={copyAllToday}
-            className="text-[10px] font-bold uppercase tracking-widest border-green-500/40 text-green-500 hover:bg-green-500/10 h-8 gap-2"
+            className="text-[10px] font-bold uppercase tracking-widest border-green-500/40 text-green-500 hover:bg-green-500/10 h-9 gap-2 px-4"
           >
-            <Copy className="w-3.5 h-3.5" />
+            <Copy className="w-4 h-4" />
             Copiar citas de hoy
           </Button>
         )}
       </div>
 
       <Dialog open={!!finId} onOpenChange={() => setFinId(null)}>
-        <DialogContent className="sm:max-w-[500px] bg-card border-border shadow-xl backdrop-blur-[12px]">
+        <DialogContent className="sm:max-w-[500px] bg-card border-border shadow-xl backdrop-blur-[12px] z-[70]">
           <DialogHeader>
             <DialogTitle className="text-foreground">Finalizar cita de hoy</DialogTitle>
             <DialogDescription className="text-muted-foreground">Indica el resultado de la reunión y registra acuerdos importantes.</DialogDescription>
@@ -368,7 +385,7 @@ Número: ${app.phone}`;
       </Dialog>
 
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent className="sm:max-w-[550px] border shadow-2xl backdrop-blur-md overflow-hidden p-0 bg-green-950 border-green-500/50 text-white">
+        <DialogContent className="sm:max-w-[550px] border shadow-2xl backdrop-blur-md overflow-hidden p-0 bg-green-950 border-green-500/50 text-white z-[80]">
           <div className="p-8 space-y-6">
             <div className="flex flex-col items-center text-center space-y-4">
               <div className="relative">
@@ -417,7 +434,7 @@ Número: ${app.phone}`;
       </Dialog>
 
       <AlertDialog open={!!confirmId} onOpenChange={(open) => !open && setConfirmId(null)}>
-        <AlertDialogContent className="bg-card border-border shadow-xl backdrop-blur-md">
+        <AlertDialogContent className="bg-card border-border shadow-xl backdrop-blur-md z-[70]">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-foreground">¿Confirmar asistencia del prospecto?</AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground">

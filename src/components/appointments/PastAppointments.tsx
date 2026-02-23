@@ -1,9 +1,16 @@
 "use client"
 
 import React, { useState } from 'react';
-import { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
+import { Appointment, AppointmentStatus } from '@/services/appointment-service';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { MessageSquare, ChevronDown } from "lucide-react";
+import { 
+  MessageSquare, 
+  ChevronDown, 
+  Phone, 
+  Box, 
+  FileText, 
+  ChevronRight 
+} from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
@@ -15,31 +22,39 @@ interface Props {
   formatDate: (date: string) => string;
   format12hTime: (time: string) => string;
   highlightedId?: string | null;
+  expanded?: boolean;
 }
 
-export default function PastAppointments({ appointments, onSelect, formatDate, format12hTime, highlightedId }: Props) {
+export default function PastAppointments({ 
+  appointments, 
+  onSelect, 
+  formatDate, 
+  format12hTime, 
+  highlightedId,
+  expanded = false
+}: Props) {
   const [visibleCount, setVisibleCount] = useState(20);
   const { toast } = useToast();
 
   if (appointments.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-muted-foreground bg-muted/20 rounded-lg border border-dashed">
-        <MessageSquare className="w-12 h-12 mb-2 opacity-20" />
-        <p>No hay registro de citas pasadas.</p>
+      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground bg-muted/10 h-full rounded-xl border border-dashed border-border/50">
+        <MessageSquare className="w-16 h-16 mb-4 opacity-10" />
+        <p className="text-sm font-bold uppercase tracking-widest opacity-40">No hay registro de citas pasadas</p>
       </div>
     );
   }
 
   const getStatusColor = (status?: AppointmentStatus) => {
     switch (status) {
-      case 'Cierre': return 'text-green-500 font-bold';
-      case 'Apartado': return 'text-green-100/90 font-bold'; // Tono verde pastel blanco ligero
-      case 'No asistencia': return 'text-destructive';
-      case 'Reagendó': return 'text-primary';
-      case 'Asistencia': return 'text-accent';
-      case 'Reembolso': return 'text-orange-400';
-      case 'Continuación en otra cita': return 'text-blue-400';
-      default: return 'text-muted-foreground';
+      case 'Cierre': return 'text-green-500 bg-green-500/10 border-green-500/20';
+      case 'Apartado': return 'text-green-100/90 bg-green-500/20 border-green-400/30';
+      case 'No asistencia': return 'text-destructive bg-destructive/10 border-destructive/20';
+      case 'Reagendó': return 'text-primary bg-primary/10 border-primary/20';
+      case 'Asistencia': return 'text-accent bg-accent/10 border-accent/20';
+      case 'Reembolso': return 'text-orange-400 bg-orange-400/10 border-orange-400/20';
+      case 'Continuación en otra cita': return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
+      default: return 'text-muted-foreground bg-muted/10 border-border/20';
     }
   };
 
@@ -56,16 +71,20 @@ export default function PastAppointments({ appointments, onSelect, formatDate, f
   const visibleAppointments = appointments.slice(0, visibleCount);
 
   return (
-    <div className="space-y-4">
-      <div className="border rounded-md overflow-hidden bg-card/10 relative backdrop-blur-sm">
-        <ScrollArea className="h-[400px]">
+    <div className="space-y-4 flex flex-col h-full">
+      <div className="border rounded-xl overflow-hidden bg-card/10 relative backdrop-blur-sm flex-1 flex flex-col">
+        <ScrollArea className="flex-1">
           <Table>
             <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm">
               <TableRow>
-                <TableHead>Nombre / Teléfono</TableHead>
+                <TableHead className={expanded ? "w-[250px]" : ""}>Nombre / Teléfono</TableHead>
+                {expanded && <TableHead>Contacto</TableHead>}
                 <TableHead>Motivo</TableHead>
-                <TableHead>Fecha</TableHead>
+                {expanded && <TableHead>Producto</TableHead>}
+                <TableHead>Fecha / Hora</TableHead>
+                {expanded && <TableHead className="w-[300px]">Notas rápidas</TableHead>}
                 <TableHead>Resultado</TableHead>
+                {expanded && <TableHead className="w-12"></TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -76,28 +95,85 @@ export default function PastAppointments({ appointments, onSelect, formatDate, f
                     key={app.id} 
                     onClick={() => onSelect(app)}
                     className={cn(
-                      "hover:bg-primary/10 transition-colors cursor-pointer relative",
+                      "hover:bg-primary/10 transition-colors cursor-pointer relative h-16",
                       isHighlighted && "bg-accent/20 animate-pulse border-2 border-accent/40 z-20"
                     )}
                   >
-                    <TableCell>
-                      <div className="font-medium text-sm">{app.name}</div>
-                      <div 
-                        onClick={(e) => copyPhone(e, app.phone)}
-                        className="text-xs text-muted-foreground hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1 group/phone"
-                      >
-                        {app.phone}
-                      </div>
+                    <TableCell className="align-middle">
+                      <div className="font-bold text-sm text-foreground">{app.name}</div>
+                      {!expanded && (
+                        <div 
+                          onClick={(e) => copyPhone(e, app.phone)}
+                          className="text-[10px] text-muted-foreground hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1 mt-0.5"
+                        >
+                          <Phone className="w-2.5 h-2.5" /> {app.phone}
+                        </div>
+                      )}
                     </TableCell>
-                    <TableCell className="text-[10px] text-muted-foreground uppercase tracking-tight">
+
+                    {expanded && (
+                      <TableCell className="align-middle">
+                        <div 
+                          onClick={(e) => copyPhone(e, app.phone)}
+                          className="flex items-center gap-2 text-xs font-medium hover:text-primary transition-colors cursor-pointer"
+                        >
+                          <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                            <Phone className="w-3.5 h-3.5" />
+                          </div>
+                          {app.phone}
+                        </div>
+                      </TableCell>
+                    )}
+
+                    <TableCell className="text-[10px] text-muted-foreground uppercase font-bold align-middle">
                       {app.type}
                     </TableCell>
-                    <TableCell className="text-muted-foreground text-[10px] uppercase font-medium">
-                      {formatDate(app.date)} {format12hTime(app.time)}
+
+                    {expanded && (
+                      <TableCell className="align-middle">
+                        <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+                          <Box className="w-3.5 h-3.5 text-accent" /> {app.product || 'N/A'}
+                        </div>
+                      </TableCell>
+                    )}
+
+                    <TableCell className="text-muted-foreground text-[10px] uppercase font-bold align-middle">
+                      <div className="leading-tight">{formatDate(app.date)}</div>
+                      <div className="text-accent/80">{format12hTime(app.time)}</div>
                     </TableCell>
-                    <TableCell className={cn("text-[10px] uppercase font-bold", getStatusColor(app.status))}>
-                      {app.status || 'N/A'}
+
+                    {expanded && (
+                      <TableCell className="align-middle">
+                        <div className="flex items-start gap-2 max-w-[280px]">
+                          <FileText className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0 mt-0.5" />
+                          <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
+                            {app.notes || 'Sin anotaciones registradas.'}
+                          </p>
+                        </div>
+                      </TableCell>
+                    )}
+
+                    <TableCell className="align-middle">
+                      <div className={cn(
+                        "text-[9px] uppercase font-bold px-2 py-1 rounded-full border w-fit text-center min-w-[80px]",
+                        getStatusColor(app.status)
+                      )}>
+                        {app.status || 'N/A'}
+                      </div>
                     </TableCell>
+
+                    {expanded && (
+                      <TableCell className="align-middle text-right" onClick={(e) => e.stopPropagation()}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-primary"
+                          onClick={() => onSelect(app)}
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    )}
                   </TableRow>
                 );
               })}
@@ -107,14 +183,14 @@ export default function PastAppointments({ appointments, onSelect, formatDate, f
       </div>
       
       {visibleCount < appointments.length && (
-        <div className="flex justify-center">
+        <div className="flex justify-center shrink-0">
           <Button 
             variant="outline" 
             size="sm" 
             onClick={() => setVisibleCount(p => p + 20)}
-            className="text-xs border-dashed hover:bg-primary/10 backdrop-blur-md"
+            className="text-xs font-bold uppercase tracking-widest border-dashed hover:bg-primary/10 backdrop-blur-md h-9 px-6"
           >
-            <ChevronDown className="mr-2 h-3 w-3" /> Cargar 20 más
+            <ChevronDown className="mr-2 h-4 w-4" /> Cargar más historial
           </Button>
         </div>
       )}
