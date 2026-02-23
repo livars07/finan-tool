@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useMemo } from 'react';
@@ -9,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { CalendarClock, Search } from 'lucide-react';
-import { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
+import { Appointment, AppointmentStatus } from '@/services/appointment-service';
 import { parseISO, format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -120,6 +121,7 @@ export default function AppointmentsDashboard({
               <TabsContent value="upcoming">
                 <UpcomingAppointments 
                   appointments={filteredUpcoming} 
+                  allAppointments={appointments}
                   formatDate={formatFriendlyDate}
                   format12hTime={format12hTime}
                   onSelect={(app) => setSelectedAppId(app.id)}

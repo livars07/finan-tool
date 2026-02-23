@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Clock, Calendar, Info, CheckCircle2, AlertCircle, CheckCircle, Trophy, PartyPopper, Sparkles, Copy } from "lucide-react";
-import { parseISO, format } from 'date-fns';
+import { Clock, Calendar, Info, CheckCircle2, AlertCircle, CheckCircle, Trophy, PartyPopper, Sparkles, Copy, ClipboardCheck } from "lucide-react";
+import { parseISO, format, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface Props {
   appointments: Appointment[];
+  allAppointments: Appointment[];
   formatDate: (date: string) => string;
   format12hTime: (time: string) => string;
   onSelect: (app: Appointment) => void;
@@ -43,6 +44,7 @@ interface Props {
 
 export default function UpcomingAppointments({ 
   appointments, 
+  allAppointments,
   formatDate, 
   format12hTime, 
   onSelect, 
@@ -65,6 +67,14 @@ export default function UpcomingAppointments({
     return d.getDate() === today.getDate() && 
            d.getMonth() === today.getMonth() && 
            d.getFullYear() === today.getFullYear();
+  };
+
+  const isActuallyTomorrow = (dateStr: string) => {
+    const d = parseISO(dateStr);
+    const tomorrow = addDays(new Date(), 1);
+    return d.getDate() === tomorrow.getDate() && 
+           d.getMonth() === tomorrow.getMonth() && 
+           d.getFullYear() === tomorrow.getFullYear();
   };
 
   const handleConfirmAction = () => {
@@ -154,6 +164,25 @@ Número: ${app.phone}`;
       toast({
         title: "Citas de hoy copiadas",
         description: `Se han copiado ${todayApps.length} citas al portapapeles.`,
+      });
+    });
+  };
+
+  const copyDailyReport = () => {
+    const todaySales = allAppointments.filter(a => isActuallyToday(a.date) && a.status === 'Cierre').length;
+    const todayTotal = allAppointments.filter(a => isActuallyToday(a.date)).length;
+    const todayConfirmed = allAppointments.filter(a => isActuallyToday(a.date) && a.isConfirmed).length;
+    const tomorrowTotal = allAppointments.filter(a => isActuallyTomorrow(a.date)).length;
+
+    const reportText = `✅Ventas: ${todaySales}
+✅Citas para hoy: ${todayTotal}
+✅Citas confirmadas: ${todayConfirmed}
+✅Citas para el día siguiente: ${tomorrowTotal}`;
+
+    navigator.clipboard.writeText(reportText).then(() => {
+      toast({
+        title: "Reporte diario copiado",
+        description: "Las estadísticas del día han sido copiadas al portapapeles.",
       });
     });
   };
@@ -268,8 +297,17 @@ Número: ${app.phone}`;
         )}
       </div>
 
-      {hasTodayApps && (
-        <div className="flex justify-end pt-2">
+      <div className="flex flex-wrap justify-end gap-2 pt-2">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={copyDailyReport}
+          className="text-[10px] font-bold uppercase tracking-widest border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 h-8 gap-2"
+        >
+          <ClipboardCheck className="w-3.5 h-3.5" />
+          Copiar Reporte Diario
+        </Button>
+        {hasTodayApps && (
           <Button 
             variant="outline" 
             size="sm" 
@@ -279,8 +317,8 @@ Número: ${app.phone}`;
             <Copy className="w-3.5 h-3.5" />
             Copiar citas de hoy
           </Button>
-        </div>
-      )}
+        )}
+      </div>
 
       <Dialog open={!!finId} onOpenChange={() => setFinId(null)}>
         <DialogContent className="sm:max-w-[500px] bg-card border-border shadow-2xl">
