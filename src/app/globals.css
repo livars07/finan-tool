@@ -31,25 +31,26 @@
 
   [data-theme="corporativo"] {
     color-scheme: light;
-    --background: 210 15% 92%;
-    --foreground: 222 20% 20%;
-    --card: 0 0% 100% / 0.8;
-    --card-foreground: 222 20% 20%;
-    --popover: 210 15% 95% / 0.98;
-    --popover-foreground: 222 20% 20%;
-    --primary: 215 40% 45%;
+    --background: 210 20% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 221 83% 53%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 20% 88%;
-    --secondary-foreground: 222 20% 20%;
-    --muted: 210 20% 80%;
-    --muted-foreground: 190 70% 50%;
-    --accent: 160 30% 50%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 50% 50%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214 10% 82%;
-    --input: 214 10% 82%;
-    --ring: 215 40% 45%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
     --calendar-filter: none;
   }
 
@@ -112,36 +113,6 @@
     --accent-foreground: 222 47% 5%;
     --border: 45 90% 30% / 0.2;
     --ring: 45 90% 50%;
-    --calendar-filter: invert(1);
-  }
-
-  [data-theme="bosque"] {
-    color-scheme: dark;
-    --background: 150 40% 8%;
-    --foreground: 150 20% 95%;
-    --card: 150 40% 12% / 0.4;
-    --card-foreground: 150 20% 95%;
-    --primary: 145 80% 45%;
-    --primary-foreground: 150 40% 5%;
-    --accent: 160 100% 50%;
-    --accent-foreground: 150 40% 5%;
-    --border: 145 80% 20% / 0.3;
-    --ring: 145 80% 45%;
-    --calendar-filter: invert(1);
-  }
-
-  [data-theme="amanecer"] {
-    color-scheme: dark;
-    --background: 20 30% 10%;
-    --foreground: 30 50% 95%;
-    --card: 20 30% 15% / 0.4;
-    --card-foreground: 30 50% 95%;
-    --primary: 25 95% 55%;
-    --primary-foreground: 20 30% 5%;
-    --accent: 35 100% 50%;
-    --accent-foreground: 20 30% 5%;
-    --border: 25 95% 30% / 0.3;
-    --ring: 25 95% 55%;
     --calendar-filter: invert(1);
   }
 

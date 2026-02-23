@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { 
   LayoutDashboard, Wallet, CalendarDays, Users, CheckCircle2, ShieldCheck, TrendingUp, RotateCcw,
   Palette, Moon, Sun, Cpu, Phone, BookOpen, Info, Calculator, Maximize2, Sparkles, History,
-  ClipboardList, Target, Calendar, Copy, Crown, Trees, Sunrise, Zap, Snowflake, Trash2
+  ClipboardList, Target, Calendar, Copy, Crown, Zap, Snowflake, Trash2
 } from 'lucide-react';
 import { Separator } from "@/components/ui/separator";
 import { useAppointments } from '@/hooks/use-appointments';
@@ -49,7 +49,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
-type Theme = 'predeterminado' | 'discreto' | 'corporativo' | 'moderno' | 'elegante' | 'bosque' | 'amanecer' | 'neon' | 'gelido';
+type Theme = 'predeterminado' | 'discreto' | 'corporativo' | 'moderno' | 'elegante' | 'neon' | 'gelido';
 
 const APP_TIPS = [
   { icon: Calculator, title: "Calculadora Rápida", color: "text-primary", text: "Usa la calculadora rapida en caso de tener una llamada con un interesado que pregunte montos aproximados." },
@@ -142,11 +142,9 @@ export default function Home() {
                 {[
                   { id: 'predeterminado', label: 'Predeterminado', icon: Palette, color: 'bg-primary' },
                   { id: 'discreto', label: 'Discreto', icon: Moon, color: 'bg-indigo-500' },
-                  { id: 'corporativo', label: 'Corporativo', icon: Sun, color: 'bg-slate-400' },
+                  { id: 'corporativo', label: 'Corporativo (Legible)', icon: Sun, color: 'bg-blue-600' },
                   { id: 'moderno', label: 'Moderno', icon: Cpu, color: 'bg-cyan-400' },
                   { id: 'elegante', label: 'Elegante', icon: Crown, color: 'bg-yellow-600' },
-                  { id: 'bosque', label: 'Bosque', icon: Trees, color: 'bg-green-600' },
-                  { id: 'amanecer', label: 'Amanecer', icon: Sunrise, color: 'bg-orange-500' },
                   { id: 'neon', label: 'Neón', icon: Zap, color: 'bg-pink-500' },
                   { id: 'gelido', label: 'Gélido', icon: Snowflake, color: 'bg-blue-300' },
                 ].map((t) => (
@@ -211,7 +209,7 @@ export default function Home() {
         <DialogContent className="sm:max-w-[750px] max-h-[90vh] flex flex-col p-0 overflow-hidden bg-card backdrop-blur-3xl shadow-2xl border-border">
           <DialogHeader className="p-8 border-b border-border/50 bg-primary/5 shrink-0"><div className="flex items-center gap-4"><div className="p-3 rounded-2xl bg-primary/20 border border-primary/30"><BookOpen className="w-7 h-7 text-primary" /></div><div><DialogTitle className="text-3xl font-bold">Guía Técnica de Finanto</DialogTitle><DialogDescription>Manual v1.1 - 23 de Marzo</DialogDescription></div></div></DialogHeader>
           <div className="flex-1 overflow-y-auto p-8 space-y-10"><section className="space-y-4"><h2 className="text-2xl font-bold text-primary">Introducción al Sistema</h2><p className="text-muted-foreground leading-relaxed">Finanto es una plataforma técnica diseñada para optimizar la eficiencia operativa del ejecutivo en financiamiento inmobiliario. Facilita el perfilamiento rápido de prospectos y garantiza una administración técnica de los créditos.</p></section><div className="grid grid-cols-1 md:grid-cols-2 gap-8"><Card className="bg-muted/30 border-border/50"><CardContent className="p-6 space-y-4"><h3 className="text-lg font-bold flex items-center gap-2 text-accent"><Calculator className="w-5 h-5" /> 1. Calculadora de Precisión</h3><ul className="text-sm space-y-2 list-disc pl-5 text-muted-foreground"><li><strong>Perfilamiento profesional:</strong> Determine montos inmediatos por llamada o en 1ra consulta sin conexión.</li><li><strong>Tanteo Financiero:</strong> Ajuste montos en tiempo real frente al cliente.</li></ul></CardContent></Card><Card className="bg-muted/30 border-border/50"><CardContent className="p-6 space-y-4"><h3 className="text-lg font-bold flex items-center gap-2 text-accent"><CalendarDays className="w-5 h-5" /> 2. Gestión de Agenda</h3><ul className="text-sm space-y-2 list-disc pl-5 text-muted-foreground"><li><strong>Priorización Diaria:</strong> Organice su día para maximizar la productividad.</li><li><strong>Logística:</strong> Valide confirmaciones para evitar tiempos muertos.</li></ul></CardContent></Card></div><section className="p-6 rounded-2xl bg-primary/5 border border-primary/20"><h3 className="text-xl font-bold text-primary mb-2">3. Administración de Datos Críticos</h3><p className="text-sm text-muted-foreground">Al concretar un trámite, capture montos finales, comisiones y fechas de firma. Esta disciplina garantiza un control administrativo impecable.</p></section></div>
-          <DialogFooter className="p-6 border-t border-border/50 bg-muted/20 shrink-0"><Button onClick={() => setShowHelp(false)} className="w-full sm:w-auto font-bold">Entendido</Button></DialogFooter>
+          <DialogFooter className="p-6 border-t border-border/50 bg-muted/20 shrink-0"><Button onClick={() => setShowHelp(false)} className="max-w-none w-full sm:w-auto font-bold">Entendido</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
