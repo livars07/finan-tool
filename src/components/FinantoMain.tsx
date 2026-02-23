@@ -84,6 +84,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showHelp, setShowHelp] = useState(initialSection === 'guia');
+  const [isSimulatorExpanded, setIsSimulatorExpanded] = useState(initialSection === 'simulador');
   const [theme, setTheme] = useState<Theme>('predeterminado');
   const [api, setApi] = useState<CarouselApi>();
   const [timerKey, setTimerKey] = useState(0);
@@ -101,6 +102,17 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       }
     }
   }, [initialSection]);
+
+  // Actualizar Título de Página
+  useEffect(() => {
+    if (showHelp) {
+      document.title = "Guía";
+    } else if (isSimulatorExpanded) {
+      document.title = "Simulador";
+    } else {
+      document.title = "Finanto - Gestión de Financiamiento Inmobiliario";
+    }
+  }, [showHelp, isSimulatorExpanded]);
 
   useEffect(() => {
     if (!api) return;
@@ -196,7 +208,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                 <DropdownMenuSeparator />
                 {[
                   { id: 'predeterminado', label: 'Predeterminado', icon: Palette, color: 'bg-primary' },
-                  { id: 'corporativo', label: 'Corporativo (Azul/Verde)', icon: Sun, color: 'bg-blue-600' },
+                  { id: 'corporativo', label: 'Corporativo', icon: Sun, color: 'bg-blue-600' },
                   { id: 'moderno', label: 'Moderno', icon: Cpu, color: 'bg-cyan-500' },
                   { id: 'discreto', label: 'Discreto', icon: Moon, color: 'bg-slate-700' },
                   { id: 'olivares', label: 'Olivares', icon: Crown, color: 'bg-yellow-600' },
@@ -246,7 +258,10 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
         <div className="grid grid-cols-1 gap-8 items-start flex-1 xl:grid-cols-12">
           <section className="xl:col-span-5">
             <div className="sticky top-24 space-y-6">
-              <CreditCalculator initialExpanded={initialSection === 'simulador'} />
+              <CreditCalculator 
+                initialExpanded={initialSection === 'simulador'} 
+                onExpandedChange={setIsSimulatorExpanded}
+              />
               <div className="relative p-6 overflow-hidden border rounded-xl border-primary/20 bg-primary/5 backdrop-blur-sm group">
                 <Carousel setApi={setApi} className="w-full" opts={{ align: "start", loop: true }}>
                   <CarouselContent>

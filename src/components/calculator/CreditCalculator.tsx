@@ -36,6 +36,7 @@ import { cn } from "@/lib/utils";
 
 interface CreditCalculatorProps {
   initialExpanded?: boolean;
+  onExpandedChange?: (expanded: boolean) => void;
 }
 
 const CalculatorInputs = ({ 
@@ -95,7 +96,7 @@ const CalculatorInputs = ({
   </div>
 );
 
-export default function CreditCalculator({ initialExpanded = false }: CreditCalculatorProps) {
+export default function CreditCalculator({ initialExpanded = false, onExpandedChange }: CreditCalculatorProps) {
   const [totalPrice, setTotalPrice] = useState<string>('');
   const [monthlyPayment, setMonthlyPayment] = useState<string>('');
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
@@ -110,6 +111,10 @@ export default function CreditCalculator({ initialExpanded = false }: CreditCalc
       setIsExpanded(true);
     }
   }, [initialExpanded]);
+
+  useEffect(() => {
+    onExpandedChange?.(isExpanded);
+  }, [isExpanded, onExpandedChange]);
 
   // Sincronizar URL con el estado del Simulador
   useEffect(() => {

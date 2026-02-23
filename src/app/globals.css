@@ -31,25 +31,25 @@
 
   [data-theme="corporativo"] {
     color-scheme: light;
-    --background: 210 40% 98%; /* Fondo Azul Glacial */
+    --background: 210 60% 96%; /* Azul Glacial más marcado */
     --foreground: 222 47% 11%;
     --card: 0 0% 100% / 0.7;
     --card-foreground: 222 47% 15%;
     --popover: 0 0% 100% / 0.8;
     --popover-foreground: 222 47% 15%;
-    --primary: 142 76% 36%; /* Verde Bosque Vibrante */
+    --primary: 142 76% 36%; /* Verde Bosque */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 30% 90%; /* Azul Riel Suave */
+    --secondary: 210 50% 88%; /* Azul Riel más visible */
     --secondary-foreground: 222 47% 15%;
-    --muted: 210 20% 95%;
-    --muted-foreground: 142 20% 40%;
-    --accent: 45 100% 50%; /* Amarillo Oro / Ámbar */
+    --muted: 210 30% 94%;
+    --muted-foreground: 210 40% 30%; /* Azul para texto secundario */
+    --accent: 45 100% 50%; /* Amarillo Oro */
     --accent-foreground: 222 47% 10%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 210 20% 88%;
-    --input: 210 20% 88%;
-    --ring: 142 76% 36%;
+    --border: 210 30% 85%;
+    --input: 210 30% 85%;
+    --ring: 210 60% 50%; /* Ring Azul */
     --radius: 0.75rem;
     --calendar-filter: none;
   }
@@ -165,7 +165,7 @@
 
   [data-theme^="corporativo"] [role="dialog"]:not([data-calculator-dialog="true"]),
   [data-theme^="corporativo"] [role="status"] {
-    background-color: rgba(255, 255, 255, 0.85) !important;
+    background-color: rgba(230, 242, 255, 0.85) !important; /* Tono azul glacial translúcido */
     @apply border-border shadow-xl !important;
   }
 
