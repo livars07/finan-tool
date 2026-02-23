@@ -20,7 +20,8 @@ import {
   CalendarDays,
   TrendingUp,
   Coins,
-  ArrowRight
+  ArrowRight,
+  Info
 } from 'lucide-react';
 import { Appointment, AppointmentStatus } from '@/services/appointment-service';
 import { parseISO, format } from 'date-fns';
@@ -34,6 +35,12 @@ import {
   DialogDescription,
   DialogClose
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from '@/lib/utils';
 import * as Service from '@/services/appointment-service';
 
@@ -133,49 +140,103 @@ export default function AppointmentsDashboard({
   const DashboardContent = ({ expanded = false }: { expanded?: boolean }) => (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
       <div className={cn("flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 shrink-0", expanded && "bg-muted/10 p-6 rounded-2xl border border-border/30 backdrop-blur-md")}>
-        <TabsList className={cn("grid w-full sm:w-80 grid-cols-2")}>
-          <TabsTrigger value="upcoming">Próximas ({filteredUpcoming.length})</TabsTrigger>
-          <TabsTrigger value="past">Pasadas ({filteredPast.length})</TabsTrigger>
+        <TabsList className={cn(
+          "grid w-full sm:w-80 grid-cols-2 p-1.5 bg-muted/50 border border-border/20 shadow-inner",
+          "data-[state=active]:bg-background"
+        )}>
+          <TabsTrigger 
+            value="upcoming" 
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
+          >
+            Próximas ({filteredUpcoming.length})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="past" 
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
+          >
+            Historial ({filteredPast.length})
+          </TabsTrigger>
         </TabsList>
 
         {expanded && (
-          <div className="grid grid-cols-3 md:grid-cols-5 gap-6 items-center flex-1 ml-0 sm:ml-8">
-            <div className="flex flex-col items-center sm:items-start group">
-              <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-primary transition-colors">Hoy</span>
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 border border-blue-500/20"><CalendarDays className="w-3.5 h-3.5"/></div>
-                <span className="text-sm font-bold text-foreground">{stats.todayConfirmed}<span className="text-muted-foreground/40 mx-0.5">/</span>{stats.todayCount}</span>
-              </div>
+          <TooltipProvider delayDuration={0}>
+            <div className="grid grid-cols-3 md:grid-cols-5 gap-6 items-center flex-1 ml-0 sm:ml-8">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex flex-col items-center sm:items-start group cursor-help">
+                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-primary transition-colors">Hoy</span>
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 border border-blue-500/20"><CalendarDays className="w-3.5 h-3.5"/></div>
+                      <span className="text-sm font-bold text-foreground">{stats.todayConfirmed}<span className="text-muted-foreground/40 mx-0.5">/</span>{stats.todayCount}</span>
+                    </div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">Citas confirmadas vs. citas totales para el día de hoy.</p>
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex flex-col items-center sm:items-start group cursor-help">
+                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-accent transition-colors">Mañana</span>
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-accent/10 text-accent border border-accent/20"><ArrowRight className="w-3.5 h-3.5"/></div>
+                      <span className="text-sm font-bold text-foreground">{stats.tomorrowTotal}</span>
+                    </div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">Volumen de citas programadas para el día de mañana.</p>
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex flex-col items-center sm:items-start group cursor-help">
+                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-green-500 transition-colors">Cierres Mes</span>
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-green-500/10 text-green-500 border border-green-500/20"><CheckCircle2 className="w-3.5 h-3.5"/></div>
+                      <span className="text-sm font-bold text-foreground">{stats.currentMonthSales}</span>
+                    </div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">Número de trámites concretados con éxito en el mes actual.</p>
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="hidden md:flex flex-col items-center sm:items-start group cursor-help">
+                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-blue-500 transition-colors">Apartados</span>
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-500 border border-blue-500/20"><Coins className="w-3.5 h-3.5"/></div>
+                      <span className="text-sm font-bold text-foreground">{stats.currentMonthApartados}</span>
+                    </div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">Clientes que han realizado un apartado en el mes actual.</p>
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="hidden md:flex flex-col items-center sm:items-start group cursor-help">
+                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-primary transition-colors">Conversión</span>
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20"><TrendingUp className="w-3.5 h-3.5"/></div>
+                      <span className="text-sm font-bold text-foreground">{stats.conversionRate}%</span>
+                    </div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">Ratio de efectividad basado en cierres vs. prospectos totales.</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
-            <div className="flex flex-col items-center sm:items-start group">
-              <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-accent transition-colors">Mañana</span>
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-accent/10 text-accent border border-accent/20"><ArrowRight className="w-3.5 h-3.5"/></div>
-                <span className="text-sm font-bold text-foreground">{stats.tomorrowTotal}</span>
-              </div>
-            </div>
-            <div className="flex flex-col items-center sm:items-start group">
-              <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-green-500 transition-colors">Cierres Mes</span>
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-green-500/10 text-green-500 border border-green-500/20"><CheckCircle2 className="w-3.5 h-3.5"/></div>
-                <span className="text-sm font-bold text-foreground">{stats.currentMonthSales}</span>
-              </div>
-            </div>
-            <div className="hidden md:flex flex-col items-center sm:items-start group">
-              <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-blue-500 transition-colors">Apartados</span>
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-500 border border-blue-500/20"><Coins className="w-3.5 h-3.5"/></div>
-                <span className="text-sm font-bold text-foreground">{stats.currentMonthApartados}</span>
-              </div>
-            </div>
-            <div className="hidden md:flex flex-col items-center sm:items-start group">
-              <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-primary transition-colors">Conversión</span>
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20"><TrendingUp className="w-3.5 h-3.5"/></div>
-                <span className="text-sm font-bold text-foreground">{stats.conversionRate}%</span>
-              </div>
-            </div>
-          </div>
+          </TooltipProvider>
         )}
       </div>
 
