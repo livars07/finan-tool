@@ -3,8 +3,9 @@
 import React, { useState } from 'react';
 import { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Clock, Calendar, Info, CheckCircle2, AlertCircle, CheckCircle, Trophy, PartyPopper, Sparkles } from "lucide-react";
-import { parseISO } from 'date-fns';
+import { Clock, Calendar, Info, CheckCircle2, AlertCircle, CheckCircle, Trophy, PartyPopper, Sparkles, Copy } from "lucide-react";
+import { parseISO, format } from 'date-fns';
+import { es } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -126,6 +127,39 @@ export default function UpcomingAppointments({
     });
   };
 
+  const copyAllToday = () => {
+    const todayApps = appointments.filter(app => isActuallyToday(app.date));
+    if (todayApps.length === 0) {
+      toast({
+        title: "Sin citas para hoy",
+        description: "No hay citas programadas para el día de hoy que copiar.",
+      });
+      return;
+    }
+
+    const formattedApps = todayApps.map(app => {
+      const dateObj = parseISO(app.date);
+      const dateFormatted = format(dateObj, "EEEE d 'de' MMMM yyyy", { locale: es });
+      const capitalizedDate = dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
+      const timeFormatted = format12hTime(app.time);
+      
+      return `Cita: ${capitalizedDate}
+Nombre: ${app.name}
+Motivo: ${app.type}
+Hora: ${timeFormatted}
+Número: ${app.phone}`;
+    }).join('\n\n');
+
+    navigator.clipboard.writeText(formattedApps).then(() => {
+      toast({
+        title: "Citas de hoy copiadas",
+        description: `Se han copiado ${todayApps.length} citas al portapapeles.`,
+      });
+    });
+  };
+
+  const hasTodayApps = appointments.some(app => isActuallyToday(app.date));
+
   return (
     <div className="space-y-4">
       <div className="border rounded-md overflow-hidden relative backdrop-blur-sm">
@@ -233,6 +267,20 @@ export default function UpcomingAppointments({
           </Table>
         )}
       </div>
+
+      {hasTodayApps && (
+        <div className="flex justify-end pt-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={copyAllToday}
+            className="text-[10px] font-bold uppercase tracking-widest border-green-500/40 text-green-500 hover:bg-green-500/10 h-8 gap-2"
+          >
+            <Copy className="w-3.5 h-3.5" />
+            Copiar citas de hoy
+          </Button>
+        </div>
+      )}
 
       <Dialog open={!!finId} onOpenChange={() => setFinId(null)}>
         <DialogContent className="sm:max-w-[500px] bg-card border-border shadow-2xl">

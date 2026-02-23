@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -111,6 +110,17 @@ export default function CreditCalculator({ initialExpanded = false }: CreditCalc
       setIsExpanded(true);
     }
   }, [initialExpanded]);
+
+  // Sincronizar URL con el estado del Simulador
+  useEffect(() => {
+    if (isExpanded) {
+      window.history.pushState(null, '', '/simulador');
+    } else {
+      if (window.location.pathname === '/simulador') {
+        window.history.pushState(null, '', '/');
+      }
+    }
+  }, [isExpanded]);
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('es-MX', {

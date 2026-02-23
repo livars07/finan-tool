@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -115,6 +114,17 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
     }, 6000);
     return () => clearInterval(interval);
   }, []);
+
+  // Sincronizar URL con el estado de la Guía
+  useEffect(() => {
+    if (showHelp) {
+      window.history.pushState(null, '', '/guia');
+    } else {
+      if (window.location.pathname === '/guia') {
+        window.history.pushState(null, '', '/');
+      }
+    }
+  }, [showHelp]);
 
   const resetTimer = useCallback(() => setTimerKey(prev => prev + 1), []);
   const handleNext = useCallback(() => { if (api) { api.scrollNext(); resetTimer(); } }, [api, resetTimer]);
