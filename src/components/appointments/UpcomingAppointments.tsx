@@ -149,14 +149,18 @@ export default function UpcomingAppointments({
       const dateFormatted = format(dateObj, "EEEE d 'de' MMMM yyyy", { locale: es });
       const capitalizedDate = dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
       const timeFormatted = format12hTime(app.time);
-      const confirmedTag = app.isConfirmed ? ' (Confirmado)' : '';
+      
+      // Formato WhatsApp Bold
+      const dateBold = `*${capitalizedDate}*`;
+      const timeBold = `*${timeFormatted}*`;
+      const confirmedBold = app.isConfirmed ? ' *(Confirmado)*' : '';
       
       const motivoLine = app.type === '1ra consulta' ? '' : `Motivo: ${app.type}\n`;
 
-      return `Cita: ${capitalizedDate}
+      return `Cita: ${dateBold}
 Nombre: ${app.name}
 ${motivoLine}Producto: ${app.product || 'N/A'}
-Hora: ${timeFormatted}${confirmedTag}
+Hora: ${timeBold}${confirmedBold}
 Número: ${app.phone}`;
     }).join('\n\n');
 
@@ -174,10 +178,11 @@ Número: ${app.phone}`;
     const todayConfirmed = allAppointments.filter(a => isActuallyToday(a.date) && a.isConfirmed).length;
     const tomorrowTotal = allAppointments.filter(a => isActuallyTomorrow(a.date)).length;
 
-    const reportText = `✅Ventas: ${todaySales}
-✅Citas para hoy: ${todayTotal}
-✅Citas confirmadas: ${todayConfirmed}
-✅Citas para el día siguiente: ${tomorrowTotal}`;
+    // Formato WhatsApp Bold para números
+    const reportText = `✅Ventas: *${todaySales}*
+✅Citas para hoy: *${todayTotal}*
+✅Citas confirmadas: *${todayConfirmed}*
+✅Citas para el día siguiente: *${tomorrowTotal}*`;
 
     navigator.clipboard.writeText(reportText).then(() => {
       toast({
