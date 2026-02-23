@@ -159,8 +159,8 @@ export function useAppointments() {
   const startOfToday = startOfDay(now);
   const lastMonth = subMonths(now, 1);
 
-  // Filtrado core solicitado
-  const activeAppointments = appointments.filter(app => app.isArchived !== true);
+  // Filtrado core: Separamos las que están en papelera de las activas
+  const activeAppointments = appointments.filter(app => !app.isArchived);
   const archived = appointments.filter(app => app.isArchived === true);
 
   const upcoming = activeAppointments

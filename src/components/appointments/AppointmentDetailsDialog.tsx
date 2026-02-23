@@ -65,28 +65,38 @@ export default function AppointmentDetailsDialog({
     toast({ title: "Guardado", description: "La información del cliente ha sido actualizada." });
   };
 
-  const handleDelete = () => {
-    const idToDelete = appointment.id;
-    // 1. Cerramos el popup de confirmación primero
-    setShowDeleteConfirm(false);
-    
-    // 2. Ejecutamos la lógica de eliminación
-    onDelete(idToDelete);
-    
-    // 3. Cerramos el diálogo principal
-    onOpenChange(false);
-    
-    // 4. Limpieza forzada del DOM para asegurar interactividad
+  // Función crítica para limpiar el bloqueo del DOM de Radix/Shadcn
+  const forceDOMCleanup = () => {
     setTimeout(() => {
       if (typeof document !== 'undefined') {
         document.body.style.pointerEvents = 'auto';
         document.body.style.overflow = 'auto';
+        // Eliminar cualquier overlay residual si existiera
+        const overlays = document.querySelectorAll('[data-radix-focus-guard]');
+        overlays.forEach(el => (el as HTMLElement).style.display = 'none');
       }
-    }, 100);
+    }, 150);
+  };
+
+  const handleConfirmArchive = () => {
+    const idToArchive = appointment.id;
+    const name = appointment.name;
+    
+    // 1. Cerramos el diálogo de confirmación
+    setShowDeleteConfirm(false);
+    
+    // 2. Cerramos el diálogo principal de detalles inmediatamente
+    onOpenChange(false);
+    
+    // 3. Ejecutamos la lógica de archivado (Papelera)
+    onDelete(idToArchive);
+    
+    // 4. Limpieza forzada del DOM para asegurar interactividad total
+    forceDOMCleanup();
 
     toast({ 
-      title: "Registro eliminado", 
-      description: `Se ha borrado el historial de ${appointment.name}.` 
+      title: "Cita movida a papelera", 
+      description: `Se ha archivado el historial de ${name}.` 
     });
   };
 
@@ -114,9 +124,15 @@ Número: ${appointment.phone}`;
 
   return (
     <>
-      <Dialog open={open} onOpenChange={(o) => { if(!o) setIsEditing(false); onOpenChange(o); }}>
+      <Dialog open={open} onOpenChange={(o) => { 
+        if(!o) {
+          setIsEditing(false);
+          forceDOMCleanup();
+        } 
+        onOpenChange(o); 
+      }}>
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border custom-scrollbar p-0">
-          <DialogHeader className="px-6 py-3 border-b border-border/40 flex flex-row items-center justify-between">
+          <DialogHeader className="px-6 py-4 border-b border-border/40 flex flex-row items-center justify-between">
             <div className="flex items-center gap-2">
               <DialogTitle className="text-xl font-headline font-bold text-foreground leading-none">
                 Detalles
@@ -142,13 +158,13 @@ Número: ${appointment.phone}`;
                   onClick={copyToWhatsAppFormat}
                   variant="outline" 
                   size="sm"
-                  className="h-7 px-3 text-[10px] border-green-500/30 text-green-500 hover:bg-green-500/10 font-bold uppercase tracking-tight flex items-center justify-center"
+                  className="h-8 px-3 text-[10px] border-green-500/30 text-green-500 hover:bg-green-500/10 font-bold uppercase tracking-tight flex items-center justify-center"
                 >
-                  <MessageCircle className="w-3 h-3 mr-1.5" />
+                  <MessageCircle className="w-3.5 h-3.5 mr-1.5" />
                   Copiar datos
                 </Button>
               )}
-              <DialogClose className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 transition-all hover:bg-red-600 focus:outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
+              <DialogClose className="flex h-4 w-4 items-center justify-center rounded-full bg-destructive transition-all hover:bg-destructive/90 focus:outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
                 <span className="sr-only">Cerrar</span>
               </DialogClose>
             </div>
@@ -289,7 +305,7 @@ Número: ${appointment.phone}`;
               className="text-destructive hover:bg-destructive/10 h-8 text-xs font-bold uppercase"
               onClick={() => setShowDeleteConfirm(true)}
             >
-              <Trash2 className="w-3.5 h-3.5 mr-2" /> Eliminar
+              <Trash2 className="w-3.5 h-3.5 mr-2" /> Borrar
             </Button>
             
             <div className="flex gap-2">
@@ -310,21 +326,21 @@ Número: ${appointment.phone}`;
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+      <AlertDialog open={showDeleteConfirm} onOpenChange={(o) => { if(!o) forceDOMCleanup(); setShowDeleteConfirm(o); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Confirmar eliminación?</AlertDialogTitle>
+            <AlertDialogTitle>¿Mover a la papelera?</AlertDialogTitle>
             <AlertDialogDescription>
-              Se eliminará toda la información y el historial de notas de <strong>{appointment.name}</strong> de forma permanente.
+              La cita de <strong>{appointment.name}</strong> se ocultará de las listas activas. Podrás recuperarla desde la papelera más tarde.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Volver</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => forceDOMCleanup()}>Volver</AlertDialogCancel>
             <AlertDialogAction 
-              onClick={handleDelete}
+              onClick={handleConfirmArchive}
               className="bg-destructive text-white hover:bg-destructive/90"
             >
-              Sí, eliminar
+              Sí, archivar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
