@@ -171,7 +171,6 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
     }).format(val);
   };
 
-  // Lógica de cálculo dinámico
   const handleTotalPriceChange = (val: string) => {
     const cleanVal = val.replace(/,/g, '');
     setTotalPrice(cleanVal);
@@ -201,7 +200,6 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
   const handleExtraDownChange = (val: string) => {
     const cleanVal = val.replace(/,/g, '');
     setExtraDownPayment(cleanVal);
-    // Al dar más enganche, se descuenta el financiamiento y baja la mensualidad
     const p = parseNumber(totalPrice);
     const ed = parseFloat(cleanVal) || 0;
     const netP = Math.max(0, p - ed);
@@ -213,8 +211,6 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
   const handleExtraMonthlyChange = (val: string) => {
     const cleanVal = val.replace(/,/g, '');
     setExtraMonthlyContribution(cleanVal);
-    // Al agregar mensualidad extra, se ajusta el financiamiento para mantener el equilibrio si es necesario,
-    // o simplemente actualiza la carga total. En este modelo, actualizamos la mensualidad total.
     const p = parseNumber(totalPrice);
     const ed = parseNumber(extraDownPayment);
     const netP = Math.max(0, p - ed);
@@ -223,7 +219,6 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
     setMonthlyPayment(totalMonthly.toFixed(2));
   };
 
-  // Recalcular cuando cambia el plazo
   useEffect(() => {
     const p = parseNumber(totalPrice);
     const ed = parseNumber(extraDownPayment);
@@ -243,7 +238,6 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
     setCustomTerm('192');
   };
 
-  // Cálculos para la vista de resultados
   const rawP = parseNumber(totalPrice);
   const extraDown = parseNumber(extraDownPayment);
   const netFinancing = Math.max(0, rawP - extraDown);
@@ -273,15 +267,34 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
       return;
     }
 
-    const summaryText = `Resumen de cotización de financiamiento inmobiliario:
-• Valor de Referencia: ${formatCurrency(rawP)}
-• Monto a Financiar Neto: ${formatCurrency(netFinancing)}
-• Plazo: ${currentTerm} meses
-• Enganche Total: ${formatCurrency(totalDownPayment)}
-• Mensualidad Base: ${formatCurrency(baseMonthly)}
-${currentExtraMonthly > 0 ? `• Aportación Extra: ${formatCurrency(currentExtraMonthly)}\n` : ''}• Carga Mensual Total: ${formatCurrency(totalMonthlyLoad)}
-• Ingreso Mínimo Req.: ${formatCurrency(minIncomeRequired)}
-* Proyección técnica informativa.`;
+    let summaryParts = [
+      `📊 *RESUMEN DE COTIZACIÓN - FINANTO*`,
+      `• Valor de Referencia: ${formatCurrency(rawP)}`,
+      `• Monto a Financiar Neto: ${formatCurrency(netFinancing)}`,
+      `• Plazo: ${currentTerm} meses`,
+      `• Enganche Total: ${formatCurrency(totalDownPayment)}`,
+      `• Carga Mensual Total: ${formatCurrency(totalMonthlyLoad)}`,
+      `--------------------------`,
+      `💼 *GASTOS OPERATIVOS (ESTIMADOS)*`,
+      `• Est. Escrituración (5%): ${formatCurrency(estimatedClosingCosts)}`,
+      `• Est. Avalúo Pericial: ${formatCurrency(appraisalCost)}`,
+      `• Inversión Inicial Total: ${formatCurrency(totalDownPayment + totalOperatingExpenses)}`,
+    ];
+
+    let notes = [];
+    if (extraDown > 0) notes.push(`• Se aplicó un enganche adicional de ${formatCurrency(extraDown)}.`);
+    if (currentTerm < 192) notes.push(`• Se optimizó el plazo a ${currentTerm} meses.`);
+    if (currentExtraMonthly > 0) notes.push(`• Se incluyó una aportación mensual extra de ${formatCurrency(currentExtraMonthly)}.`);
+
+    if (notes.length > 0) {
+      summaryParts.push(`--------------------------`);
+      summaryParts.push(`📝 *NOTAS DE PERSONALIZACIÓN*`);
+      summaryParts.push(...notes);
+    }
+
+    summaryParts.push(`\n* Proyección técnica informativa sujeta a cambios.`);
+
+    const summaryText = summaryParts.join('\n');
 
     navigator.clipboard.writeText(summaryText).then(() => {
       toast({
