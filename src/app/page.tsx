@@ -120,16 +120,20 @@ export default function Home() {
             <div className="bg-primary/20 p-1.5 rounded-lg border border-primary/30">
               <ShieldCheck className="text-primary w-6 h-6" />
             </div>
-            <h1 className="text-xl font-headline font-bold tracking-tight text-foreground">
-              Finanto <span className="text-primary">BETA</span>
-            </h1>
-          </div>
-          <nav className="hidden md:flex items-center gap-6">
-            <div className="text-sm font-medium text-muted-foreground border-b-2 border-primary pb-1">
-              <LayoutDashboard className="w-4 h-4 inline mr-1" />v1.1 (23 - Marzo)
+            <div className="flex flex-col">
+              <h1 className="text-xl font-headline font-bold tracking-tight text-foreground leading-none">
+                Finanto <span className="text-primary">BETA</span>
+              </h1>
+              <span className="text-[10px] text-muted-foreground font-medium opacity-60 mt-1">Por Olivares</span>
             </div>
-          </nav>
+          </div>
+          
           <div className="flex items-center gap-4">
+            <div className="hidden md:flex flex-col items-end mr-1 select-none pointer-events-none">
+              <span className="text-[10px] font-bold text-primary/80 uppercase tracking-widest leading-none">v1.1</span>
+              <span className="text-[9px] text-muted-foreground/50 font-medium">23 - Marzo</span>
+            </div>
+            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" className="w-9 h-9 rounded-full bg-muted border border-border overflow-hidden backdrop-blur-md">
