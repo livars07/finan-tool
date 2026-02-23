@@ -83,6 +83,7 @@ export default function Home() {
   const [theme, setTheme] = useState<Theme>('predeterminado');
   const [api, setApi] = useState<CarouselApi>();
   const [timerKey, setTimerKey] = useState(0);
+  const [statsKey, setStatsKey] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -95,6 +96,14 @@ export default function Home() {
     const intervalId = setInterval(() => api.scrollNext(), 18000);
     return () => clearInterval(intervalId);
   }, [api, timerKey]);
+
+  // Efecto para repetir la animación de entrada de los stats cada 10 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStatsKey(prev => prev + 1);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   const resetTimer = useCallback(() => setTimerKey(prev => prev + 1), []);
   const handleNext = useCallback(() => { if (api) { api.scrollNext(); resetTimer(); } }, [api, resetTimer]);
@@ -168,7 +177,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1 container mx-auto px-4 py-6 md:py-12 flex flex-col">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 shrink-0">
+        <div key={statsKey} className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 shrink-0">
           {[
             { label: 'Citas hoy', value: stats.todayCount.toString(), icon: CalendarDays, color: 'text-primary' },
             { label: 'Citas pendientes', value: stats.pendingCount.toString(), icon: Wallet, color: 'text-primary' },
@@ -359,10 +368,10 @@ export default function Home() {
                       <p className="text-xs text-muted-foreground">Presiona el botón de expansión <Maximize2 className="inline w-3 h-3" /> para entrar en el modo pantalla completa. Ideal para mostrar al cliente su estructura financiera sin distracciones.</p>
                       <Separator className="bg-border/30" />
                       <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 w-full">
-                        <span className="text-[10px] font-bold text-primary uppercase flex items-center gap-2 mb-1">
-                          <Copy className="w-3 h-3" /> Protip del Experto:
+                        <span className="text-[10px] font-bold text-primary uppercase flex items-center gap-2 mb-2">
+                          <Copy className="w-3.5 h-3.5" /> Protip del Experto:
                         </span>
-                        <p className="text-[10px] leading-tight italic text-muted-foreground">
+                        <p className="text-xs leading-relaxed italic text-muted-foreground">
                           Copia el resumen rápido con el boton que dice copiar, y lo pegas en las notas de la cita, asi no se te escapan datos en una 2da cita
                         </p>
                       </div>
@@ -461,3 +470,4 @@ export default function Home() {
     </div>
   );
 }
+
