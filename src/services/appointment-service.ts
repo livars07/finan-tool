@@ -137,7 +137,7 @@ export const generateSeedData = (): Appointment[] => {
     });
   }
 
-  // 2 Citas Pendientes
+  // 2 Citas Pendientes (Mañana y Pasado)
   for (let i = 0; i < 2; i++) {
     const futureDate = addDays(now, i + 1);
     data.push({
@@ -147,12 +147,12 @@ export const generateSeedData = (): Appointment[] => {
       date: futureDate.toISOString(),
       time: hours[(i+2) % hours.length],
       type: types[i % types.length],
-      product: products[(i+1) % products.length],
+      product: products[(i+2) % products.length],
       notes: "Cita programada a futuro."
     });
   }
 
-  // 5 Citas del mes pasado
+  // 5 Citas del mes pasado (Historial)
   const lastMonth = subMonths(now, 1);
   for (let i = 0; i < 5; i++) {
     const pastDate = subDays(lastMonth, i + 5);
