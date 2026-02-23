@@ -37,7 +37,7 @@
     --card: 0 0% 100% / 0.8;
     --card-foreground: 222 20% 20%;
     
-    /* Popups oscuros para evitar exceso de luz */
+    /* Popups oscuros para evitar exceso de luz con texto blanco/celeste */
     --popover: 222 20% 15% / 0.95;
     --popover-foreground: 0 0% 100%;
     

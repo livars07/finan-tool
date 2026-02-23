@@ -133,7 +133,7 @@ Número: ${appointment.phone}`;
                 onClick={copyToWhatsAppFormat}
                 variant="outline" 
                 size="sm"
-                className="h-8 px-3 text-[10px] border-green-500/50 text-green-500 hover:bg-transparent font-bold uppercase backdrop-blur-md"
+                className="h-8 px-3 text-[10px] border-green-500 text-green-500 hover:bg-green-500/5 font-bold uppercase backdrop-blur-md"
               >
                 <MessageCircle className="w-3.5 h-3.5 mr-1.5" />
                 Copiar
