@@ -269,11 +269,10 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
 
     let summaryParts = [
       `📊 *RESUMEN DE COTIZACIÓN - FINANTO*`,
-      `• Valor de Referencia: ${formatCurrency(rawP)}`,
-      `• Monto a Financiar Neto: ${formatCurrency(netFinancing)}`,
+      `• Crédito: ${formatCurrency(rawP)}`,
       `• Plazo: ${currentTerm} meses`,
-      `• Enganche Total: ${formatCurrency(totalDownPayment)}`,
-      `• Carga Mensual Total: ${formatCurrency(totalMonthlyLoad)}`,
+      `• Enganche Final: ${formatCurrency(totalDownPayment)}`,
+      `• Mensualidad: ${formatCurrency(totalMonthlyLoad)}`,
       `--------------------------`,
       `💼 *GASTOS OPERATIVOS (ESTIMADOS)*`,
       `• Est. Escrituración (5%): ${formatCurrency(estimatedClosingCosts)}`,

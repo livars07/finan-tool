@@ -26,13 +26,13 @@ import {
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 
@@ -101,20 +101,16 @@ export default function UpcomingAppointments({
       const currentNotes = finNotes;
       const clientName = app.name;
 
-      // Actualizamos inmediatamente el estado para persistencia
       updateStatus(finId, currentStatus, currentNotes);
 
       if (currentStatus === 'Cierre') {
-        // Obtenemos la versión actualizada del objeto (con el nuevo estatus)
         const updatedApp = { ...app, status: currentStatus, notes: currentNotes };
         setLastClosedApp(updatedApp);
         
-        // Sonido de éxito
         const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3");
         audio.volume = 0.5;
         audio.play().catch(() => {});
 
-        // Mostramos el popup de felicitaciones
         setShowSuccessDialog(true);
       } else {
         toast({
@@ -191,7 +187,10 @@ Número: *${app.phone}*`;
 
   return (
     <div className="space-y-4 flex flex-col h-full">
-      <div className="border rounded-xl overflow-hidden relative backdrop-blur-sm bg-card/20 flex-1 flex flex-col">
+      <div className={cn(
+        "border rounded-xl overflow-hidden relative backdrop-blur-sm bg-card/20 flex-1 flex flex-col",
+        !expanded && "max-h-[400px]"
+      )}>
         {appointments.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-muted-foreground bg-muted/10 h-full">
             <Calendar className="w-16 h-16 mb-4 opacity-10" />
@@ -443,10 +442,6 @@ Número: *${app.phone}*`;
                 <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Notas de acuerdos verbales</li>
               </ul>
             </div>
-            
-            <p className="text-center text-[10px] text-green-200/60 uppercase font-bold tracking-tighter">
-              Puedes editar estos detalles a continuación en el registro del cliente.
-            </p>
           </div>
 
           <DialogFooter className="p-6 bg-green-900/50 border-t border-green-800/50 sm:justify-center">

@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -33,7 +34,7 @@ export default function PastAppointments({
   highlightedId,
   expanded = false
 }: Props) {
-  const [visibleCount, setVisibleCount] = useState(20);
+  const [visibleCount, setVisibleCount] = useState(15);
   const { toast } = useToast();
 
   if (appointments.length === 0) {
@@ -72,7 +73,10 @@ export default function PastAppointments({
 
   return (
     <div className="space-y-4 flex flex-col h-full">
-      <div className="border rounded-xl overflow-hidden bg-card/10 relative backdrop-blur-sm flex-1 flex flex-col">
+      <div className={cn(
+        "border rounded-xl overflow-hidden bg-card/10 relative backdrop-blur-sm flex-1 flex flex-col",
+        !expanded && "max-h-[400px]"
+      )}>
         <ScrollArea className="flex-1">
           <Table>
             <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm">
@@ -187,7 +191,7 @@ export default function PastAppointments({
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={() => setVisibleCount(p => p + 20)}
+            onClick={() => setVisibleCount(p => p + 15)}
             className="text-xs font-bold uppercase tracking-widest border-dashed hover:bg-primary/10 backdrop-blur-md h-9 px-6"
           >
             <ChevronDown className="mr-2 h-4 w-4" /> Cargar más historial
