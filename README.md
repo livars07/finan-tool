@@ -1,6 +1,6 @@
-# Finanto - Tu asistente digital de crédito hipotecario (v0.7.1)
+# Finanto - Tu asistente digital de financiamiento inmobiliario (v0.7.1)
 
-¡Bienvenido a Finanto! Esta es una herramienta diseñada especialmente para que los asesores hipotecarios puedan ser más rápidos, organizados y profesionales frente a sus clientes.
+¡Bienvenido a Finanto! Esta es una herramienta diseñada especialmente para que los ejecutivos en financiamiento inmobiliario puedan ser más rápidos, organizados y profesionales frente a sus clientes.
 
 ## 🌟 ¿Qué puedes hacer con Finanto?
 

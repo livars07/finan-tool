@@ -53,6 +53,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 type Theme = 'predeterminado' | 'discreto' | 'corporativo' | 'moderno';
 
@@ -201,7 +202,10 @@ export default function Home() {
               subLabel: 'Mes pasado'
             },
           ].map((stat, i) => (
-            <Card key={i} className="bg-card/30 border-border/50 backdrop-blur-xl hover:border-primary/30 transition-all group">
+            <Card key={i} className={cn(
+              "bg-card/30 backdrop-blur-xl hover:border-primary/30 transition-all group",
+              (theme === 'predeterminado' || theme === 'discreto') ? "border-transparent" : "border-border/50"
+            )}>
               <CardContent className="p-4 flex items-center gap-3">
                 <div className={`p-2 rounded-full bg-muted/50 ${stat.color} backdrop-blur-md`}>
                   <stat.icon className="w-5 h-5" />
@@ -259,7 +263,7 @@ export default function Home() {
 
       <footer className="mt-12 border-t border-border/40 py-8 bg-card/10 backdrop-blur-[20px]">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm">
-          <p>© 2026 Finanto - Tu asistente digital de crédito</p>
+          <p>© 2026 Finanto - Gestión de Financiamiento Inmobiliario</p>
           <div className="flex items-center gap-6">
             <button 
               onClick={copyFooterPhone}
@@ -319,7 +323,7 @@ export default function Home() {
               </div>
               <div>
                 <DialogTitle className="text-3xl font-headline font-bold">Guía de Usuario - Finanto</DialogTitle>
-                <DialogDescription className="text-base">Manual interactivo para el asesor hipotecario (v0.7.1)</DialogDescription>
+                <DialogDescription className="text-base">Manual interactivo para el ejecutivo en financiamiento inmobiliario (v0.7.1)</DialogDescription>
               </div>
             </div>
           </DialogHeader>
@@ -331,7 +335,7 @@ export default function Home() {
                   ¡Bienvenido a Finanto!
                 </h2>
                 <p className="text-base leading-relaxed text-muted-foreground">
-                  Esta es una herramienta diseñada especialmente para que los asesores hipotecarios puedan ser más rápidos, organizados y profesionales frente a sus clientes.
+                  Esta es una herramienta diseñada especialmente para que los ejecutivos en financiamiento inmobiliario puedan ser más rápidos, organizados y profesionales frente a sus clientes.
                 </p>
               </section>
 

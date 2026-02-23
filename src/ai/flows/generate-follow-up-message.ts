@@ -43,7 +43,7 @@ const generateFollowUpMessagePrompt = ai.definePrompt({
   name: 'generateFollowUpMessagePrompt',
   input: {schema: GenerateFollowUpMessageInputSchema},
   output: {schema: GenerateFollowUpMessageOutputSchema},
-  prompt: `Eres un asistente de IA especializado en generar plantillas de mensajes de seguimiento profesionales y personalizados para agentes de ventas de Finanto (créditos hipotecarios).
+  prompt: `Eres un asistente de IA especializado en generar plantillas de mensajes de seguimiento profesionales y personalizados para ejecutivos en financiamiento inmobiliario de Finanto.
 
 Genera una plantilla de mensaje de seguimiento basada en el siguiente estado de una cita pasada y los detalles proporcionados. El mensaje debe ser cordial, profesional y adaptado al estado.
 
