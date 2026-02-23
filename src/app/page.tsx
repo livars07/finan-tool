@@ -9,7 +9,7 @@ import {
   LayoutDashboard, Wallet, CalendarDays, Users, CheckCircle2, ShieldCheck, TrendingUp, RotateCcw,
   Palette, Moon, Sun, Cpu, Phone, BookOpen, Info, Calculator, Maximize2, Sparkles, History,
   ClipboardList, Target, Calendar, Copy, Crown, Zap, Snowflake, Trash2, Rocket, ShieldAlert,
-  Smartphone, MessageSquare, CalendarClock
+  Smartphone, MessageSquare, CalendarClock, Coins
 } from 'lucide-react';
 import { Separator } from "@/components/ui/separator";
 import { useAppointments } from '@/hooks/use-appointments';
@@ -293,7 +293,7 @@ export default function Home() {
       </AlertDialog>
 
       <Dialog open={showHelp} onOpenChange={setShowHelp}>
-        <DialogContent className="sm:max-w-[800px] max-h-[85vh] flex flex-col p-0 overflow-hidden bg-card backdrop-blur-3xl shadow-2xl border-border">
+        <DialogContent className="sm:max-w-[800px] h-[85vh] flex flex-col p-0 overflow-hidden bg-card backdrop-blur-3xl shadow-2xl border-border">
           <DialogHeader className="p-8 border-b border-border/50 bg-primary/5 shrink-0">
             <div className="flex items-center gap-4">
               <div className="p-4 rounded-2xl bg-primary/20 border border-primary/30">
@@ -306,8 +306,8 @@ export default function Home() {
             </div>
           </DialogHeader>
           
-          <ScrollArea className="flex-1">
-            <div className="p-8 space-y-12">
+          <ScrollArea className="flex-1 w-full">
+            <div className="p-8 space-y-12 pb-20">
               {/* Sección 1: Bienvenida */}
               <section className="space-y-6">
                 <div className="flex items-center gap-3">
@@ -349,7 +349,7 @@ export default function Home() {
                       <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-widest"><Maximize2 className="w-3.5 h-3.5" /> Modo Presentación Profesional</div>
                       <p className="text-xs text-muted-foreground">Presiona el botón de expansión <Maximize2 className="inline w-3 h-3" /> para entrar en el modo pantalla completa. Ideal para mostrar al cliente su estructura financiera sin distracciones.</p>
                       <Separator className="bg-border/30" />
-                      <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
+                      <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 w-full">
                         <span className="text-[10px] font-bold text-primary uppercase flex items-center gap-2 mb-1">
                           <Copy className="w-3 h-3" /> Protip del Experto:
                         </span>
@@ -452,19 +452,3 @@ export default function Home() {
     </div>
   );
 }
-
-// Icono faltante para la sección de comisiones
-const Coins = ({ className }: { className?: string }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
-    className={className}
-  >
-    <circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/><path d="m17.41 17.41-2.82-2.82" />
-  </svg>
-);
