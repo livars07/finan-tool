@@ -81,23 +81,23 @@
 
   [data-theme="moderno"] {
     color-scheme: dark;
-    --background: 222 47% 7%;
-    --foreground: 190 100% 50%; /* Azul distintivo */
+    --background: 222 47% 5%;
+    --foreground: 180 100% 50%; /* Cian/Verde brillante para texto */
     --card: 222 47% 12% / 0.3;
-    --card-foreground: 190 100% 50%;
+    --card-foreground: 180 100% 50%;
     --popover: 222 47% 8% / 0.5;
-    --popover-foreground: 190 100% 50%;
-    --primary: 210 100% 50%; /* Azul brillante */
+    --popover-foreground: 180 100% 50%;
+    --primary: 210 100% 55%; /* Azul Eléctrico */
     --primary-foreground: 222 47% 5%;
-    --secondary: 260 80% 60% / 0.4; /* Morado tecnologico */
-    --secondary-foreground: 190 100% 90%;
+    --secondary: 280 80% 65% / 0.5; /* Púrpura Tecnológico */
+    --secondary-foreground: 280 100% 85%;
     --muted: 222 30% 15% / 0.2;
-    --muted-foreground: 210 50% 70%;
-    --accent: 190 100% 50%;
+    --muted-foreground: 180 40% 70%;
+    --accent: 145 100% 50%; /* Verde Neón - Variedad cromática */
     --accent-foreground: 222 47% 5%;
     --border: 210 100% 30% / 0.2;
     --input: 222 30% 15% / 0.3;
-    --ring: 210 100% 50%;
+    --ring: 210 100% 55%;
     --radius: 0.15rem;
     --calendar-filter: invert(1) hue-rotate(200deg);
   }
