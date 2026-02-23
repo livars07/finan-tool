@@ -14,7 +14,7 @@
     --popover-foreground: 0 0% 100%;
     --primary: 205 71% 66%;
     --primary-foreground: 197 15% 10%;
-    --secondary: 197 10% 25% / 0.4;
+    --secondary: 197 30% 25% / 0.6;
     --secondary-foreground: 0 0% 100%;
     --muted: 197 10% 20% / 0.3;
     --muted-foreground: 0 0% 70%;
@@ -39,12 +39,12 @@
     --popover-foreground: 222 47% 11%;
     --primary: 221 83% 53%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
+    --secondary: 210 40% 90%;
     --secondary-foreground: 222 47% 11%;
     --muted: 210 40% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 190 90% 45%;
+    --accent-foreground: 210 40% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
@@ -82,15 +82,15 @@
   [data-theme="moderno"] {
     color-scheme: dark;
     --background: 222 47% 7%;
-    --foreground: 210 100% 90%; /* Azul distintivo */
+    --foreground: 190 100% 50%; /* Azul distintivo */
     --card: 222 47% 12% / 0.3;
-    --card-foreground: 210 100% 90%;
+    --card-foreground: 190 100% 50%;
     --popover: 222 47% 8% / 0.5;
-    --popover-foreground: 210 100% 90%;
+    --popover-foreground: 190 100% 50%;
     --primary: 210 100% 50%; /* Azul brillante */
     --primary-foreground: 222 47% 5%;
-    --secondary: 222 30% 20% / 0.25;
-    --secondary-foreground: 210 100% 90%;
+    --secondary: 260 80% 60% / 0.4; /* Morado tecnologico */
+    --secondary-foreground: 190 100% 90%;
     --muted: 222 30% 15% / 0.2;
     --muted-foreground: 210 50% 70%;
     --accent: 190 100% 50%;
@@ -112,7 +112,7 @@
     --popover-foreground: 0 0% 98%;
     --primary: 235 86% 65%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 225 6% 13% / 0.5;
+    --secondary: 225 15% 13% / 0.6;
     --secondary-foreground: 0 0% 100%;
     --muted: 225 6% 15% / 0.4;
     --muted-foreground: 215 15% 75%;
@@ -135,7 +135,7 @@
     --primary: 45 90% 50%; /* Oro */
     --primary-foreground: 222 47% 5%;
     --secondary: 215 80% 60%; /* Azul Real */
-    --secondary-foreground: 222 47% 5%;
+    --secondary-foreground: 0 0% 100%;
     --accent: 155 85% 45%; /* Esmeralda */
     --accent-foreground: 222 47% 5%;
     --border: 45 90% 40% / 0.15;
@@ -149,9 +149,11 @@
     --foreground: 280 20% 95%;
     --card: 280 50% 10% / 0.5;
     --card-foreground: 280 20% 95%;
-    --primary: 320 100% 60%;
+    --primary: 320 100% 60%; /* Rosa */
     --primary-foreground: 280 50% 5%;
-    --accent: 280 100% 60%;
+    --secondary: 280 100% 60%; /* Purpura */
+    --secondary-foreground: 0 0% 100%;
+    --accent: 180 100% 50%; /* Cyan Neón */
     --accent-foreground: 280 50% 5%;
     --border: 320 100% 40% / 0.3;
     --ring: 320 100% 60%;
@@ -164,9 +166,11 @@
     --foreground: 210 20% 95%;
     --card: 210 40% 15% / 0.5;
     --card-foreground: 210 20% 95%;
-    --primary: 190 100% 50%;
+    --primary: 190 100% 50%; /* Cyan Glacial */
     --primary-foreground: 210 40% 5%;
-    --accent: 200 100% 60%;
+    --secondary: 210 100% 70% / 0.4; /* Azul Claro Ártico */
+    --secondary-foreground: 0 0% 100%;
+    --accent: 200 100% 60%; /* Azul Frío */
     --accent-foreground: 210 40% 5%;
     --border: 190 100% 30% / 0.3;
     --ring: 190 100% 50%;

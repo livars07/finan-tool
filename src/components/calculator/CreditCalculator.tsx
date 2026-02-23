@@ -51,18 +51,18 @@ const CalculatorInputs = ({
 }) => (
   <div className={isModal ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "grid grid-cols-1 md:grid-cols-2 gap-4"}>
     <div className="space-y-2">
-      <Label htmlFor={isModal ? "totalPriceModal" : "totalPrice"} className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+      <Label htmlFor={isModal ? "totalPriceModal" : "totalPrice"} className="text-xs font-bold text-primary uppercase tracking-wider">
         Monto del crédito (P)
       </Label>
       <div className="relative flex items-center">
         <span className={cn(
           "absolute left-3 font-bold pointer-events-none",
-          isModal ? "text-xl text-muted-foreground top-1/2 -translate-y-1/2" : "text-muted-foreground top-2.5"
+          isModal ? "text-xl text-primary top-1/2 -translate-y-1/2" : "text-primary top-2.5"
         )}>$</span>
         <Input
           id={isModal ? "totalPriceModal" : "totalPrice"}
           placeholder="0.00"
-          className={isModal ? "pl-9 font-bold text-2xl bg-muted/20 h-14" : "pl-7 font-semibold text-lg bg-muted/20"}
+          className={isModal ? "pl-9 font-bold text-2xl bg-primary/5 border-primary/30 focus-visible:ring-primary h-14" : "pl-7 font-semibold text-lg bg-primary/5 border-primary/30 focus-visible:ring-primary"}
           type="text"
           value={formatWithCommas(totalPrice)}
           onChange={(e) => onPriceChange(e.target.value)}
@@ -233,9 +233,9 @@ export default function CreditCalculator() {
             formatWithCommas={formatWithCommas}
           />
 
-          <div className="space-y-3 p-4 rounded-xl bg-muted/40 border border-border/50 backdrop-blur-sm">
+          <div className="space-y-3 p-4 rounded-xl bg-primary/10 border border-primary/20 backdrop-blur-sm">
             <div className="flex justify-between items-end mb-1">
-              <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest text-primary">Enganche requerido (3%)</span>
+              <span className="text-[10px] text-primary uppercase font-bold tracking-widest">Enganche requerido (3%)</span>
               <span className="text-[10px] font-bold text-primary">{formatCurrency(currentDownPayment)}</span>
             </div>
             <Progress value={3} className="h-2 bg-primary/20" />
@@ -265,9 +265,9 @@ export default function CreditCalculator() {
           </div>
 
           <div className="pt-2 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2 p-2 px-3 rounded-full bg-muted border border-border/50">
-              <Info className="w-3.5 h-3.5 text-muted-foreground" />
-              <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-tighter">
+            <div className="flex items-center gap-2 p-2 px-3 rounded-full bg-secondary border border-secondary/30">
+              <Info className="w-3.5 h-3.5 text-secondary-foreground" />
+              <span className="text-[10px] text-secondary-foreground font-semibold uppercase tracking-tighter">
                 Factor mensualidad: 0.6982%
               </span>
             </div>
@@ -401,8 +401,8 @@ export default function CreditCalculator() {
 
               <div className="space-y-6 flex flex-col">
                 <div className="p-6 rounded-2xl border border-secondary/20 bg-secondary/5 space-y-4 flex-1 flex flex-col justify-center">
-                  <div className="flex items-center gap-2 text-secondary">
-                    <ShieldAlert className="w-5 h-5" />
+                  <div className="flex items-center gap-2 text-secondary-foreground">
+                    <ShieldAlert className="w-5 h-5 text-secondary-foreground" />
                     <h4 className="text-[10px] font-bold uppercase tracking-widest">Perfilamiento Operativo</h4>
                   </div>
                   <div className="space-y-4">
@@ -411,12 +411,12 @@ export default function CreditCalculator() {
                       <p className="text-2xl font-bold text-foreground">{formatCurrency(minIncomeRequired)}</p>
                     </div>
                     
-                    <div className="p-3 bg-white/5 rounded-xl border border-white/10">
-                      <div className="flex items-center gap-2 text-secondary mb-0.5">
+                    <div className="p-3 bg-secondary/20 rounded-xl border border-secondary/30">
+                      <div className="flex items-center gap-2 text-secondary-foreground mb-0.5">
                         <Coins className="w-3.5 h-3.5" />
                         <span className="text-[10px] font-bold uppercase">Presupuesto de vida sugerido</span>
                       </div>
-                      <p className="text-lg font-bold">{formatCurrency(suggestedLivingBudget)}</p>
+                      <p className="text-lg font-bold text-foreground">{formatCurrency(suggestedLivingBudget)}</p>
                     </div>
 
                     <div className="space-y-2">
@@ -424,7 +424,7 @@ export default function CreditCalculator() {
                         <span>Ratio de endeudamiento sano</span>
                         <span>35% DTI</span>
                       </div>
-                      <Progress value={35} className="h-1.5 bg-secondary/20" />
+                      <Progress value={35} className="h-1.5 bg-secondary/30" />
                     </div>
                   </div>
                 </div>
