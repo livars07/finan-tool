@@ -24,6 +24,7 @@ import {
   ClipboardList,
   Target
 } from 'lucide-react';
+import { Separator } from "@/components/ui/separator";
 import { useAppointments } from '@/hooks/use-appointments';
 import { Button } from '@/components/ui/button';
 import {
@@ -53,8 +54,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 type Theme = 'predeterminado' | 'discreto' | 'corporativo' | 'moderno';
@@ -317,7 +316,7 @@ export default function Home() {
       </AlertDialog>
 
       <Dialog open={showHelp} onOpenChange={setShowHelp}>
-        <DialogContent className="sm:max-w-[750px] max-h-[90vh] bg-card border-border backdrop-blur-3xl overflow-hidden flex flex-col p-0 shadow-2xl">
+        <DialogContent className="sm:max-w-[750px] h-[90vh] bg-card border-border backdrop-blur-3xl flex flex-col p-0 shadow-2xl overflow-hidden">
           <DialogHeader className="p-8 border-b border-border/50 bg-primary/5 shrink-0">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-2xl bg-primary/20 border border-primary/30">
@@ -330,7 +329,7 @@ export default function Home() {
             </div>
           </DialogHeader>
           
-          <ScrollArea className="flex-1 p-8">
+          <div className="flex-1 overflow-y-auto p-8 min-h-0 scrollbar-thin">
             <div className="space-y-10 text-foreground/90 pb-12">
               <section className="space-y-4">
                 <h2 className="text-2xl font-bold flex items-center gap-2 text-primary">
@@ -406,10 +405,10 @@ export default function Home() {
               </section>
 
               <p className="text-center text-xs text-muted-foreground italic pt-6 border-t border-border/20">
-                Finanto: Diseñado para el ejecutivo que prioriza el control técnico y el cierre efectivo en financiamiento inmobiliario.
+                Finanto: Diseñado para el ejecutivo en financiamiento inmobiliario que prioriza el control técnico y el cierre efectivo.
               </p>
             </div>
-          </ScrollArea>
+          </div>
           
           <DialogFooter className="p-6 border-t border-border/50 bg-muted/20 shrink-0">
             <Button onClick={() => setShowHelp(false)} className="w-full sm:w-auto font-bold h-12 px-8 text-lg">
