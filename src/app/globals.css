@@ -197,21 +197,23 @@
   * { @apply border-border; }
   body { @apply bg-background text-foreground font-body antialiased transition-colors duration-300; }
   
-  /* Header dinámico según tema */
-  header { @apply backdrop-blur-[20px] bg-card/10 !important; }
+  /* Header dinámico según tema - Blur reducido un 40% de 20px a 12px */
+  header { @apply backdrop-blur-[12px] bg-card/10 !important; }
   
   /* Diálogos y Popups Globales con Desenfoque Moderno */
   /* Se excluye el simulador de pantalla completa mediante el atributo data-calculator-dialog */
+  /* Blur reducido un 40% (20px -> 12px) y sombra reducida un 40% (2xl -> xl) */
   [role="dialog"]:not([data-calculator-dialog="true"]), 
   [role="status"] { 
-    @apply backdrop-blur-[20px] !important; 
+    @apply backdrop-blur-[12px] !important; 
     background-color: hsl(var(--card) / 0.8) !important;
+    @apply shadow-xl !important;
   }
 
   [data-theme^="corporativo"] [role="dialog"]:not([data-calculator-dialog="true"]),
   [data-theme^="corporativo"] [role="status"] {
     background-color: rgba(255, 255, 255, 0.85) !important;
-    @apply border-border shadow-2xl !important;
+    @apply border-border shadow-xl !important;
   }
 
   input[type="date"]::-webkit-calendar-picker-indicator,

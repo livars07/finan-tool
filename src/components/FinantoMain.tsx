@@ -155,7 +155,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
-      <header className="border-b border-border/40 sticky top-0 z-50 backdrop-blur-[20px] bg-card/10 shrink-0">
+      <header className="border-b border-border/40 sticky top-0 z-50 backdrop-blur-[12px] bg-card/10 shrink-0">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="bg-primary/20 p-1.5 rounded-lg border border-primary/30">
@@ -191,7 +191,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   {theme === 'moderno' ? <Cpu className="w-5 h-5 text-primary" /> : theme.startsWith('corporativo') ? <Sun className="w-5 h-5 text-primary" /> : theme === 'discreto' ? <Moon className="w-5 h-5 text-primary" /> : theme === 'olivares' ? <Crown className="w-5 h-5 text-primary" /> : <Palette className="w-5 h-5 text-primary" />}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 backdrop-blur-2xl bg-popover border-border/30">
+              <DropdownMenuContent align="end" className="w-56 backdrop-blur-lg bg-popover border-border/30">
                 <DropdownMenuLabel className="text-foreground">Temas de Ejecutivos</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {[
@@ -226,13 +226,13 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
             <Card 
               key={i} 
               className={cn(
-                "border border-transparent bg-card/30 backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:bg-card/50",
+                "border border-transparent bg-card/30 backdrop-blur-md transition-all duration-300 hover:border-primary/40 hover:bg-card/50",
                 "animate-entrance-glow"
               )}
               style={{ animationDelay: `${i * 150}ms` }}
             >
               <CardContent className="p-4 flex items-center gap-3">
-                <div className={`p-2 rounded-full bg-muted/50 ${stat.color} backdrop-blur-md`}><stat.icon className="w-5 h-5" /></div>
+                <div className={`p-2 rounded-full bg-muted/50 ${stat.color} backdrop-blur-sm`}><stat.icon className="w-5 h-5" /></div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold truncate">{stat.label}</p>
                   <div className="flex items-baseline gap-2">
@@ -249,7 +249,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
           <section className="xl:col-span-5">
             <div className="sticky top-24 space-y-6">
               <CreditCalculator initialExpanded={initialSection === 'simulador'} />
-              <div className="relative p-6 overflow-hidden border rounded-xl border-primary/20 bg-primary/5 backdrop-blur-md group">
+              <div className="relative p-6 overflow-hidden border rounded-xl border-primary/20 bg-primary/5 backdrop-blur-sm group">
                 <Carousel setApi={setApi} className="w-full" opts={{ align: "start", loop: true }}>
                   <CarouselContent>
                     {APP_TIPS.map((tip, index) => (
@@ -289,7 +289,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
         </div>
       </main>
 
-      <footer className="mt-auto border-t border-border/40 py-8 bg-card/10 backdrop-blur-[20px] shrink-0">
+      <footer className="mt-auto border-t border-border/40 py-8 bg-card/10 backdrop-blur-[12px] shrink-0">
         <div className="container flex flex-col items-center justify-between gap-6 px-4 mx-auto text-sm md:flex-row text-muted-foreground">
           <div className="flex items-center gap-4">
             <span className="font-bold text-foreground">Finanto</span>
@@ -316,7 +316,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       </footer>
 
       <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
-        <AlertDialogContent>
+        <AlertDialogContent className="shadow-xl">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Confirmar reinicio?</AlertDialogTitle>
             <AlertDialogDescription>Se restaurarán los datos de prueba iniciales. Se borrará tu información actual.</AlertDialogDescription>
@@ -329,7 +329,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       </AlertDialog>
 
       <AlertDialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
-        <AlertDialogContent>
+        <AlertDialogContent className="shadow-xl">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Limpiar base de datos por completo?</AlertDialogTitle>
             <AlertDialogDescription>Esta acción eliminará todas las citas y dejará el sistema vacío. Esta acción no se puede deshacer.</AlertDialogDescription>
@@ -344,7 +344,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       </AlertDialog>
 
       <Dialog open={showHelp} onOpenChange={setShowHelp}>
-        <DialogContent className="sm:max-w-[800px] h-[85vh] flex flex-col p-0 overflow-hidden bg-card backdrop-blur-3xl shadow-2xl border-border">
+        <DialogContent className="sm:max-w-[800px] h-[85vh] flex flex-col p-0 overflow-hidden bg-card backdrop-blur-xl shadow-xl border-border">
           <DialogHeader className="p-8 border-b shrink-0 border-border/50 bg-primary/5">
             <div className="flex items-center gap-4">
               <div className="p-4 border border-primary/30 rounded-2xl bg-primary/20">
@@ -487,7 +487,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
           </ScrollArea>
           
           <DialogFooter className="p-6 border-t shrink-0 border-border/50 bg-muted/20">
-            <Button onClick={() => setShowHelp(false)} className="w-full h-12 px-10 font-bold shadow-lg max-w-none sm:w-auto rounded-xl transition-transform hover:scale-105 active:scale-95">
+            <Button onClick={() => setShowHelp(false)} className="w-full h-12 px-10 font-bold shadow-xl max-w-none sm:w-auto rounded-xl transition-transform hover:scale-105 active:scale-95">
               ¡Entendido, a cerrar ventas!
             </Button>
           </DialogFooter>

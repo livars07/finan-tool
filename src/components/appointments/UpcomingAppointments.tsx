@@ -319,7 +319,7 @@ Número: ${app.phone}`;
       </div>
 
       <Dialog open={!!finId} onOpenChange={() => setFinId(null)}>
-        <DialogContent className="sm:max-w-[500px] bg-card border-border shadow-2xl">
+        <DialogContent className="sm:max-w-[500px] bg-card border-border shadow-xl">
           <DialogHeader>
             <DialogTitle>Finalizar cita de hoy</DialogTitle>
             <DialogDescription>Indica el resultado de la reunión y registra acuerdos importantes.</DialogDescription>
@@ -362,10 +362,10 @@ Número: ${app.phone}`;
       </Dialog>
 
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent className="sm:max-w-[550px] bg-green-950/90 border-green-500/50 text-white backdrop-blur-xl">
+        <DialogContent className="sm:max-w-[550px] bg-green-950/90 border-green-500/50 text-white backdrop-blur-md shadow-xl">
           <DialogHeader className="flex flex-col items-center text-center space-y-4">
             <div className="relative">
-              <div className="absolute inset-0 bg-green-400 blur-2xl opacity-20 animate-pulse"></div>
+              <div className="absolute inset-0 bg-green-400 blur-xl opacity-20 animate-pulse"></div>
               <div className="bg-green-500/20 p-4 rounded-full border border-green-400/30">
                 <Trophy className="w-16 h-16 text-green-400" />
               </div>
@@ -411,7 +411,7 @@ Número: ${app.phone}`;
       </Dialog>
 
       <AlertDialog open={!!confirmId} onOpenChange={(open) => !open && setConfirmId(null)}>
-        <AlertDialogContent className="bg-card border-border shadow-2xl">
+        <AlertDialogContent className="bg-card border-border shadow-xl">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Confirmar asistencia del prospecto?</AlertDialogTitle>
             <AlertDialogDescription>

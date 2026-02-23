@@ -51,7 +51,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
   };
 
   return (
-    <Card className="bg-card border-border shadow-md backdrop-blur-xl">
+    <Card className="bg-card border-border shadow-md backdrop-blur-lg">
       <CardHeader className="py-4 border-b border-border/50">
         <div className="flex items-center gap-2">
           <UserPlus className="text-accent w-5 h-5" />

@@ -205,7 +205,7 @@ export default function CreditCalculator({ initialExpanded = false }: CreditCalc
 
   return (
     <>
-      <Card className="shadow-2xl bg-card border-border overflow-hidden">
+      <Card className="shadow-xl bg-card border-border overflow-hidden">
         <CardHeader className="bg-primary/5 border-b border-border/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -220,7 +220,7 @@ export default function CreditCalculator({ initialExpanded = false }: CreditCalc
                       <HelpCircle className="w-4 h-4 cursor-help" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent className="max-w-[250px] p-4 text-xs backdrop-blur-xl bg-card/80 border-border/30">
+                  <TooltipContent className="max-w-[250px] p-4 text-xs backdrop-blur-md bg-card/80 border-border/30 shadow-lg">
                     <p className="font-semibold mb-1">Modelo de negocio:</p>
                     <ul className="space-y-1 list-disc pl-3">
                       <li>Enganche: 3%</li>
@@ -372,7 +372,7 @@ export default function CreditCalculator({ initialExpanded = false }: CreditCalc
                             <TooltipTrigger asChild>
                               <HelpCircle className="w-4 h-4 text-muted-foreground/60 cursor-help" />
                             </TooltipTrigger>
-                            <TooltipContent className="max-w-[350px] p-6 text-base leading-relaxed bg-popover border-border shadow-2xl backdrop-blur-xl">
+                            <TooltipContent className="max-w-[350px] p-6 text-base leading-relaxed bg-popover border-border shadow-2xl backdrop-blur-md">
                               <p className="font-bold mb-2 text-accent text-lg flex items-center gap-2">
                                 <FileText className="w-5 h-5" /> ¿Qué es la escrituración?
                               </p>
@@ -391,7 +391,7 @@ export default function CreditCalculator({ initialExpanded = false }: CreditCalc
                             <TooltipTrigger asChild>
                               <HelpCircle className="w-4 h-4 text-muted-foreground/60 cursor-help" />
                             </TooltipTrigger>
-                            <TooltipContent className="max-w-[350px] p-6 text-base leading-relaxed bg-popover border-border shadow-2xl backdrop-blur-xl">
+                            <TooltipContent className="max-w-[350px] p-6 text-base leading-relaxed bg-popover border-border shadow-2xl backdrop-blur-md">
                               <p className="font-bold mb-2 text-accent text-lg flex items-center gap-2">
                                 <Info className="w-5 h-5" /> ¿Por qué el avalúo?
                               </p>

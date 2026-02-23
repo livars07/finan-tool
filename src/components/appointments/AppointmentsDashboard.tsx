@@ -93,7 +93,7 @@ export default function AppointmentsDashboard({
       <div className="grid grid-cols-1 gap-6">
         <AppointmentForm onAdd={addAppointment} />
 
-        <Card className="shadow-2xl bg-card border-border border-l-4 border-l-primary overflow-hidden">
+        <Card className="shadow-xl bg-card border-border border-l-4 border-l-primary overflow-hidden">
           <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">

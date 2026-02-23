@@ -134,7 +134,7 @@ Número: ${appointment.phone}`;
         } 
         onOpenChange(o); 
       }}>
-        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border p-0 shadow-2xl backdrop-blur-[20px]">
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border p-0 shadow-xl backdrop-blur-md">
           <DialogHeader className="px-6 py-4 border-b border-border/40 flex flex-row items-center justify-between bg-card/10">
             <div className="flex items-center gap-2">
               <DialogTitle className="text-xl font-headline font-bold text-foreground">
@@ -351,7 +351,7 @@ Número: ${appointment.phone}`;
             </div>
           </div>
 
-          <DialogFooter className="flex flex-row justify-end items-center gap-2 border-t border-border/50 px-6 py-4 bg-card/30 backdrop-blur-md">
+          <DialogFooter className="flex flex-row justify-end items-center gap-2 border-t border-border/50 px-6 py-4 bg-card/30 backdrop-blur-sm">
             <div className="flex gap-2">
               {isEditing ? (
                 <>
@@ -383,7 +383,7 @@ Número: ${appointment.phone}`;
       </Dialog>
 
       <AlertDialog open={showRescheduleConfirm} onOpenChange={setShowRescheduleConfirm}>
-        <AlertDialogContent className="bg-card border-border shadow-2xl">
+        <AlertDialogContent className="bg-card border-border shadow-xl">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Re-agendar para hoy?</AlertDialogTitle>
             <AlertDialogDescription>
