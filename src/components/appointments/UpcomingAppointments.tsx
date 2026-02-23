@@ -61,20 +61,10 @@ export default function UpcomingAppointments({
   const isActuallyToday = (dateStr: string) => {
     const d = parseISO(dateStr);
     const today = new Date();
-    // Comparación robusta de día/mes/año local para evitar bugs de UTC
     return d.getDate() === today.getDate() && 
            d.getMonth() === today.getMonth() && 
            d.getFullYear() === today.getFullYear();
   };
-
-  if (appointments.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 text-muted-foreground bg-muted/20 rounded-lg border border-dashed">
-        <Calendar className="w-12 h-12 mb-2 opacity-20" />
-        <p>No hay citas programadas.</p>
-      </div>
-    );
-  }
 
   const handleConfirmAction = () => {
     if (confirmId) {
@@ -97,6 +87,11 @@ export default function UpcomingAppointments({
       const currentNotes = finNotes;
       const clientName = app.name;
 
+      // Importante: Guardamos la referencia ANTES de que desaparezca de la lista por el updateStatus
+      if (currentStatus === 'Cierre') {
+        setLastClosedApp(app);
+      }
+
       updateStatus(finId, currentStatus, currentNotes);
       setFinId(null);
       setFinNotes('');
@@ -105,8 +100,6 @@ export default function UpcomingAppointments({
         const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3");
         audio.volume = 0.5;
         audio.play().catch(() => {});
-        
-        setLastClosedApp(app);
         setShowSuccessDialog(true);
       } else {
         toast({
@@ -135,104 +128,114 @@ export default function UpcomingAppointments({
   };
 
   return (
-    <div className="border rounded-md overflow-hidden relative backdrop-blur-sm">
-      <Table>
-        <TableHeader className="bg-muted/50">
-          <TableRow>
-            <TableHead>Nombre / Teléfono</TableHead>
-            <TableHead>Motivo</TableHead>
-            <TableHead>Fecha</TableHead>
-            <TableHead>Hora</TableHead>
-            <TableHead className="w-12"></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {appointments.map((app) => {
-            const appToday = isActuallyToday(app.date);
-            const isHighlighted = highlightedId === app.id;
-            
-            return (
-              <TableRow 
-                key={app.id} 
-                onClick={() => onSelect(app)}
-                className={cn(
-                  "hover:bg-primary/10 transition-colors cursor-pointer group relative",
-                  appToday && "bg-primary/5 border-l-4 border-l-primary",
-                  isHighlighted && "bg-accent/20 animate-pulse border-2 border-accent/40"
-                )}
-              >
-                <TableCell>
-                  <div className="font-medium text-sm">
-                    {app.name}
-                  </div>
-                  <div 
-                    onClick={(e) => copyPhone(e, app.phone)}
-                    className="text-xs text-muted-foreground hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1 group/phone"
+    <div className="space-y-4">
+      <div className="border rounded-md overflow-hidden relative backdrop-blur-sm">
+        {appointments.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground bg-muted/20">
+            <Calendar className="w-12 h-12 mb-2 opacity-20" />
+            <p className="text-sm font-medium">No hay citas programadas.</p>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader className="bg-muted/50">
+              <TableRow>
+                <TableHead>Nombre / Teléfono</TableHead>
+                <TableHead>Motivo</TableHead>
+                <TableHead>Fecha</TableHead>
+                <TableHead>Hora</TableHead>
+                <TableHead className="w-12"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {appointments.map((app) => {
+                const appToday = isActuallyToday(app.date);
+                const isHighlighted = highlightedId === app.id;
+                
+                return (
+                  <TableRow 
+                    key={app.id} 
+                    onClick={() => onSelect(app)}
+                    className={cn(
+                      "hover:bg-primary/10 transition-colors cursor-pointer group relative",
+                      appToday && "bg-primary/5 border-l-4 border-l-primary",
+                      isHighlighted && "bg-accent/20 animate-pulse border-2 border-accent/40"
+                    )}
                   >
-                    {app.phone}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-tight">
-                    <Info className="w-3 h-3" /> {app.type}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-col gap-1">
-                    <span className={cn(
-                      "text-[10px] font-bold uppercase tracking-wider",
-                      appToday ? "text-primary" : "text-muted-foreground"
-                    )}>
-                      {formatDate(app.date)}
-                    </span>
-                    {appToday && (
-                      <div onClick={(e) => e.stopPropagation()}>
-                        {app.isConfirmed ? (
-                          <div className="flex items-center gap-1 text-[9px] font-bold text-green-400 uppercase tracking-tighter">
-                            <CheckCircle className="w-2.5 h-2.5" /> Confirmada
+                    <TableCell>
+                      <div className="font-medium text-sm">
+                        {app.name}
+                      </div>
+                      <div 
+                        onClick={(e) => copyPhone(e, app.phone)}
+                        className="text-xs text-muted-foreground hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1 group/phone"
+                      >
+                        {app.phone}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-tight">
+                        <Info className="w-3 h-3" /> {app.type}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        <span className={cn(
+                          "text-[10px] font-bold uppercase tracking-wider",
+                          appToday ? "text-primary" : "text-muted-foreground"
+                        )}>
+                          {formatDate(app.date)}
+                        </span>
+                        {appToday && (
+                          <div onClick={(e) => e.stopPropagation()}>
+                            {app.isConfirmed ? (
+                              <div className="flex items-center gap-1 text-[9px] font-bold text-green-400 uppercase tracking-tighter">
+                                <CheckCircle className="w-2.5 h-2.5" /> Confirmada
+                              </div>
+                            ) : (
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="h-5 px-1.5 text-[8px] font-bold uppercase border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10 backdrop-blur-md"
+                                onClick={() => setConfirmId(app.id)}
+                              >
+                                <AlertCircle className="w-2 h-2 mr-1" /> Sin confirmar
+                              </Button>
+                            )}
                           </div>
-                        ) : (
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="h-5 px-1.5 text-[8px] font-bold uppercase border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10 backdrop-blur-md"
-                            onClick={() => setConfirmId(app.id)}
-                          >
-                            <AlertCircle className="w-2 h-2 mr-1" /> Sin confirmar
-                          </Button>
                         )}
                       </div>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-1 text-accent font-bold text-[10px]">
-                    <Clock className="w-3 h-3" /> {format12hTime(app.time)}
-                  </div>
-                </TableCell>
-                <TableCell onClick={(e) => e.stopPropagation()}>
-                  {appToday && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-primary hover:bg-primary/20 backdrop-blur-md"
-                      onClick={() => {
-                        setFinId(app.id);
-                        setFinNotes(app.notes || '');
-                        setStatus('Asistencia');
-                      }}
-                      title="Finalizar cita"
-                    >
-                      <CheckCircle2 className="h-5 w-5" />
-                    </Button>
-                  )}
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1 text-accent font-bold text-[10px]">
+                        <Clock className="w-3 h-3" /> {format12hTime(app.time)}
+                      </div>
+                    </TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      {appToday && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-primary hover:bg-primary/20 backdrop-blur-md"
+                          onClick={() => {
+                            setFinId(app.id);
+                            setFinNotes(app.notes || '');
+                            setStatus('Asistencia');
+                          }}
+                          title="Finalizar cita"
+                        >
+                          <CheckCircle2 className="h-5 w-5" />
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        )}
+      </div>
 
+      {/* Los diálogos se mueven aquí para que siempre se rendericen independientemente de la lista */}
       <Dialog open={!!finId} onOpenChange={() => setFinId(null)}>
         <DialogContent className="sm:max-w-[500px] backdrop-blur-[20px] bg-card/10">
           <DialogHeader>
@@ -242,7 +245,6 @@ export default function UpcomingAppointments({
           <div className="py-4 space-y-4">
             <div className="space-y-2">
               <Label className="text-xs font-bold uppercase">Resultado final</Label>
-              <span className="sr-only">Selección de estatus de cita</span>
               <Select value={status} onValueChange={(v) => setStatus(v as AppointmentStatus)}>
                 <SelectTrigger className={cn("bg-muted/30", status === 'Cierre' && "border-green-500 text-green-500 bg-green-500/5")}>
                   <SelectValue placeholder="Selecciona resultado" />
