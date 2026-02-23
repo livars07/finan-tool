@@ -106,6 +106,7 @@ export default function Home() {
   const [showHelp, setShowHelp] = useState(false);
   const [theme, setTheme] = useState<Theme>('predeterminado');
   const [api, setApi] = useState<CarouselApi>();
+  const [timerKey, setTimerKey] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -123,7 +124,25 @@ export default function Home() {
     }, 18000);
 
     return () => clearInterval(intervalId);
-  }, [api]);
+  }, [api, timerKey]);
+
+  const resetTimer = useCallback(() => {
+    setTimerKey(prev => prev + 1);
+  }, []);
+
+  const handleNext = useCallback(() => {
+    if (api) {
+      api.scrollNext();
+      resetTimer();
+    }
+  }, [api, resetTimer]);
+
+  const handlePrev = useCallback(() => {
+    if (api) {
+      api.scrollPrev();
+      resetTimer();
+    }
+  }, [api, resetTimer]);
 
   const applyTheme = (themeId: Theme) => {
     setTheme(themeId);
@@ -309,8 +328,14 @@ export default function Home() {
                     ))}
                   </CarouselContent>
                   <div className="flex items-center justify-end gap-2 mt-4">
-                    <CarouselPrevious className="static translate-y-0 h-8 w-8 bg-transparent border-primary/20 hover:bg-primary/10" />
-                    <CarouselNext className="static translate-y-0 h-8 w-8 bg-transparent border-primary/20 hover:bg-primary/10" />
+                    <CarouselPrevious 
+                      onClick={handlePrev}
+                      className="static translate-y-0 h-8 w-8 bg-transparent border-primary/20 hover:bg-primary/10" 
+                    />
+                    <CarouselNext 
+                      onClick={handleNext}
+                      className="static translate-y-0 h-8 w-8 bg-transparent border-primary/20 hover:bg-primary/10" 
+                    />
                   </div>
                 </Carousel>
                 <div className="absolute top-2 right-4 text-[9px] font-bold text-primary/30 uppercase tracking-tighter">
