@@ -76,6 +76,29 @@
     --ring: 190 100% 50%;
     --radius: 0.15rem;
   }
+
+  [data-theme="corporativo"] {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 15% / 0.6;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 10% / 0.8;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 217 19% 27% / 0.5;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 19% 15% / 0.4;
+    --muted-foreground: 215 20% 65%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 19% 27% / 0.5;
+    --input: 217 19% 27% / 0.5;
+    --ring: 217 91% 60%;
+    --radius: 0.3rem;
+  }
 }
 
 @layer base {
@@ -87,11 +110,11 @@
   }
 
   header {
-    @apply backdrop-blur-[40px] bg-card/5 !important;
+    @apply backdrop-blur-[20px] bg-card/5 !important;
   }
 
   [role="dialog"], [role="status"] {
-    @apply backdrop-blur-[40px] bg-card/5 !important;
+    @apply backdrop-blur-[20px] bg-card/5 !important;
   }
 
   /* Minimalist Scrollbar */

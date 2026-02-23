@@ -9,7 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Appointment } from '@/services/appointment-service';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { Appointment, AppointmentStatus, AppointmentType } from '@/services/appointment-service';
 import { User, Phone, Calendar, Clock, Edit2, Save, MessageCircle, Info, ClipboardList, CheckCircle2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format } from 'date-fns';
@@ -99,7 +106,7 @@ Número: ${appointment.phone}`;
       } 
       onOpenChange(o); 
     }}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border p-0 shadow-2xl backdrop-blur-[40px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border p-0 shadow-2xl backdrop-blur-[20px]">
         <DialogHeader className="px-6 py-4 border-b border-border/40 flex flex-row items-center justify-between bg-card/10">
           <div className="flex items-center gap-2">
             <DialogTitle className="text-xl font-headline font-bold text-foreground">
@@ -151,6 +158,47 @@ Número: ${appointment.phone}`;
                   <Input value={editData.phone || ''} onChange={e => setEditData({...editData, phone: e.target.value})} className="bg-muted/30" />
                 </div>
               </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Motivo</Label>
+                  <Select 
+                    value={editData.type} 
+                    onValueChange={(v) => setEditData({...editData, type: v as AppointmentType})}
+                  >
+                    <SelectTrigger className="bg-muted/30">
+                      <SelectValue placeholder="Motivo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1ra consulta">1ra consulta</SelectItem>
+                      <SelectItem value="2da consulta">2da consulta</SelectItem>
+                      <SelectItem value="cierre">Cierre</SelectItem>
+                      <SelectItem value="seguimiento">Seguimiento</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Resultado</Label>
+                  <Select 
+                    value={editData.status || 'Asistencia'} 
+                    onValueChange={(v) => setEditData({...editData, status: v as AppointmentStatus})}
+                  >
+                    <SelectTrigger className="bg-muted/30">
+                      <SelectValue placeholder="Resultado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Asistencia">Asistencia</SelectItem>
+                      <SelectItem value="No asistencia">No asistencia</SelectItem>
+                      <SelectItem value="Continuación en otra cita">Continuación en otra cita</SelectItem>
+                      <SelectItem value="Reagendó">Reagendó</SelectItem>
+                      <SelectItem value="Apartado">Apartado</SelectItem>
+                      <SelectItem value="Reembolso">Reembolso</SelectItem>
+                      <SelectItem value="Cierre">Cierre</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Fecha</Label>
