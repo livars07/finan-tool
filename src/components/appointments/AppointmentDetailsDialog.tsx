@@ -9,14 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   AlertDialog, AlertDialogAction, AlertDialogCancel, 
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter, 
   AlertDialogHeader, AlertDialogTitle 
 } from "@/components/ui/alert-dialog";
-import { Appointment, AppointmentStatus, AppointmentType } from '@/hooks/use-appointments';
-import { User, Phone, Calendar, Clock, BookOpen, Trash2, Edit2, Save, MessageCircle, Info } from 'lucide-react';
+import { Appointment } from '@/services/appointment-service';
+import { User, Phone, Calendar, Clock, Trash2, Edit2, Save, MessageCircle, Info } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -57,13 +56,12 @@ export default function AppointmentDetailsDialog({
     }
   }, [appointment]);
 
-  // Limpiador nuclear del DOM
+  // Limpieza agresiva del DOM para evitar bloqueos de clicks
   const forceDOMCleanup = () => {
     if (typeof document === 'undefined') return;
     setTimeout(() => {
       document.body.style.pointerEvents = 'auto';
       document.body.style.overflow = 'auto';
-      // Eliminamos capas de bloqueo residuales de Radix
       const residualGuards = document.querySelectorAll('[data-radix-focus-guard], [style*="pointer-events: none"]');
       residualGuards.forEach(el => (el as HTMLElement).style.pointerEvents = 'auto');
     }, 150);
@@ -81,7 +79,7 @@ export default function AppointmentDetailsDialog({
     const idToArchive = appointment.id;
     const name = appointment.name;
     
-    // Primero cerramos la UI para evitar colisiones de estado
+    // Primero cerramos visualmente para liberar el DOM
     setShowDeleteConfirm(false);
     onOpenChange(false);
     
@@ -155,7 +153,7 @@ Número: ${appointment.phone}`;
                   Copiar
                 </Button>
               )}
-              <DialogClose className="h-6 w-6 flex items-center justify-center rounded-full bg-destructive/10 text-destructive hover:bg-destructive transition-colors group">
+              <DialogClose className="h-7 w-7 flex items-center justify-center rounded-full bg-destructive/10 text-destructive hover:bg-destructive transition-colors group">
                 <span className="text-xs font-bold group-hover:text-white">✕</span>
               </DialogClose>
             </div>

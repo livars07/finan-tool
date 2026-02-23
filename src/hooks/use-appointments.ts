@@ -1,269 +1,148 @@
 "use client"
 
-import { useState, useEffect } from 'react';
-import { isAfter, isBefore, isToday, isTomorrow, isThisWeek, format, parseISO, startOfDay, subDays, addDays, isSameMonth, subMonths, differenceInDays } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { v4 as uuidv4 } from 'uuid';
+import { useState, useEffect, useMemo } from 'react';
+import { 
+  isToday, 
+  isAfter, 
+  isBefore, 
+  startOfDay, 
+  parseISO, 
+  isTomorrow, 
+  format, 
+  differenceInDays 
+} from 'date-fns';
+import * as Service from '@/services/appointment-service';
+import { Appointment, AppointmentStatus, AppointmentType } from '@/services/appointment-service';
 
-export type AppointmentStatus = 
-  | 'Asistencia' 
-  | 'No asistencia' 
-  | 'Continuación en otra cita' 
-  | 'Reagendó' 
-  | 'Reembolso' 
-  | 'Cierre';
-
-export type AppointmentType = '1ra consulta' | '2da consulta' | 'cierre' | 'seguimiento';
-
-export interface Appointment {
-  id: string;
-  name: string;
-  phone: string;
-  date: string; // ISO string
-  time: string; // "HH:mm" (24h internal format)
-  type: AppointmentType;
-  status?: AppointmentStatus;
-  notes?: string;
-  isConfirmed?: boolean;
-  isArchived?: boolean;
-}
-
-const STORAGE_KEY = 'olivares_fin_data_v4';
-
-const formatPhoneNumber = (phone: string) => {
-  const cleaned = ('' + phone).replace(/\D/g, '');
-  const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
-  if (match) {
-    return `${match[1]} ${match[2]} ${match[3]}`;
-  }
-  return phone;
-};
-
-const generateSeedData = (): Appointment[] => {
-  const data: Appointment[] = [];
-  const types: AppointmentType[] = ['1ra consulta', '2da consulta', 'cierre', 'seguimiento'];
-  const statuses: AppointmentStatus[] = ['Asistencia', 'No asistencia', 'Continuación en otra cita', 'Reagendó', 'Reembolso', 'Cierre'];
-  const names = ['Juan Pérez', 'María García', 'Carlos López', 'Ana Martínez', 'Luis Rodríguez', 'Elena Sánchez', 'Roberto Díaz', 'Sofía Castro'];
-
-  for (let i = 0; i < 50; i++) {
-    const randomName = names[Math.floor(Math.random() * names.length)];
-    const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
-    const randomType = types[Math.floor(Math.random() * types.length)];
-    const pastDate = subDays(new Date(), Math.floor(Math.random() * 30)); // Más concentrado en el mes actual para demos
-    
-    data.push({
-      id: uuidv4(),
-      name: `${randomName} ${i + 1}`,
-      phone: formatPhoneNumber(`55${Math.floor(10000000 + Math.random() * 90000000)}`),
-      date: pastDate.toISOString(),
-      time: `${Math.floor(9 + Math.random() * 8).toString().padStart(2, '0')}:00`,
-      type: randomType,
-      status: randomStatus,
-      notes: "Cliente interesado en crédito tradicional.",
-      isConfirmed: true,
-      isArchived: false
-    });
-  }
-
-  for (let i = 0; i < 15; i++) {
-    const randomName = names[Math.floor(Math.random() * names.length)];
-    const randomType = types[Math.floor(Math.random() * types.length)];
-    let futureDate;
-    if (i < 5) futureDate = new Date(); 
-    else if (i < 10) futureDate = addDays(new Date(), 1); 
-    else futureDate = addDays(new Date(), Math.floor(Math.random() * 14) + 2);
-
-    data.push({
-      id: uuidv4(),
-      name: `${randomName} Futuro ${i + 1}`,
-      phone: formatPhoneNumber(`55${Math.floor(10000000 + Math.random() * 90000000)}`),
-      date: futureDate.toISOString(),
-      time: `${Math.floor(9 + Math.random() * 8).toString().padStart(2, '0')}:30`,
-      type: randomType,
-      notes: "",
-      isArchived: false
-    });
-  }
-
-  return data;
-};
-
+/**
+ * Hook useAppointments
+ * 
+ * Este hook es el puente entre los componentes de React y nuestro Servicio de Datos.
+ * Se encarga de que React se entere cuando los datos cambian para redibujar la pantalla.
+ */
 export function useAppointments() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Función para guardar forzadamente en disco
-  const saveToDisk = (data: Appointment[]) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  };
-
+  // Al iniciar la app, cargamos lo que hay en el disco
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        setAppointments(JSON.parse(saved));
-      } catch (e) {
-        const seed = generateSeedData();
-        setAppointments(seed);
-        saveToDisk(seed);
-      }
+    const saved = Service.getFromDisk();
+    if (saved.length > 0) {
+      setAppointments(saved);
     } else {
-      const seed = generateSeedData();
+      // Si no hay nada, creamos datos de prueba
+      const seed = Service.generateSeedData();
       setAppointments(seed);
-      saveToDisk(seed);
     }
     setIsLoaded(true);
   }, []);
 
-  useEffect(() => {
-    if (isLoaded) {
-      saveToDisk(appointments);
-    }
-  }, [appointments, isLoaded]);
+  // --- ACCIONES (Que llaman al servicio y actualizan el estado de React) ---
 
-  const addAppointment = (newApp: Omit<Appointment, 'id' | 'isArchived'>) => {
-    const formattedApp: Appointment = {
-      ...newApp,
-      id: uuidv4(),
-      phone: formatPhoneNumber(newApp.phone),
-      isArchived: false
-    };
-    setAppointments(prev => {
-      const updated = [formattedApp, ...prev];
-      saveToDisk(updated);
-      return updated;
-    });
+  const addAppointment = (data: Omit<Appointment, 'id' | 'isArchived'>) => {
+    const updated = Service.createAppointment(data);
+    setAppointments(updated);
   };
 
   const updateStatus = (id: string, status: AppointmentStatus) => {
-    setAppointments(prev => {
-      const updated = prev.map(app => app.id === id ? { ...app, status } : app);
-      saveToDisk(updated);
-      return updated;
-    });
+    const updated = Service.updateAppointment(id, { status });
+    setAppointments(updated);
   };
 
   const archiveAppointment = (id: string) => {
-    setAppointments(prev => {
-      const updated = prev.map(app => app.id === id ? { ...app, isArchived: true } : app);
-      saveToDisk(updated);
-      return updated;
-    });
+    // El "archivado" es simplemente poner isArchived en true
+    const updated = Service.updateAppointment(id, { isArchived: true });
+    setAppointments(updated);
   };
 
   const restoreAppointment = (id: string) => {
-    setAppointments(prev => {
-      const updated = prev.map(app => app.id === id ? { ...app, isArchived: false } : app);
-      saveToDisk(updated);
-      return updated;
-    });
+    const updated = Service.updateAppointment(id, { isArchived: false });
+    setAppointments(updated);
   };
 
   const permanentlyDeleteAppointment = (id: string) => {
-    setAppointments(prev => {
-      const updated = prev.filter(app => app.id !== id);
-      saveToDisk(updated);
-      return updated;
-    });
+    const updated = Service.deletePermanently(id);
+    setAppointments(updated);
   };
 
-  const editAppointment = (id: string, updatedData: Partial<Appointment>) => {
-    setAppointments(prev => {
-      const dataToUpdate = { ...updatedData };
-      if (dataToUpdate.phone) dataToUpdate.phone = formatPhoneNumber(dataToUpdate.phone);
-      const updated = prev.map(app => app.id === id ? { ...app, ...dataToUpdate } : app);
-      saveToDisk(updated);
-      return updated;
-    });
+  const editAppointment = (id: string, data: Partial<Appointment>) => {
+    const updated = Service.updateAppointment(id, data);
+    setAppointments(updated);
   };
 
   const toggleConfirmation = (id: string) => {
-    setAppointments(prev => {
-      const updated = prev.map(app => app.id === id ? { ...app, isConfirmed: true } : app);
-      saveToDisk(updated);
-      return updated;
-    });
+    const updated = Service.updateAppointment(id, { isConfirmed: true });
+    setAppointments(updated);
   };
 
   const resetData = () => {
-    const seed = generateSeedData();
+    const seed = Service.generateSeedData();
     setAppointments(seed);
-    saveToDisk(seed);
   };
 
-  const now = new Date();
-  const startOfToday = startOfDay(now);
-  const lastMonth = subMonths(now, 1);
+  // --- FILTRADO DE LISTAS (Para saber qué mostrar en cada pestaña) ---
 
-  const activeAppointments = appointments.filter(app => !app.isArchived);
-  const archived = appointments.filter(app => app.isArchived === true);
+  const activeAppointments = useMemo(() => appointments.filter(a => !a.isArchived), [appointments]);
+  const archived = useMemo(() => appointments.filter(a => a.isArchived), [appointments]);
 
-  const upcoming = activeAppointments
-    .filter(app => {
-      const appDate = startOfDay(parseISO(app.date));
-      return (isToday(appDate) || isAfter(appDate, startOfToday)) && !app.status;
-    })
-    .sort((a, b) => {
-      const timeA = parseISO(a.date).getTime();
-      const timeB = parseISO(b.date).getTime();
-      if (timeA !== timeB) return timeA - timeB;
-      return a.time.localeCompare(b.time);
-    });
+  const upcoming = useMemo(() => {
+    const today = startOfDay(new Date());
+    return activeAppointments
+      .filter(a => {
+        const d = startOfDay(parseISO(a.date));
+        return (isToday(d) || isAfter(d, today)) && !a.status;
+      })
+      .sort((a, b) => {
+        const dateA = parseISO(a.date).getTime();
+        const dateB = parseISO(b.date).getTime();
+        if (dateA !== dateB) return dateA - dateB;
+        return a.time.localeCompare(b.time);
+      });
+  }, [activeAppointments]);
 
-  const past = activeAppointments
-    .filter(app => {
-      const appDate = startOfDay(parseISO(app.date));
-      return isBefore(appDate, startOfToday) || app.status;
-    })
-    .sort((a, b) => {
-      const timeA = parseISO(a.date).getTime();
-      const timeB = parseISO(b.date).getTime();
-      if (timeA !== timeB) return timeB - timeA;
-      return b.time.localeCompare(a.time);
-    });
+  const past = useMemo(() => {
+    const today = startOfDay(new Date());
+    return activeAppointments
+      .filter(a => {
+        const d = startOfDay(parseISO(a.date));
+        return isBefore(d, today) || !!a.status;
+      })
+      .sort((a, b) => {
+        const dateA = parseISO(a.date).getTime();
+        const dateB = parseISO(b.date).getTime();
+        if (dateA !== dateB) return dateB - dateA;
+        return b.time.localeCompare(a.time);
+      });
+  }, [activeAppointments]);
+
+  // --- HELPERS VISUALES ---
 
   const formatFriendlyDate = (dateStr: string) => {
     const d = parseISO(dateStr);
-    const dayOfApp = startOfDay(d);
-    if (isToday(dayOfApp)) return "Hoy";
-    if (isTomorrow(dayOfApp)) return "Mañana";
-    const pastDiffDays = differenceInDays(startOfDay(new Date()), dayOfApp);
-    if (pastDiffDays === 1) return "Ayer";
+    const day = startOfDay(d);
+    if (isToday(day)) return "Hoy";
+    if (isTomorrow(day)) return "Mañana";
+    if (differenceInDays(startOfDay(new Date()), day) === 1) return "Ayer";
     return format(d, 'dd/MM/yyyy');
   };
 
   const format12hTime = (time24h: string) => {
     if (!time24h) return '';
-    const [hours, minutes] = time24h.split(':').map(Number);
-    const period = hours >= 12 ? 'PM' : 'AM';
-    const hours12 = hours % 12 || 12;
-    return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
+    const [h, m] = time24h.split(':').map(Number);
+    const period = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    return `${h12}:${m.toString().padStart(2, '0')} ${period}`;
   };
 
-  const stats = {
-    todayCount: activeAppointments.filter(app => isToday(parseISO(app.date))).length,
-    pendingCount: upcoming.length,
-    archivedCount: archived.length,
-    
-    // CAMBIO: Ahora cuenta todas las citas activas del mes actual Y citas futuras de cualquier mes
-    currentMonthProspects: activeAppointments.filter(app => {
-      const appDate = parseISO(app.date);
-      return isSameMonth(appDate, now) || isAfter(appDate, now);
-    }).length,
+  const stats = useMemo(() => Service.calculateStats(appointments), [appointments]);
 
-    lastMonthProspects: activeAppointments.filter(app => isSameMonth(parseISO(app.date), lastMonth)).length,
-
-    currentMonthSales: activeAppointments.filter(app => app.status === 'Cierre' && isSameMonth(parseISO(app.date), now)).length,
-    lastMonthSales: activeAppointments.filter(app => app.status === 'Cierre' && isSameMonth(parseISO(app.date), lastMonth)).length,
-  };
-
-  return { 
-    upcoming, 
-    past, 
+  return {
+    appointments,
+    upcoming,
+    past,
     archived,
-    appointments, 
-    addAppointment, 
-    updateStatus, 
+    addAppointment,
+    updateStatus,
     archiveAppointment,
     restoreAppointment,
     permanentlyDeleteAppointment,
@@ -272,7 +151,10 @@ export function useAppointments() {
     resetData,
     formatFriendlyDate,
     format12hTime,
-    stats, 
-    isLoaded 
+    stats,
+    isLoaded
   };
 }
+
+// Re-exportamos tipos para conveniencia de los componentes
+export type { Appointment, AppointmentStatus, AppointmentType };
