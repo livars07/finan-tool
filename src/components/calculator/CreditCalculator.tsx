@@ -238,7 +238,7 @@ export default function CreditCalculator() {
               <span className="text-[10px] text-primary uppercase font-bold tracking-widest">Enganche requerido (3%)</span>
               <span className="text-[10px] font-bold text-primary">{formatCurrency(currentDownPayment)}</span>
             </div>
-            <Progress value={3} className="h-2 bg-primary/20" />
+            <Progress value={3} className="h-2" />
             <div className="flex justify-between text-[10px] font-medium text-muted-foreground pt-1">
               <span>Crédito: {formatCurrency(currentP)}</span>
               <span>Financiamiento: 97%</span>
@@ -422,9 +422,9 @@ export default function CreditCalculator() {
                     <div className="space-y-2">
                       <div className="flex justify-between text-[10px] uppercase font-bold">
                         <span className="text-secondary-foreground">Ratio de endeudamiento sano</span>
-                        <span className="text-primary">35% DTI</span>
+                        <span className="text-primary font-bold">35% DTI</span>
                       </div>
-                      <Progress value={35} className="h-2 bg-secondary/40" />
+                      <Progress value={35} className="h-2" />
                     </div>
                   </div>
                 </div>

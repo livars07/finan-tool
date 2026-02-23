@@ -14,7 +14,7 @@
     --popover-foreground: 0 0% 100%;
     --primary: 205 71% 66%;
     --primary-foreground: 197 15% 10%;
-    --secondary: 197 30% 25% / 0.6;
+    --secondary: 197 15% 25%;
     --secondary-foreground: 0 0% 100%;
     --muted: 197 10% 20% / 0.3;
     --muted-foreground: 0 0% 70%;
@@ -56,25 +56,25 @@
 
   [data-theme="corporativo-v2"] {
     color-scheme: light;
-    --background: 210 33% 99%;
-    --foreground: 215 25% 27%;
+    --background: 215 25% 95%; /* Fondo grisáceo profesional */
+    --foreground: 222 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 27%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 27%;
-    --primary: 217 91% 60%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 239 84% 67%; /* Indigo moderno */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 215 25% 27%;
-    --muted: 210 40% 96%;
+    --secondary: 215 25% 85%; /* Gris con contraste */
+    --secondary-foreground: 222 47% 11%;
+    --muted: 215 25% 90%;
     --muted-foreground: 215 16% 47%;
     --accent: 199 89% 48%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 217 91% 60%;
+    --border: 214 32% 85%;
+    --input: 214 32% 85%;
+    --ring: 239 84% 67%;
     --radius: 0.375rem;
     --calendar-filter: none;
   }
@@ -82,18 +82,18 @@
   [data-theme="moderno"] {
     color-scheme: dark;
     --background: 222 47% 5%;
-    --foreground: 180 100% 50%; /* Cian/Verde brillante para texto */
+    --foreground: 180 100% 50%;
     --card: 222 47% 12% / 0.3;
     --card-foreground: 180 100% 50%;
     --popover: 222 47% 8% / 0.5;
     --popover-foreground: 180 100% 50%;
-    --primary: 210 100% 55%; /* Azul Eléctrico */
+    --primary: 210 100% 55%;
     --primary-foreground: 222 47% 5%;
-    --secondary: 45 90% 50% / 0.5; /* Oro Tecnológico (Importado de Elegante) */
+    --secondary: 222 30% 20%;
     --secondary-foreground: 45 100% 85%;
     --muted: 222 30% 15% / 0.2;
     --muted-foreground: 180 40% 70%;
-    --accent: 155 100% 50%; /* Verde Neón vibrante */
+    --accent: 155 100% 50%;
     --accent-foreground: 222 47% 5%;
     --border: 210 100% 30% / 0.2;
     --input: 222 30% 15% / 0.3;
@@ -112,7 +112,7 @@
     --popover-foreground: 0 0% 98%;
     --primary: 235 86% 65%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 225 15% 13% / 0.6;
+    --secondary: 220 7% 30%;
     --secondary-foreground: 0 0% 100%;
     --muted: 225 6% 15% / 0.4;
     --muted-foreground: 215 15% 75%;
@@ -126,20 +126,25 @@
     --calendar-filter: invert(1);
   }
 
-  [data-theme="elegante"] {
+  [data-theme="olivares"] {
     color-scheme: dark;
     --background: 222 47% 8%;
     --foreground: 0 0% 100%;
     --card: 222 47% 15% / 0.4;
     --card-foreground: 0 0% 100%;
+    --popover: 222 47% 10%;
+    --popover-foreground: 0 0% 100%;
     --primary: 45 90% 50%; /* Oro */
     --primary-foreground: 222 47% 5%;
-    --secondary: 215 80% 60%; /* Azul Real */
+    --secondary: 222 47% 20%;
     --secondary-foreground: 0 0% 100%;
+    --muted: 222 47% 12%;
+    --muted-foreground: 45 30% 70%;
     --accent: 155 85% 45%; /* Esmeralda */
     --accent-foreground: 222 47% 5%;
     --border: 45 90% 40% / 0.15;
     --ring: 45 90% 50%;
+    --radius: 0.5rem;
     --calendar-filter: invert(1);
   }
 
@@ -149,14 +154,19 @@
     --foreground: 280 20% 95%;
     --card: 280 50% 10% / 0.5;
     --card-foreground: 280 20% 95%;
+    --popover: 280 50% 8%;
+    --popover-foreground: 280 20% 95%;
     --primary: 320 100% 60%; /* Rosa */
     --primary-foreground: 280 50% 5%;
-    --secondary: 280 100% 60%; /* Purpura */
+    --secondary: 280 50% 15%;
     --secondary-foreground: 0 0% 100%;
+    --muted: 280 50% 12%;
+    --muted-foreground: 320 40% 80%;
     --accent: 180 100% 50%; /* Cyan Neón */
     --accent-foreground: 280 50% 5%;
     --border: 320 100% 40% / 0.3;
     --ring: 320 100% 60%;
+    --radius: 0.25rem;
     --calendar-filter: invert(1);
   }
 
@@ -166,14 +176,19 @@
     --foreground: 210 20% 95%;
     --card: 210 40% 15% / 0.5;
     --card-foreground: 210 20% 95%;
+    --popover: 210 40% 12%;
+    --popover-foreground: 210 20% 95%;
     --primary: 190 100% 50%; /* Cyan Glacial */
     --primary-foreground: 210 40% 5%;
-    --secondary: 210 100% 70% / 0.4; /* Azul Claro Ártico */
+    --secondary: 210 40% 25%;
     --secondary-foreground: 0 0% 100%;
+    --muted: 210 40% 18%;
+    --muted-foreground: 190 40% 80%;
     --accent: 200 100% 60%; /* Azul Frío */
     --accent-foreground: 210 40% 5%;
     --border: 190 100% 30% / 0.3;
     --ring: 190 100% 50%;
+    --radius: 1rem;
     --calendar-filter: invert(1);
   }
 }

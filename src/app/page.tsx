@@ -51,7 +51,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
-type Theme = 'predeterminado' | 'corporativo' | 'corporativo-v2' | 'moderno' | 'discreto' | 'elegante' | 'neon' | 'gelido';
+type Theme = 'predeterminado' | 'corporativo' | 'corporativo-v2' | 'moderno' | 'discreto' | 'olivares' | 'neon' | 'gelido';
 
 const APP_TIPS = [
   { icon: Calculator, title: "Calculadora Rápida", color: "text-primary", text: "Usa la calculadora rapida en caso de tener una llamada con un interesado que pregunte montos aproximados." },
@@ -155,7 +155,7 @@ export default function Home() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" className="w-9 h-9 rounded-full bg-muted border border-border overflow-hidden backdrop-blur-md">
-                  {theme === 'moderno' ? <Cpu className="w-5 h-5 text-primary" /> : theme.startsWith('corporativo') ? <Sun className="w-5 h-5 text-primary" /> : theme === 'discreto' ? <Moon className="w-5 h-5 text-primary" /> : <Palette className="w-5 h-5 text-primary" />}
+                  {theme === 'moderno' ? <Cpu className="w-5 h-5 text-primary" /> : theme.startsWith('corporativo') ? <Sun className="w-5 h-5 text-primary" /> : theme === 'discreto' ? <Moon className="w-5 h-5 text-primary" /> : theme === 'olivares' ? <Crown className="w-5 h-5 text-primary" /> : <Palette className="w-5 h-5 text-primary" />}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 backdrop-blur-2xl bg-popover border-border/30">
@@ -164,10 +164,10 @@ export default function Home() {
                 {[
                   { id: 'predeterminado', label: 'Predeterminado', icon: Palette, color: 'bg-primary' },
                   { id: 'corporativo', label: 'Corporativo', icon: Sun, color: 'bg-blue-600' },
-                  { id: 'corporativo-v2', label: 'Corporativo v2', icon: ShieldCheck, color: 'bg-blue-400' },
+                  { id: 'corporativo-v2', label: 'Corporativo v2', icon: ShieldCheck, color: 'bg-indigo-500' },
                   { id: 'moderno', label: 'Moderno', icon: Cpu, color: 'bg-cyan-500' },
-                  { id: 'discreto', label: 'Discreto', icon: Moon, color: 'bg-indigo-500' },
-                  { id: 'elegante', label: 'Elegante', icon: Crown, color: 'bg-yellow-600' },
+                  { id: 'discreto', label: 'Discreto', icon: Moon, color: 'bg-slate-700' },
+                  { id: 'olivares', label: 'Olivares', icon: Crown, color: 'bg-yellow-600' },
                   { id: 'neon', label: 'Neón', icon: Zap, color: 'bg-pink-500' },
                   { id: 'gelido', label: 'Gélido', icon: Snowflake, color: 'bg-blue-300' },
                 ].map((t) => (
