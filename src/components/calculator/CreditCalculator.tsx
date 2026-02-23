@@ -31,7 +31,6 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 
-// Componente de Inputs separado para evitar pérdida de foco por re-renderizado
 const CalculatorInputs = ({ 
   isModal = false, 
   totalPrice, 
@@ -57,7 +56,7 @@ const CalculatorInputs = ({
         <Input
           id={isModal ? "totalPriceModal" : "totalPrice"}
           placeholder="0.00"
-          className={isModal ? "pl-7 font-bold text-2xl bg-muted/20 h-14" : "pl-7 font-semibold text-lg bg-muted/20"}
+          className={isModal ? "pl-7 font-bold text-3xl bg-muted/20 h-16" : "pl-7 font-semibold text-lg bg-muted/20"}
           type="text"
           value={formatWithCommas(totalPrice)}
           onChange={(e) => onPriceChange(e.target.value)}
@@ -73,7 +72,7 @@ const CalculatorInputs = ({
         <Input
           id={isModal ? "monthlyPaymentModal" : "monthlyPayment"}
           placeholder="0.00"
-          className={isModal ? "pl-7 border-accent/30 focus-visible:ring-accent font-bold text-2xl text-accent bg-accent/5 h-14" : "pl-7 border-accent/30 focus-visible:ring-accent font-bold text-lg text-accent bg-accent/5"}
+          className={isModal ? "pl-7 border-accent/30 focus-visible:ring-accent font-bold text-3xl text-accent bg-accent/5 h-16" : "pl-7 border-accent/30 focus-visible:ring-accent font-bold text-lg text-accent bg-accent/5"}
           type="text"
           value={formatWithCommas(monthlyPayment)}
           onChange={(e) => onMonthlyChange(e.target.value)}
@@ -89,9 +88,9 @@ export default function CreditCalculator() {
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
   
-  const FACTOR_MENSUALIDAD = 0.006982; // 0.6982%
-  const FACTOR_ENGANCHE = 0.03; // 3%
-  const INCOME_RATIO = 0.35; // 35% de ingresos destinados a mensualidad
+  const FACTOR_MENSUALIDAD = 0.006982; 
+  const FACTOR_ENGANCHE = 0.03; 
+  const INCOME_RATIO = 0.35; 
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('es-MX', {
@@ -154,11 +153,9 @@ export default function CreditCalculator() {
     }
 
     const summaryText = `Resumen de Cotización Hipotecaria:
-------------------------------
 • Valor Inmueble: ${formatCurrency(currentP)}
 • Enganche (3%): ${formatCurrency(currentDownPayment)}
 • Mensualidad: ${formatCurrency(currentMonthly)}
-------------------------------
 * Sujeto a aprobación de crédito.`;
 
     navigator.clipboard.writeText(summaryText).then(() => {
@@ -174,7 +171,7 @@ export default function CreditCalculator() {
       <Card className="shadow-2xl bg-card border-border overflow-hidden">
         <CardHeader className="bg-primary/5 border-b border-border/50">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <div className="flex items-center gap-2">
                 <Calculator className="text-primary w-6 h-6" />
                 <CardTitle className="text-xl font-headline font-semibold">Calculadora rápida</CardTitle>
@@ -266,26 +263,29 @@ export default function CreditCalculator() {
       </Card>
 
       <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
-        <DialogContent className="max-w-[95vw] sm:max-w-[95vw] w-[95vw] max-h-[90vh] overflow-y-auto bg-card border-border shadow-2xl p-0 backdrop-blur-[20px] flex flex-col">
-          <DialogHeader className="px-8 py-4 border-b border-border/40 flex flex-row items-center justify-between bg-card/20 sticky top-0 z-10 shrink-0">
-            <div className="flex items-center gap-3">
-              <div className="bg-primary/20 p-2 rounded-xl border border-primary/30">
-                <Calculator className="text-primary w-6 h-6" />
+        <DialogContent 
+          data-calculator-dialog="true"
+          className="max-w-none w-screen h-screen m-0 rounded-none bg-background border-none shadow-none p-0 flex flex-col overflow-hidden"
+        >
+          <DialogHeader className="px-10 py-6 border-b border-border/40 flex flex-row items-center justify-between bg-card/10 shrink-0">
+            <div className="flex items-center gap-4">
+              <div className="bg-primary/20 p-3 rounded-2xl border border-primary/30">
+                <Calculator className="text-primary w-8 h-8" />
               </div>
               <div>
-                <DialogTitle className="text-xl font-headline font-bold text-foreground">Simulador Profesional</DialogTitle>
-                <DialogDescription className="text-xs">Cálculos de alta precisión para cierres inmobiliarios.</DialogDescription>
+                <DialogTitle className="text-2xl font-headline font-bold text-foreground">Simulador Profesional de Crédito</DialogTitle>
+                <DialogDescription className="text-sm">Herramienta de precisión para prospectación y cierres de alta gama.</DialogDescription>
               </div>
             </div>
             <DialogClose asChild>
-              <Button variant="ghost" size="icon" className="rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors h-8 w-8">
-                <X className="w-4 h-4" />
+              <Button variant="ghost" size="icon" className="rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors h-12 w-12">
+                <X className="w-6 h-6" />
               </Button>
             </DialogClose>
           </DialogHeader>
 
-          <div className="p-6 space-y-6 overflow-y-auto flex-1">
-            <section className="bg-muted/30 p-6 rounded-2xl border border-border/50">
+          <div className="flex-1 overflow-y-auto p-10 space-y-10">
+            <section className="bg-muted/30 p-10 rounded-3xl border border-border/50 shadow-inner">
               <CalculatorInputs 
                 isModal={true}
                 totalPrice={totalPrice}
@@ -296,107 +296,108 @@ export default function CreditCalculator() {
               />
             </section>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-              <div className="space-y-4">
-                <div className="p-5 rounded-2xl border border-primary/20 bg-primary/5 space-y-4">
-                  <div className="flex items-center gap-2 text-primary">
-                    <TrendingUp className="w-4 h-4" />
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest">Resumen Financiero</h4>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-muted-foreground">Financiamiento (97%):</span>
-                      <span className="font-bold">{formatCurrency(currentP * 0.97)}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-muted-foreground">Enganche (3%):</span>
-                      <span className="font-bold text-primary">{formatCurrency(currentDownPayment)}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm pt-2 border-t border-border/30">
-                      <span className="text-muted-foreground font-semibold">Mensualidad:</span>
-                      <span className="text-lg font-bold text-primary">{formatCurrency(currentMonthly)}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-5 rounded-2xl border border-accent/20 bg-accent/5 space-y-4">
-                  <div className="flex items-center gap-2 text-accent">
-                    <Receipt className="w-4 h-4" />
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest">Gastos Adicionales</h4>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-muted-foreground">Escrituras (est. 5%):</span>
-                      <span className="font-bold">{formatCurrency(currentP * 0.05)}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-muted-foreground">Avalúo (est.):</span>
-                      <span className="font-bold">$7,500.00</span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm pt-2 border-t border-border/30">
-                      <span className="text-muted-foreground font-semibold">Inversión Inicial:</span>
-                      <span className="text-lg font-bold text-accent">{formatCurrency(currentDownPayment + (currentP * 0.05) + 7500)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="p-5 rounded-2xl border border-yellow-500/20 bg-yellow-500/5 space-y-4">
-                  <div className="flex items-center gap-2 text-yellow-500">
-                    <ShieldAlert className="w-4 h-4" />
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest">Validación de Perfil</h4>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-stretch">
+              <div className="space-y-6">
+                <div className="p-8 rounded-3xl border border-primary/20 bg-primary/5 space-y-6 h-full flex flex-col justify-center">
+                  <div className="flex items-center gap-3 text-primary">
+                    <TrendingUp className="w-6 h-6" />
+                    <h4 className="text-xs font-bold uppercase tracking-widest">Estructura del Crédito</h4>
                   </div>
                   <div className="space-y-4">
-                    <div>
-                      <p className="text-[9px] text-muted-foreground uppercase font-bold mb-1">Ingreso Mínimo Sugerido</p>
-                      <p className="text-xl font-bold text-foreground">{formatCurrency(minIncomeRequired)}</p>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Valor del Inmueble:</span>
+                      <span className="font-bold">{formatCurrency(currentP)}</span>
                     </div>
-                    <div className="pt-2">
-                      <p className="text-[9px] text-muted-foreground mb-1">Capacidad de Pago (DTI 35%)</p>
-                      <Progress value={35} className="h-1.5 bg-yellow-500/20" />
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Financiamiento Sugerido (97%):</span>
+                      <span className="font-bold">{formatCurrency(currentP * 0.97)}</span>
                     </div>
-                  </div>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-muted/20 border border-border/50">
-                  <h4 className="text-xs font-bold mb-3 flex items-center gap-2">
-                    <FileText className="w-3.5 h-3.5 text-primary" /> Notas Técnicas
-                  </h4>
-                  <div className="space-y-2 text-[10px] text-muted-foreground leading-tight">
-                    <p>• Gastos varían por estado.</p>
-                    <p>• Seguros integrados en pago.</p>
-                    <p>• Factor 0.6982% (16 años).</p>
-                    <p>• Perfil requiere triple de ingresos.</p>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Enganche Requerido (3%):</span>
+                      <span className="font-bold text-primary">{formatCurrency(currentDownPayment)}</span>
+                    </div>
+                    <div className="pt-6 border-t border-border/30">
+                      <span className="text-xs text-muted-foreground font-semibold uppercase tracking-tight">Inversión Mensual</span>
+                      <p className="text-4xl font-bold text-primary mt-1">{formatCurrency(currentMonthly)}</p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-4 flex flex-col h-full justify-between">
-                <div className="p-6 rounded-2xl border border-green-500/20 bg-green-500/5 flex-1 flex flex-col justify-center items-center text-center space-y-4">
-                  <TrendingUp className="w-10 h-10 text-green-500 opacity-50" />
-                  <div>
-                    <h4 className="text-sm font-bold text-foreground">Listos para prospectar</h4>
-                    <p className="text-xs text-muted-foreground mt-1">Comparte el resumen con tu cliente en un solo clic.</p>
+              <div className="space-y-6">
+                <div className="p-8 rounded-3xl border border-accent/20 bg-accent/5 space-y-6 h-full flex flex-col justify-center">
+                  <div className="flex items-center gap-3 text-accent">
+                    <Receipt className="w-6 h-6" />
+                    <h4 className="text-xs font-bold uppercase tracking-widest">Gastos de Operación</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Gastos de Escrituración (est. 5%):</span>
+                      <span className="font-bold">{formatCurrency(currentP * 0.05)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Costo de Avalúo (est.):</span>
+                      <span className="font-bold">$7,500.00</span>
+                    </div>
+                    <div className="pt-6 border-t border-border/30">
+                      <span className="text-xs text-muted-foreground font-semibold uppercase tracking-tight">Desembolso Inicial Total</span>
+                      <p className="text-4xl font-bold text-accent mt-1">{formatCurrency(currentDownPayment + (currentP * 0.05) + 7500)}</p>
+                    </div>
                   </div>
                 </div>
-                
-                <div className="space-y-3 shrink-0">
-                  <Button 
-                    onClick={handleCopySummary}
-                    variant="outline"
-                    className="w-full h-12 border-green-500 text-green-500 hover:bg-green-500/5 font-bold shadow-sm"
-                  >
-                    <Copy className="w-4 h-4 mr-2" /> Copiar Resumen (Sin fondo)
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    onClick={clear}
-                    className="w-full h-10 text-muted-foreground hover:text-destructive"
-                  >
-                    <RotateCcw className="w-4 h-4 mr-2" /> Reiniciar Valores
-                  </Button>
+              </div>
+
+              <div className="space-y-6 flex flex-col">
+                <div className="p-8 rounded-3xl border border-yellow-500/20 bg-yellow-500/5 space-y-6 flex-1">
+                  <div className="flex items-center gap-3 text-yellow-500">
+                    <ShieldAlert className="w-6 h-6" />
+                    <h4 className="text-xs font-bold uppercase tracking-widest">Perfilamiento del Cliente</h4>
+                  </div>
+                  <div className="space-y-6">
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold mb-2">Ingreso Mínimo Comprobable</p>
+                      <p className="text-3xl font-bold text-foreground">{formatCurrency(minIncomeRequired)}</p>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-[10px] uppercase font-bold">
+                        <span>Ratio de Endeudamiento</span>
+                        <span>35% DTI</span>
+                      </div>
+                      <Progress value={35} className="h-2 bg-yellow-500/20" />
+                      <p className="text-[10px] text-muted-foreground leading-snug">El ingreso mensual debe ser al menos 2.8 veces mayor a la mensualidad para una aprobación saludable.</p>
+                    </div>
+                  </div>
                 </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-6 pt-4 border-t border-border/20 items-center justify-between">
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2 p-3 px-5 rounded-2xl bg-muted border border-border/50">
+                  <FileText className="w-4 h-4 text-primary" />
+                  <span className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Plan Tradicional 192 Meses</span>
+                </div>
+                <div className="text-xs text-muted-foreground/60 leading-tight hidden xl:block">
+                  * Cotización informativa basada en factor mensualidad fijo de 0.6982%. <br />
+                  Los montos finales pueden variar según la institución financiera y perfil crediticio.
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 w-full md:w-auto">
+                <Button 
+                  onClick={handleCopySummary}
+                  variant="outline"
+                  className="flex-1 md:flex-none h-14 px-8 border-green-500 text-green-500 hover:bg-green-500/5 font-bold text-lg rounded-2xl transition-all"
+                >
+                  <Copy className="w-5 h-5 mr-3" /> Copiar Resumen
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  onClick={clear}
+                  className="h-14 px-6 text-muted-foreground hover:text-destructive rounded-2xl"
+                >
+                  <RotateCcw className="w-5 h-5 mr-2" /> Limpiar Todo
+                </Button>
               </div>
             </div>
           </div>

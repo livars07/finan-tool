@@ -22,7 +22,7 @@
     --accent-foreground: 197 15% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 197 15% 25% / 0.15; /* Reducción de saturación de líneas */
+    --border: 197 15% 25% / 0.15;
     --input: 197 15% 25% / 0.2;
     --ring: 205 71% 66%;
     --radius: 0.75rem;
@@ -31,13 +31,12 @@
 
   [data-theme="corporativo"] {
     color-scheme: light;
-    /* Corporativo - Gris desaturado de baja luz para evitar exceso de brillo */
+    /* Corporativo - Gris desaturado de baja luz */
     --background: 210 15% 92%;
     --foreground: 222 20% 20%;
     --card: 0 0% 100% / 0.8;
     --card-foreground: 222 20% 20%;
     
-    /* Popover para menús (Dropdown) - CLARO con texto gris oscuro para legibilidad */
     --popover: 210 15% 95% / 0.98;
     --popover-foreground: 222 20% 20%;
     
@@ -46,9 +45,7 @@
     --secondary: 210 20% 88%;
     --secondary-foreground: 222 20% 20%;
     --muted: 210 20% 80%;
-    
-    /* Texto secundario en celeste */
-    --muted-foreground: 190 70% 60%; 
+    --muted-foreground: 190 70% 50%; /* Celeste oscuro para legibilidad */
     
     --accent: 160 30% 50%;
     --accent-foreground: 0 0% 100%;
@@ -60,9 +57,8 @@
     --calendar-filter: none;
   }
 
-  /* Override específico para Diálogos (Popups grandes) en Corporativo */
-  /* Se vuelven oscuros con texto blanco para evitar el exceso de luz y mejorar el contraste */
-  [data-theme="corporativo"] [role="dialog"],
+  /* Override para Diálogos Corporativos (Excepto la Calculadora) */
+  [data-theme="corporativo"] [role="dialog"]:not([data-calculator-dialog="true"]),
   [data-theme="corporativo"] [role="status"] {
     --background: 222 20% 15%;
     --foreground: 0 0% 100%;
@@ -75,36 +71,35 @@
     color: hsl(var(--foreground)) !important;
   }
 
-  /* Asegura que los hijos dentro de diálogos corporativos ignoren el color navy blue */
-  [data-theme="corporativo"] [role="dialog"] p,
-  [data-theme="corporativo"] [role="dialog"] span,
-  [data-theme="corporativo"] [role="dialog"] h2,
-  [data-theme="corporativo"] [role="dialog"] h3,
-  [data-theme="corporativo"] [role="dialog"] label {
-    color: inherit;
+  /* Asegura que los textos sean blancos en diálogos oscuros corporativos */
+  [data-theme="corporativo"] [role="dialog"]:not([data-calculator-dialog="true"]) p,
+  [data-theme="corporativo"] [role="dialog"]:not([data-calculator-dialog="true"]) span,
+  [data-theme="corporativo"] [role="dialog"]:not([data-calculator-dialog="true"]) h2,
+  [data-theme="corporativo"] [role="dialog"]:not([data-calculator-dialog="true"]) h3,
+  [data-theme="corporativo"] [role="dialog"]:not([data-calculator-dialog="true"]) label {
+    color: white !important;
   }
   
-  /* Mantener el celeste para los muted-foreground incluso en diálogos oscuros */
-  [data-theme="corporativo"] [role="dialog"] .text-muted-foreground {
+  [data-theme="corporativo"] [role="dialog"]:not([data-calculator-dialog="true"]) .text-muted-foreground {
     color: hsl(190 70% 75%) !important;
   }
 
   [data-theme="discreto"] {
     color-scheme: dark;
     /* Discreto - Discord 2025 Palette */
-    --background: 220 7% 21%; /* #313338 */
+    --background: 220 7% 21%;
     --foreground: 0 0% 98%;
-    --card: 225 7% 18% / 0.9; /* #2b2d31 */
+    --card: 225 7% 18% / 0.9;
     --card-foreground: 0 0% 98%;
     --popover: 225 7% 12% / 0.95;
     --popover-foreground: 0 0% 98%;
-    --primary: 235 86% 65%; /* Discord Blurple #5865f2 */
+    --primary: 235 86% 65%;
     --primary-foreground: 0 0% 100%;
     --secondary: 225 6% 13% / 0.5;
     --secondary-foreground: 0 0% 100%;
     --muted: 225 6% 15% / 0.4;
     --muted-foreground: 215 15% 75%;
-    --accent: 142 70% 45%; /* Discord Green #23a559 */
+    --accent: 142 70% 45%;
     --accent-foreground: 0 0% 100%;
     --destructive: 359 82% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -130,8 +125,6 @@
     --muted-foreground: 190 50% 70%;
     --accent: 145 100% 50%;
     --accent-foreground: 222 47% 5%;
-    --destructive: 0 100% 60%;
-    --destructive-foreground: 0 0% 100%;
     --border: 190 100% 30% / 0.2;
     --input: 222 30% 15% / 0.3;
     --ring: 190 100% 50%;
@@ -156,7 +149,6 @@
     @apply backdrop-blur-[20px] !important;
   }
 
-  /* Estilos armoniosos para inputs de fecha y hora nativos */
   input[type="date"]::-webkit-calendar-picker-indicator,
   input[type="time"]::-webkit-calendar-picker-indicator {
     filter: var(--calendar-filter);
@@ -170,7 +162,6 @@
     opacity: 1;
   }
 
-  /* Estilos para las opciones de los Selects */
   [role="option"]:hover, 
   [role="option"][data-highlighted],
   [role="menuitem"]:hover,
@@ -178,7 +169,6 @@
     @apply bg-primary/20 text-foreground cursor-pointer transition-colors duration-200 !important;
   }
 
-  /* Minimalist Scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
