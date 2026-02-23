@@ -198,6 +198,7 @@ export default function UpcomingAppointments({
                 <SelectItem value="Reagendó">Reagendó</SelectItem>
                 <SelectItem value="Reembolso">Reembolso</SelectItem>
                 <SelectItem value="Cierre">Cierre</SelectItem>
+                <SelectItem value="Apartado">Apartado</SelectItem>
               </SelectContent>
             </Select>
           </div>

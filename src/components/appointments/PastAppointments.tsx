@@ -33,6 +33,7 @@ export default function PastAppointments({ appointments, onSelect, formatDate, f
   const getStatusColor = (status?: AppointmentStatus) => {
     switch (status) {
       case 'Cierre': return 'text-green-500 font-bold';
+      case 'Apartado': return 'text-green-100/90 font-bold'; // Tono verde pastel blanco ligero
       case 'No asistencia': return 'text-destructive';
       case 'Reagendó': return 'text-primary';
       case 'Asistencia': return 'text-accent';

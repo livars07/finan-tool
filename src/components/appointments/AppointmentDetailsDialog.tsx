@@ -193,6 +193,7 @@ Número: ${appointment.phone}`;
                       <SelectItem value="Reagendó">Reagendó</SelectItem>
                       <SelectItem value="Reembolso">Reembolso</SelectItem>
                       <SelectItem value="Cierre">Cierre</SelectItem>
+                      <SelectItem value="Apartado">Apartado</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -269,7 +270,12 @@ Número: ${appointment.phone}`;
                   <CheckCircle2 className="w-4 h-4 text-green-400" />
                   <div>
                     <p className="text-[10px] text-muted-foreground uppercase font-bold">Resultado</p>
-                    <p className="text-sm font-bold text-green-400">{appointment.status}</p>
+                    <p className={cn(
+                      "text-sm font-bold",
+                      appointment.status === 'Apartado' ? "text-green-100/90" : "text-green-400"
+                    )}>
+                      {appointment.status}
+                    </p>
                   </div>
                 </div>
               )}

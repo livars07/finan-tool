@@ -23,7 +23,8 @@ export type AppointmentStatus =
   | 'Continuación en otra cita' 
   | 'Reagendó' 
   | 'Reembolso' 
-  | 'Cierre';
+  | 'Cierre'
+  | 'Apartado';
 
 export type AppointmentType = '1ra consulta' | '2da consulta' | 'Cierre' | 'Seguimiento';
 
@@ -113,7 +114,7 @@ export const generateSeedData = (): Appointment[] => {
   const firstNames = ['Juan', 'María', 'Carlos', 'Ana', 'Luis', 'Elena', 'Roberto', 'Sofía', 'Diego', 'Lucía'];
   const lastNames = ['Pérez', 'García', 'López', 'Martínez', 'Rodríguez', 'Gómez', 'Díaz', 'Ruiz', 'Torres', 'Morales'];
   const types: AppointmentType[] = ['1ra consulta', '2da consulta', 'Cierre', 'Seguimiento'];
-  const statuses: AppointmentStatus[] = ['Asistencia', 'No asistencia', 'Continuación en otra cita', 'Reagendó', 'Reembolso', 'Cierre'];
+  const statuses: AppointmentStatus[] = ['Asistencia', 'No asistencia', 'Continuación en otra cita', 'Reagendó', 'Reembolso', 'Cierre', 'Apartado'];
   const hours = ['09:00', '10:30', '12:00', '14:30', '16:00', '17:30'];
 
   const now = new Date();
@@ -161,6 +162,19 @@ export const generateSeedData = (): Appointment[] => {
       notes: "Historial del mes pasado."
     });
   }
+
+  // Una cita adicional con estado 'Apartado' para demostración
+  data.push({
+    id: uuidv4(),
+    name: "Alejandro Ruiz (Test)",
+    phone: "664 999 0011",
+    date: subDays(now, 2).toISOString(),
+    time: "11:00",
+    type: "2da consulta",
+    status: "Apartado",
+    isConfirmed: true,
+    notes: "Cliente interesado, ya realizó el apartado."
+  });
   
   saveToDisk(data);
   return data;
@@ -184,7 +198,7 @@ export const calculateStats = (appointments: Appointment[]) => {
       return isSameMonth(d, now) || isAfter(d, now);
     }).length,
     lastMonthProspects: appointments.filter(a => isSameMonth(parseISO(a.date), lastMonth)).length,
-    currentMonthSales: appointments.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), now)).length,
-    lastMonthSales: appointments.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), lastMonth)).length,
+    currentMonthSales: appointments.filter(a => (a.status === 'Cierre' || a.status === 'Apartado') && isSameMonth(parseISO(a.date), now)).length,
+    lastMonthSales: appointments.filter(a => (a.status === 'Cierre' || a.status === 'Apartado') && isSameMonth(parseISO(a.date), lastMonth)).length,
   };
 };
