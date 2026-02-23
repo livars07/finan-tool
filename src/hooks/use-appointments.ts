@@ -30,7 +30,17 @@ export function useAppointments() {
   };
 
   const updateStatus = (id: string, status: AppointmentStatus, notes?: string) => {
-    const updated = Service.updateAppointment(id, { status, notes });
+    const app = appointments.find(a => a.id === id);
+    
+    // Nueva lógica: si no está confirmada pero se finaliza con un estado positivo
+    // Se confirma automáticamente.
+    const shouldAutoConfirm = app && !app.isConfirmed && status !== 'No asistencia' && status !== 'Reagendó';
+    
+    const updated = Service.updateAppointment(id, { 
+      status, 
+      notes,
+      ...(shouldAutoConfirm ? { isConfirmed: true } : {})
+    });
     setAppointments(updated);
   };
 
