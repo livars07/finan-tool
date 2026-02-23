@@ -1,10 +1,8 @@
-
 "use client"
 
 import React, { useState } from 'react';
 import { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Clock, Calendar, Info, CheckCircle2, AlertCircle, CheckCircle } from "lucide-react";
 import { parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -109,29 +107,32 @@ export default function UpcomingAppointments({
                   <div className="text-xs text-muted-foreground">{app.phone}</div>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-1 text-xs font-semibold text-muted-foreground">
+                  <div className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-tight">
                     <Info className="w-3 h-3" /> {app.type}
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-col gap-1">
-                    <Badge variant={appToday ? "default" : "secondary"} className="font-normal w-fit">
+                    <span className={cn(
+                      "text-[10px] font-bold uppercase tracking-wider",
+                      appToday ? "text-primary" : "text-muted-foreground"
+                    )}>
                       {formatDate(app.date)}
-                    </Badge>
+                    </span>
                     {appToday && (
                       <div onClick={(e) => e.stopPropagation()}>
                         {app.isConfirmed ? (
-                          <div className="flex items-center gap-1 text-[10px] font-bold text-green-400 uppercase tracking-tighter">
-                            <CheckCircle className="w-3 h-3" /> Confirmada
+                          <div className="flex items-center gap-1 text-[9px] font-bold text-green-400 uppercase tracking-tighter">
+                            <CheckCircle className="w-2.5 h-2.5" /> Confirmada
                           </div>
                         ) : (
                           <Button 
                             variant="outline" 
                             size="sm" 
-                            className="h-6 px-2 text-[9px] font-bold uppercase border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10"
+                            className="h-5 px-1.5 text-[8px] font-bold uppercase border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10"
                             onClick={() => setConfirmId(app.id)}
                           >
-                            <AlertCircle className="w-2.5 h-2.5 mr-1" /> Sin confirmar
+                            <AlertCircle className="w-2 h-2 mr-1" /> Sin confirmar
                           </Button>
                         )}
                       </div>
@@ -139,7 +140,7 @@ export default function UpcomingAppointments({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-1 text-accent font-bold">
+                  <div className="flex items-center gap-1 text-accent font-bold text-[10px]">
                     <Clock className="w-3 h-3" /> {format12hTime(app.time)}
                   </div>
                 </TableCell>

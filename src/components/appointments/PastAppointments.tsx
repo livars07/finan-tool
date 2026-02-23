@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -75,10 +74,10 @@ export default function PastAppointments({ appointments, onSelect, formatDate, f
                     <TableCell className="text-[10px] text-muted-foreground uppercase tracking-tight">
                       {app.type}
                     </TableCell>
-                    <TableCell className="text-muted-foreground text-xs">
+                    <TableCell className="text-muted-foreground text-[10px] uppercase font-medium">
                       {formatDate(app.date)} {format12hTime(app.time)}
                     </TableCell>
-                    <TableCell className={cn("text-xs", getStatusColor(app.status))}>
+                    <TableCell className={cn("text-[10px] uppercase font-bold", getStatusColor(app.status))}>
                       {app.status || 'N/A'}
                     </TableCell>
                   </TableRow>

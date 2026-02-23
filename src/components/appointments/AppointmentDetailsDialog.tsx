@@ -175,16 +175,19 @@ Número: ${appointment.phone}`;
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
                   <Calendar className="w-4 h-4 text-primary" />
-                  <div>
-                    <p className="text-[10px] text-muted-foreground uppercase font-bold">Fecha</p>
-                    <p className="text-sm font-medium">{formatFriendlyDate(appointment.date)}</p>
+                  <div className="flex flex-col">
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold leading-tight">Fecha</p>
+                    <p className="text-xs font-medium">{formatFriendlyDate(appointment.date)}</p>
+                    <p className="text-[10px] text-muted-foreground/60 font-mono tracking-tighter">
+                      {format(parseISO(appointment.date), 'yyyy-MM-dd')}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Clock className="w-4 h-4 text-primary" />
                   <div>
                     <p className="text-[10px] text-muted-foreground uppercase font-bold">Hora</p>
-                    <p className="text-sm font-medium">{format12hTime(appointment.time)}</p>
+                    <p className="text-xs font-medium">{format12hTime(appointment.time)}</p>
                   </div>
                 </div>
               </div>
@@ -195,7 +198,7 @@ Número: ${appointment.phone}`;
             <Label className="flex items-center gap-2 text-muted-foreground text-xs font-bold uppercase">📝 Notas</Label>
             <Textarea 
               placeholder="Detalles del prospecto..."
-              className="min-h-[120px] bg-muted/30 border-border/50 focus-visible:ring-primary resize-none"
+              className="min-h-[120px] bg-muted/30 border-border/50 focus-visible:ring-primary resize-none text-sm"
               value={isEditing ? editData.notes : appointment.notes}
               onChange={e => setEditData({...editData, notes: e.target.value})}
               readOnly={!isEditing}

@@ -87,11 +87,11 @@
   }
 
   header {
-    @apply backdrop-blur-2xl bg-card/10 !important;
+    @apply backdrop-blur-[40px] bg-card/5 !important;
   }
 
   [role="dialog"], [role="status"] {
-    @apply backdrop-blur-3xl !important;
+    @apply backdrop-blur-[40px] bg-card/5 !important;
   }
 
   /* Minimalist Scrollbar */

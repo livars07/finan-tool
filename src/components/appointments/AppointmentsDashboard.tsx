@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { CalendarClock, Search } from 'lucide-react';
 import { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
-import { parseISO, format, isWeekend } from 'date-fns';
+import { parseISO, format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 interface AppointmentsDashboardProps {
