@@ -32,11 +32,11 @@ export default function PastAppointments({ appointments, onSelect, formatDate, f
 
   const getStatusColor = (status?: AppointmentStatus) => {
     switch (status) {
-      case 'Cierre': return 'text-green-400 font-bold';
+      case 'Cierre': return 'text-green-500 font-bold';
       case 'No asistencia': return 'text-destructive';
       case 'Reagendó': return 'text-primary';
       case 'Asistencia': return 'text-accent';
-      case 'Apartado': return 'text-green-100/90 font-semibold';
+      case 'Apartado': return 'text-green-100/90 bg-green-900/10 px-1.5 py-0.5 rounded font-medium';
       case 'Reembolso': return 'text-orange-400';
       case 'Continuación en otra cita': return 'text-blue-400';
       default: return 'text-muted-foreground';

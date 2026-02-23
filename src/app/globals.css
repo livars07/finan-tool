@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    /* Predeterminado - Celeste */
+    /* Predeterminado - Celeste Dark */
     --background: 197 15% 15%;
     --foreground: 0 0% 100%;
     --card: 197 15% 18% / 0.5;
@@ -24,12 +24,30 @@
     --border: 197 15% 25% / 0.3;
     --input: 197 15% 25% / 0.4;
     --ring: 205 71% 66%;
-    --chart-1: 205 71% 66%;
-    --chart-2: 180 85% 49%;
-    --chart-3: 197 15% 40%;
-    --chart-4: 210 100% 70%;
-    --chart-5: 180 100% 80%;
     --radius: 0.75rem;
+  }
+
+  /* Tema Corporativo - Blanco y Grises (Light Mode Suave) */
+  [data-theme="corporativo"] {
+    --background: 210 20% 96%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100% / 0.9;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100% / 0.95;
+    --popover-foreground: 222 47% 11%;
+    --primary: 221 83% 53%; /* Azul Corporativo */
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11.2%;
+    --muted: 210 40% 92%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 142 70% 45%; /* Verde Corporativo */
+    --accent-foreground: 222 47% 11.2%;
+    --destructive: 0 84.2% 60.2%; /* Rojo Corporativo */
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
   }
 
   [data-theme="discreto"] {
@@ -76,29 +94,6 @@
     --ring: 190 100% 50%;
     --radius: 0.15rem;
   }
-
-  [data-theme="corporativo"] {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 15% / 0.6;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 10% / 0.8;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 217 19% 27% / 0.5;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 19% 15% / 0.4;
-    --muted-foreground: 215 20% 65%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 19% 27% / 0.5;
-    --input: 217 19% 27% / 0.5;
-    --ring: 217 91% 60%;
-    --radius: 0.3rem;
-  }
 }
 
 @layer base {
@@ -106,15 +101,15 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-body antialiased;
+    @apply bg-background text-foreground font-body antialiased transition-colors duration-300;
   }
 
   header {
-    @apply backdrop-blur-[20px] bg-card/5 !important;
+    @apply backdrop-blur-[20px] bg-card/10 !important;
   }
 
   [role="dialog"], [role="status"] {
-    @apply backdrop-blur-[20px] bg-card/5 !important;
+    @apply backdrop-blur-[20px] bg-card/10 !important;
   }
 
   /* Minimalist Scrollbar */

@@ -53,15 +53,25 @@ export default function Home() {
   useEffect(() => {
     const savedTheme = localStorage.getItem('finanto-theme') as Theme;
     if (savedTheme) {
-      setTheme(savedTheme);
-      document.documentElement.setAttribute('data-theme', savedTheme);
+      applyTheme(savedTheme);
     }
   }, []);
 
-  const handleThemeChange = (themeId: Theme) => {
+  const applyTheme = (themeId: Theme) => {
     setTheme(themeId);
-    localStorage.setItem('finanto-theme', themeId);
     document.documentElement.setAttribute('data-theme', themeId);
+    
+    // El tema corporativo es el único "Light Mode" (o Soft Light)
+    if (themeId === 'corporativo') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
+  };
+
+  const handleThemeChange = (themeId: Theme) => {
+    applyTheme(themeId);
+    localStorage.setItem('finanto-theme', themeId);
     
     const themeNames = {
       predeterminado: 'Predeterminado',
@@ -98,7 +108,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
-      <header className="border-b border-border/40 sticky top-0 z-50 backdrop-blur-[40px] bg-card/10">
+      <header className="border-b border-border/40 sticky top-0 z-50 backdrop-blur-[20px] bg-card/10">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="bg-primary/20 p-1.5 rounded-lg border border-primary/30">
@@ -122,7 +132,7 @@ export default function Home() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" className="w-9 h-9 rounded-full bg-muted border border-border overflow-hidden backdrop-blur-md">
-                  {theme === 'moderno' ? <Cpu className="w-5 h-5 text-primary" /> : theme === 'corporativo' ? <Sun className="w-5 h-5" /> : theme === 'discreto' ? <Moon className="w-5 h-5 text-primary" /> : <Palette className="w-5 h-5 text-primary" />}
+                  {theme === 'moderno' ? <Cpu className="w-5 h-5 text-primary" /> : theme === 'corporativo' ? <Sun className="w-5 h-5 text-primary" /> : theme === 'discreto' ? <Moon className="w-5 h-5 text-primary" /> : <Palette className="w-5 h-5 text-primary" />}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 backdrop-blur-2xl bg-card/20 border-border/30">
@@ -135,7 +145,7 @@ export default function Home() {
                   <div className="w-3 h-3 rounded-full bg-[#5865f2]" /> Discreto
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleThemeChange('corporativo')} className="flex items-center gap-2 cursor-pointer">
-                  <div className="w-3 h-3 rounded-full bg-white border border-gray-300" /> Corporativo
+                  <div className="w-3 h-3 rounded-full bg-slate-400 border border-gray-300" /> Corporativo
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleThemeChange('moderno')} className="flex items-center gap-2 cursor-pointer">
                   <div className="w-3 h-3 rounded-full bg-[#00f7ff] shadow-[0_0_8px_#00f7ff]" /> Moderno
@@ -173,7 +183,7 @@ export default function Home() {
               label: 'Cierres', 
               value: stats.currentMonthSales.toString(), 
               icon: CheckCircle2, 
-              color: 'text-green-400',
+              color: 'text-green-500',
               subValue: stats.lastMonthSales,
               subLabel: 'Mes pasado'
             },
@@ -234,7 +244,7 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="mt-12 border-t border-border/40 py-8 bg-card/10 backdrop-blur-[40px]">
+      <footer className="mt-12 border-t border-border/40 py-8 bg-card/10 backdrop-blur-[20px]">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm">
           <p>© 2026 Finanto - Gestión Hipotecaria</p>
           <div className="flex items-center gap-6">
@@ -258,7 +268,7 @@ export default function Home() {
       </footer>
 
       <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
-        <AlertDialogContent className="backdrop-blur-[40px] bg-card/20 border-border/20">
+        <AlertDialogContent className="backdrop-blur-[20px] bg-card/20 border-border/20">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Confirmar reinicio total?</AlertDialogTitle>
             <AlertDialogDescription>
