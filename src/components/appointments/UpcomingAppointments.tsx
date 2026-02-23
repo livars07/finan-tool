@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -148,13 +149,14 @@ export default function UpcomingAppointments({
       const dateFormatted = format(dateObj, "EEEE d 'de' MMMM yyyy", { locale: es });
       const capitalizedDate = dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
       const timeFormatted = format12hTime(app.time);
+      const confirmedTag = app.isConfirmed ? ' (Confirmado)' : '';
       
       const motivoLine = app.type === '1ra consulta' ? '' : `Motivo: ${app.type}\n`;
 
       return `Cita: ${capitalizedDate}
 Nombre: ${app.name}
 ${motivoLine}Producto: ${app.product || 'N/A'}
-Hora: ${timeFormatted}
+Hora: ${timeFormatted}${confirmedTag}
 Número: ${app.phone}`;
     }).join('\n\n');
 

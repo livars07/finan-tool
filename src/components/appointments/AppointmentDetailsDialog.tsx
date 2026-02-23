@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -109,13 +110,14 @@ export default function AppointmentDetailsDialog({
     const dateFormatted = format(dateObj, "EEEE d 'de' MMMM yyyy", { locale: es });
     const capitalizedDate = dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
     const timeFormatted = format12hTime(appointment.time);
+    const confirmedTag = appointment.isConfirmed ? ' (Confirmado)' : '';
 
     const motivoLine = appointment.type === '1ra consulta' ? '' : `Motivo: ${appointment.type}\n`;
 
     const text = `Cita: ${capitalizedDate}
 Nombre: ${appointment.name}
 ${motivoLine}Producto: ${appointment.product || 'N/A'}
-Hora: ${timeFormatted}
+Hora: ${timeFormatted}${confirmedTag}
 Número: ${appointment.phone}`;
 
     navigator.clipboard.writeText(text).then(() => {
