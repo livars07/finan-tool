@@ -169,10 +169,12 @@ export default function UpcomingAppointments({
       const motivoLine = app.type === '1ra consulta' ? '' : `\nMotivo: *${app.type}*`;
       
       return `📌 *${app.name}*
-Hora: *${timeFormatted}*${confirmedText}${motivoLine}
+Hora: *${timeBold(timeFormatted)}*${confirmedText}${motivoLine}
 Producto: *${app.product || 'N/A'}*
 Número: *${app.phone}*`;
     }).join('\n\n---\n\n');
+
+    function timeBold(t: string) { return `*${t}*`; }
 
     navigator.clipboard.writeText(reportText).then(() => {
       toast({
@@ -183,18 +185,6 @@ Número: *${app.phone}*`;
   };
 
   const hasTodayApps = appointments.some(app => isActuallyToday(app.date));
-
-  const TableHeaderRow = () => (
-    <TableRow className="bg-muted/50 sticky top-0 z-10 shadow-sm">
-      <TableHead className={expanded ? "w-[250px]" : ""}>Nombre / Teléfono</TableHead>
-      {expanded && <TableHead>Contacto</TableHead>}
-      <TableHead>Motivo</TableHead>
-      {expanded && <TableHead>Producto</TableHead>}
-      <TableHead>Fecha / Estado</TableHead>
-      <TableHead>Hora</TableHead>
-      <TableHead className="w-12 text-center">Acciones</TableHead>
-    </TableRow>
-  );
 
   return (
     <div className="space-y-4 flex flex-col h-full">
@@ -207,8 +197,16 @@ Número: *${app.phone}*`;
         ) : (
           <ScrollArea className="flex-1">
             <Table>
-              <TableHeader>
-                <TableHeaderRow />
+              <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm">
+                <TableRow>
+                  <TableHead className={expanded ? "w-[250px]" : ""}>Nombre / Teléfono</TableHead>
+                  {expanded && <TableHead>Contacto</TableHead>}
+                  <TableHead>Motivo</TableHead>
+                  {expanded && <TableHead>Producto</TableHead>}
+                  <TableHead>Fecha / Estado</TableHead>
+                  <TableHead>Hora</TableHead>
+                  <TableHead className="w-12 text-center">Acciones</TableHead>
+                </TableRow>
               </TableHeader>
               <TableBody>
                 {appointments.map((app) => {
@@ -363,21 +361,23 @@ Número: *${app.phone}*`;
         )}
       </div>
 
-      <Dialog open={!!finId} onOpenChange={() => setFinId(null)}>
-        <DialogContent className="sm:max-w-[500px] bg-card border-border shadow-xl backdrop-blur-[12px] z-[70]">
+      <Dialog open={!!finId} onOpenChange={(open) => !open && setFinId(null)}>
+        <DialogContent className="sm:max-w-[450px] bg-card border-border shadow-2xl backdrop-blur-[12px] z-[80]">
           <DialogHeader>
-            <DialogTitle className="text-foreground">Finalizar cita de hoy</DialogTitle>
-            <DialogDescription className="text-muted-foreground">Indica el resultado de la reunión y registra acuerdos importantes.</DialogDescription>
+            <DialogTitle className="text-foreground flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-primary" /> Finalizar Consulta
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">Registra el resultado de la reunión con el prospecto.</DialogDescription>
           </DialogHeader>
-          <div className="py-4 space-y-4">
-            <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase text-muted-foreground">Resultado final</Label>
+          <div className="py-2 space-y-4">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Estatus Final</Label>
               <select 
                 value={status} 
                 onChange={(e) => setStatus(e.target.value as AppointmentStatus)}
                 className={cn(
-                  "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-                  status === 'Cierre' && "border-green-500 text-green-600 bg-green-500/5"
+                  "flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+                  status === 'Cierre' && "border-green-500 text-green-600 bg-green-500/5 font-bold"
                 )}
               >
                 <option value="Asistencia">Asistencia</option>
@@ -389,27 +389,27 @@ Número: *${app.phone}*`;
                 <option value="Apartado">Apartado</option>
               </select>
             </div>
-            <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase text-muted-foreground">Notas de la cita</Label>
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Acuerdos y Notas</Label>
               <Textarea 
-                placeholder="Escribe acuerdos, montos o próximos pasos aquí..." 
-                className="bg-muted/30 border-border/40 min-h-[150px] resize-none text-foreground"
+                placeholder="Escribe montos, fechas o acuerdos aquí..." 
+                className="bg-muted/10 border-border/30 min-h-[120px] resize-none text-xs"
                 value={finNotes}
                 onChange={(e) => setFinNotes(e.target.value)}
               />
             </div>
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setFinId(null)} className="border-border">Cancelar</Button>
-            <Button onClick={handleFinalize} className={cn("shadow-lg font-bold", status === 'Cierre' ? "bg-green-600 hover:bg-green-700 text-white" : "bg-primary text-primary-foreground")}>
-              {status === 'Cierre' ? '¡Confirmar cierre!' : 'Confirmar y archivar'}
+            <Button variant="outline" onClick={() => setFinId(null)} className="h-9 text-xs">Volver</Button>
+            <Button onClick={handleFinalize} className={cn("h-9 text-xs font-bold shadow-lg", status === 'Cierre' ? "bg-green-600 hover:bg-green-700 text-white" : "bg-primary text-primary-foreground")}>
+              {status === 'Cierre' ? 'Confirmar Venta' : 'Cerrar Consulta'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent className="sm:max-w-[550px] border shadow-2xl backdrop-blur-md overflow-hidden p-0 bg-green-950 border-green-500/50 text-white z-[80]">
+        <DialogContent className="sm:max-w-[550px] border shadow-2xl backdrop-blur-md overflow-hidden p-0 bg-green-950 border-green-500/50 text-white z-[90]">
           <div className="p-8 space-y-6">
             <div className="flex flex-col items-center text-center space-y-4">
               <div className="relative">
@@ -458,15 +458,15 @@ Número: *${app.phone}*`;
       </Dialog>
 
       <AlertDialog open={!!confirmId} onOpenChange={(open) => !open && setConfirmId(null)}>
-        <AlertDialogContent className="bg-card border-border shadow-xl backdrop-blur-md z-[70]">
+        <AlertDialogContent className="bg-card border-border shadow-2xl backdrop-blur-md z-[85]">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-foreground">¿Confirmar asistencia del prospecto?</AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground">
-              Marcarás esta cita como confirmada para el día de hoy. Esto ayuda a llevar un mejor control de tu agenda diaria.
+              Marcarás esta cita como confirmada para el día de hoy.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-border">Volver</AlertDialogCancel>
+            <AlertDialogCancel>Volver</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleConfirmAction}
               className="bg-green-600 hover:bg-green-700 text-white shadow-lg font-bold"

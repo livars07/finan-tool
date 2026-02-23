@@ -6,7 +6,6 @@ import AppointmentForm from './AppointmentForm';
 import UpcomingAppointments from './UpcomingAppointments';
 import PastAppointments from './PastAppointments';
 import AppointmentDetailsDialog from './AppointmentDetailsDialog';
-import TrashDialog from './TrashDialog';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -15,10 +14,10 @@ import {
   Search, 
   Maximize2, 
   X, 
-  Trash2, 
-  CalendarRange, 
-  Filter, 
-  LayoutDashboard
+  LayoutDashboard,
+  Target,
+  CheckCircle2,
+  CalendarDays
 } from 'lucide-react';
 import { Appointment, AppointmentStatus } from '@/services/appointment-service';
 import { parseISO, format } from 'date-fns';
@@ -33,6 +32,7 @@ import {
   DialogClose
 } from "@/components/ui/dialog";
 import { cn } from '@/lib/utils';
+import * as Service from '@/services/appointment-service';
 
 interface AppointmentsDashboardProps {
   appointments: Appointment[];
@@ -62,7 +62,8 @@ export default function AppointmentsDashboard({
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState('upcoming');
-  const [showTrash, setShowTrash] = useState(false);
+
+  const stats = useMemo(() => Service.calculateStats(appointments), [appointments]);
 
   useEffect(() => {
     if (isExpanded) {
@@ -135,21 +136,24 @@ export default function AppointmentsDashboard({
         </TabsList>
 
         {expanded && (
-          <div className="flex items-center gap-2">
-            <Button 
-              onClick={() => setShowTrash(true)}
-              variant="outline" 
-              size="sm" 
-              className="h-9 gap-2 text-xs font-bold uppercase border-border/50 bg-background/50 backdrop-blur-md hover:text-destructive"
-            >
-              <Trash2 className="w-3.5 h-3.5" /> Papelera
-            </Button>
-            <Button variant="outline" size="sm" className="h-9 gap-2 text-xs font-bold uppercase border-border/50 bg-background/50 backdrop-blur-md">
-              <CalendarRange className="w-3.5 h-3.5" /> Reporte Semanal
-            </Button>
-            <Button variant="outline" size="sm" className="h-9 gap-2 text-xs font-bold uppercase border-border/50 bg-background/50 backdrop-blur-md">
-              <Filter className="w-3.5 h-3.5" /> Filtro Producto
-            </Button>
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 border-r border-border/40 pr-6">
+              <div className="flex flex-col">
+                <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-tighter">Hoy</span>
+                <span className="text-sm font-bold text-primary flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5"/> {stats.todayCount}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-tighter">Mes</span>
+                <span className="text-sm font-bold text-accent flex items-center gap-1.5"><Target className="w-3.5 h-3.5"/> {stats.currentMonthProspects}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-tighter">Cierres</span>
+                <span className="text-sm font-bold text-green-500 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5"/> {stats.currentMonthSales}</span>
+              </div>
+            </div>
+            <div className="text-[10px] font-bold text-muted-foreground/60 italic uppercase tracking-widest hidden xl:block">
+              Monitoreo en tiempo real
+            </div>
           </div>
         )}
       </div>
@@ -273,16 +277,6 @@ export default function AppointmentsDashboard({
         onEdit={editAppointment}
         formatFriendlyDate={formatFriendlyDate}
         format12hTime={format12hTime}
-      />
-
-      <TrashDialog 
-        open={showTrash} 
-        onOpenChange={setShowTrash} 
-        archivedAppointments={[]} // Se asume que viene de un hook o servicio
-        onRestore={() => {}} 
-        onDelete={() => {}} 
-        formatDate={formatFriendlyDate} 
-        format12hTime={format12hTime} 
       />
     </div>
   );
