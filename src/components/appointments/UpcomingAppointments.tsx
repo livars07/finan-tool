@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -103,6 +102,8 @@ export default function UpcomingAppointments({
 
       if (currentStatus === 'Cierre') {
         setLastClosedApp(app);
+        // Mostrar éxito inmediatamente después del update
+        setTimeout(() => setShowSuccessDialog(true), 100);
       }
 
       updateStatus(finId, currentStatus, currentNotes);
@@ -113,7 +114,6 @@ export default function UpcomingAppointments({
         const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3");
         audio.volume = 0.5;
         audio.play().catch(() => {});
-        setShowSuccessDialog(true);
       } else {
         toast({
           title: "Cita finalizada",
@@ -169,12 +169,10 @@ export default function UpcomingAppointments({
       const motivoLine = app.type === '1ra consulta' ? '' : `\nMotivo: *${app.type}*`;
       
       return `📌 *${app.name}*
-Hora: *${timeBold(timeFormatted)}*${confirmedText}${motivoLine}
+Hora: *${timeFormatted}*${confirmedText}${motivoLine}
 Producto: *${app.product || 'N/A'}*
 Número: *${app.phone}*`;
     }).join('\n\n---\n\n');
-
-    function timeBold(t: string) { return `*${t}*`; }
 
     navigator.clipboard.writeText(reportText).then(() => {
       toast({

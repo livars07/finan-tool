@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -17,7 +16,10 @@ import {
   LayoutDashboard,
   Target,
   CheckCircle2,
-  CalendarDays
+  CalendarDays,
+  TrendingUp,
+  Coins,
+  ArrowRight
 } from 'lucide-react';
 import { Appointment, AppointmentStatus } from '@/services/appointment-service';
 import { parseISO, format } from 'date-fns';
@@ -129,30 +131,48 @@ export default function AppointmentsDashboard({
 
   const DashboardContent = ({ expanded = false }: { expanded?: boolean }) => (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
-      <div className={cn("flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 shrink-0", expanded && "bg-muted/30 p-4 rounded-xl border border-border/50")}>
+      <div className={cn("flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 shrink-0", expanded && "bg-muted/10 p-6 rounded-2xl border border-border/30 backdrop-blur-md")}>
         <TabsList className={cn("grid w-full sm:w-80 grid-cols-2")}>
           <TabsTrigger value="upcoming">Próximas ({filteredUpcoming.length})</TabsTrigger>
           <TabsTrigger value="past">Pasadas ({filteredPast.length})</TabsTrigger>
         </TabsList>
 
         {expanded && (
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-4 border-r border-border/40 pr-6">
-              <div className="flex flex-col">
-                <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-tighter">Hoy</span>
-                <span className="text-sm font-bold text-primary flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5"/> {stats.todayCount}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-tighter">Mes</span>
-                <span className="text-sm font-bold text-accent flex items-center gap-1.5"><Target className="w-3.5 h-3.5"/> {stats.currentMonthProspects}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-tighter">Cierres</span>
-                <span className="text-sm font-bold text-green-500 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5"/> {stats.currentMonthSales}</span>
+          <div className="grid grid-cols-3 md:grid-cols-5 gap-6 items-center flex-1 ml-0 sm:ml-8">
+            <div className="flex flex-col items-center sm:items-start group">
+              <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-primary transition-colors">Hoy</span>
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 border border-blue-500/20"><CalendarDays className="w-3.5 h-3.5"/></div>
+                <span className="text-sm font-bold text-foreground">{stats.todayConfirmed}<span className="text-muted-foreground/40 mx-0.5">/</span>{stats.todayCount}</span>
               </div>
             </div>
-            <div className="text-[10px] font-bold text-muted-foreground/60 italic uppercase tracking-widest hidden xl:block">
-              Monitoreo en tiempo real
+            <div className="flex flex-col items-center sm:items-start group">
+              <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-accent transition-colors">Mañana</span>
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-accent/10 text-accent border border-accent/20"><ArrowRight className="w-3.5 h-3.5"/></div>
+                <span className="text-sm font-bold text-foreground">{stats.tomorrowTotal}</span>
+              </div>
+            </div>
+            <div className="flex flex-col items-center sm:items-start group">
+              <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-green-500 transition-colors">Cierres Mes</span>
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-green-500/10 text-green-500 border border-green-500/20"><CheckCircle2 className="w-3.5 h-3.5"/></div>
+                <span className="text-sm font-bold text-foreground">{stats.currentMonthSales}</span>
+              </div>
+            </div>
+            <div className="hidden md:flex flex-col items-center sm:items-start group">
+              <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-blue-500 transition-colors">Apartados</span>
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-500 border border-blue-500/20"><Coins className="w-3.5 h-3.5"/></div>
+                <span className="text-sm font-bold text-foreground">{stats.currentMonthApartados}</span>
+              </div>
+            </div>
+            <div className="hidden md:flex flex-col items-center sm:items-start group">
+              <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-primary transition-colors">Conversión</span>
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20"><TrendingUp className="w-3.5 h-3.5"/></div>
+                <span className="text-sm font-bold text-foreground">{stats.conversionRate}%</span>
+              </div>
             </div>
           </div>
         )}
@@ -191,11 +211,11 @@ export default function AppointmentsDashboard({
       <div className="grid grid-cols-1 gap-6">
         <AppointmentForm onAdd={addAppointment} />
 
-        <Card className="shadow-xl bg-card border-border border-l-4 border-l-primary overflow-hidden">
+        <Card className="shadow-xl bg-card border-border border-l-4 border-l-blue-600 overflow-hidden">
           <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="bg-primary/10 p-2 rounded-xl border border-primary/20">
-                <CalendarClock className="text-primary w-6 h-6" />
+              <div className="bg-blue-600/10 p-2 rounded-xl border border-blue-600/20">
+                <CalendarClock className="text-blue-600 w-6 h-6" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -219,7 +239,7 @@ export default function AppointmentsDashboard({
                 variant="ghost" 
                 size="icon" 
                 onClick={() => setIsExpanded(true)}
-                className="h-9 w-9 rounded-lg text-muted-foreground/60 hover:text-primary hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20"
+                className="h-9 w-9 rounded-lg text-muted-foreground/60 hover:text-blue-600 hover:bg-blue-600/10 transition-all border border-transparent hover:border-blue-600/20"
               >
                 <Maximize2 className="w-4 h-4" />
               </Button>
@@ -237,8 +257,8 @@ export default function AppointmentsDashboard({
         >
           <DialogHeader className="px-6 py-4 border-b border-border/40 flex flex-row items-center justify-between bg-card/10 shrink-0">
             <div className="flex items-center gap-3">
-              <div className="bg-primary/20 p-2 rounded-xl border border-primary/30">
-                <LayoutDashboard className="text-primary w-6 h-6" />
+              <div className="bg-blue-600/20 p-2 rounded-xl border border-blue-600/30">
+                <LayoutDashboard className="text-blue-600 w-6 h-6" />
               </div>
               <div>
                 <DialogTitle className="text-xl font-headline font-bold text-foreground">Panel de Control de Citas</DialogTitle>

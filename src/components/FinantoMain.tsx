@@ -88,7 +88,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const [theme, setTheme] = useState<Theme>('corporativo');
   const [api, setApi] = useState<CarouselApi>();
   const [timerKey, setTimerKey] = useState(0);
-  const [statsKey, setStatsKey] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -122,13 +121,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
     const intervalId = setInterval(() => api.scrollNext(), 18000);
     return () => clearInterval(intervalId);
   }, [api, timerKey]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setStatsKey(prev => prev + 1);
-    }, 6000);
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     if (showHelp) {
@@ -231,12 +223,12 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       </header>
 
       <main className="flex-1 container mx-auto px-4 py-6 md:py-12 flex flex-col">
-        <div key={statsKey} className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 shrink-0">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 shrink-0">
           {[
             { label: 'Citas hoy', value: stats.todayCount.toString(), icon: CalendarDays, color: 'text-primary' },
             { label: 'Citas pendientes', value: stats.pendingCount.toString(), icon: Wallet, color: 'text-primary' },
             { label: 'Prospectos (mes)', value: stats.currentMonthProspects.toString(), icon: Users, color: 'text-accent', subValue: stats.lastMonthProspects, subLabel: 'Mes pasado' },
-            { label: 'Cierres', value: stats.currentMonthSales.toString(), icon: CheckCircle2, color: 'text-green-500', subValue: stats.lastMonthSales, subLabel: 'Mes pasado' },
+            { label: 'Cierres (mes)', value: stats.currentMonthSales.toString(), icon: CheckCircle2, color: 'text-green-500', subValue: stats.lastMonthSales, subLabel: 'Mes pasado' },
           ].map((stat, i) => (
             <Card 
               key={i} 

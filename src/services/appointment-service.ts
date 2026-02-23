@@ -125,7 +125,7 @@ export const generateSeedData = (): Appointment[] => {
 
   // 25 Citas Próximas (Hoy y Futuro)
   for (let i = 0; i < 25; i++) {
-    const daysAhead = Math.floor(i / 5); // 5 citas por día aprox
+    const daysAhead = Math.floor(i / 5); 
     const futureDate = addDays(now, daysAhead);
     const isTodayApp = isToday(futureDate);
     
@@ -164,24 +164,36 @@ export const generateSeedData = (): Appointment[] => {
 };
 
 /**
- * Calcula las estadísticas globales.
+ * Calcula las estadísticas globales enriquecidas.
  */
 export const calculateStats = (appointments: Appointment[]) => {
   const now = new Date();
+  const tomorrow = addDays(now, 1);
   const lastMonth = subMonths(now, 1);
 
+  const currentMonthProspects = appointments.filter(a => isSameMonth(parseISO(a.date), now)).length;
+  const currentMonthSales = appointments.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), now)).length;
+  const currentMonthApartados = appointments.filter(a => a.status === 'Apartado' && isSameMonth(parseISO(a.date), now)).length;
+  
+  const todayTotal = appointments.filter(a => isToday(parseISO(a.date))).length;
+  const todayConfirmed = appointments.filter(a => isToday(parseISO(a.date)) && a.isConfirmed).length;
+  const tomorrowTotal = appointments.filter(a => isToday(addDays(parseISO(a.date), -1))).length;
+
+  const conversionRate = currentMonthProspects > 0 ? (currentMonthSales / currentMonthProspects) * 100 : 0;
+
   return {
-    todayCount: appointments.filter(a => isToday(parseISO(a.date))).length,
+    todayCount: todayTotal,
+    todayConfirmed,
+    tomorrowTotal,
     pendingCount: appointments.filter(a => {
       const d = startOfDay(parseISO(a.date));
       return (isToday(d) || isAfter(d, startOfDay(now))) && !a.status;
     }).length,
-    currentMonthProspects: appointments.filter(a => {
-      const d = parseISO(a.date);
-      return isSameMonth(d, now) || (isAfter(d, now) && isSameMonth(d, now));
-    }).length,
+    currentMonthProspects,
     lastMonthProspects: appointments.filter(a => isSameMonth(parseISO(a.date), lastMonth)).length,
-    currentMonthSales: appointments.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), now)).length,
+    currentMonthSales,
+    currentMonthApartados,
     lastMonthSales: appointments.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), lastMonth)).length,
+    conversionRate: conversionRate.toFixed(1),
   };
 };
