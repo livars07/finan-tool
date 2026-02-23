@@ -265,9 +265,9 @@ export default function CreditCalculator() {
           </div>
 
           <div className="pt-2 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2 p-2 px-3 rounded-full bg-secondary border border-secondary/30">
-              <Info className="w-3.5 h-3.5 text-secondary-foreground" />
-              <span className="text-[10px] text-secondary-foreground font-semibold uppercase tracking-tighter">
+            <div className="flex items-center gap-2 p-2 px-3">
+              <Info className="w-3.5 h-3.5 text-muted-foreground/60" />
+              <span className="text-[10px] text-muted-foreground/60 font-semibold uppercase tracking-tighter">
                 Factor mensualidad: 0.6982%
               </span>
             </div>
@@ -400,7 +400,7 @@ export default function CreditCalculator() {
               </div>
 
               <div className="space-y-6 flex flex-col">
-                <div className="p-6 rounded-2xl border border-secondary/20 bg-secondary/5 space-y-4 flex-1 flex flex-col justify-center">
+                <div className="p-6 rounded-2xl border border-secondary/30 bg-secondary/10 space-y-4 flex-1 flex flex-col justify-center shadow-lg transition-all">
                   <div className="flex items-center gap-2 text-secondary-foreground">
                     <ShieldAlert className="w-5 h-5 text-secondary-foreground" />
                     <h4 className="text-[10px] font-bold uppercase tracking-widest">Perfilamiento Operativo</h4>
