@@ -98,9 +98,10 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       applyTheme('corporativo');
     }
 
+    // Lógica de Redirección a Guía en Primera Visita
     if (!initialSection) {
-      const existing = Service.getFromDisk();
-      if (existing.length === 0) {
+      const hasVisited = localStorage.getItem(Service.STORAGE_KEY);
+      if (!hasVisited) {
         setShowHelp(true);
       }
     }
@@ -108,9 +109,9 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
 
   useEffect(() => {
     if (showHelp) {
-      document.title = "Guía";
+      document.title = "Guía - Finanto";
     } else if (isSimulatorExpanded) {
-      document.title = "Simulador";
+      document.title = "Simulador - Finanto";
     } else {
       document.title = "Finanto - Gestión de Financiamiento Inmobiliario";
     }
@@ -191,7 +192,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
           <div className="flex items-center gap-4">
             <div className="hidden md:flex flex-col items-end mr-1 select-none pointer-events-none">
               <span className="text-[10px] font-bold text-primary/80 uppercase tracking-widest leading-none">v1.1</span>
-              <span className="text-[9px] text-muted-foreground/50 font-medium">23 - Marzo</span>
+              <span className="text-[9px] text-muted-foreground/50 font-medium">24 - Marzo</span>
             </div>
             
             <DropdownMenu>
@@ -473,7 +474,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                         <span><span className="font-bold text-foreground">Automatización IA:</span> Generación de mensajes personalizados para seguimiento según el estatus de la cita.</span>
                       </li>
                       <li className="flex gap-2">
-                        <div className="shrink-0 mt-1"><Smartphone className="w-3 h-3 text-primary" /></div>
+                        <div className="shrink-0 mt-1"><MessageSquare className="w-3 h-3 text-primary" /></div>
                         <span><span className="font-bold text-foreground">Sincronización en Nube:</span> Tus datos siempre contigo, en cualquier dispositivo con tu cuenta oficial.</span>
                       </li>
                       <li className="flex gap-2">

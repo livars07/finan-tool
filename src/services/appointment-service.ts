@@ -43,7 +43,7 @@ export interface Appointment {
   isConfirmed?: boolean;
 }
 
-const STORAGE_KEY = 'FINANTO_DATA_V1.1_50SEED';
+export const STORAGE_KEY = 'FINANTO_DATA_V1.1_50SEED';
 
 /**
  * Guarda la lista de citas en el almacenamiento local (localStorage).
