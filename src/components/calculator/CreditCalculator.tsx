@@ -265,7 +265,7 @@ export default function CreditCalculator() {
           </div>
 
           <div className="pt-2 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2 p-2 px-3">
+            <div className="flex items-center gap-2 p-2">
               <Info className="w-3.5 h-3.5 text-muted-foreground/60" />
               <span className="text-[10px] text-muted-foreground/60 font-semibold uppercase tracking-tighter">
                 Factor mensualidad: 0.6982%
@@ -400,31 +400,31 @@ export default function CreditCalculator() {
               </div>
 
               <div className="space-y-6 flex flex-col">
-                <div className="p-6 rounded-2xl border border-secondary/30 bg-secondary/10 space-y-4 flex-1 flex flex-col justify-center shadow-lg transition-all">
-                  <div className="flex items-center gap-2 text-secondary-foreground">
+                <div className="p-6 rounded-2xl border-2 border-secondary bg-secondary/20 space-y-4 flex-1 flex flex-col justify-center shadow-lg transition-all">
+                  <div className="flex items-center gap-2">
                     <ShieldAlert className="w-5 h-5 text-secondary-foreground" />
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest">Perfilamiento Operativo</h4>
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-secondary-foreground">Perfilamiento Operativo</h4>
                   </div>
                   <div className="space-y-4">
                     <div>
-                      <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1">Ingreso mínimo comprobable</p>
+                      <p className="text-[10px] text-primary uppercase font-bold mb-1">Ingreso mínimo comprobable</p>
                       <p className="text-2xl font-bold text-foreground">{formatCurrency(minIncomeRequired)}</p>
                     </div>
                     
-                    <div className="p-3 bg-secondary/20 rounded-xl border border-secondary/30">
-                      <div className="flex items-center gap-2 text-secondary-foreground mb-0.5">
+                    <div className="p-4 bg-secondary/30 rounded-xl border border-secondary/40 shadow-inner">
+                      <div className="flex items-center gap-2 text-secondary-foreground mb-1">
                         <Coins className="w-3.5 h-3.5" />
-                        <span className="text-[10px] font-bold uppercase">Presupuesto de vida sugerido</span>
+                        <span className="text-[10px] font-bold uppercase tracking-tight">Presupuesto de vida sugerido</span>
                       </div>
                       <p className="text-lg font-bold text-foreground">{formatCurrency(suggestedLivingBudget)}</p>
                     </div>
 
                     <div className="space-y-2">
                       <div className="flex justify-between text-[10px] uppercase font-bold">
-                        <span>Ratio de endeudamiento sano</span>
-                        <span>35% DTI</span>
+                        <span className="text-secondary-foreground">Ratio de endeudamiento sano</span>
+                        <span className="text-primary">35% DTI</span>
                       </div>
-                      <Progress value={35} className="h-1.5 bg-secondary/30" />
+                      <Progress value={35} className="h-2 bg-secondary/40" />
                     </div>
                   </div>
                 </div>
