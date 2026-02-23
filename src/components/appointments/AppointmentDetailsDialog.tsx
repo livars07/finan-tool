@@ -111,18 +111,17 @@ export default function AppointmentDetailsDialog({
     const capitalizedDate = dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
     const timeFormatted = format12hTime(appointment.time);
     
-    // Formato Negritas WhatsApp
     const dateBold = `*${capitalizedDate}*`;
     const timeBold = `*${timeFormatted}*`;
-    const confirmedBold = appointment.isConfirmed ? ' *(Confirmado)*' : '';
+    const confirmedBold = appointment.isConfirmed ? ' * (Confirmado)*' : '';
 
-    const motivoLine = appointment.type === '1ra consulta' ? '' : `Motivo: ${appointment.type}\n`;
+    const motivoLine = appointment.type === '1ra consulta' ? '' : `Motivo: *${appointment.type}*\n`;
 
     const text = `Cita: ${dateBold}
-Nombre: ${appointment.name}
-${motivoLine}Producto: ${appointment.product || 'N/A'}
+Nombre: *${appointment.name}*
+${motivoLine}Producto: *${appointment.product || 'N/A'}*
 Hora: ${timeBold}${confirmedBold}
-Número: ${appointment.phone}`;
+Número: *${appointment.phone}*`;
 
     navigator.clipboard.writeText(text).then(() => {
       toast({ title: "Copiado", description: "Datos listos para WhatsApp." });
@@ -140,7 +139,7 @@ Número: ${appointment.phone}`;
         } 
         onOpenChange(o); 
       }}>
-        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border p-0 shadow-xl backdrop-blur-md">
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border p-0 shadow-xl backdrop-blur-md z-[70]">
           <DialogHeader className="px-6 py-4 border-b border-border/40 flex flex-row items-center justify-between bg-card/10">
             <div className="flex items-center gap-2">
               <DialogTitle className="text-xl font-headline font-bold text-foreground">
@@ -389,7 +388,7 @@ Número: ${appointment.phone}`;
       </Dialog>
 
       <AlertDialog open={showRescheduleConfirm} onOpenChange={setShowRescheduleConfirm}>
-        <AlertDialogContent className="bg-card border-border shadow-xl">
+        <AlertDialogContent className="bg-card border-border shadow-xl z-[80]">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Re-agendar para hoy?</AlertDialogTitle>
             <AlertDialogDescription>

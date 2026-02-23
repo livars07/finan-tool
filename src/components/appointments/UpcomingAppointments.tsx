@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -145,10 +146,10 @@ export default function UpcomingAppointments({
     const todayConfirmed = allAppointments.filter(a => isActuallyToday(a.date) && a.isConfirmed).length;
     const tomorrowTotal = allAppointments.filter(a => isActuallyTomorrow(a.date)).length;
 
-    const reportText = `✅Ventas: *${todaySales}*
-✅Citas para hoy: *${todayTotal}*
-✅Citas confirmadas: *${todayConfirmed}*
-✅Citas para el día siguiente: *${tomorrowTotal}*`;
+    const reportText = `✅ Ventas: *${todaySales}*
+✅ Citas para hoy: *${todayTotal}*
+✅ Citas confirmadas: *${todayConfirmed}*
+✅ Citas para el día siguiente: *${tomorrowTotal}*`;
 
     navigator.clipboard.writeText(reportText).then(() => {
       toast({
@@ -164,7 +165,7 @@ export default function UpcomingAppointments({
 
     const reportText = todayApps.map(app => {
       const timeFormatted = format12hTime(app.time);
-      const confirmedText = app.isConfirmed ? ' *(Confirmado)*' : '';
+      const confirmedText = app.isConfirmed ? ' * (Confirmado)*' : '';
       const motivoLine = app.type === '1ra consulta' ? '' : `\nMotivo: *${app.type}*`;
       
       return `📌 *${app.name}*

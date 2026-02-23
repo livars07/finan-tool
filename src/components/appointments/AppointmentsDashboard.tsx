@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -5,6 +6,7 @@ import AppointmentForm from './AppointmentForm';
 import UpcomingAppointments from './UpcomingAppointments';
 import PastAppointments from './PastAppointments';
 import AppointmentDetailsDialog from './AppointmentDetailsDialog';
+import TrashDialog from './TrashDialog';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -13,11 +15,10 @@ import {
   Search, 
   Maximize2, 
   X, 
-  FileDown, 
-  BarChart3, 
-  Printer, 
-  LayoutDashboard,
-  Filter
+  Trash2, 
+  CalendarRange, 
+  Filter, 
+  LayoutDashboard
 } from 'lucide-react';
 import { Appointment, AppointmentStatus } from '@/services/appointment-service';
 import { parseISO, format } from 'date-fns';
@@ -60,12 +61,20 @@ export default function AppointmentsDashboard({
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [activeTab, setActiveTab] = useState('upcoming');
+  const [showTrash, setShowTrash] = useState(false);
 
   useEffect(() => {
     if (isExpanded) {
       const originalTitle = document.title;
       document.title = "Gestión de Citas";
-      return () => { document.title = originalTitle; };
+      window.history.pushState(null, '', '/gestor');
+      return () => { 
+        document.title = originalTitle; 
+        if (window.location.pathname === '/gestor') {
+          window.history.pushState(null, '', '/');
+        }
+      };
     }
   }, [isExpanded]);
 
@@ -118,7 +127,7 @@ export default function AppointmentsDashboard({
   };
 
   const DashboardContent = ({ expanded = false }: { expanded?: boolean }) => (
-    <Tabs defaultValue="upcoming" className="w-full h-full flex flex-col">
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
       <div className={cn("flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 shrink-0", expanded && "bg-muted/30 p-4 rounded-xl border border-border/50")}>
         <TabsList className={cn("grid w-full sm:w-80 grid-cols-2")}>
           <TabsTrigger value="upcoming">Próximas ({filteredUpcoming.length})</TabsTrigger>
@@ -127,14 +136,19 @@ export default function AppointmentsDashboard({
 
         {expanded && (
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="h-9 gap-2 text-xs font-bold uppercase border-border/50 bg-background/50 backdrop-blur-md">
-              <FileDown className="w-3.5 h-3.5" /> Exportar PDF
+            <Button 
+              onClick={() => setShowTrash(true)}
+              variant="outline" 
+              size="sm" 
+              className="h-9 gap-2 text-xs font-bold uppercase border-border/50 bg-background/50 backdrop-blur-md hover:text-destructive"
+            >
+              <Trash2 className="w-3.5 h-3.5" /> Papelera
             </Button>
             <Button variant="outline" size="sm" className="h-9 gap-2 text-xs font-bold uppercase border-border/50 bg-background/50 backdrop-blur-md">
-              <Printer className="w-3.5 h-3.5" /> Imprimir
+              <CalendarRange className="w-3.5 h-3.5" /> Reporte Semanal
             </Button>
             <Button variant="outline" size="sm" className="h-9 gap-2 text-xs font-bold uppercase border-border/50 bg-background/50 backdrop-blur-md">
-              <BarChart3 className="w-3.5 h-3.5" /> Análisis
+              <Filter className="w-3.5 h-3.5" /> Filtro Producto
             </Button>
           </div>
         )}
@@ -259,6 +273,16 @@ export default function AppointmentsDashboard({
         onEdit={editAppointment}
         formatFriendlyDate={formatFriendlyDate}
         format12hTime={format12hTime}
+      />
+
+      <TrashDialog 
+        open={showTrash} 
+        onOpenChange={setShowTrash} 
+        archivedAppointments={[]} // Se asume que viene de un hook o servicio
+        onRestore={() => {}} 
+        onDelete={() => {}} 
+        formatDate={formatFriendlyDate} 
+        format12hTime={format12hTime} 
       />
     </div>
   );
