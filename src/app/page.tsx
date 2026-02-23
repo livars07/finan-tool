@@ -61,7 +61,6 @@ export default function Home() {
     setTheme(themeId);
     document.documentElement.setAttribute('data-theme', themeId);
     
-    // El tema corporativo es el único "Light Mode" (o Soft Light)
     if (themeId === 'corporativo') {
       document.documentElement.classList.remove('dark');
     } else {
@@ -120,7 +119,7 @@ export default function Home() {
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer border-b-2 border-primary pb-1">
-              <LayoutDashboard className="w-4 h-4" />v0.5 ( 23 de marzo )
+              <LayoutDashboard className="w-4 h-4" />v0.7 ( 23 de marzo )
             </div>
           </nav>
           <div className="flex items-center gap-4">
@@ -219,7 +218,7 @@ export default function Home() {
                    💡 Notas
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Versión v0.5 con sistema de fechas naturales y visuales mejorados. Los datos se guardan localmente para máxima velocidad.
+                  Versión v0.7 con sistema de fechas naturales y visuales mejorados. Los datos se guardan localmente para máxima velocidad.
                   <br />
                   <br />
                   Esta herramienta está optimizada para el flujo de trabajo hipotecario diario, permitiendo cálculos rápidos y gestión de agenda en un solo lugar.

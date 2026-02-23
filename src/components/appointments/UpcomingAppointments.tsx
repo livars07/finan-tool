@@ -181,7 +181,7 @@ export default function UpcomingAppointments({
       </Table>
 
       <Dialog open={!!finId} onOpenChange={() => setFinId(null)}>
-        <DialogContent className="sm:max-w-[400px] backdrop-blur-[40px] bg-card/10">
+        <DialogContent className="sm:max-w-[400px] backdrop-blur-[20px] bg-card/10">
           <DialogHeader>
             <DialogTitle>Finalizar cita de hoy</DialogTitle>
           </DialogHeader>
@@ -196,6 +196,7 @@ export default function UpcomingAppointments({
                 <SelectItem value="No asistencia">No asistencia</SelectItem>
                 <SelectItem value="Continuación en otra cita">Continuación en otra cita</SelectItem>
                 <SelectItem value="Reagendó">Reagendó</SelectItem>
+                <SelectItem value="Apartado">Apartado</SelectItem>
                 <SelectItem value="Reembolso">Reembolso</SelectItem>
                 <SelectItem value="Cierre">Cierre</SelectItem>
               </SelectContent>
@@ -214,7 +215,7 @@ export default function UpcomingAppointments({
       </Dialog>
 
       <AlertDialog open={!!confirmId} onOpenChange={(open) => !open && setConfirmId(null)}>
-        <AlertDialogContent className="backdrop-blur-[40px] bg-card/10 border-border/20">
+        <AlertDialogContent className="backdrop-blur-[20px] bg-card/20 border-border/20">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Confirmar asistencia del prospecto?</AlertDialogTitle>
             <AlertDialogDescription>

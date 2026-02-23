@@ -41,11 +41,10 @@ export interface Appointment {
   isConfirmed?: boolean;
 }
 
-const STORAGE_KEY = 'FINANTO_DATA_V05_CLEAN';
+const STORAGE_KEY = 'FINANTO_DATA_V07';
 
 /**
  * Guarda la lista de citas en el almacenamiento local (localStorage).
- * Imagina que es como guardar tu maleta en el maletero del coche.
  */
 export const saveToDisk = (appointments: Appointment[]): void => {
   if (typeof window === 'undefined') return;
@@ -53,7 +52,7 @@ export const saveToDisk = (appointments: Appointment[]): void => {
 };
 
 /**
- * Recupera las citas guardadas. Si no hay nada, devuelve una lista vacía.
+ * Recupera las citas guardadas.
  */
 export const getFromDisk = (): Appointment[] => {
   if (typeof window === 'undefined') return [];
@@ -67,7 +66,7 @@ export const getFromDisk = (): Appointment[] => {
 };
 
 /**
- * Formatea un número de teléfono a un estilo legible (ej. 664 694 7418).
+ * Formatea un número de teléfono a un estilo legible.
  */
 export const formatPhoneNumber = (phone: string): string => {
   const cleaned = ('' + phone).replace(/\D/g, ''); 
@@ -77,7 +76,7 @@ export const formatPhoneNumber = (phone: string): string => {
 };
 
 /**
- * Crea una nueva cita y la guarda inmediatamente.
+ * Crea una nueva cita y la guarda.
  */
 export const createAppointment = (data: Omit<Appointment, 'id'>): Appointment[] => {
   const all = getFromDisk();
@@ -109,8 +108,7 @@ export const updateAppointment = (id: string, partialData: Partial<Appointment>)
 };
 
 /**
- * Genera datos de prueba realistas para la primera carga.
- * Nombres con formato: "Nombre Apellido (Test)"
+ * Genera datos de prueba realistas.
  */
 export const generateSeedData = (): Appointment[] => {
   const data: Appointment[] = [];
@@ -122,7 +120,7 @@ export const generateSeedData = (): Appointment[] => {
 
   const now = new Date();
 
-  // 3 Citas para Hoy (Sin confirmar, sin resultado)
+  // 3 Citas para Hoy
   for (let i = 0; i < 3; i++) {
     data.push({
       id: uuidv4(),
@@ -135,7 +133,7 @@ export const generateSeedData = (): Appointment[] => {
     });
   }
 
-  // 2 Citas Pendientes para los siguientes días
+  // 2 Citas Pendientes
   for (let i = 0; i < 2; i++) {
     const futureDate = addDays(now, i + 1);
     data.push({
@@ -149,7 +147,7 @@ export const generateSeedData = (): Appointment[] => {
     });
   }
 
-  // 5 Citas del mes pasado (Con resultados variados)
+  // 5 Citas del mes pasado
   const lastMonth = subMonths(now, 1);
   for (let i = 0; i < 5; i++) {
     const pastDate = subDays(lastMonth, i + 5);
@@ -160,7 +158,7 @@ export const generateSeedData = (): Appointment[] => {
       date: pastDate.toISOString(),
       time: hours[i % hours.length],
       type: types[i % types.length],
-      status: i === 0 ? 'Cierre' : statuses[i % statuses.length],
+      status: i === 0 ? 'Apartado' : statuses[i % statuses.length],
       isConfirmed: true,
       notes: "Historial del mes pasado."
     });
@@ -171,7 +169,7 @@ export const generateSeedData = (): Appointment[] => {
 };
 
 /**
- * Calcula las estadísticas globales para el panel principal.
+ * Calcula las estadísticas globales.
  */
 export const calculateStats = (appointments: Appointment[]) => {
   const now = new Date();
@@ -185,7 +183,6 @@ export const calculateStats = (appointments: Appointment[]) => {
     }).length,
     currentMonthProspects: appointments.filter(a => {
       const d = parseISO(a.date);
-      // Cuenta prospectos de este mes y citas futuras
       return isSameMonth(d, now) || isAfter(d, now);
     }).length,
     lastMonthProspects: appointments.filter(a => isSameMonth(parseISO(a.date), lastMonth)).length,
