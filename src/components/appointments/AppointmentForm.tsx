@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -84,8 +85,8 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
               </SelectContent>
             </Select>
           </div>
-          <Button type="submit" className="bg-accent hover:bg-accent/80 text-accent-foreground font-semibold shadow-lg">
-            <PlusCircle className="mr-2 h-4 w-4" /> Agregar
+          <Button type="submit" size="icon" className="bg-accent hover:bg-accent/80 text-accent-foreground font-semibold shadow-lg w-full md:w-10 h-10 flex items-center justify-center">
+            <PlusCircle className="h-5 w-5" />
           </Button>
         </form>
       </CardContent>

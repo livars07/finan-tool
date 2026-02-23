@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -70,8 +71,25 @@ export default function UpcomingAppointments({
 
   const handleConfirmAction = () => {
     if (confirmId) {
+      const app = appointments.find(a => a.id === confirmId);
       toggleConfirmation(confirmId);
       setConfirmId(null);
+      toast({
+        title: "Asistencia Confirmada",
+        description: `Se ha confirmado la asistencia de ${app?.name}.`,
+      });
+    }
+  };
+
+  const handleFinalize = () => {
+    if (finId) {
+      const app = appointments.find(a => a.id === finId);
+      updateStatus(finId, status);
+      setFinId(null);
+      toast({
+        title: "Cita Finalizada",
+        description: `${app?.name} movido al historial con resultado: ${status}.`,
+      });
     }
   };
 
@@ -204,12 +222,7 @@ export default function UpcomingAppointments({
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setFinId(null)} className="backdrop-blur-md">Cancelar</Button>
-            <Button onClick={() => {
-              if (finId) {
-                updateStatus(finId, status);
-                setFinId(null);
-              }
-            }} className="shadow-lg">Confirmar y Archivar</Button>
+            <Button onClick={handleFinalize} className="shadow-lg">Confirmar y Archivar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
