@@ -172,7 +172,14 @@ export default function Home() {
             { label: 'Prospectos (mes)', value: stats.currentMonthProspects.toString(), icon: Users, color: 'text-accent', subValue: stats.lastMonthProspects, subLabel: 'Mes pasado' },
             { label: 'Cierres', value: stats.currentMonthSales.toString(), icon: CheckCircle2, color: 'text-green-500', subValue: stats.lastMonthSales, subLabel: 'Mes pasado' },
           ].map((stat, i) => (
-            <Card key={i} className={cn("bg-card/30 backdrop-blur-xl transition-all border-border/50")}>
+            <Card 
+              key={i} 
+              className={cn(
+                "border-none bg-card/30 backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:bg-card/50",
+                "animate-entrance-glow"
+              )}
+              style={{ animationDelay: `${i * 150}ms` }}
+            >
               <CardContent className="p-4 flex items-center gap-3">
                 <div className={`p-2 rounded-full bg-muted/50 ${stat.color} backdrop-blur-md`}><stat.icon className="w-5 h-5" /></div>
                 <div className="flex-1 min-w-0">

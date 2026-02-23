@@ -185,3 +185,13 @@
     transition: opacity 0.2s;
   }
 }
+
+@keyframes entrance-glow {
+  0% { background-color: transparent; }
+  50% { background-color: hsl(var(--primary) / 0.2); }
+  100% { background-color: transparent; }
+}
+
+.animate-entrance-glow {
+  animation: entrance-glow 0.8s ease-in-out forwards;
+}
