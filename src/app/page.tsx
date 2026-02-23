@@ -134,7 +134,7 @@ export default function Home() {
                   {theme === 'moderno' ? <Cpu className="w-5 h-5 text-primary" /> : theme === 'corporativo' ? <Sun className="w-5 h-5 text-primary" /> : theme === 'discreto' ? <Moon className="w-5 h-5 text-primary" /> : <Palette className="w-5 h-5 text-primary" />}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 backdrop-blur-2xl bg-card/20 border-border/30">
+              <DropdownMenuContent align="end" className="w-48 backdrop-blur-2xl bg-popover border-border/30">
                 <DropdownMenuLabel>Temas</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => handleThemeChange('predeterminado')} className="flex items-center gap-2 cursor-pointer">

@@ -37,9 +37,9 @@
     --card: 0 0% 100% / 0.8;
     --card-foreground: 222 20% 20%;
     
-    /* Popups oscuros para evitar exceso de luz con texto blanco/celeste */
-    --popover: 222 20% 15% / 0.95;
-    --popover-foreground: 0 0% 100%;
+    /* Popover para menús (Dropdown) - CLARO con texto gris oscuro para legibilidad */
+    --popover: 210 15% 95% / 0.98;
+    --popover-foreground: 222 20% 20%;
     
     --primary: 215 40% 45%;
     --primary-foreground: 210 40% 98%;
@@ -47,7 +47,7 @@
     --secondary-foreground: 222 20% 20%;
     --muted: 210 20% 80%;
     
-    /* Texto gris pasa a celeste en modo corporativo */
+    /* Texto secundario en celeste */
     --muted-foreground: 190 70% 60%; 
     
     --accent: 160 30% 50%;
@@ -58,6 +58,35 @@
     --input: 214 10% 82%;
     --ring: 215 40% 45%;
     --calendar-filter: none;
+  }
+
+  /* Override específico para Diálogos (Popups grandes) en Corporativo */
+  /* Se vuelven oscuros con texto blanco para evitar el exceso de luz y mejorar el contraste */
+  [data-theme="corporativo"] [role="dialog"],
+  [data-theme="corporativo"] [role="status"] {
+    --background: 222 20% 15%;
+    --foreground: 0 0% 100%;
+    --popover: 222 20% 15% / 0.95;
+    --popover-foreground: 0 0% 100%;
+    --card: 222 20% 20% / 0.4;
+    --card-foreground: 0 0% 100%;
+    --border: 222 20% 30% / 0.3;
+    background-color: hsl(var(--background)) !important;
+    color: hsl(var(--foreground)) !important;
+  }
+
+  /* Asegura que los hijos dentro de diálogos corporativos ignoren el color navy blue */
+  [data-theme="corporativo"] [role="dialog"] p,
+  [data-theme="corporativo"] [role="dialog"] span,
+  [data-theme="corporativo"] [role="dialog"] h2,
+  [data-theme="corporativo"] [role="dialog"] h3,
+  [data-theme="corporativo"] [role="dialog"] label {
+    color: inherit;
+  }
+  
+  /* Mantener el celeste para los muted-foreground incluso en diálogos oscuros */
+  [data-theme="corporativo"] [role="dialog"] .text-muted-foreground {
+    color: hsl(190 70% 75%) !important;
   }
 
   [data-theme="discreto"] {
@@ -124,7 +153,7 @@
   }
 
   [role="dialog"], [role="status"] {
-    @apply backdrop-blur-[20px] bg-card/10 !important;
+    @apply backdrop-blur-[20px] !important;
   }
 
   /* Estilos armoniosos para inputs de fecha y hora nativos */
