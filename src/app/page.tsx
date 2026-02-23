@@ -20,7 +20,9 @@ import {
   Phone,
   BookOpen,
   Info,
-  Star
+  Star,
+  ClipboardList,
+  Target
 } from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
 import { Button } from '@/components/ui/button';
@@ -140,7 +142,7 @@ export default function Home() {
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex flex-col items-end text-right">
               <span className="text-xs font-semibold text-foreground">Ejecutivo Olivares Mtz</span>
-              <span className="text-[10px] text-primary uppercase tracking-tighter font-medium">Datos guardados en el navegador</span>
+              <span className="text-[10px] text-primary uppercase tracking-tighter font-medium">Financiamiento Inmobiliario</span>
             </div>
             
             <DropdownMenu>
@@ -233,13 +235,13 @@ export default function Home() {
               <CreditCalculator />
               <div className="mt-6 p-6 rounded-xl border border-primary/20 bg-primary/5 backdrop-blur-md">
                 <h3 className="text-sm font-headline font-bold mb-2 flex items-center gap-2 text-primary">
-                   💡 Nota del sistema (v0.7.1)
+                   💡 Perfilamiento Profesional (v0.7.1)
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Esta versión incluye el nuevo <strong>"Panel de felicitación por cierre"</strong> y una calculadora optimizada para pantallas grandes.
+                  Utilice la calculadora para proyecciones en tiempo real durante llamadas o consultas presenciales. 
                   <br />
                   <br />
-                  Toda tu información se guarda de forma privada en este navegador para que puedas trabajar con rapidez y seguridad.
+                  Este sistema garantiza la <strong>privacidad técnica</strong> al almacenar los datos exclusivamente en este equipo.
                 </p>
               </div>
             </div>
@@ -263,7 +265,7 @@ export default function Home() {
 
       <footer className="mt-12 border-t border-border/40 py-8 bg-card/10 backdrop-blur-[20px]">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm">
-          <p>© 2026 Finanto - Gestión de Financiamiento Inmobiliario</p>
+          <p>© 2026 Finanto - Ejecutivo en Financiamiento Inmobiliario</p>
           <div className="flex items-center gap-6">
             <button 
               onClick={copyFooterPhone}
@@ -322,20 +324,20 @@ export default function Home() {
                 <BookOpen className="w-7 h-7 text-primary" />
               </div>
               <div>
-                <DialogTitle className="text-3xl font-headline font-bold">Guía de Usuario - Finanto</DialogTitle>
-                <DialogDescription className="text-base">Manual interactivo para el ejecutivo en financiamiento inmobiliario (v0.7.1)</DialogDescription>
+                <DialogTitle className="text-3xl font-headline font-bold text-foreground">Guía Técnica de Finanto</DialogTitle>
+                <DialogDescription className="text-base">Manual de operación para ejecutivos en financiamiento inmobiliario (v0.7.1)</DialogDescription>
               </div>
             </div>
           </DialogHeader>
           
-          <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+          <ScrollArea className="flex-1 p-8">
             <div className="space-y-10 text-foreground/90 pb-8">
               <section className="space-y-4">
                 <h2 className="text-2xl font-bold flex items-center gap-2 text-primary">
-                  ¡Bienvenido a Finanto!
+                  Introducción al Sistema
                 </h2>
                 <p className="text-base leading-relaxed text-muted-foreground">
-                  Esta es una herramienta diseñada especialmente para que los ejecutivos en financiamiento inmobiliario puedan ser más rápidos, organizados y profesionales frente a sus clientes.
+                  Finanto es una plataforma técnica diseñada para optimizar la eficiencia operativa del ejecutivo. Facilita el perfilamiento rápido de prospectos y garantiza una administración impecable de la agenda diaria.
                 </p>
               </section>
 
@@ -343,12 +345,12 @@ export default function Home() {
                 <Card className="bg-muted/30 border-border/50 shadow-sm">
                   <CardContent className="p-6 space-y-4">
                     <h3 className="text-lg font-bold flex items-center gap-2 text-accent">
-                      <Wallet className="w-5 h-5" /> 1. Calculadora inteligente
+                      <Wallet className="w-5 h-5" /> 1. Calculadora de Precisión
                     </h3>
                     <ul className="text-sm space-y-3 list-disc pl-5 text-muted-foreground">
-                      <li><strong>Cálculos instantáneos:</strong> Solo pon el monto del crédito y el sistema te dirá la mensualidad y el enganche automáticamente.</li>
-                      <li><strong>Modo presentación:</strong> Si le das al botón de "Pantalla completa", tendrás una vista profesional para mostrar números al cliente.</li>
-                      <li><strong>Resumen WhatsApp:</strong> Copia un resumen profesional de la cotización con un solo clic.</li>
+                      <li><strong>Perfilamiento en llamada:</strong> Determine montos aproximados de forma inmediata para prospectos por teléfono.</li>
+                      <li><strong>Tanteo Financiero:</strong> Realice ajustes de montos en tiempo real frente al cliente para encontrar su capacidad de pago ideal.</li>
+                      <li><strong>Independencia Tecnológica:</strong> Herramienta optimizada para operar sin dependencia de conexión a servidores externos.</li>
                     </ul>
                   </CardContent>
                 </Card>
@@ -356,58 +358,58 @@ export default function Home() {
                 <Card className="bg-muted/30 border-border/50 shadow-sm">
                   <CardContent className="p-6 space-y-4">
                     <h3 className="text-lg font-bold flex items-center gap-2 text-accent">
-                      <CalendarDays className="w-5 h-5" /> 2. Control de agenda
+                      <CalendarDays className="w-5 h-5" /> 2. Gestión de Agenda
                     </h3>
                     <ul className="text-sm space-y-3 list-disc pl-5 text-muted-foreground">
-                      <li><strong>Organización diaria:</strong> Mira tus citas de hoy en un panel destacado.</li>
-                      <li><strong>Confirmación:</strong> Marca si el cliente confirmó su asistencia con un clic.</li>
-                      <li><strong>Historial:</strong> Guarda qué pasó en cada cita (cierre, apartado, reagendado).</li>
+                      <li><strong>Optimización de Tiempos:</strong> El sistema prioriza las citas del día para maximizar la productividad.</li>
+                      <li><strong>Control de Traslados:</strong> Valide la confirmación de asistencia para optimizar la logística y evitar tiempos muertos.</li>
+                      <li><strong>Historial de Interacción:</strong> Centraliza cada acuerdo y resultado de cita para un seguimiento robusto.</li>
                     </ul>
                   </CardContent>
                 </Card>
               </div>
 
-              <section className="space-y-4 bg-green-500/5 p-6 rounded-2xl border border-green-500/20">
-                <h3 className="text-xl font-bold flex items-center gap-2 text-green-500">
-                  <Star className="w-6 h-6" /> 3. Celebración de éxitos
+              <section className="space-y-4 bg-primary/5 p-6 rounded-2xl border border-primary/20">
+                <h3 className="text-xl font-bold flex items-center gap-2 text-primary">
+                  <ClipboardList className="w-6 h-6" /> 3. Administración de Cierres y Datos
                 </h3>
                 <p className="text-base text-muted-foreground leading-relaxed">
-                  <strong>Recompensa por cierre:</strong> Cuando logres concretar un trámite y lo marques como "Cierre", el sistema te felicitará con un sonido y un panel especial para registrar los datos finales del éxito. No olvides anotar el monto final y las comisiones.
+                  Al concretar un trámite, el panel de <strong>Registro de Datos Críticos</strong> permite asegurar la integridad del expediente. Es fundamental capturar el monto final del crédito, las comisiones devengadas y la fecha de firma para mantener un control administrativo impecable.
                 </p>
               </section>
 
-              <section className="space-y-4 bg-primary/5 p-6 rounded-2xl border border-primary/20">
-                <h3 className="text-xl font-bold flex items-center gap-2 text-primary">
-                  <Cpu className="w-6 h-6" /> 4. Asistente de mensajes IA
+              <section className="space-y-4 bg-accent/5 p-6 rounded-2xl border border-accent/20">
+                <h3 className="text-xl font-bold flex items-center gap-2 text-accent">
+                  <Target className="w-6 h-6" /> 4. Productividad Operativa
                 </h3>
                 <p className="text-base text-muted-foreground leading-relaxed">
-                  <strong>No más bloqueos:</strong> El sistema puede redactar por ti mensajes de seguimiento profesionales dependiendo de lo que haya pasado en la cita (ej. si el cliente no llegó o si ya apartó). Puedes copiarlos y pegarlos directamente en WhatsApp.
+                  El sistema monitorea automáticamente su desempeño mensual. Compare sus cierres y prospectos con periodos anteriores para identificar áreas de oportunidad y mantener un flujo constante de expedientes.
                 </p>
               </section>
 
               <Separator className="bg-border/50" />
 
-              <section className="p-6 rounded-2xl bg-accent/5 border border-accent/20 space-y-4">
-                <h3 className="text-sm font-bold flex items-center gap-2 text-accent uppercase tracking-widest">
-                  <Info className="w-5 h-5" /> Información Importante
+              <section className="p-6 rounded-2xl bg-muted/20 border border-border/50 space-y-4">
+                <h3 className="text-sm font-bold flex items-center gap-2 text-muted-foreground uppercase tracking-widest">
+                  <Info className="w-5 h-5" /> Privacidad y Almacenamiento
                 </h3>
                 <ul className="text-sm space-y-3 text-muted-foreground">
                   <li className="flex gap-3">
-                    <div className="w-2 h-2 rounded-full bg-accent mt-1.5 shrink-0" />
-                    <span><strong>Privacidad:</strong> Toda la información se guarda únicamente en el navegador de tu dispositivo actual. Nadie fuera de este equipo puede ver tus datos.</span>
+                    <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
+                    <span><strong>Seguridad Local:</strong> Los datos residen exclusivamente en su navegador. Esto garantiza que la información sensible de clientes sea privada.</span>
                   </li>
                   <li className="flex gap-3">
-                    <div className="w-2 h-2 rounded-full bg-accent mt-1.5 shrink-0" />
-                    <span><strong>Recomendación:</strong> Si cambias de dispositivo o borras el historial, los datos se reiniciarán. ¡Pronto tendremos sincronización en la nube!</span>
+                    <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
+                    <span><strong>Respaldo:</strong> No borre el historial si desea conservar sus registros. La sincronización en servidor es una funcionalidad planeada para futuras versiones.</span>
                   </li>
                 </ul>
               </section>
 
               <p className="text-center text-xs text-muted-foreground italic pt-6 border-t border-border/20">
-                Desarrollado para que te enfoques en lo que mejor sabes hacer: ¡Cerrar créditos y ayudar a familias a tener su hogar!
+                Finanto: Diseñado para el ejecutivo que prioriza el control técnico y el cierre efectivo.
               </p>
             </div>
-          </div>
+          </ScrollArea>
           
           <DialogFooter className="p-6 border-t border-border/50 bg-muted/20">
             <Button onClick={() => setShowHelp(false)} className="w-full sm:w-auto font-bold h-12 px-8 text-lg">
@@ -419,3 +421,4 @@ export default function Home() {
     </div>
   );
 }
+
