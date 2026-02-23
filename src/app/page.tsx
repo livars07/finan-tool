@@ -175,7 +175,7 @@ export default function Home() {
             <Card 
               key={i} 
               className={cn(
-                "border-none bg-card/30 backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:bg-card/50",
+                "border border-transparent bg-card/30 backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:bg-card/50",
                 "animate-entrance-glow"
               )}
               style={{ animationDelay: `${i * 150}ms` }}
