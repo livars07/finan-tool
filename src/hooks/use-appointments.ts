@@ -25,7 +25,7 @@ export interface Appointment {
   status?: AppointmentStatus;
   notes?: string;
   isConfirmed?: boolean;
-  isArchived?: boolean; // Atributo solicitado para la papelera
+  isArchived?: boolean;
 }
 
 const STORAGE_KEY = 'olivares_fin_data_v4';
@@ -159,9 +159,9 @@ export function useAppointments() {
   const startOfToday = startOfDay(now);
   const lastMonth = subMonths(now, 1);
 
-  // Filtrar solo las que NO están archivadas
-  const activeAppointments = appointments.filter(app => !app.isArchived);
-  const archived = appointments.filter(app => app.isArchived);
+  // Filtrado core solicitado
+  const activeAppointments = appointments.filter(app => app.isArchived !== true);
+  const archived = appointments.filter(app => app.isArchived === true);
 
   const upcoming = activeAppointments
     .filter(app => {
