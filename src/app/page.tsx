@@ -55,7 +55,7 @@ const APP_TIPS = [
   { icon: Calculator, title: "Calculadora Rápida", color: "text-primary", text: "Usa la calculadora rapida en caso de tener una llamada con un interesado que pregunte montos aproximados." },
   { icon: ClipboardList, title: "Gestión Eficiente", color: "text-accent", text: "Nunca olvides registrar todas tus citas en el gestionador de citas, para tener un orden eficiente de fechas y datos en un solo lugar." },
   { icon: ShieldCheck, title: "Seguridad de Datos", color: "text-destructive", text: "Recuerda, tus citas son guardadas dentro de este navegador, si cambias de navegador o de dispositivo contacta al desarrollador." },
-  { icon: Sparkles, title: "Próximas Mejoras", color: "text-yellow-500", text: "Esta es una versión funcional para cálculo inteligente y gestión de citas, en un futuro: datos en la nube, cuentas, monitoreo por parte de líderes y gerencia, IA para automatización de mensajes personalizados, una guía de capacitación, etc." },
+  { icon: Sparkles, title: "Próximas Mejoras", color: "text-yellow-500", text: "Esta es una versión funcional para cálculo inteligente y gestión de citas, en un futuro: datos en la nube, con cuentas, monitoreo por parte de líderes y gerencia, IA para automatización de mensajes personalizados, una guía de capacitación, etc." },
   { icon: Maximize2, title: "Calculadora Completa", color: "text-primary", text: "Usa la calculadora completa para no tantear números a la hora de tener la cita frente tuyo o al estar en una llamada extensa" },
   { icon: Palette, title: "Imagen Corporativa", color: "text-accent", text: "Usa el tema <<corporativo>> para mostrar pantalla a tus clientes presenciales." },
   { icon: Palette, title: "Personalización", color: "text-primary", text: "Cambia de tema en la esquina superior de este sistema web, ya sea que prefieras lo corporativo, lo ligero o vibes de hacker." },
@@ -184,8 +184,46 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start flex-1">
-          <section className="xl:col-span-5"><div className="sticky top-24 space-y-6"><CreditCalculator /><div className="relative p-6 rounded-xl border border-primary/20 bg-primary/5 backdrop-blur-md overflow-hidden group"><Carousel setApi={setApi} className="w-full" opts={{ align: "start", loop: true }}><CarouselContent>{APP_TIPS.map((tip, index) => (<CarouselItem key={index}><div className="space-y-2"><h3 className={cn("text-sm font-headline font-bold flex items-center gap-2", tip.color)}><tip.icon className="w-4 h-4" /> {tip.title}</h3><p className="text-xs text-muted-foreground leading-relaxed min-h-[3rem]">{tip.text}</p></div></CarouselItem>))}</CarouselContent><div className="flex items-center justify-end gap-2 mt-4"><CarouselPrevious onClick={handlePrev} className="static translate-y-0 h-8 w-8 bg-transparent border-primary/20" /><CarouselNext onClick={handleNext} className="static translate-y-0 h-8 w-8 bg-transparent border-primary/20" /></div></Carousel></div></div></section>
-          <section className="xl:col-span-7 space-y-8 pb-10"><AppointmentsDashboard appointments={appointmentState.appointments} upcoming={appointmentState.upcoming} past={appointmentState.past} addAppointment={appointmentState.addAppointment} updateStatus={appointmentState.updateStatus} editAppointment={appointmentState.editAppointment} toggleConfirmation={appointmentState.toggleConfirmation} formatFriendlyDate={appointmentState.formatFriendlyDate} format12hTime={appointmentState.format12hTime} /></section>
+          <section className="xl:col-span-5">
+            <div className="sticky top-24 space-y-6">
+              <CreditCalculator />
+              <div className="relative p-6 rounded-xl border border-primary/20 bg-primary/5 backdrop-blur-md overflow-hidden group">
+                <Carousel setApi={setApi} className="w-full" opts={{ align: "start", loop: true }}>
+                  <CarouselContent>
+                    {APP_TIPS.map((tip, index) => (
+                      <CarouselItem key={index}>
+                        <div className="space-y-2">
+                          <h3 className={cn("text-sm font-headline font-bold flex items-center gap-2", tip.color)}>
+                            <tip.icon className="w-4 h-4" /> {tip.title}
+                          </h3>
+                          <p className="text-xs text-muted-foreground leading-relaxed min-h-[3rem]">
+                            {tip.text}
+                          </p>
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <div className="flex items-center justify-end gap-2 mt-4">
+                    <CarouselPrevious onClick={handlePrev} className="static translate-y-0 h-8 w-8 bg-transparent border-primary/20" />
+                    <CarouselNext onClick={handleNext} className="static translate-y-0 h-8 w-8 bg-transparent border-primary/20" />
+                  </div>
+                </Carousel>
+              </div>
+            </div>
+          </section>
+          <section className="xl:col-span-7 space-y-8 pb-10">
+            <AppointmentsDashboard 
+              appointments={appointmentState.appointments} 
+              upcoming={appointmentState.upcoming} 
+              past={appointmentState.past} 
+              addAppointment={appointmentState.addAppointment} 
+              updateStatus={appointmentState.updateStatus} 
+              editAppointment={appointmentState.editAppointment} 
+              toggleConfirmation={appointmentState.toggleConfirmation} 
+              formatFriendlyDate={appointmentState.formatFriendlyDate} 
+              format12hTime={appointmentState.format12hTime} 
+            />
+          </section>
         </div>
       </main>
 
@@ -193,24 +231,103 @@ export default function Home() {
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm">
           <p>© 2026 Finanto - Ejecutivo en Financiamiento Inmobiliario</p>
           <div className="flex items-center gap-6">
-            <button className="flex items-center gap-2 hover:text-primary transition-colors cursor-pointer group"><Phone className="w-3.5 h-3.5 group-hover:animate-pulse" /><span>664 694 7418</span></button>
+            <button className="flex items-center gap-2 hover:text-primary transition-colors cursor-pointer group">
+              <Phone className="w-3.5 h-3.5 group-hover:animate-pulse" />
+              <span>664 694 7418</span>
+            </button>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase" onClick={() => setShowHelp(true)}><BookOpen className="w-3 h-3 mr-1" /> Guía</Button>
-              <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase hover:text-destructive" onClick={() => setShowClearConfirm(true)}><Trash2 className="w-3 h-3 mr-1" /> Limpiar Todo</Button>
-              <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase" onClick={() => setShowResetConfirm(true)}><RotateCcw className="w-3 h-3 mr-1" /> Reiniciar (Semillas)</Button>
+              <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase" onClick={() => setShowHelp(true)}>
+                <BookOpen className="w-3 h-3 mr-1" /> Guía
+              </Button>
+              <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase hover:text-destructive" onClick={() => setShowClearConfirm(true)}>
+                <Trash2 className="w-3 h-3 mr-1" /> Limpiar Todo
+              </Button>
+              <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase" onClick={() => setShowResetConfirm(true)}>
+                <RotateCcw className="w-3 h-3 mr-1" /> Reiniciar (Semillas)
+              </Button>
             </div>
           </div>
         </div>
       </footer>
 
-      <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>¿Confirmar reinicio con semillas?</AlertDialogTitle><AlertDialogDescription>Se restaurarán los datos de prueba iniciales de la financiera. Se borrará tu información actual.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => { resetData(); setShowResetConfirm(false); toast({ title: "Datos reiniciados" }); }}>Sí, reiniciar</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
-      <AlertDialog open={showClearConfirm} onOpenChange={setShowClearConfirm}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>¿Limpiar base de datos por completo?</AlertDialogTitle><AlertDialogDescription>Esta acción eliminará todas las citas y dejará el sistema vacío. Esta acción no se puede deshacer.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => { clearAll(); setShowClearConfirm(false); toast({ title: "Base de datos limpia", variant: "destructive" }); }} className="bg-destructive text-white hover:bg-destructive/90">Eliminar todo</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+      <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Confirmar reinicio con semillas?</AlertDialogTitle>
+            <AlertDialogDescription>Se restaurarán los datos de prueba iniciales de la financiera. Se borrará tu información actual.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { resetData(); setShowResetConfirm(false); toast({ title: "Datos reiniciados" }); }}>Sí, reiniciar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Limpiar base de datos por completo?</AlertDialogTitle>
+            <AlertDialogDescription>Esta acción eliminará todas las citas y dejará el sistema vacío. Esta acción no se puede deshacer.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { clearAll(); setShowClearConfirm(false); toast({ title: "Base de datos limpia", variant: "destructive" }); }} className="bg-destructive text-white hover:bg-destructive/90">
+              Eliminar todo
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Dialog open={showHelp} onOpenChange={setShowHelp}>
         <DialogContent className="sm:max-w-[750px] max-h-[90vh] flex flex-col p-0 overflow-hidden bg-card backdrop-blur-3xl shadow-2xl border-border">
-          <DialogHeader className="p-8 border-b border-border/50 bg-primary/5 shrink-0"><div className="flex items-center gap-4"><div className="p-3 rounded-2xl bg-primary/20 border border-primary/30"><BookOpen className="w-7 h-7 text-primary" /></div><div><DialogTitle className="text-3xl font-bold">Guía Técnica de Finanto</DialogTitle><DialogDescription>Manual v1.1 - 23 de Marzo</DialogDescription></div></div></DialogHeader>
-          <div className="flex-1 overflow-y-auto p-8 space-y-10"><section className="space-y-4"><h2 className="text-2xl font-bold text-primary">Introducción al Sistema</h2><p className="text-muted-foreground leading-relaxed">Finanto es una plataforma técnica diseñada para optimizar la eficiencia operativa del ejecutivo en financiamiento inmobiliario. Facilita el perfilamiento rápido de prospectos y garantiza una administración técnica de los créditos.</p></section><div className="grid grid-cols-1 md:grid-cols-2 gap-8"><Card className="bg-muted/30 border-border/50"><CardContent className="p-6 space-y-4"><h3 className="text-lg font-bold flex items-center gap-2 text-accent"><Calculator className="w-5 h-5" /> 1. Calculadora de Precisión</h3><ul className="text-sm space-y-2 list-disc pl-5 text-muted-foreground"><li><strong>Perfilamiento profesional:</strong> Determine montos inmediatos por llamada o en 1ra consulta sin conexión.</li><li><strong>Tanteo Financiero:</strong> Ajuste montos en tiempo real frente al cliente.</li></ul></CardContent></Card><Card className="bg-muted/30 border-border/50"><CardContent className="p-6 space-y-4"><h3 className="text-lg font-bold flex items-center gap-2 text-accent"><CalendarDays className="w-5 h-5" /> 2. Gestión de Agenda</h3><ul className="text-sm space-y-2 list-disc pl-5 text-muted-foreground"><li><strong>Priorización Diaria:</strong> Organice su día para maximizar la productividad.</li><li><strong>Logística:</strong> Valide confirmaciones para evitar tiempos muertos.</li></ul></CardContent></Card></div><section className="p-6 rounded-2xl bg-primary/5 border border-primary/20"><h3 className="text-xl font-bold text-primary mb-2">3. Administración de Datos Críticos</h3><p className="text-sm text-muted-foreground">Al concretar un trámite, capture montos finales, comisiones y fechas de firma. Esta disciplina garantiza un control administrativo impecable.</p></section></div>
-          <DialogFooter className="p-6 border-t border-border/50 bg-muted/20 shrink-0"><Button onClick={() => setShowHelp(false)} className="max-w-none w-full sm:w-auto font-bold">Entendido</Button></DialogFooter>
+          <DialogHeader className="p-8 border-b border-border/50 bg-primary/5 shrink-0">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-2xl bg-primary/20 border border-primary/30">
+                <BookOpen className="w-7 h-7 text-primary" />
+              </div>
+              <div>
+                <DialogTitle className="text-3xl font-bold">Guía Técnica de Finanto</DialogTitle>
+                <DialogDescription>Manual v1.1 - 23 de Marzo</DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto p-8 space-y-10">
+            <section className="space-y-4">
+              <h2 className="text-2xl font-bold text-primary">Introducción al Sistema</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                Finanto es una plataforma técnica diseñada para optimizar la eficiencia operativa del ejecutivo en financiamiento inmobiliario. Facilita el perfilamiento rápido de prospectos y garantiza una administración técnica de los créditos.
+              </p>
+            </section>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <Card className="bg-muted/30 border-border/50">
+                <CardContent className="p-6 space-y-4">
+                  <h3 className="text-lg font-bold flex items-center gap-2 text-accent"><Calculator className="w-5 h-5" /> 1. Calculadora de Precisión</h3>
+                  <ul className="text-sm space-y-2 list-disc pl-5 text-muted-foreground">
+                    <li><strong>Perfilamiento profesional:</strong> Determine montos inmediatos por llamada o en 1ra consulta sin conexión.</li>
+                    <li><strong>Tanteo Financiero:</strong> Ajuste montos en tiempo real frente al cliente.</li>
+                  </ul>
+                </CardContent>
+              </Card>
+              <Card className="bg-muted/30 border-border/50">
+                <CardContent className="p-6 space-y-4">
+                  <h3 className="text-lg font-bold flex items-center gap-2 text-accent"><CalendarDays className="w-5 h-5" /> 2. Gestión de Agenda</h3>
+                  <ul className="text-sm space-y-2 list-disc pl-5 text-muted-foreground">
+                    <li><strong>Priorización Diaria:</strong> Organice su día para maximizar la productividad.</li>
+                    <li><strong>Logística:</strong> Valide confirmaciones para evitar tiempos muertos.</li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+            <section className="p-6 rounded-2xl bg-primary/5 border border-primary/20">
+              <h3 className="text-xl font-bold text-primary mb-2">3. Administración de Datos Críticos</h3>
+              <p className="text-sm text-muted-foreground">
+                Al concretar un trámite, capture montos finales, comisiones y fechas de firma. Esta disciplina garantiza un control administrativo impecable.
+              </p>
+            </section>
+          </div>
+          <DialogFooter className="p-6 border-t border-border/50 bg-muted/20 shrink-0">
+            <Button onClick={() => setShowHelp(false)} className="max-w-none w-full sm:w-auto font-bold">Entendido</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
