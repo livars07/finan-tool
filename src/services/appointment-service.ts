@@ -1,13 +1,14 @@
 /**
  * @fileOverview Servicio de Gestión de Datos - Finanto
  * 
- * Este archivo es el "Cerebro" de los datos. Aquí decidimos cómo se guardan, 
- * cómo se borran y cómo se transforman las citas.
+ * Este archivo es el "Cerebro" de los datos. Aquí centralizamos todo el manejo
+ * de la información que se guarda en tu navegador (LocalStorage).
  * 
- * EXPLICACIÓN SIMPLE:
- * 1. El navegador tiene una pequeña "maleta" llamada LocalStorage.
- * 2. Esta maleta solo acepta TEXTO (Strings).
- * 3. Nosotros guardamos nuestras CITAS (Objetos) convirtiéndolas a texto y viceversa.
+ * EXPLICACIÓN SIMPLE PARA HUMANOS:
+ * 1. El navegador tiene una "maleta" (LocalStorage) donde guardamos datos.
+ * 2. Esta maleta solo entiende TEXTO.
+ * 3. Nosotros convertimos nuestras CITAS (objetos) a TEXTO para guardarlas (JSON.stringify).
+ * 4. Cuando las necesitamos, convertimos ese TEXTO de vuelta a CITAS (JSON.parse).
  */
 
 import { v4 as uuidv4 } from 'uuid';
@@ -21,52 +22,50 @@ import {
   isSameMonth, 
   subDays, 
   addDays, 
-  differenceInDays 
 } from 'date-fns';
 
 // --- TIPOS DE DATOS (Las reglas de cómo debe verse una cita) ---
 
 export type AppointmentStatus = 
   | 'Asistencia' 
-  | 'No asistencia' 
+  | 'Sin asistencia' 
   | 'Continuación en otra cita' 
   | 'Reagendó' 
+  | 'Apartado' 
   | 'Reembolso' 
   | 'Cierre';
 
-export type AppointmentType = '1ra consulta' | '2da consulta' | 'cierre' | 'seguimiento';
+export type AppointmentType = '1ra consulta' | '2da consulta' | 'Cierre' | 'Seguimiento';
 
 export interface Appointment {
   id: string;
   name: string;
   phone: string;
-  date: string; // Fecha en formato ISO
-  time: string; // Hora en formato "HH:mm"
+  date: string; // Guardamos la fecha como un texto largo estandarizado (ISO)
+  time: string; // Hora en formato "14:30"
   type: AppointmentType;
   status?: AppointmentStatus;
   notes?: string;
   isConfirmed?: boolean;
-  isArchived?: boolean; // Si es TRUE, está en la papelera
+  isArchived?: boolean; // Si es TRUE, el usuario la "borró" y está en la papelera
 }
 
 // --- CONFIGURACIÓN ---
-const STORAGE_KEY = 'finanto_data_v5'; // Nombre de nuestra "maleta" en el navegador
+const STORAGE_KEY = 'FINANTO_DATA_V05'; // Nombre de nuestra maleta en el disco
 
-// --- FUNCIONES BÁSICAS (Las herramientas de bajo nivel) ---
+// --- FUNCIONES BÁSICAS (Las herramientas de persistencia) ---
 
 /**
- * Guarda CUALQUIER lista de citas en el disco del navegador.
- * @param appointments La lista completa de citas a guardar.
+ * Función para guardar TODO el listado en el disco inmediatamente.
  */
 export const saveToDisk = (appointments: Appointment[]): void => {
   if (typeof window === 'undefined') return;
-  // Convertimos la lista de objetos a un texto largo (JSON) para que quepa en la maleta
+  // Convertimos la lista de objetos a texto para que quepa en la maleta
   localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
 };
 
 /**
- * Lee la lista de citas que tenemos guardada en el disco.
- * @returns Una lista de citas o una lista vacía si no hay nada.
+ * Función para leer lo que hay en el disco actualmente.
  */
 export const getFromDisk = (): Appointment[] => {
   if (typeof window === 'undefined') return [];
@@ -74,19 +73,19 @@ export const getFromDisk = (): Appointment[] => {
   if (!rawData) return [];
   
   try {
-    // Convertimos el texto largo de vuelta a una lista de objetos que JavaScript entiende
+    // Convertimos el texto de vuelta a una lista de objetos que React entiende
     return JSON.parse(rawData);
   } catch (e) {
-    console.error("Error al leer de la maleta:", e);
+    console.error("Error al leer los datos del disco:", e);
     return [];
   }
 };
 
 /**
- * Transforma un número de teléfono a un formato bonito (Ej: 664 694 7418).
+ * Función para poner los teléfonos bonitos automáticamente (Ej: 664 123 4567).
  */
 export const formatPhoneNumber = (phone: string): string => {
-  const cleaned = ('' + phone).replace(/\D/g, ''); // Quitamos todo lo que no sea número
+  const cleaned = ('' + phone).replace(/\D/g, ''); 
   const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
   if (match) {
     return `${match[1]} ${match[2]} ${match[3]}`;
@@ -94,18 +93,18 @@ export const formatPhoneNumber = (phone: string): string => {
   return phone;
 };
 
-// --- FUNCIONES DE NEGOCIO (Lo que el programa usa directamente) ---
+// --- FUNCIONES DE NEGOCIO (Lo que el programa usa para trabajar) ---
 
 /**
- * Crea una cita nueva, le pone un ID único y la guarda.
+ * Agrega una nueva cita al sistema y la guarda al instante.
  */
 export const createAppointment = (data: Omit<Appointment, 'id' | 'isArchived'>): Appointment[] => {
   const all = getFromDisk();
   const newApp: Appointment = {
     ...data,
-    id: uuidv4(), // Generamos una identificación única e irrepetible
+    id: uuidv4(), // Le damos un DNI único a la cita
     phone: formatPhoneNumber(data.phone),
-    isArchived: false // Por defecto, una cita nueva NO está en la papelera
+    isArchived: false // Por defecto no está en la papelera
   };
   
   const updatedList = [newApp, ...all];
@@ -114,16 +113,14 @@ export const createAppointment = (data: Omit<Appointment, 'id' | 'isArchived'>):
 };
 
 /**
- * Actualiza una cita existente. Puede cambiar el nombre, el estado o mandarla a la papelera.
+ * Actualiza cualquier dato de una cita (Nombre, estado, archivado, etc).
  */
 export const updateAppointment = (id: string, partialData: Partial<Appointment>): Appointment[] => {
   const all = getFromDisk();
   
   const updatedList = all.map(app => {
     if (app.id === id) {
-      // Si el ID coincide, mezclamos los datos viejos con los nuevos
       const updated = { ...app, ...partialData };
-      // Si el teléfono cambió, lo volvemos a poner bonito
       if (partialData.phone) updated.phone = formatPhoneNumber(partialData.phone);
       return updated;
     }
@@ -135,7 +132,7 @@ export const updateAppointment = (id: string, partialData: Partial<Appointment>)
 };
 
 /**
- * Borra definitivamente una cita de la existencia. No hay vuelta atrás.
+ * Borra una cita de la existencia para siempre.
  */
 export const deletePermanently = (id: string): Appointment[] => {
   const all = getFromDisk();
@@ -145,24 +142,80 @@ export const deletePermanently = (id: string): Appointment[] => {
 };
 
 /**
- * Genera datos de prueba para que la app no se vea vacía al iniciar.
+ * Genera datos de prueba realistas (Seed Data).
  */
 export const generateSeedData = (): Appointment[] => {
   const data: Appointment[] = [];
-  const names = ['Juan Pérez', 'María García', 'Carlos López', 'Ana Martínez', 'Luis Rodríguez'];
-  
-  for (let i = 0; i < 20; i++) {
-    const randomDate = subDays(new Date(), Math.floor(Math.random() * 15));
+  const names = ['Juan Pérez', 'María García', 'Carlos López', 'Ana Martínez', 'Luis Rodríguez', 'Elena Gómez', 'Roberto Díaz', 'Sofía Ruiz', 'Diego Torres', 'Lucía Morales'];
+  const types: AppointmentType[] = ['1ra consulta', '2da consulta', 'Cierre', 'Seguimiento'];
+  const statuses: AppointmentStatus[] = ['Asistencia', 'Sin asistencia', 'Continuación en otra cita', 'Reagendó', 'Apartado', 'Reembolso', 'Cierre'];
+  const hours = ['09:00', '10:30', '12:00', '14:30', '16:00', '17:30', '11:15', '13:45'];
+
+  const now = new Date();
+
+  // 1. 3 Citas para HOY (Sin confirmar, sin asistir - Para el flujo de "Hoy")
+  for (let i = 0; i < 3; i++) {
     data.push({
       id: uuidv4(),
-      name: `${names[i % names.length]} Test ${i + 1}`,
-      phone: "664 123 4567",
-      date: randomDate.toISOString(),
-      time: "10:00",
-      type: '1ra consulta',
-      status: i % 2 === 0 ? 'Asistencia' : 'Cierre',
+      name: `${names[i % names.length]} (Hoy)`,
+      phone: "664 111 2233",
+      date: now.toISOString(),
+      time: hours[i % hours.length],
+      type: types[i % types.length],
+      isConfirmed: false,
       isArchived: false,
-      isConfirmed: true
+      notes: "Cita programada para el día de hoy, pendiente de confirmar asistencia."
+    });
+  }
+
+  // 2. 2 Citas PENDIENTES (Futuras - Para los siguientes días)
+  for (let i = 0; i < 2; i++) {
+    const futureDate = addDays(now, i + 1);
+    data.push({
+      id: uuidv4(),
+      name: `${names[(i + 3) % names.length]} (Pendiente)`,
+      phone: "664 444 5566",
+      date: futureDate.toISOString(),
+      time: hours[(i + 3) % hours.length],
+      type: types[i % types.length],
+      isConfirmed: false,
+      isArchived: false,
+      notes: "Cita para seguimiento en días próximos."
+    });
+  }
+
+  // 3. 5 Citas del MES ANTERIOR (Pasadas - Para llenar historial e ingresos pasados)
+  const lastMonth = subMonths(now, 1);
+  for (let i = 0; i < 5; i++) {
+    const pastDate = subDays(lastMonth, i + 5);
+    data.push({
+      id: uuidv4(),
+      name: `${names[(i + 5) % names.length]} (Histórico)`,
+      phone: "664 777 8899",
+      date: pastDate.toISOString(),
+      time: hours[(i + 5) % hours.length],
+      type: types[i % types.length],
+      status: i === 0 ? 'Cierre' : statuses[i % statuses.length],
+      isConfirmed: true,
+      isArchived: false,
+      notes: "Registro de actividad del mes pasado para estadísticas comparativas."
+    });
+  }
+
+  // 4. 10 Citas aleatorias para rellenar el mes actual
+  for (let i = 0; i < 10; i++) {
+    const randomDate = subDays(now, Math.floor(Math.random() * 15) + 1);
+    data.push({
+      id: uuidv4(),
+      name: names[(i + 10) % names.length],
+      phone: "664 999 0000",
+      date: randomDate.toISOString(),
+      time: hours[Math.floor(Math.random() * hours.length)],
+      type: types[Math.floor(Math.random() * types.length)],
+      status: statuses[Math.floor(Math.random() * statuses.length)],
+      isConfirmed: true,
+      isArchived: false,
+      notes: "Cita de historial del mes corriente."
     });
   }
   
@@ -171,7 +224,7 @@ export const generateSeedData = (): Appointment[] => {
 };
 
 /**
- * Calcula todas las estadísticas (Prospectos, Cierres, etc.) basándose en la lista actual.
+ * Calcula todas las estadísticas basándose en la lista actual.
  */
 export const calculateStats = (appointments: Appointment[]) => {
   const now = new Date();
@@ -184,6 +237,7 @@ export const calculateStats = (appointments: Appointment[]) => {
       const d = startOfDay(parseISO(a.date));
       return (isToday(d) || isAfter(d, startOfDay(now))) && !a.status;
     }).length,
+    // Prospectos del mes: Todo lo programado para este mes en adelante
     currentMonthProspects: active.filter(a => {
       const d = parseISO(a.date);
       return isSameMonth(d, now) || isAfter(d, now);

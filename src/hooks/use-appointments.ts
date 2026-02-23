@@ -30,14 +30,14 @@ export function useAppointments() {
     if (saved.length > 0) {
       setAppointments(saved);
     } else {
-      // Si no hay nada, creamos datos de prueba
+      // Si no hay nada, creamos datos de prueba con la nueva lógica seed avanzada
       const seed = Service.generateSeedData();
       setAppointments(seed);
     }
     setIsLoaded(true);
   }, []);
 
-  // --- ACCIONES (Que llaman al servicio y actualizan el estado de React) ---
+  // --- ACCIONES (Que llaman al servicio centralizado y actualizan el estado de React) ---
 
   const addAppointment = (data: Omit<Appointment, 'id' | 'isArchived'>) => {
     const updated = Service.createAppointment(data);
@@ -50,12 +50,13 @@ export function useAppointments() {
   };
 
   const archiveAppointment = (id: string) => {
-    // El "archivado" es simplemente poner isArchived en true
+    // Marcamos como archivado para que se mueva a la papelera
     const updated = Service.updateAppointment(id, { isArchived: true });
     setAppointments(updated);
   };
 
   const restoreAppointment = (id: string) => {
+    // Restauramos de la papelera
     const updated = Service.updateAppointment(id, { isArchived: false });
     setAppointments(updated);
   };
@@ -80,7 +81,7 @@ export function useAppointments() {
     setAppointments(seed);
   };
 
-  // --- FILTRADO DE LISTAS (Para saber qué mostrar en cada pestaña) ---
+  // --- FILTRADO DE LISTAS (Manejado con isArchived) ---
 
   const activeAppointments = useMemo(() => appointments.filter(a => !a.isArchived), [appointments]);
   const archived = useMemo(() => appointments.filter(a => a.isArchived), [appointments]);
@@ -90,6 +91,7 @@ export function useAppointments() {
     return activeAppointments
       .filter(a => {
         const d = startOfDay(parseISO(a.date));
+        // Próximas: Hoy o futuro que no tengan resultado (status) asignado
         return (isToday(d) || isAfter(d, today)) && !a.status;
       })
       .sort((a, b) => {
@@ -105,6 +107,7 @@ export function useAppointments() {
     return activeAppointments
       .filter(a => {
         const d = startOfDay(parseISO(a.date));
+        // Pasadas: Días anteriores o citas que ya tienen un resultado asignado
         return isBefore(d, today) || !!a.status;
       })
       .sort((a, b) => {
@@ -156,5 +159,4 @@ export function useAppointments() {
   };
 }
 
-// Re-exportamos tipos para conveniencia de los componentes
 export type { Appointment, AppointmentStatus, AppointmentType };
