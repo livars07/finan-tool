@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Calculator, RotateCcw, Info, UserCheck, HelpCircle } from "lucide-react";
+import { Calculator, RotateCcw, Info, UserCheck, HelpCircle, Maximize2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function CreditCalculator() {
@@ -72,25 +72,37 @@ export default function CreditCalculator() {
     <Card className="shadow-2xl bg-card border-border overflow-hidden">
       <CardHeader className="bg-primary/5 border-b border-border/50">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Calculator className="text-primary w-6 h-6" />
-            <CardTitle className="text-xl font-headline font-semibold">Calculadora rápida</CardTitle>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Calculator className="text-primary w-6 h-6" />
+              <CardTitle className="text-xl font-headline font-semibold">Calculadora rápida</CardTitle>
+            </div>
+            <TooltipProvider>
+              <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
+                    <HelpCircle className="w-4 h-4 cursor-help" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-[250px] p-4 text-xs backdrop-blur-xl bg-card/80 border-border/30">
+                  <p className="font-semibold mb-1">Modelo de Negocio:</p>
+                  <ul className="space-y-1 list-disc pl-3">
+                    <li>Enganche: 3%</li>
+                    <li>Mensualidad: 0.6982% del Valor P</li>
+                    <li>Interés: 7% Anual</li>
+                  </ul>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <HelpCircle className="w-5 h-5 text-muted-foreground cursor-help" />
-              </TooltipTrigger>
-              <TooltipContent className="max-w-[250px] p-4 text-xs">
-                <p className="font-semibold mb-1">Modelo de Negocio:</p>
-                <ul className="space-y-1 list-disc pl-3">
-                  <li>Enganche: 3%</li>
-                  <li>Mensualidad: 0.6982% del Valor P</li>
-                  <li>Interés: 7% Anual</li>
-                </ul>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-8 w-8 rounded-lg text-muted-foreground/60 hover:text-primary hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20 cursor-default"
+          >
+            <Maximize2 className="w-4 h-4" />
+          </Button>
         </div>
         <CardDescription className="text-muted-foreground">
           Plazo 192 meses - Plan Tradicional 12pp
@@ -105,7 +117,7 @@ export default function CreditCalculator() {
               <Input
                 id="totalPrice"
                 placeholder="0.00"
-                className="pl-7 font-semibold text-lg"
+                className="pl-7 font-semibold text-lg bg-muted/20"
                 type="text"
                 value={formatWithCommas(totalPrice)}
                 onChange={(e) => handleTotalPriceChange(e.target.value)}
@@ -119,7 +131,7 @@ export default function CreditCalculator() {
               <Input
                 id="monthlyPayment"
                 placeholder="0.00"
-                className="pl-7 border-accent/30 focus-visible:ring-accent font-bold text-lg text-accent"
+                className="pl-7 border-accent/30 focus-visible:ring-accent font-bold text-lg text-accent bg-accent/5"
                 type="text"
                 value={formatWithCommas(monthlyPayment)}
                 onChange={(e) => handleMonthlyPaymentChange(e.target.value)}
@@ -128,7 +140,7 @@ export default function CreditCalculator() {
           </div>
         </div>
 
-        <div className="space-y-3 p-4 rounded-xl bg-muted/40 border border-border/50">
+        <div className="space-y-3 p-4 rounded-xl bg-muted/40 border border-border/50 backdrop-blur-sm">
           <div className="flex justify-between items-end mb-1">
             <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest text-primary">Enganche: 3%</span>
             <span className="text-[10px] font-bold text-primary">{formatCurrency(currentDownPayment)}</span>
@@ -140,7 +152,7 @@ export default function CreditCalculator() {
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-accent/10 border border-accent/20">
+        <div className="p-4 rounded-xl bg-accent/10 border border-accent/20 backdrop-blur-sm">
           <div className="flex items-center gap-3">
             <div className="bg-accent/20 p-2 rounded-lg">
               <UserCheck className="w-5 h-5 text-accent" />
