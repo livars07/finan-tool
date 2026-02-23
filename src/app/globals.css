@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    color-scheme: dark;
     /* Predeterminado - Celeste Dark */
     --background: 197 15% 15%;
     --foreground: 0 0% 100%;
@@ -25,32 +26,35 @@
     --input: 197 15% 25% / 0.4;
     --ring: 205 71% 66%;
     --radius: 0.75rem;
+    --calendar-filter: invert(1);
   }
 
-  /* Tema Corporativo - Blanco y Grises (Light Mode Suave) */
   [data-theme="corporativo"] {
+    color-scheme: light;
     --background: 210 20% 96%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100% / 0.9;
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100% / 0.95;
     --popover-foreground: 222 47% 11%;
-    --primary: 221 83% 53%; /* Azul Corporativo */
+    --primary: 221 83% 53%;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222 47% 11.2%;
     --muted: 210 40% 92%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 142 70% 45%; /* Verde Corporativo */
+    --accent: 142 70% 45%;
     --accent-foreground: 222 47% 11.2%;
-    --destructive: 0 84.2% 60.2%; /* Rojo Corporativo */
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
+    --calendar-filter: none;
   }
 
   [data-theme="discreto"] {
+    color-scheme: dark;
     --background: 220 7% 21%;
     --foreground: 0 0% 100%;
     --card: 225 7% 18% / 0.45;
@@ -70,9 +74,11 @@
     --border: 225 6% 15% / 0.3;
     --input: 225 6% 13% / 0.4;
     --ring: 235 86% 65%;
+    --calendar-filter: invert(1);
   }
 
   [data-theme="moderno"] {
+    color-scheme: dark;
     --background: 222 47% 7%;
     --foreground: 180 100% 95%;
     --card: 222 47% 12% / 0.3;
@@ -93,6 +99,7 @@
     --input: 222 30% 15% / 0.3;
     --ring: 190 100% 50%;
     --radius: 0.15rem;
+    --calendar-filter: invert(1) hue-rotate(180deg);
   }
 }
 
@@ -110,6 +117,28 @@
 
   [role="dialog"], [role="status"] {
     @apply backdrop-blur-[20px] bg-card/10 !important;
+  }
+
+  /* Estilos armoniosos para inputs de fecha y hora nativos */
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: var(--calendar-filter);
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator:hover,
+  input[type="time"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+  }
+
+  /* Estilos para las opciones de los Selects */
+  [role="option"]:hover, 
+  [role="option"][data-highlighted],
+  [role="menuitem"]:hover,
+  [role="menuitem"][data-highlighted] {
+    @apply bg-primary/20 text-foreground cursor-pointer transition-colors duration-200 !important;
   }
 
   /* Minimalist Scrollbar */
