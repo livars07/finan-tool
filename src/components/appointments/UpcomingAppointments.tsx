@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Clock, Calendar, Info, CheckCircle2, AlertCircle, CheckCircle } from "lucide-react";
+import { Clock, Calendar, Info, CheckCircle2, AlertCircle, CheckCircle, Trophy, PartyPopper, Sparkles } from "lucide-react";
 import { parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -52,6 +53,9 @@ export default function UpcomingAppointments({
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [status, setStatus] = useState<AppointmentStatus>('Asistencia');
   const [finNotes, setFinNotes] = useState('');
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [lastClosedName, setLastClosedName] = useState('');
+  
   const { toast } = useToast();
 
   const isActuallyToday = (dateStr: string) => {
@@ -86,13 +90,28 @@ export default function UpcomingAppointments({
   const handleFinalize = () => {
     if (finId) {
       const app = appointments.find(a => a.id === finId);
-      updateStatus(finId, status, finNotes);
+      const currentStatus = status;
+      const currentNotes = finNotes;
+      const clientName = app?.name || '';
+
+      updateStatus(finId, currentStatus, currentNotes);
       setFinId(null);
       setFinNotes('');
-      toast({
-        title: "Cita Finalizada",
-        description: `${app?.name} movido al historial con resultado: ${status}.`,
-      });
+
+      if (currentStatus === 'Cierre') {
+        // Play success sound
+        const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3");
+        audio.volume = 0.5;
+        audio.play().catch(() => {});
+        
+        setLastClosedName(clientName);
+        setShowSuccessDialog(true);
+      } else {
+        toast({
+          title: "Cita Finalizada",
+          description: `${clientName} movido al historial con resultado: ${currentStatus}.`,
+        });
+      }
     }
   };
 
@@ -191,6 +210,7 @@ export default function UpcomingAppointments({
                       onClick={() => {
                         setFinId(app.id);
                         setFinNotes(app.notes || '');
+                        setStatus('Asistencia');
                       }}
                       title="Finalizar cita"
                     >
@@ -208,14 +228,14 @@ export default function UpcomingAppointments({
         <DialogContent className="sm:max-w-[500px] backdrop-blur-[20px] bg-card/10">
           <DialogHeader>
             <DialogTitle>Finalizar cita de hoy</DialogTitle>
+            <DialogDescription>Indica el resultado de la reunión y registra acuerdos importantes.</DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-4">
-            <p className="text-sm text-muted-foreground">Selecciona el resultado y añade notas del cierre.</p>
             <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase">Resultado</Label>
+              <Label className="text-xs font-bold uppercase">Resultado Final</Label>
               <Select value={status} onValueChange={(v) => setStatus(v as AppointmentStatus)}>
-                <SelectTrigger className="bg-muted/30">
-                  <SelectValue placeholder="Resultado" />
+                <SelectTrigger className={cn("bg-muted/30", status === 'Cierre' && "border-green-500 text-green-500 bg-green-500/5")}>
+                  <SelectValue placeholder="Selecciona resultado" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Asistencia">Asistencia</SelectItem>
@@ -223,15 +243,15 @@ export default function UpcomingAppointments({
                   <SelectItem value="Continuación en otra cita">Continuación en otra cita</SelectItem>
                   <SelectItem value="Reagendó">Reagendó</SelectItem>
                   <SelectItem value="Reembolso">Reembolso</SelectItem>
-                  <SelectItem value="Cierre">Cierre</SelectItem>
+                  <SelectItem value="Cierre">✨ Cierre ✨</SelectItem>
                   <SelectItem value="Apartado">Apartado</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase">Notas de Seguimiento</Label>
+              <Label className="text-xs font-bold uppercase">Notas de la Cita</Label>
               <Textarea 
-                placeholder="Escribe detalles importantes aquí..." 
+                placeholder="Escribe acuerdos, montos o próximos pasos aquí..." 
                 className="bg-muted/30 min-h-[150px] resize-none"
                 value={finNotes}
                 onChange={(e) => setFinNotes(e.target.value)}
@@ -240,7 +260,59 @@ export default function UpcomingAppointments({
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setFinId(null)} className="backdrop-blur-md">Cancelar</Button>
-            <Button onClick={handleFinalize} className="shadow-lg">Confirmar y Archivar</Button>
+            <Button onClick={handleFinalize} className={cn("shadow-lg", status === 'Cierre' && "bg-green-600 hover:bg-green-700")}>
+              {status === 'Cierre' ? '¡Confirmar Cierre!' : 'Confirmar y Archivar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Celebratory Success Dialog for Cierre */}
+      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <DialogContent className="sm:max-w-[550px] bg-green-950/90 border-green-500/50 text-white backdrop-blur-xl">
+          <DialogHeader className="flex flex-col items-center text-center space-y-4">
+            <div className="relative">
+              <div className="absolute inset-0 bg-green-400 blur-2xl opacity-20 animate-pulse"></div>
+              <div className="bg-green-500/20 p-4 rounded-full border border-green-400/30">
+                <Trophy className="w-16 h-16 text-green-400" />
+              </div>
+            </div>
+            <DialogTitle className="text-3xl font-headline font-bold text-white flex items-center gap-3">
+              <PartyPopper className="text-yellow-400" /> ¡FELICIDADES POR EL CIERRE! <PartyPopper className="text-yellow-400" />
+            </DialogTitle>
+            <DialogDescription className="text-green-100 text-lg">
+              Has concretado el crédito de <strong>{lastClosedName}</strong> con éxito.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-6 space-y-6">
+            <div className="bg-white/5 border border-white/10 p-5 rounded-2xl space-y-4">
+              <h4 className="text-xs font-bold uppercase tracking-widest text-green-400 flex items-center gap-2">
+                <Sparkles className="w-4 h-4" /> Checklist de Cierre
+              </h4>
+              <p className="text-sm text-green-50/80 leading-relaxed">
+                Asegúrate de haber registrado en las notas del cliente los siguientes datos específicos para tu reporte:
+              </p>
+              <ul className="grid grid-cols-2 gap-3 text-xs font-medium text-white">
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Monto del Crédito Final</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Institución Financiera</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Fecha Estimada de Firma</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Comisión Pactada (%)</li>
+              </ul>
+            </div>
+            
+            <p className="text-center text-[10px] text-green-200/60 uppercase font-bold">
+              ESTE CIERRE SE HA REGISTRADO EN TUS ESTADÍSTICAS MENSUALES
+            </p>
+          </div>
+
+          <DialogFooter className="sm:justify-center">
+            <Button 
+              onClick={() => setShowSuccessDialog(false)}
+              className="bg-white text-green-900 hover:bg-green-50 font-bold px-10 h-12 rounded-xl text-lg transition-all transform hover:scale-105"
+            >
+              Continuar Ganando
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

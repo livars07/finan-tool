@@ -1,42 +1,31 @@
-# Finanto - Gestión Hipotecaria (BETA)
+# Finanto - Tu Asistente Digital de Crédito Hipotecario (v0.7.1)
 
-Finanto es un sistema especializado en financiamiento inmobiliario y gestión de prospectos, diseñado para asesores hipotecarios que buscan centralizar su flujo de trabajo en una herramienta ágil y moderna.
+¡Bienvenido a Finanto! Esta es una herramienta diseñada especialmente para que los asesores hipotecarios puedan ser más rápidos, organizados y profesionales frente a sus clientes.
 
-## 🚀 Funcionalidades Principales
+## 🌟 ¿Qué puedes hacer con Finanto?
 
-### 1. Calculadora de Crédito Rápida
-*   **Cálculo Automático**: Determina mensualidades y enganches basados en el precio del inmueble.
-*   **Parámetros de Negocio**: Configurada con un factor de mensualidad de 0.6982% y un enganche del 3%.
-*   **Perfil de Riesgo**: Calcula automáticamente el ingreso mensual recomendado (DTI del 35%).
+### 1. Calculadora de Crédito Inteligente
+*   **Cálculos Instantáneos**: Solo pon el monto del crédito y el sistema te dirá la mensualidad y el enganche automáticamente.
+*   **Modo Presentación**: Si le das al botón de "Pantalla Completa", tendrás una vista profesional y limpia para mostrarle los números al cliente en tu oficina o tablet.
+*   **Resumen para WhatsApp**: Con un solo clic, copia un resumen profesional de la cotización para enviárselo al cliente de inmediato.
 
-### 2. Gestión de Citas e Historial
-*   **Panel de Control**: Visualización de citas próximas y pasadas con filtros inteligentes.
-*   **Buscador Avanzado**: Búsqueda insensible a acentos y flexible (nombres, teléfonos, meses, días).
-*   **Estados de Cita**: Seguimiento detallado desde la primera consulta hasta el "Cierre" o "Reembolso".
-*   **Confirmación Diaria**: Sistema de confirmación para citas del día de hoy con retroalimentación visual inmediata.
+### 2. Control de Agenda y Citas
+*   **Organización Diaria**: Mira tus citas de hoy en un panel destacado.
+*   **Confirmación con un Clic**: Marca si el cliente confirmó su asistencia para que no pierdas tiempo en traslados innecesarios.
+*   **Historial de Prospectos**: Guarda qué pasó en cada cita (si fue un cierre, si se apartó, o si hay que re-agendar).
 
-### 3. Asistente de Seguimiento con IA (Genkit)
-*   **Generación de Mensajes**: Crea plantillas personalizadas y profesionales basadas en el estado de la cita.
-*   **Contexto Inteligente**: Adapta el tono según si fue un "Cierre", "No asistencia", "Reagendó", etc.
+### 3. Celebración de Éxitos (¡Nuevo!)
+*   **Recompensa por Cierre**: Cuando logres concretar un trámite y lo marques como "Cierre", el sistema te felicitará con un sonido y un panel especial para registrar los datos finales del éxito.
 
-### 4. Herramientas de Productividad
-*   **Integración WhatsApp**: Botón para copiar datos del cliente en formato listo para enviar por mensaje.
-*   **Formateo Automático**: Los números telefónicos se normalizan automáticamente (ej. 664 694 7418).
-*   **Interfaz Minimalista**: Diseño optimizado en modo oscuro con scrollbars discretos y tooltips informativos.
-
-## 🛠️ Aspectos Técnicos
-*   **Framework**: Next.js 15 (App Router).
-*   **Estilos**: Tailwind CSS + ShadCN UI.
-*   **IA**: Google Genkit para la generación de contenidos.
-*   **Iconos**: Lucide React.
-*   **Manejo de Fechas**: Date-fns con soporte localizado para español.
-
-## ⚠️ Alcances y Límites
-
-*   **Persistencia Local (BETA)**: Actualmente, todos los datos se guardan exclusivamente en el **LocalStorage** de tu navegador. 
-    *   *Riesgo*: Si limpias los datos del navegador o cambias de dispositivo, la información no se sincronizará automáticamente.
-*   **Sin Base de Datos en la Nube**: Esta es una versión funcional para validación. Próximamente se integrará una base de datos real para persistencia multi-dispositivo.
-*   **Entorno Seguro**: Aunque los datos están en tu navegador, evita compartir dispositivos con terceros para proteger la información de tus prospectos.
+### 4. Asistente de Mensajes con IA
+*   **No más bloqueos**: El sistema puede redactar por ti mensajes de seguimiento profesionales dependiendo de lo que haya pasado en la cita (ej. si el cliente no llegó o si ya apartó).
 
 ---
-*Desarrollado para optimizar la eficiencia en la prospección y cierre de créditos hipotecarios.*
+
+## 💡 Información Importante (Para tener en cuenta)
+
+*   **Tus datos están seguros en tu equipo**: Por ahora, toda la información que escribes se guarda únicamente en el navegador (Chrome, Edge, etc.) de la computadora o tablet que estés usando. 
+*   **Recomendación**: Si cambias de dispositivo o borras el historial del navegador, recuerda que los datos actuales se reiniciarán. ¡Pronto tendremos una versión en la nube para sincronizar todo!
+
+---
+*Desarrollado para que te enfoques en lo que mejor sabes hacer: ¡Cerrar créditos y ayudar a familias a tener su hogar!*

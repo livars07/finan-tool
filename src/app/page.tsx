@@ -119,7 +119,7 @@ export default function Home() {
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer border-b-2 border-primary pb-1">
-              <LayoutDashboard className="w-4 h-4" />v0.7 ( 23 de marzo )
+              <LayoutDashboard className="w-4 h-4" />v0.7.1 ( 23 de marzo )
             </div>
           </nav>
           <div className="flex items-center gap-4">
@@ -215,13 +215,13 @@ export default function Home() {
               <CreditCalculator />
               <div className="mt-6 p-6 rounded-xl border border-primary/20 bg-primary/5 backdrop-blur-md">
                 <h3 className="text-sm font-headline font-bold mb-2 flex items-center gap-2 text-primary">
-                   💡 Notas
+                   💡 Nota de Sistema (v0.7.1)
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Versión v0.7 con sistema de fechas naturales y visuales mejorados. Los datos se guardan localmente para máxima velocidad.
+                  Esta versión incluye el nuevo <strong>"Panel de Felicitación por Cierre"</strong> y una calculadora optimizada para pantallas grandes.
                   <br />
                   <br />
-                  Esta herramienta está optimizada para el flujo de trabajo hipotecario diario, permitiendo cálculos rápidos y gestión de agenda en un solo lugar.
+                  Toda tu información se guarda de forma privada en este navegador para que puedas trabajar con rapidez y seguridad.
                 </p>
               </div>
             </div>
@@ -245,7 +245,7 @@ export default function Home() {
 
       <footer className="mt-12 border-t border-border/40 py-8 bg-card/10 backdrop-blur-[20px]">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm">
-          <p>© 2026 Finanto - Gestión Hipotecaria</p>
+          <p>© 2026 Finanto - Tu Asistente Digital de Crédito</p>
           <div className="flex items-center gap-6">
             <button 
               onClick={copyFooterPhone}
