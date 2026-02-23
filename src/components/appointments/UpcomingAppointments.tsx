@@ -205,7 +205,7 @@ export default function UpcomingAppointments({
       </Table>
 
       <Dialog open={!!finId} onOpenChange={() => setFinId(null)}>
-        <DialogContent className="sm:max-w-[400px] backdrop-blur-[20px] bg-card/10">
+        <DialogContent className="sm:max-w-[500px] backdrop-blur-[20px] bg-card/10">
           <DialogHeader>
             <DialogTitle>Finalizar cita de hoy</DialogTitle>
           </DialogHeader>
@@ -232,7 +232,7 @@ export default function UpcomingAppointments({
               <Label className="text-xs font-bold uppercase">Notas de Seguimiento</Label>
               <Textarea 
                 placeholder="Escribe detalles importantes aquí..." 
-                className="bg-muted/30 min-h-[100px] resize-none"
+                className="bg-muted/30 min-h-[150px] resize-none"
                 value={finNotes}
                 onChange={(e) => setFinNotes(e.target.value)}
               />

@@ -30,6 +30,7 @@ import {
   DialogClose
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 const CalculatorInputs = ({ 
   isModal = false, 
@@ -51,12 +52,15 @@ const CalculatorInputs = ({
       <Label htmlFor={isModal ? "totalPriceModal" : "totalPrice"} className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
         Monto del Crédito (P)
       </Label>
-      <div className="relative">
-        <span className="absolute left-3 top-2.5 text-muted-foreground">$</span>
+      <div className="relative flex items-center">
+        <span className={cn(
+          "absolute left-3 font-bold pointer-events-none",
+          isModal ? "text-2xl text-muted-foreground top-1/2 -translate-y-1/2" : "text-muted-foreground top-2.5"
+        )}>$</span>
         <Input
           id={isModal ? "totalPriceModal" : "totalPrice"}
           placeholder="0.00"
-          className={isModal ? "pl-7 font-bold text-3xl bg-muted/20 h-16" : "pl-7 font-semibold text-lg bg-muted/20"}
+          className={isModal ? "pl-9 font-bold text-3xl bg-muted/20 h-16" : "pl-7 font-semibold text-lg bg-muted/20"}
           type="text"
           value={formatWithCommas(totalPrice)}
           onChange={(e) => onPriceChange(e.target.value)}
@@ -67,12 +71,15 @@ const CalculatorInputs = ({
       <Label htmlFor={isModal ? "monthlyPaymentModal" : "monthlyPayment"} className="text-xs font-bold text-accent uppercase tracking-wider">
         Mensualidad (0.6982%)
       </Label>
-      <div className="relative">
-        <span className="absolute left-3 top-2.5 text-accent font-bold">$</span>
+      <div className="relative flex items-center">
+        <span className={cn(
+          "absolute left-3 font-bold pointer-events-none",
+          isModal ? "text-2xl text-accent top-1/2 -translate-y-1/2" : "text-accent top-2.5"
+        )}>$</span>
         <Input
           id={isModal ? "monthlyPaymentModal" : "monthlyPayment"}
           placeholder="0.00"
-          className={isModal ? "pl-7 border-accent/30 focus-visible:ring-accent font-bold text-3xl text-accent bg-accent/5 h-16" : "pl-7 border-accent/30 focus-visible:ring-accent font-bold text-lg text-accent bg-accent/5"}
+          className={isModal ? "pl-9 border-accent/30 focus-visible:ring-accent font-bold text-3xl text-accent bg-accent/5 h-16" : "pl-7 border-accent/30 focus-visible:ring-accent font-bold text-lg text-accent bg-accent/5"}
           type="text"
           value={formatWithCommas(monthlyPayment)}
           onChange={(e) => onMonthlyChange(e.target.value)}
