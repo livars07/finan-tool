@@ -198,7 +198,7 @@ export const calculateStats = (appointments: Appointment[]) => {
       return isSameMonth(d, now) || isAfter(d, now);
     }).length,
     lastMonthProspects: appointments.filter(a => isSameMonth(parseISO(a.date), lastMonth)).length,
-    currentMonthSales: appointments.filter(a => (a.status === 'Cierre' || a.status === 'Apartado') && isSameMonth(parseISO(a.date), now)).length,
-    lastMonthSales: appointments.filter(a => (a.status === 'Cierre' || a.status === 'Apartado') && isSameMonth(parseISO(a.date), lastMonth)).length,
+    currentMonthSales: appointments.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), now)).length,
+    lastMonthSales: appointments.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), lastMonth)).length,
   };
 };
