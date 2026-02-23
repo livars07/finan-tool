@@ -30,7 +30,7 @@ export default function PastAppointments({
   onSelect, 
   formatDate, 
   format12hTime, 
-  highlightedId,
+  highlightedId, 
   expanded = false
 }: Props) {
   const [visibleCount, setVisibleCount] = useState(15);
@@ -73,8 +73,8 @@ export default function PastAppointments({
   return (
     <div className="space-y-4 flex flex-col h-full">
       <div className={cn(
-        "border rounded-xl overflow-hidden bg-card/10 relative backdrop-blur-sm flex-1 flex flex-col",
-        !expanded ? "h-[400px]" : "h-full"
+        "border rounded-xl overflow-hidden bg-card/10 relative backdrop-blur-sm flex flex-col",
+        !expanded ? "h-[400px]" : "h-full flex-1"
       )}>
         <ScrollArea className="flex-1 scrollbar-thin">
           <Table>

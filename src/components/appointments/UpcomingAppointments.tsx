@@ -186,8 +186,8 @@ Número: *${app.phone}*`;
   return (
     <div className="space-y-4 flex flex-col h-full">
       <div className={cn(
-        "border rounded-xl overflow-hidden relative backdrop-blur-sm bg-card/20 flex-1 flex flex-col",
-        !expanded ? "h-[400px]" : "h-full"
+        "border rounded-xl overflow-hidden relative backdrop-blur-sm bg-card/20 flex flex-col",
+        !expanded ? "h-[400px]" : "h-full flex-1"
       )}>
         {appointments.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-muted-foreground bg-muted/10 h-full">
