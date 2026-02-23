@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -7,7 +8,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { 
   LayoutDashboard, Wallet, CalendarDays, Users, CheckCircle2, ShieldCheck, TrendingUp, RotateCcw,
   Palette, Moon, Sun, Cpu, Phone, BookOpen, Info, Calculator, Maximize2, Sparkles, History,
-  ClipboardList, Target, Calendar, Copy, Crown, Zap, Snowflake, Trash2
+  ClipboardList, Target, Calendar, Copy, Crown, Zap, Snowflake, Trash2, Rocket, ShieldAlert,
+  Smartphone, MessageSquare
 } from 'lucide-react';
 import { Separator } from "@/components/ui/separator";
 import { useAppointments } from '@/hooks/use-appointments';
@@ -290,57 +292,174 @@ export default function Home() {
       </AlertDialog>
 
       <Dialog open={showHelp} onOpenChange={setShowHelp}>
-        <DialogContent className="sm:max-w-[750px] max-h-[90vh] flex flex-col p-0 overflow-hidden bg-card backdrop-blur-3xl shadow-2xl border-border">
+        <DialogContent className="sm:max-w-[800px] max-h-[85vh] flex flex-col p-0 overflow-hidden bg-card backdrop-blur-3xl shadow-2xl border-border">
           <DialogHeader className="p-8 border-b border-border/50 bg-primary/5 shrink-0">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-primary/20 border border-primary/30">
-                <BookOpen className="w-7 h-7 text-primary" />
+              <div className="p-4 rounded-2xl bg-primary/20 border border-primary/30">
+                <BookOpen className="w-8 h-8 text-primary" />
               </div>
               <div>
-                <DialogTitle className="text-3xl font-bold">Guía Técnica de Finanto</DialogTitle>
-                <DialogDescription>Manual v1.1 - 23 de Marzo</DialogDescription>
+                <DialogTitle className="text-3xl font-headline font-bold">Manual Técnico de Finanto</DialogTitle>
+                <DialogDescription className="text-sm font-medium">Guía de Inducción v1.1 - Perfilado, Gestión y Cierre</DialogDescription>
               </div>
             </div>
           </DialogHeader>
-          <div className="flex-1 overflow-y-auto p-8 space-y-10">
-            <section className="space-y-4">
-              <h2 className="text-2xl font-bold text-primary">Introducción al Sistema</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                Finanto es una plataforma técnica diseñada para optimizar la eficiencia operativa del ejecutivo en financiamiento inmobiliario. Facilita el perfilamiento rápido de prospectos y garantiza una administración técnica de los créditos.
-              </p>
+          
+          <div className="flex-1 overflow-y-auto p-8 space-y-12">
+            {/* Sección 1: Bienvenida */}
+            <section className="space-y-6">
+              <div className="flex items-center gap-3">
+                <Rocket className="w-6 h-6 text-primary" />
+                <h2 className="text-2xl font-bold font-headline">La Nueva Onda de Financiamiento</h2>
+              </div>
+              <div className="bg-muted/30 p-6 rounded-2xl border border-border/50 space-y-4">
+                <p className="text-muted-foreground leading-relaxed">
+                  Bienvenido al sistema que redefine tu operación diaria. Finanto no es solo un registro; es tu aliado táctico para que cada llamada sea un perfilamiento profesional y cada cita tenga una estructura administrativa impecable.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="p-1.5 rounded-lg bg-accent/20 text-accent mt-0.5"><Target className="w-4 h-4" /></div>
+                    <p className="text-xs font-medium"><span className="text-foreground font-bold">Prospectadores:</span> Cierra el ciclo de interés con números precisos desde el minuto uno.</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="p-1.5 rounded-lg bg-green-500/20 text-green-500 mt-0.5"><CheckCircle2 className="w-4 h-4" /></div>
+                    <p className="text-xs font-medium"><span className="text-foreground font-bold">Vendedores:</span> Domina la presentación de gastos y perfilamiento frente al cliente.</p>
+                  </div>
+                </div>
+              </div>
             </section>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <Card className="bg-muted/30 border-border/50">
-                <CardContent className="p-6 space-y-4">
-                  <h3 className="text-lg font-bold flex items-center gap-2 text-accent"><Calculator className="w-5 h-5" /> 1. Calculadora de Precisión</h3>
-                  <ul className="text-sm space-y-2 list-disc pl-5 text-muted-foreground">
-                    <li><strong>Perfilamiento profesional:</strong> Determine montos inmediatos por llamada o en 1ra consulta sin conexión.</li>
-                    <li><strong>Tanteo Financiero:</strong> Ajuste montos en tiempo real frente al cliente.</li>
-                  </ul>
-                </CardContent>
-              </Card>
-              <Card className="bg-muted/30 border-border/50">
-                <CardContent className="p-6 space-y-4">
-                  <h3 className="text-lg font-bold flex items-center gap-2 text-accent"><CalendarDays className="w-5 h-5" /> 2. Gestión de Agenda</h3>
-                  <ul className="text-sm space-y-2 list-disc pl-5 text-muted-foreground">
-                    <li><strong>Priorización Diaria:</strong> Organice su día para maximizar la productividad.</li>
-                    <li><strong>Logística:</strong> Valide confirmaciones para evitar tiempos muertos.</li>
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
-            <section className="p-6 rounded-2xl bg-primary/5 border border-primary/20">
-              <h3 className="text-xl font-bold text-primary mb-2">3. Administración de Datos Críticos</h3>
-              <p className="text-sm text-muted-foreground">
-                Al concretar un trámite, capture montos finales, comisiones y fechas de firma. Esta disciplina garantiza un control administrativo impecable.
+
+            {/* Sección 2: Herramientas Core */}
+            <section className="space-y-8">
+              <h3 className="text-xl font-bold flex items-center gap-2 border-l-4 border-l-primary pl-4">Pilares Operativos</h3>
+              
+              {/* Calculadora */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                <div className="md:col-span-4 space-y-3">
+                  <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 w-fit">
+                    <Calculator className="w-6 h-6 text-primary" />
+                  </div>
+                  <h4 className="font-bold text-lg">Perfilamiento Inteligente</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Olvídate de "tantear" montos. Ingresa el crédito y obtén enganche, mensualidad e ingreso mínimo al instante.</p>
+                </div>
+                <Card className="md:col-span-8 bg-muted/20 border-border/40 shadow-none overflow-hidden">
+                  <CardContent className="p-5 space-y-4">
+                    <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-widest"><Maximize2 className="w-3.5 h-3.5" /> Modo Presentación Profesional</div>
+                    <p className="text-xs text-muted-foreground">Presiona el botón de expansión <Maximize2 className="inline w-3 h-3" /> para entrar en el modo pantalla completa. Ideal para mostrar al cliente su estructura financiera sin distracciones.</p>
+                    <Separator className="bg-border/30" />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase">Protip:</span>
+                        <p className="text-[10px] leading-tight italic">Copia el resumen rápido <Copy className="inline w-2.5 h-2.5" /> para mandarlo por WhatsApp justo al colgar.</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Agenda */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                <Card className="md:col-span-8 bg-muted/20 border-border/40 shadow-none overflow-hidden order-2 md:order-1">
+                  <CardContent className="p-5 space-y-4">
+                    <div className="flex items-center gap-2 text-xs font-bold text-accent uppercase tracking-widest"><CalendarClock className="w-3.5 h-3.5" /> Gestión de Tiempos Muertos</div>
+                    <p className="text-xs text-muted-foreground">Cada cita de hoy tiene un botón de confirmación. Úsalo para validar si el cliente asistirá y evitar desplazamientos innecesarios a la financiera.</p>
+                    <Separator className="bg-border/30" />
+                    <ul className="text-[10px] space-y-2">
+                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> <span className="font-bold">Azul:</span> Citas para hoy (Prioridad 1).</li>
+                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-muted-foreground" /> <span className="font-bold">Gris:</span> Citas futuras (Preparación).</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+                <div className="md:col-span-4 space-y-3 order-1 md:order-2">
+                  <div className="p-3 rounded-xl bg-accent/10 border border-accent/20 w-fit">
+                    <CalendarDays className="w-6 h-6 text-accent" />
+                  </div>
+                  <h4 className="font-bold text-lg">Control de Agenda</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">No pierdas un solo número. Registra nombre, teléfono y motivo de la consulta. Las notas son tu memoria técnica.</p>
+                </div>
+              </div>
+            </section>
+
+            {/* Sección 3: El Cierre */}
+            <section className="p-8 rounded-[2rem] bg-green-500/5 border border-green-500/20 space-y-6">
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="w-7 h-7 text-green-500" />
+                <h3 className="text-2xl font-bold font-headline">El Sello del Cierre</h3>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Cuando concretes una operación, marca la cita con el estatus <span className="font-bold text-green-500">✨ Cierre ✨</span>. Esto activará el checklist administrativo para que no olvides registrar:
               </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { label: "Monto Final", icon: Wallet },
+                  { label: "Comisiones", icon: Coins },
+                  { label: "Fecha Firma", icon: Calendar },
+                  { label: "Notas Extra", icon: Info }
+                ].map((item, i) => (
+                  <div key={i} className="flex flex-col items-center gap-2 p-3 bg-white/5 rounded-xl border border-white/5">
+                    <item.icon className="w-4 h-4 text-green-400" />
+                    <span className="text-[10px] font-bold text-center uppercase tracking-tighter">{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Sección 4: Futuro y Seguridad */}
+            <section className="space-y-8 pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <h4 className="text-lg font-bold flex items-center gap-2 text-yellow-500"><Sparkles className="w-5 h-5" /> Visión Futura (Próximamente)</h4>
+                  <ul className="text-xs space-y-3 text-muted-foreground">
+                    <li className="flex gap-2">
+                      <div className="shrink-0 mt-1"><MessageSquare className="w-3 h-3 text-primary" /></div>
+                      <span><span className="text-foreground font-bold">Automatización IA:</span> Generación de mensajes personalizados para seguimiento según el estatus de la cita.</span>
+                    </li>
+                    <li className="flex gap-2">
+                      <div className="shrink-0 mt-1"><Smartphone className="w-3 h-3 text-primary" /></div>
+                      <span><span className="text-foreground font-bold">Sincronización en Nube:</span> Tus datos siempre contigo, en cualquier dispositivo con tu cuenta oficial.</span>
+                    </li>
+                    <li className="flex gap-2">
+                      <div className="shrink-0 mt-1"><TrendingUp className="w-3 h-3 text-primary" /></div>
+                      <span><span className="text-foreground font-bold">Panel de Gerencia:</span> Monitoreo de productividad en tiempo real para líderes de equipo.</span>
+                    </li>
+                  </ul>
+                </div>
+                <div className="space-y-4 p-6 rounded-2xl bg-destructive/5 border border-destructive/20">
+                  <h4 className="text-lg font-bold flex items-center gap-2 text-destructive"><ShieldAlert className="w-5 h-5" /> Nota de Seguridad</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Actualmente, tus datos se almacenan de forma segura <span className="text-foreground font-bold">solo en este navegador</span>. 
+                  </p>
+                  <p className="text-[10px] font-bold text-destructive uppercase">
+                    ¡CUIDADO! NO BORRES EL CACHÉ O HISTORIAL DE DATOS DEL NAVEGADOR SIN RESPALDAR TUS CITAS.
+                  </p>
+                </div>
+              </div>
             </section>
           </div>
+          
           <DialogFooter className="p-6 border-t border-border/50 bg-muted/20 shrink-0">
-            <Button onClick={() => setShowHelp(false)} className="max-w-none w-full sm:w-auto font-bold">Entendido</Button>
+            <Button onClick={() => setShowHelp(false)} className="max-w-none w-full sm:w-auto font-bold h-12 px-10 rounded-xl shadow-lg transition-transform hover:scale-105 active:scale-95">
+              ¡Entendido, a cerrar ventas!
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
   );
 }
+
+// Icono faltante para la sección de comisiones
+const Coins = ({ className }: { className?: string }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/><path d="m17.41 17.41-2.82-2.82" />
+  </svg>
+);
