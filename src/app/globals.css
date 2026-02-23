@@ -89,11 +89,11 @@
     --popover-foreground: 180 100% 50%;
     --primary: 210 100% 55%; /* Azul Eléctrico */
     --primary-foreground: 222 47% 5%;
-    --secondary: 280 80% 65% / 0.5; /* Púrpura Tecnológico */
-    --secondary-foreground: 280 100% 85%;
+    --secondary: 45 90% 50% / 0.5; /* Oro Tecnológico (Importado de Elegante) */
+    --secondary-foreground: 45 100% 85%;
     --muted: 222 30% 15% / 0.2;
     --muted-foreground: 180 40% 70%;
-    --accent: 145 100% 50%; /* Verde Neón - Variedad cromática */
+    --accent: 155 100% 50%; /* Verde Neón vibrante */
     --accent-foreground: 222 47% 5%;
     --border: 210 100% 30% / 0.2;
     --input: 222 30% 15% / 0.3;
