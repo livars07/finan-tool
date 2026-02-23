@@ -291,12 +291,12 @@ Número: *${appointment.phone}*`;
           )}
 
           <div className="space-y-1.5 flex-1 flex flex-col min-h-0">
-            <Label className="flex items-center gap-2 text-muted-foreground text-[10px] font-bold uppercase tracking-wider shrink-0">📝 Notas del Prospecto</Label>
+            <Label className="flex items-center gap-2 text-muted-foreground text-[10px] font-bold uppercase tracking-wider shrink-0">📝 Notas del cliente</Label>
             <Textarea 
               placeholder="Detalles importantes..."
               className={cn(
                 "bg-muted/10 border-border/30 focus-visible:ring-primary resize-none text-xs backdrop-blur-sm flex-1",
-                "h-[650px] overflow-y-auto scrollbar-thin"
+                "h-[800px] overflow-y-auto scrollbar-thin"
               )}
               value={isEditing ? editData.notes : appointment.notes}
               onChange={e => setEditData({...editData, notes: e.target.value})}
