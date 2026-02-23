@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -6,7 +5,7 @@ import CreditCalculator from '@/components/calculator/CreditCalculator';
 import AppointmentsDashboard from '@/components/appointments/AppointmentsDashboard';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
-  LayoutDashboard, Wallet, CalendarDays, Users, CheckCircle2, ShieldCheck, TrendingUp, RotateCcw,
+  Wallet, CalendarDays, Users, CheckCircle2, ShieldCheck, TrendingUp, RotateCcw,
   Palette, Moon, Sun, Cpu, Phone, BookOpen, Info, Calculator, Maximize2, Sparkles, History,
   ClipboardList, Target, Calendar, Copy, Crown, Zap, Snowflake, Trash2, Rocket, ShieldAlert,
   Smartphone, MessageSquare, CalendarClock, Coins
@@ -51,6 +50,7 @@ import {
 } from "@/components/ui/carousel"
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import * as Service from '@/services/appointment-service';
 
 type Theme = 'predeterminado' | 'corporativo' | 'corporativo-v2' | 'moderno' | 'discreto' | 'olivares' | 'neon' | 'gelido';
 
@@ -89,6 +89,12 @@ export default function Home() {
   useEffect(() => {
     const savedTheme = localStorage.getItem('finanto-theme') as Theme;
     if (savedTheme) applyTheme(savedTheme);
+
+    // Auto-show help if first time (no appointments in disk)
+    const existing = Service.getFromDisk();
+    if (existing.length === 0) {
+      setShowHelp(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -135,14 +141,24 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
       <header className="border-b border-border/40 sticky top-0 z-50 backdrop-blur-[20px] bg-card/10 shrink-0">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <div className="bg-primary/20 p-1.5 rounded-lg border border-primary/30">
               <ShieldCheck className="text-primary w-6 h-6" />
             </div>
             <div className="flex flex-col">
-              <h1 className="text-xl font-headline font-bold tracking-tight text-foreground leading-none">
-                Finanto <span className="text-primary">BETA</span>
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-headline font-bold tracking-tight text-foreground leading-none">
+                  Finanto <span className="text-primary">BETA</span>
+                </h1>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 px-2 text-[10px] font-bold uppercase hover:bg-primary/10 hover:text-primary transition-colors border border-primary/20" 
+                  onClick={() => setShowHelp(true)}
+                >
+                  <BookOpen className="w-3.5 h-3.5 mr-1" /> Guía
+                </Button>
+              </div>
               <span className="text-[10px] text-muted-foreground font-medium opacity-60 mt-1">Por Olivares</span>
             </div>
           </div>
@@ -262,10 +278,6 @@ export default function Home() {
           <div className="flex items-center gap-4">
             <span className="font-bold text-foreground">Finanto</span>
             <span className="opacity-60">© 2026 - Derechos de Autor Apache</span>
-            <Separator orientation="vertical" className="h-4 bg-border/40 hidden md:block" />
-            <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase" onClick={() => setShowHelp(true)}>
-              <BookOpen className="w-3 h-3 mr-1.5" /> Guía
-            </Button>
           </div>
           <div className="flex items-center gap-6">
             <button 

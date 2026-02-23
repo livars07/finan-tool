@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -59,7 +58,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
       </CardHeader>
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
             <div className="space-y-2">
               <Label htmlFor="name" className="text-xs uppercase font-bold text-muted-foreground/70">Nombre del Prospecto</Label>
               <Input 
@@ -67,7 +66,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
                 value={name} 
                 onChange={(e) => setName(e.target.value)} 
                 placeholder="Escribe el nombre..." 
-                className="bg-muted/30 border-border/40 text-sm placeholder:text-muted-foreground/50 h-11" 
+                className="bg-muted/30 border-border/40 text-sm placeholder:text-muted-foreground/40 h-11 w-full" 
               />
             </div>
             <div className="space-y-2">
@@ -77,7 +76,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
                 value={phone} 
                 onChange={(e) => setPhone(e.target.value)} 
                 placeholder="Ej. 664 123 4567" 
-                className="bg-muted/30 border-border/40 text-sm placeholder:text-muted-foreground/50 h-11" 
+                className="bg-muted/30 border-border/40 text-sm placeholder:text-muted-foreground/40 h-11 w-full" 
               />
             </div>
             <div className="space-y-2">
@@ -88,8 +87,8 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
                 value={date} 
                 onChange={(e) => setDate(e.target.value)} 
                 className={cn(
-                  "bg-muted/30 border-border/40 text-sm h-11",
-                  !date && "text-muted-foreground/50"
+                  "bg-muted/30 border-border/40 text-sm h-11 w-full",
+                  !date && "text-muted-foreground/40"
                 )} 
               />
             </div>
@@ -101,8 +100,8 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
                 value={time} 
                 onChange={(e) => setTime(e.target.value)} 
                 className={cn(
-                  "bg-muted/30 border-border/40 text-sm h-11",
-                  !time && "text-muted-foreground/50"
+                  "bg-muted/30 border-border/40 text-sm h-11 w-full",
+                  !time && "text-muted-foreground/40"
                 )} 
               />
             </div>
@@ -112,7 +111,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
             <div className="md:col-span-4 space-y-2">
               <Label htmlFor="type" className="text-xs uppercase font-bold text-muted-foreground/70">Motivo de la Consulta</Label>
               <Select value={type} onValueChange={(v) => setType(v as AppointmentType)}>
-                <SelectTrigger className="bg-muted/30 border-border/40 h-11 text-sm">
+                <SelectTrigger className="bg-muted/30 border-border/40 h-11 text-sm w-full text-muted-foreground/60">
                   <SelectValue placeholder="Selecciona el motivo" />
                 </SelectTrigger>
                 <SelectContent>
@@ -125,7 +124,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
             </div>
             <Button 
               type="submit" 
-              className="bg-accent hover:bg-accent/80 text-accent-foreground font-bold shadow-lg h-11 flex items-center justify-center gap-2"
+              className="bg-accent hover:bg-accent/80 text-accent-foreground font-bold shadow-lg h-11 flex items-center justify-center gap-2 w-full"
             >
               <PlusCircle className="h-4 w-4" />
               <span>Registrar</span>
