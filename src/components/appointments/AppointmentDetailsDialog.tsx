@@ -66,33 +66,36 @@ export default function AppointmentDetailsDialog({
   };
 
   const forceDOMCleanup = () => {
+    // Forzamos la limpieza del body para evitar que Radix deje el ratón bloqueado
     setTimeout(() => {
       if (typeof document !== 'undefined') {
         document.body.style.pointerEvents = 'auto';
         document.body.style.overflow = 'auto';
-        const overlays = document.querySelectorAll('[data-radix-focus-guard]');
-        overlays.forEach(el => (el as HTMLElement).style.display = 'none');
+        // Eliminamos capas invisibles de bloqueo si persisten
+        const focusGuards = document.querySelectorAll('[data-radix-focus-guard]');
+        focusGuards.forEach(el => (el as HTMLElement).remove());
       }
-    }, 100);
+    }, 50);
   };
 
   const handleConfirmArchive = () => {
     const idToArchive = appointment.id;
     const name = appointment.name;
     
-    // Cerramos alertas antes de ejecutar logica
+    // 1. Ejecutamos la lógica de datos inmediatamente
+    onDelete(idToArchive);
+    
+    // 2. Cerramos popups
     setShowDeleteConfirm(false);
     onOpenChange(false);
     
-    // Pequeño retardo para que las animaciones de cierre no choquen con el re-renderizado
-    setTimeout(() => {
-      onDelete(idToArchive);
-      forceDOMCleanup();
-      toast({ 
-        title: "Cita movida a papelera", 
-        description: `Se ha archivado el historial de ${name}.` 
-      });
-    }, 150);
+    // 3. Limpiamos el DOM agresivamente
+    forceDOMCleanup();
+    
+    toast({ 
+      title: "Cita movida a papelera", 
+      description: `Se ha archivado el historial de ${name}.` 
+    });
   };
 
   const copyToWhatsAppFormat = () => {
@@ -122,7 +125,7 @@ Número: ${appointment.phone}`;
       <Dialog open={open} onOpenChange={(o) => { 
         if(!o) {
           setIsEditing(false);
-          setShowDeleteConfirm(false); // Resetear estado de borrado siempre al cerrar
+          setShowDeleteConfirm(false);
           forceDOMCleanup();
         } 
         onOpenChange(o); 
@@ -160,7 +163,7 @@ Número: ${appointment.phone}`;
                   Copiar datos
                 </Button>
               )}
-              <DialogClose className="flex h-4 w-4 items-center justify-center rounded-full bg-destructive transition-all hover:bg-destructive/90 focus:outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
+              <DialogClose className="flex h-5 w-5 items-center justify-center rounded-full bg-destructive transition-all hover:bg-destructive/90 focus:outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none border-0">
                 <span className="sr-only">Cerrar</span>
               </DialogClose>
             </div>

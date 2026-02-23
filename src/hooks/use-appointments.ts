@@ -92,6 +92,7 @@ export function useAppointments() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Carga inicial
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -106,6 +107,7 @@ export function useAppointments() {
     setIsLoaded(true);
   }, []);
 
+  // Persistencia inmediata al cambiar el estado
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
@@ -159,7 +161,7 @@ export function useAppointments() {
   const startOfToday = startOfDay(now);
   const lastMonth = subMonths(now, 1);
 
-  // Filtrado core: Separamos las que están en papelera de las activas
+  // Filtrado core: Separamos archivadas de activas
   const activeAppointments = appointments.filter(app => !app.isArchived);
   const archived = appointments.filter(app => app.isArchived === true);
 
