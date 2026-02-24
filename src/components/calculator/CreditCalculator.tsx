@@ -227,7 +227,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
       const totalMonthly = baseC + parseNumber(extraMonthlyContribution);
       setMonthlyPayment(totalMonthly.toFixed(2));
     }
-  }, [customTerm, effectiveFactor]);
+  }, [customTerm, effectiveFactor, totalPrice, extraDownPayment, extraMonthlyContribution]);
 
   const clear = () => {
     setTotalPrice('');
@@ -256,6 +256,9 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
   const netLiquidCredit = netFinancing > 0 ? netFinancing - totalOperatingExpenses : 0;
   const suggestedLivingBudget = minIncomeRequired > 0 ? minIncomeRequired - totalMonthlyLoad : 0;
 
+  const totalInitialInvestment = totalDownPayment + totalOperatingExpenses;
+  const totalCostOfCredit = (totalMonthlyLoad * currentTerm) + totalInitialInvestment;
+
   const handleCopySummary = () => {
     if (rawP <= 0) {
       toast({
@@ -265,8 +268,6 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
       });
       return;
     }
-
-    const totalInitialInvestment = totalDownPayment + totalOperatingExpenses;
 
     let summaryParts = [
       `📊 *RESUMEN DE COTIZACIÓN - FINANTO*`,
@@ -529,6 +530,18 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                         <span className="text-[10px] uppercase font-bold text-muted-foreground">Carga Mensual Total</span>
                         <p className="font-bold text-lg text-primary">{formatCurrency(totalMonthlyLoad)}</p>
                       </div>
+                      <div className="space-y-1 col-span-2 pt-2 border-t border-primary/10">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] uppercase font-bold text-primary flex items-center gap-1">
+                            Inversión Final Proyectada
+                            <Tooltip>
+                              <TooltipTrigger asChild><Info className="w-3 h-3 text-muted-foreground/40 cursor-help" /></TooltipTrigger>
+                              <TooltipContent>Suma total de todas las mensualidades + enganche + gastos operativos al final del plazo.</TooltipContent>
+                            </Tooltip>
+                          </span>
+                        </div>
+                        <p className="font-bold text-2xl text-primary">{formatCurrency(totalCostOfCredit)}</p>
+                      </div>
                     </div>
                   </div>
 
@@ -559,8 +572,8 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                         <p className="font-bold text-lg">{formatCurrency(appraisalCost)}</p>
                       </div>
                       <div className="space-y-1">
-                        <span className="text-[10px] uppercase font-bold text-muted-foreground">Inversión Total</span>
-                        <p className="font-bold text-lg text-accent">{formatCurrency(totalDownPayment + totalOperatingExpenses)}</p>
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground">Inversión Inicial Total</span>
+                        <p className="font-bold text-lg text-accent">{formatCurrency(totalInitialInvestment)}</p>
                       </div>
                       <div className="space-y-1">
                         <div className="flex items-center gap-1">
