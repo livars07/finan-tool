@@ -59,6 +59,7 @@ export default function AppointmentDetailsDialog({
   const [newTime, setNewTime] = useState('');
   const [newNotes, setNewNotes] = useState('');
   const [newProduct, setNewProduct] = useState<AppointmentProduct>('Casa');
+  const [newType, setNewType] = useState<AppointmentType>('2da consulta');
 
   const { toast } = useToast();
 
@@ -71,9 +72,10 @@ export default function AppointmentDetailsDialog({
   useEffect(() => {
     if (isRescheduling && appointment) {
       setNewName(appointment.name);
+      setNewPhone(appointment.phone || '');
       setNewProduct(appointment.product || 'Casa');
       setNewNotes(appointment.notes || '');
-      setNewPhone('');
+      setNewType('2da consulta');
       setNewDate('');
       setNewTime('');
     }
@@ -107,13 +109,13 @@ export default function AppointmentDetailsDialog({
       phone: newPhone,
       date: isoDate,
       time: newTime,
-      type: '2da consulta',
+      type: newType,
       product: newProduct,
       notes: newNotes,
     });
 
     setIsRescheduling(false);
-    toast({ title: "2da Consulta Agendada", description: `Nueva cita registrada para ${newName}.` });
+    toast({ title: "Cita Agendada", description: `Nueva cita de ${newType} registrada para ${newName}.` });
   };
 
   const copyPhoneOnly = () => {
@@ -389,7 +391,7 @@ Número: *${appointment.phone}*`;
               Programar Seguimiento
             </DialogTitle>
             <DialogDescription className="text-xs">
-              Agendando una segunda consulta para <strong>{newName}</strong>.
+              Agendando seguimiento para <strong>{newName}</strong>.
             </DialogDescription>
           </DialogHeader>
           
@@ -401,7 +403,7 @@ Número: *${appointment.phone}*`;
               </div>
               <div className="space-y-1.5">
                 <Label className="text-[10px] font-bold uppercase text-muted-foreground">Teléfono</Label>
-                <Input value={newPhone} onChange={e => setNewPhone(e.target.value)} placeholder="Opcional" className="h-9 bg-muted/20 text-sm" />
+                <Input value={newPhone} onChange={e => setNewPhone(e.target.value)} className="h-9 bg-muted/20 text-sm" />
               </div>
             </div>
 
@@ -423,9 +425,17 @@ Número: *${appointment.phone}*`;
               </div>
               <div className="space-y-1.5">
                 <Label className="text-[10px] font-bold uppercase text-muted-foreground">Motivo</Label>
-                <div className="h-9 flex items-center px-3 bg-primary/10 border border-primary/20 rounded-md text-xs font-bold text-primary">
-                  2da consulta
-                </div>
+                <Select value={newType} onValueChange={(v) => setNewType(v as AppointmentType)}>
+                  <SelectTrigger className="h-9 bg-primary/10 border-primary/20 text-xs font-bold text-primary focus:ring-primary">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1ra consulta">1ra consulta</SelectItem>
+                    <SelectItem value="2da consulta">2da consulta</SelectItem>
+                    <SelectItem value="cierre">Cierre</SelectItem>
+                    <SelectItem value="seguimiento">Seguimiento</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -454,7 +464,7 @@ Número: *${appointment.phone}*`;
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setIsRescheduling(false)} className="h-9 text-xs">Cancelar</Button>
             <Button onClick={handleConfirmSecond} className="h-9 text-xs bg-primary font-bold shadow-lg">
-              Confirmar 2da consulta
+              Confirmar Seguimiento
             </Button>
           </DialogFooter>
         </DialogContent>
