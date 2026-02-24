@@ -1,4 +1,3 @@
-
 /**
  * @fileOverview Servicio de Gestión de Datos - Finanto
  * 
@@ -42,6 +41,10 @@ export interface Appointment {
   status?: AppointmentStatus;
   notes?: string;
   isConfirmed?: boolean;
+  // Datos de comisión
+  commissionPercent?: number;
+  commissionStatus?: 'Pagada' | 'Pendiente';
+  finalCreditAmount?: number;
 }
 
 export const STORAGE_KEY = 'FINANTO_DATA_V1.1_50SEED';
@@ -111,18 +114,18 @@ export const updateAppointment = (id: string, partialData: Partial<Appointment>)
 };
 
 /**
- * Genera datos de prueba realistas (50 registros).
+ * Genera datos de prueba realistas (60 registros).
  */
 export const generateSeedData = (): Appointment[] => {
   const data: Appointment[] = [];
   
-  // Lista expandida para evitar repeticiones en 50 registros
   const firstNames = [
     'Juan', 'María', 'Carlos', 'Ana', 'Luis', 'Elena', 'Roberto', 'Sofía', 'Diego', 'Lucía', 
     'Fernando', 'Gabriela', 'Ricardo', 'Patricia', 'Héctor', 'Isabel', 'Jorge', 'Mónica', 'Andrés', 'Carmen',
     'Alejandro', 'Daniela', 'Raúl', 'Verónica', 'Víctor', 'Adriana', 'Oscar', 'Paola', 'Miguel', 'Rosa',
     'Francisco', 'Lorena', 'Eduardo', 'Ximena', 'Ramiro', 'Natalia', 'Esteban', 'Silvia', 'Javier', 'Beatriz',
-    'Manuel', 'Julia', 'Alberto', 'Teresa', 'Felipe', 'Inés', 'Enrique', 'Clara', 'Mario', 'Andrea'
+    'Manuel', 'Julia', 'Alberto', 'Teresa', 'Felipe', 'Inés', 'Enrique', 'Clara', 'Mario', 'Andrea',
+    'Raquel', 'Samuel', 'Paula', 'Arturo', 'Elisa', 'Ignacio', 'Lidia', 'Ramón', 'Gloria', 'Hugo'
   ];
   
   const lastNames = [
@@ -130,7 +133,8 @@ export const generateSeedData = (): Appointment[] => {
     'Vázquez', 'Jiménez', 'Castro', 'Ortiz', 'Álvarez', 'Flores', 'Ramos', 'Gutiérrez', 'Reyes', 'Blanco',
     'Sánchez', 'Ramírez', 'Hernández', 'Navarro', 'Delgado', 'Cano', 'Mendoza', 'Marín', 'Medina', 'Vega',
     'Moreno', 'Solís', 'Vargas', 'Herrera', 'Cortes', 'Mora', 'Ríos', 'Aguilar', 'Pascual', 'Rojo',
-    'Galán', 'Garzón', 'Suárez', 'Ibarra', 'Valdez', 'Peralta', 'Gallegos', 'Montero', 'Hidalgo', 'Ortega'
+    'Galán', 'Garzón', 'Suárez', 'Ibarra', 'Valdez', 'Peralta', 'Gallegos', 'Montero', 'Hidalgo', 'Ortega',
+    'Rivas', 'Soto', 'Mejía', 'Guerra', 'Bermúdez', 'Acosta', 'Salazar', 'Figueroa', 'Villalobos', 'Arias'
   ];
 
   const types: AppointmentType[] = ['1ra consulta', '2da consulta', 'Cierre', 'Seguimiento'];
@@ -140,17 +144,15 @@ export const generateSeedData = (): Appointment[] => {
 
   const now = new Date();
 
-  // Función para obtener una combinación única
   const getName = (index: number) => {
-    // Usamos el índice directamente para garantizar unicidad mientras index < firstNames.length
     const fname = firstNames[index % firstNames.length];
     const lname = lastNames[index % lastNames.length];
     return `${fname} ${lname}`;
   };
 
-  // 25 Citas Próximas (Hoy y Futuro)
-  for (let i = 0; i < 25; i++) {
-    const daysAhead = Math.floor(i / 5); 
+  // 30 Citas Próximas
+  for (let i = 0; i < 30; i++) {
+    const daysAhead = Math.floor(i / 6); 
     const futureDate = addDays(now, daysAhead);
     const isTodayApp = isToday(futureDate);
     
@@ -163,14 +165,16 @@ export const generateSeedData = (): Appointment[] => {
       type: types[i % types.length],
       product: products[i % products.length],
       isConfirmed: isTodayApp ? Math.random() > 0.5 : false,
-      notes: `Nota de seguimiento #${i + 1}: Interesado en ${products[i % products.length]}. Requiere perfilamiento completo.`
+      notes: `Nota #${i + 1}: Interesado en ${products[i % products.length]}.`
     });
   }
 
-  // 25 Citas Pasadas (Historial) - Usamos índices del 25 al 49 para evitar repetir nombres con el bloque anterior
-  for (let i = 0; i < 25; i++) {
-    const pastDate = subDays(now, i + 1);
-    const globalIndex = i + 25;
+  // 30 Citas Pasadas (Historial) - Algunas del mes pasado
+  for (let i = 0; i < 30; i++) {
+    const pastDate = i < 10 ? subMonths(now, 1) : subDays(now, (i % 20) + 1);
+    const globalIndex = i + 30;
+    const status = statuses[i % statuses.length];
+    
     data.push({
       id: uuidv4(),
       name: getName(globalIndex),
@@ -179,9 +183,12 @@ export const generateSeedData = (): Appointment[] => {
       time: hours[i % hours.length],
       type: types[i % types.length],
       product: products[i % products.length],
-      status: statuses[i % statuses.length],
+      status: status,
       isConfirmed: true,
-      notes: `Registro histórico #${i + 1}. El cliente mostró interés pero ${statuses[i % statuses.length].toLowerCase()}.`
+      notes: `Registro #${i + 1}. El cliente ${status.toLowerCase()}.`,
+      commissionStatus: status === 'Cierre' || status === 'Apartado' ? (Math.random() > 0.5 ? 'Pagada' : 'Pendiente') : undefined,
+      commissionPercent: status === 'Cierre' || status === 'Apartado' ? 100 : undefined,
+      finalCreditAmount: status === 'Cierre' || status === 'Apartado' ? Math.floor(1500000 + Math.random() * 2000000) : undefined,
     });
   }
   
@@ -205,7 +212,11 @@ export const calculateStats = (appointments: Appointment[]) => {
 
   const todayTotal = appointments.filter(a => isToday(parseISO(a.date))).length;
   const todayConfirmed = appointments.filter(a => isToday(parseISO(a.date)) && a.isConfirmed).length;
-  const tomorrowTotal = appointments.filter(a => isToday(addDays(parseISO(a.date), -1))).length;
+  const tomorrowTotal = appointments.filter(a => {
+    const d = parseISO(a.date);
+    const tomorrow = addDays(now, 1);
+    return d.getDate() === tomorrow.getDate() && d.getMonth() === tomorrow.getMonth() && d.getFullYear() === tomorrow.getFullYear();
+  }).length;
 
   const conversionRate = currentMonthProspects > 0 ? (currentMonthSales / currentMonthProspects) * 100 : 0;
   const lastMonthConversionRate = lastMonthProspects > 0 ? (lastMonthSales / lastMonthProspects) * 100 : 0;

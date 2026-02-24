@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -10,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { 
   Select, 
   SelectContent, 
@@ -18,7 +18,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct } from '@/services/appointment-service';
-import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus } from 'lucide-react';
+import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Percent, Coins } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -149,6 +149,16 @@ Número: *${appointment.phone}*`;
     navigator.clipboard.writeText(text).then(() => {
       toast({ title: "Copiado", description: "Datos listos para WhatsApp." });
     });
+  };
+
+  const showCommissionPanel = appointment.status === 'Cierre' || appointment.status === 'Apartado';
+  const commissionValue = (editData.finalCreditAmount || 0) * ((editData.commissionPercent || 0) / 100);
+
+  const formatCurrency = (val: number) => {
+    return new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency: 'MXN',
+    }).format(val);
   };
 
   return (
@@ -336,13 +346,92 @@ Número: *${appointment.phone}*`;
               </div>
             )}
 
+            {showCommissionPanel && (
+              <div className="bg-card border-2 border-border/40 p-4 rounded-xl space-y-4 shadow-sm animate-in fade-in slide-in-from-top-2">
+                <div className="flex items-center justify-between border-b border-border/20 pb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 bg-accent/10 rounded-md"><Receipt className="w-3.5 h-3.5 text-accent" /></div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest">Liquidación y Comisiones</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={cn(
+                      "text-[9px] font-bold uppercase px-2 py-0.5 rounded-full border",
+                      (editData.commissionStatus || 'Pendiente') === 'Pagada' ? "bg-green-500/10 text-green-500 border-green-500/20" : "bg-yellow-500/10 text-yellow-600 border-yellow-500/20"
+                    )}>
+                      {editData.commissionStatus || 'Pendiente'}
+                    </span>
+                    <Switch 
+                      checked={(editData.commissionStatus || 'Pendiente') === 'Pagada'} 
+                      onCheckedChange={(checked) => setEditData({...editData, commissionStatus: checked ? 'Pagada' : 'Pendiente'})}
+                      className={cn(
+                        "scale-75",
+                        (editData.commissionStatus || 'Pendiente') === 'Pagada' ? "data-[state=checked]:bg-green-500" : "data-[state=unchecked]:bg-yellow-500"
+                      )}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <Label className="text-[9px] font-bold uppercase text-muted-foreground flex items-center gap-1">
+                      <Coins className="w-3 h-3" /> Crédito Final
+                    </Label>
+                    {isEditing ? (
+                      <Input 
+                        type="number" 
+                        value={editData.finalCreditAmount || ''} 
+                        onChange={e => setEditData({...editData, finalCreditAmount: parseFloat(e.target.value)})}
+                        className="h-8 bg-muted/20 text-xs font-bold"
+                        placeholder="Monto acordado"
+                      />
+                    ) : (
+                      <p className="text-sm font-bold text-foreground">{formatCurrency(appointment.finalCreditAmount || 0)}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[9px] font-bold uppercase text-muted-foreground flex items-center gap-1">
+                      <Percent className="w-3 h-3" /> % Comisión
+                      <TooltipProvider>
+                        <Tooltip delayDuration={0}>
+                          <TooltipTrigger asChild>
+                            <Info className="h-2.5 w-2.5 cursor-help opacity-40 hover:opacity-100" />
+                          </TooltipTrigger>
+                          <TooltipContent side="top">
+                            <p className="text-[10px] leading-tight">La comisión completa proyectada es de 0.007 (0.7%) del valor del crédito.</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </Label>
+                    {isEditing ? (
+                      <Input 
+                        type="number" 
+                        value={editData.commissionPercent || ''} 
+                        onChange={e => setEditData({...editData, commissionPercent: parseFloat(e.target.value)})}
+                        className="h-8 bg-muted/20 text-xs font-bold text-accent"
+                        placeholder="Ej. 100"
+                      />
+                    ) : (
+                      <p className="text-sm font-bold text-accent">{appointment.commissionPercent || 0}%</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-border/10 flex items-center justify-between">
+                  <span className="text-[9px] font-bold uppercase text-muted-foreground">Valor Comisión</span>
+                  <div className="px-3 py-1 bg-accent/5 border border-accent/20 rounded-lg">
+                    <p className="text-sm font-bold text-accent">{formatCurrency(commissionValue)}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-1.5 shrink-0 flex flex-col">
               <Label className="flex items-center gap-2 text-muted-foreground text-[10px] font-bold uppercase tracking-wider shrink-0 mb-1">📝 Notas del cliente</Label>
               <Textarea 
                 placeholder="Detalles importantes..."
                 className={cn(
                   "bg-muted/10 border-border/30 focus-visible:ring-primary resize-none text-xs backdrop-blur-sm scrollbar-thin",
-                  "h-[300px] min-h-[300px] overflow-y-auto"
+                  "h-[200px] min-h-[200px] overflow-y-auto"
                 )}
                 value={isEditing ? editData.notes : appointment.notes}
                 onChange={e => setEditData({...editData, notes: e.target.value})}
