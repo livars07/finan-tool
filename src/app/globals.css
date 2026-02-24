@@ -26,6 +26,35 @@
     --ring: 210 60% 50%; /* Ring Azul */
     --radius: 0.75rem;
     --calendar-filter: none;
+    --font-body: 'Inter', sans-serif;
+    --font-headline: 'Inter', sans-serif;
+  }
+
+  [data-theme="social"] {
+    color-scheme: light;
+    --background: 210 17% 96%; /* Facebook background #F0F2F5 */
+    --foreground: 222 13% 1%;
+    --card: 0 0% 100% / 1;
+    --card-foreground: 222 13% 1%;
+    --popover: 0 0% 100% / 1;
+    --popover-foreground: 222 13% 1%;
+    --primary: 214 89% 52%; /* Facebook Blue #1877F2 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 16% 93%;
+    --secondary-foreground: 222 13% 1%;
+    --muted: 210 16% 93%;
+    --muted-foreground: 210 10% 40%;
+    --accent: 214 89% 52%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 210 16% 90%;
+    --input: 210 16% 90%;
+    --ring: 214 89% 52%;
+    --radius: 0.5rem;
+    --calendar-filter: none;
+    --font-body: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-headline: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
   }
 
   [data-theme="tranquilo"] {
@@ -210,6 +239,15 @@
   }
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background: hsl(var(--primary) / 0.5);
+  }
+}
+
+@layer base {
+  body {
+    font-family: var(--font-body);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-headline);
   }
 }
 
