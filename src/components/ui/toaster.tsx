@@ -22,13 +22,18 @@ export function Toaster() {
       if (!processedToastIds.current.has(t.id)) {
         processedToastIds.current.add(t.id)
         
-        // Determinar el sonido basado en la variante (error vs normal)
-        const soundUrl = t.variant === 'destructive' 
-          ? "https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3" // Sonido de alerta/error
+        // Determinar si es un toast de copiado buscando la palabra en el título o descripción
+        const isCopyAction = 
+          t.title?.toString().toLowerCase().includes('copia') || 
+          t.description?.toString().toLowerCase().includes('copia');
+
+        // Determinar el sonido: error y copiado usan el mismo sonido de alerta
+        const soundUrl = (t.variant === 'destructive' || isCopyAction)
+          ? "https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3" // Sonido de alerta/error/copiado
           : "https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"; // Sonido de éxito/info
           
         const audio = new Audio(soundUrl)
-        audio.volume = t.variant === 'destructive' ? 0.5 : 0.3
+        audio.volume = (t.variant === 'destructive' || isCopyAction) ? 0.5 : 0.3
         audio.play().catch(() => {
           // Ignore browser auto-play prevention errors
         })

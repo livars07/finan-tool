@@ -1,3 +1,4 @@
+
 /**
  * @fileOverview Servicio de Gestión de Datos - Finanto
  * 
@@ -114,14 +115,38 @@ export const updateAppointment = (id: string, partialData: Partial<Appointment>)
  */
 export const generateSeedData = (): Appointment[] => {
   const data: Appointment[] = [];
-  const firstNames = ['Juan', 'María', 'Carlos', 'Ana', 'Luis', 'Elena', 'Roberto', 'Sofía', 'Diego', 'Lucía', 'Fernando', 'Gabriela', 'Ricardo', 'Patricia', 'Héctor', 'Isabel', 'Jorge', 'Mónica', 'Andrés', 'Carmen'];
-  const lastNames = ['Pérez', 'García', 'López', 'Martínez', 'Rodríguez', 'Gómez', 'Díaz', 'Ruiz', 'Torres', 'Morales', 'Vázquez', 'Jiménez', 'Castro', 'Ortiz', 'Álvarez', 'Flores', 'Ramos', 'Gutiérrez', 'Reyes', 'Blanco'];
+  
+  // Lista expandida para evitar repeticiones en 50 registros
+  const firstNames = [
+    'Juan', 'María', 'Carlos', 'Ana', 'Luis', 'Elena', 'Roberto', 'Sofía', 'Diego', 'Lucía', 
+    'Fernando', 'Gabriela', 'Ricardo', 'Patricia', 'Héctor', 'Isabel', 'Jorge', 'Mónica', 'Andrés', 'Carmen',
+    'Alejandro', 'Daniela', 'Raúl', 'Verónica', 'Víctor', 'Adriana', 'Oscar', 'Paola', 'Miguel', 'Rosa',
+    'Francisco', 'Lorena', 'Eduardo', 'Ximena', 'Ramiro', 'Natalia', 'Esteban', 'Silvia', 'Javier', 'Beatriz',
+    'Manuel', 'Julia', 'Alberto', 'Teresa', 'Felipe', 'Inés', 'Enrique', 'Clara', 'Mario', 'Andrea'
+  ];
+  
+  const lastNames = [
+    'Pérez', 'García', 'López', 'Martínez', 'Rodríguez', 'Gómez', 'Díaz', 'Ruiz', 'Torres', 'Morales', 
+    'Vázquez', 'Jiménez', 'Castro', 'Ortiz', 'Álvarez', 'Flores', 'Ramos', 'Gutiérrez', 'Reyes', 'Blanco',
+    'Sánchez', 'Ramírez', 'Hernández', 'Navarro', 'Delgado', 'Cano', 'Mendoza', 'Marín', 'Medina', 'Vega',
+    'Moreno', 'Solís', 'Vargas', 'Herrera', 'Cortes', 'Mora', 'Ríos', 'Aguilar', 'Pascual', 'Rojo',
+    'Galán', 'Garzón', 'Suárez', 'Ibarra', 'Valdez', 'Peralta', 'Gallegos', 'Montero', 'Hidalgo', 'Ortega'
+  ];
+
   const types: AppointmentType[] = ['1ra consulta', '2da consulta', 'Cierre', 'Seguimiento'];
   const products: AppointmentProduct[] = ['Casa', 'Departamento', 'Terreno', 'Transporte', 'Préstamo'];
   const statuses: AppointmentStatus[] = ['Asistencia', 'No asistencia', 'Continuación en otra cita', 'Reagendó', 'Reembolso', 'Cierre', 'Apartado'];
   const hours = ['09:00', '10:00', '11:30', '13:00', '14:30', '16:00', '17:30', '19:00'];
 
   const now = new Date();
+
+  // Función para obtener una combinación única
+  const getName = (index: number) => {
+    // Usamos el índice directamente para garantizar unicidad mientras index < firstNames.length
+    const fname = firstNames[index % firstNames.length];
+    const lname = lastNames[index % lastNames.length];
+    return `${fname} ${lname}`;
+  };
 
   // 25 Citas Próximas (Hoy y Futuro)
   for (let i = 0; i < 25; i++) {
@@ -131,7 +156,7 @@ export const generateSeedData = (): Appointment[] => {
     
     data.push({
       id: uuidv4(),
-      name: `${firstNames[i % firstNames.length]} ${lastNames[i % lastNames.length]}`,
+      name: getName(i),
       phone: `664 ${Math.floor(100+Math.random()*900)} ${Math.floor(1000+Math.random()*9000)}`,
       date: futureDate.toISOString(),
       time: hours[i % hours.length],
@@ -142,12 +167,13 @@ export const generateSeedData = (): Appointment[] => {
     });
   }
 
-  // 25 Citas Pasadas (Historial)
+  // 25 Citas Pasadas (Historial) - Usamos índices del 25 al 49 para evitar repetir nombres con el bloque anterior
   for (let i = 0; i < 25; i++) {
     const pastDate = subDays(now, i + 1);
+    const globalIndex = i + 25;
     data.push({
       id: uuidv4(),
-      name: `${firstNames[(i + 5) % firstNames.length]} ${lastNames[(i + 5) % lastNames.length]}`,
+      name: getName(globalIndex),
       phone: `664 ${Math.floor(100+Math.random()*900)} ${Math.floor(1000+Math.random()*9000)}`,
       date: pastDate.toISOString(),
       time: hours[i % hours.length],
