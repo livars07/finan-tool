@@ -20,7 +20,9 @@ import {
   TrendingUp,
   Coins,
   ArrowRight,
-  Info
+  Info,
+  ArrowUpRight,
+  ArrowDownRight
 } from 'lucide-react';
 import { Appointment, AppointmentStatus } from '@/services/appointment-service';
 import { parseISO, format } from 'date-fns';
@@ -220,15 +222,26 @@ export default function AppointmentsDashboard({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="hidden md:flex flex-col items-center sm:items-start group cursor-help">
-                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-primary transition-colors">Conversión</span>
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20"><TrendingUp className="w-3.5 h-3.5"/></div>
-                      <span className="text-sm font-bold text-foreground">{stats.conversionRate}%</span>
+                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-primary transition-colors">Conversión Mes</span>
+                    <div className="flex flex-col items-center sm:items-start">
+                      <div className="flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20"><TrendingUp className="w-3.5 h-3.5"/></div>
+                        <span className="text-sm font-bold text-foreground">{stats.conversionRate}%</span>
+                      </div>
+                      <div className="flex items-center mt-1">
+                         <span className={cn(
+                           "text-[8px] font-bold flex items-center whitespace-nowrap", 
+                           stats.conversionRate >= stats.lastMonthConversionRate ? "text-green-500" : "text-muted-foreground/40"
+                         )}>
+                           {stats.conversionRate > stats.lastMonthConversionRate ? <ArrowUpRight className="w-2 h-2 mr-0.5" /> : stats.conversionRate < stats.lastMonthConversionRate ? <ArrowDownRight className="w-2 h-2 mr-0.5" /> : null}
+                           {stats.lastMonthConversionRate}% <span className="ml-1 font-medium text-muted-foreground/30">mes pasado</span>
+                         </span>
+                      </div>
                     </div>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p className="text-xs">Ratio de efectividad basado en cierres vs. prospectos totales.</p>
+                  <p className="text-xs">Efectividad de ventas este mes comparado con el anterior.</p>
                 </TooltipContent>
               </Tooltip>
             </div>

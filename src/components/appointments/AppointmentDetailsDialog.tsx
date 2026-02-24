@@ -17,7 +17,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct } from '@/services/appointment-service';
-import { User, Phone, Clock, Edit2, Save, MessageCircle, Info, ClipboardList, CheckCircle2, Box } from 'lucide-react';
+import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -138,10 +138,10 @@ Número: *${appointment.phone}*`;
                 onClick={copyToWhatsAppFormat}
                 variant="outline" 
                 size="sm"
-                className="h-7 px-2 text-[9px] border-green-500 text-green-500 hover:bg-green-500/5 font-bold uppercase backdrop-blur-md"
+                className="h-7 px-2 text-[9px] border-primary/40 text-primary hover:bg-primary/5 font-bold uppercase backdrop-blur-md"
               >
-                <MessageCircle className="w-3 h-3 mr-1" />
-                WhatsApp
+                <Copy className="w-3 h-3 mr-1" />
+                Copiar datos
               </Button>
             )}
             <DialogClose className="h-7 w-7 flex items-center justify-center rounded-full bg-destructive/10 text-destructive hover:bg-destructive transition-colors group backdrop-blur-md border border-destructive/20">

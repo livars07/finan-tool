@@ -168,18 +168,21 @@ export const generateSeedData = (): Appointment[] => {
  */
 export const calculateStats = (appointments: Appointment[]) => {
   const now = new Date();
-  const tomorrow = addDays(now, 1);
   const lastMonth = subMonths(now, 1);
 
   const currentMonthProspects = appointments.filter(a => isSameMonth(parseISO(a.date), now)).length;
   const currentMonthSales = appointments.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), now)).length;
   const currentMonthApartados = appointments.filter(a => a.status === 'Apartado' && isSameMonth(parseISO(a.date), now)).length;
   
+  const lastMonthProspects = appointments.filter(a => isSameMonth(parseISO(a.date), lastMonth)).length;
+  const lastMonthSales = appointments.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), lastMonth)).length;
+
   const todayTotal = appointments.filter(a => isToday(parseISO(a.date))).length;
   const todayConfirmed = appointments.filter(a => isToday(parseISO(a.date)) && a.isConfirmed).length;
   const tomorrowTotal = appointments.filter(a => isToday(addDays(parseISO(a.date), -1))).length;
 
   const conversionRate = currentMonthProspects > 0 ? (currentMonthSales / currentMonthProspects) * 100 : 0;
+  const lastMonthConversionRate = lastMonthProspects > 0 ? (lastMonthSales / lastMonthProspects) * 100 : 0;
 
   return {
     todayCount: todayTotal,
@@ -190,10 +193,11 @@ export const calculateStats = (appointments: Appointment[]) => {
       return (isToday(d) || isAfter(d, startOfDay(now))) && !a.status;
     }).length,
     currentMonthProspects,
-    lastMonthProspects: appointments.filter(a => isSameMonth(parseISO(a.date), lastMonth)).length,
+    lastMonthProspects,
     currentMonthSales,
     currentMonthApartados,
-    lastMonthSales: appointments.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), lastMonth)).length,
-    conversionRate: conversionRate.toFixed(1),
+    lastMonthSales,
+    conversionRate: parseFloat(conversionRate.toFixed(1)),
+    lastMonthConversionRate: parseFloat(lastMonthConversionRate.toFixed(1)),
   };
 };
