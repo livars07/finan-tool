@@ -7,10 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PlusCircle, UserPlus } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { PlusCircle, UserPlus, Plus, Calendar as CalendarIcon, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AppointmentType, AppointmentProduct } from '@/services/appointment-service';
 import { cn } from "@/lib/utils";
+import { addDays, format, nextSaturday, isSaturday } from 'date-fns';
 
 interface AppointmentFormProps {
   onAdd: (app: { name: string; phone: string; date: string; time: string; type: AppointmentType; product: AppointmentProduct }) => void;
@@ -51,6 +53,18 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
     });
   };
 
+  const setDateTomorrow = () => {
+    const tomorrow = format(addDays(new Date(), 1), 'yyyy-MM-dd');
+    setDate(tomorrow);
+  };
+
+  const setDateNextSaturday = () => {
+    const today = new Date();
+    // Si hoy es sábado, nextSaturday devolverá el siguiente sábado
+    const nextSat = format(nextSaturday(today), 'yyyy-MM-dd');
+    setDate(nextSat);
+  };
+
   return (
     <Card className="bg-card border-border shadow-md backdrop-blur-lg">
       <CardHeader className="py-4 border-b border-border/50">
@@ -83,7 +97,35 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="date" className="text-xs uppercase font-bold text-muted-foreground/70">Fecha</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="date" className="text-xs uppercase font-bold text-muted-foreground/70">Fecha</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-5 w-5 rounded-full bg-primary/10 text-primary hover:bg-primary/20">
+                      <Plus className="h-3 w-3" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent side="top" className="w-48 p-2 flex flex-col gap-1 backdrop-blur-md bg-card/90 border-primary/20">
+                    <p className="text-[10px] font-bold uppercase text-muted-foreground px-2 mb-1">Agendado rápido</p>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="justify-start h-8 text-xs font-semibold hover:bg-primary/10"
+                      onClick={setDateTomorrow}
+                    >
+                      <ArrowRight className="w-3 h-3 mr-2 text-primary" /> Mañana
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="justify-start h-8 text-xs font-semibold hover:bg-blue-500/10 text-blue-500 hover:text-blue-600"
+                      onClick={setDateNextSaturday}
+                    >
+                      <CalendarIcon className="w-3 h-3 mr-2" /> Próximo Sábado
+                    </Button>
+                  </PopoverContent>
+                </Popover>
+              </div>
               <Input 
                 id="date" 
                 type="date" 

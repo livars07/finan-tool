@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -8,7 +9,7 @@ import {
   Wallet, CalendarDays, Users, CheckCircle2, ShieldCheck, TrendingUp, RotateCcw,
   Palette, Moon, Sun, Cpu, Phone, BookOpen, Info, Calculator, Maximize2, Sparkles, History,
   ClipboardList, Target, Calendar, Copy, Crown, Zap, Snowflake, Trash2, Rocket, ShieldAlert,
-  Smartphone, MessageSquare, CalendarClock, Coins, Star
+  Smartphone, MessageSquare, CalendarClock, Coins, Star, ArrowUpRight, ArrowDownRight
 } from 'lucide-react';
 import { Separator } from "@/components/ui/separator";
 import { useAppointments } from '@/hooks/use-appointments';
@@ -134,6 +135,12 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
 
   if (!isLoaded) return null;
 
+  const getComparisonColor = (current: number, last: number) => {
+    if (current > last) return "text-green-500";
+    if (current < last) return "text-muted-foreground";
+    return "text-muted-foreground";
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
       <header className="border-b border-border/40 sticky top-0 z-50 backdrop-blur-[12px] bg-card/10 shrink-0">
@@ -194,8 +201,20 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
           {[
             { label: 'Citas hoy', value: stats.todayCount.toString(), icon: CalendarDays, color: 'text-primary' },
             { label: 'Pendientes', value: stats.pendingCount.toString(), icon: Wallet, color: 'text-primary' },
-            { label: 'Prospectos Mes', value: stats.currentMonthProspects.toString(), icon: Users, color: 'text-accent' },
-            { label: 'Ventas Mes', value: stats.currentMonthSales.toString(), icon: CheckCircle2, color: 'text-green-500' },
+            { 
+              label: 'Prospectos Mes', 
+              value: stats.currentMonthProspects.toString(), 
+              icon: Users, 
+              color: 'text-accent',
+              comparison: stats.lastMonthProspects 
+            },
+            { 
+              label: 'Ventas Mes', 
+              value: stats.currentMonthSales.toString(), 
+              icon: CheckCircle2, 
+              color: 'text-green-500',
+              comparison: stats.lastMonthSales
+            },
           ].map((stat, i) => (
             <Card 
               key={i} 
@@ -204,9 +223,17 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
             >
               <CardContent className="p-4 flex items-center gap-3">
                 <div className={cn("p-2 rounded-full bg-muted/50", stat.color)}><stat.icon className="w-5 h-5" /></div>
-                <div>
+                <div className="flex-1">
                   <p className="text-[10px] uppercase font-bold text-muted-foreground">{stat.label}</p>
-                  <p className="text-xl font-bold">{stat.value}</p>
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-xl font-bold">{stat.value}</p>
+                    {stat.comparison !== undefined && (
+                      <span className={cn("text-[9px] font-bold flex items-center", getComparisonColor(parseInt(stat.value), stat.comparison))}>
+                        {parseInt(stat.value) > stat.comparison ? <ArrowUpRight className="w-2.5 h-2.5 mr-0.5" /> : parseInt(stat.value) < stat.comparison ? <ArrowDownRight className="w-2.5 h-2.5 mr-0.5" /> : null}
+                        vs {stat.comparison}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
