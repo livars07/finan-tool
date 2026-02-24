@@ -151,16 +151,22 @@
   
   header { @apply backdrop-blur-[12px] bg-card/10 !important; }
   
-  [role="dialog"]:not([data-calculator-dialog="true"]), 
+  [role="dialog"]:not([data-calculator-dialog="true"]):not([data-appointments-dialog="true"]), 
   [role="status"] { 
     @apply backdrop-blur-[12px] !important; 
     background-color: hsl(var(--card) / 0.8) !important;
     @apply shadow-xl !important;
   }
 
-  [data-theme="corporativo"] [role="dialog"]:not([data-calculator-dialog="true"]),
+  [data-theme="moderno"] [data-calculator-dialog="true"],
+  [data-theme="moderno"] [data-appointments-dialog="true"] {
+    background-color: hsla(var(--background) / 0.6) !important;
+    backdrop-filter: blur(16px) !important;
+  }
+
+  [data-theme="corporativo"] [role="dialog"]:not([data-calculator-dialog="true"]):not([data-appointments-dialog="true"]),
   [data-theme="corporativo"] [role="status"]:not(.destructive),
-  :root:not([data-theme]) [role="dialog"]:not([data-calculator-dialog="true"]),
+  :root:not([data-theme]) [role="dialog"]:not([data-calculator-dialog="true"]):not([data-appointments-dialog="true"]),
   :root:not([data-theme]) [role="status"]:not(.destructive) {
     background-color: rgba(230, 242, 255, 0.85) !important;
     @apply border-border shadow-xl !important;
