@@ -30,7 +30,7 @@
     --font-headline: 'Inter', sans-serif;
   }
 
-  [data-theme="social"] {
+  [data-theme="corporativo-v2"] {
     color-scheme: light;
     --background: 210 17% 96%; /* Facebook background #F0F2F5 */
     --foreground: 222 13% 1%;

@@ -52,7 +52,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import * as Service from '@/services/appointment-service';
 
-type Theme = 'corporativo' | 'tranquilo' | 'moderno' | 'discreto' | 'olivares' | 'gelido' | 'social';
+type Theme = 'corporativo' | 'tranquilo' | 'moderno' | 'discreto' | 'olivares' | 'gelido' | 'corporativo-v2';
 
 const APP_TIPS = [
   { icon: Calculator, title: "Calculadora Rápida", color: "text-primary", text: "Usa la calculadora rapida en caso de tener una llamada con un interesado que pregunte montos aproximados." },
@@ -119,7 +119,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const applyTheme = (themeId: Theme) => {
     setTheme(themeId);
     document.documentElement.setAttribute('data-theme', themeId);
-    if (themeId === 'corporativo' || themeId === 'social') {
+    if (themeId === 'corporativo' || themeId === 'corporativo-v2') {
       document.documentElement.classList.remove('dark');
     } else {
       document.documentElement.classList.add('dark');
@@ -129,7 +129,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const handleThemeChange = (themeId: Theme) => {
     applyTheme(themeId);
     localStorage.setItem('finanto-theme', themeId);
-    toast({ title: "Tema actualizado", description: `Tema ${themeId.charAt(0).toUpperCase() + themeId.slice(1)} aplicado.` });
+    toast({ title: "Tema actualizado", description: `Tema ${themeId.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')} aplicado.` });
   };
 
   if (!isLoaded) return null;
@@ -164,7 +164,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" className="w-9 h-9 rounded-full bg-muted border border-border overflow-hidden">
-                  {theme === 'moderno' ? <Cpu className="w-5 h-5 text-primary" /> : theme === 'corporativo' ? <Sun className="w-5 h-5 text-primary" /> : theme === 'discreto' ? <Moon className="w-5 h-5 text-primary" /> : theme === 'olivares' ? <Crown className="w-5 h-5 text-primary" /> : theme === 'gelido' ? <Snowflake className="w-5 h-5 text-primary" /> : theme === 'social' ? <MessageSquare className="w-5 h-5 text-primary" /> : <Palette className="w-5 h-5 text-primary" />}
+                  {theme === 'moderno' ? <Cpu className="w-5 h-5 text-primary" /> : theme === 'corporativo' ? <Sun className="w-5 h-5 text-primary" /> : theme === 'discreto' ? <Moon className="w-5 h-5 text-primary" /> : theme === 'olivares' ? <Crown className="w-5 h-5 text-primary" /> : theme === 'gelido' ? <Snowflake className="w-5 h-5 text-primary" /> : theme === 'corporativo-v2' ? <MessageSquare className="w-5 h-5 text-primary" /> : <Palette className="w-5 h-5 text-primary" />}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 backdrop-blur-lg">
@@ -172,7 +172,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                 <DropdownMenuSeparator />
                 {[
                   { id: 'corporativo', label: 'Corporativo', icon: Sun, color: 'bg-blue-600' },
-                  { id: 'social', label: 'Social', icon: MessageSquare, color: 'bg-[#1877F2]' },
+                  { id: 'corporativo-v2', label: 'Corporativo V2', icon: MessageSquare, color: 'bg-[#1877F2]' },
                   { id: 'tranquilo', label: 'Tranquilo', icon: Palette, color: 'bg-primary' },
                   { id: 'moderno', label: 'Moderno', icon: Cpu, color: 'bg-cyan-500' },
                   { id: 'discreto', label: 'Discreto', icon: Moon, color: 'bg-slate-700' },
