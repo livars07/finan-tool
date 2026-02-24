@@ -56,6 +56,8 @@ interface AppointmentsDashboardProps {
   toggleConfirmation: (id: string) => void;
   formatFriendlyDate: (date: string) => string;
   format12hTime: (time: string) => string;
+  initialExpanded?: boolean;
+  onExpandedChange?: (expanded: boolean) => void;
 }
 
 export default function AppointmentsDashboard({
@@ -67,15 +69,21 @@ export default function AppointmentsDashboard({
   editAppointment,
   toggleConfirmation,
   formatFriendlyDate,
-  format12hTime
+  format12hTime,
+  initialExpanded = false,
+  onExpandedChange
 }: AppointmentsDashboardProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const [activeTab, setActiveTab] = useState('upcoming');
 
   const stats = useMemo(() => Service.calculateStats(appointments), [appointments]);
+
+  useEffect(() => {
+    onExpandedChange?.(isExpanded);
+  }, [isExpanded, onExpandedChange]);
 
   useEffect(() => {
     if (isExpanded) {

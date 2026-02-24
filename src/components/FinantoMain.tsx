@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -65,7 +66,7 @@ const APP_TIPS = [
 ];
 
 export interface FinantoMainProps {
-  initialSection?: 'guia' | 'simulador';
+  initialSection?: 'guia' | 'simulador' | 'gestor';
 }
 
 export default function FinantoMain({ initialSection }: FinantoMainProps) {
@@ -75,6 +76,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showHelp, setShowHelp] = useState(initialSection === 'guia');
   const [isSimulatorExpanded, setIsSimulatorExpanded] = useState(initialSection === 'simulador');
+  const [isGestorExpanded, setIsGestorExpanded] = useState(initialSection === 'gestor');
   const [theme, setTheme] = useState<Theme>('corporativo');
   const [api, setApi] = useState<CarouselApi>();
   const [timerKey, setTimerKey] = useState(0);
@@ -101,10 +103,12 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       document.title = "Manual de Inicio - Finanto";
     } else if (isSimulatorExpanded) {
       document.title = "Simulador - Finanto";
+    } else if (isGestorExpanded) {
+      document.title = "Gestor - Finanto";
     } else {
       document.title = "Finanto - Gestión Inmobiliaria";
     }
-  }, [showHelp, isSimulatorExpanded]);
+  }, [showHelp, isSimulatorExpanded, isGestorExpanded]);
 
   useEffect(() => {
     if (!api) return;
@@ -263,6 +267,8 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
           </section>
           <section className="xl:col-span-7 pb-10">
             <AppointmentsDashboard 
+              initialExpanded={initialSection === 'gestor'}
+              onExpandedChange={setIsGestorExpanded}
               appointments={appointmentState.appointments} 
               upcoming={appointmentState.upcoming} 
               past={appointmentState.past} 
