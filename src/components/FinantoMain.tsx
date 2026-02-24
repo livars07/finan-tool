@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -137,8 +136,8 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
 
   const getComparisonColor = (current: number, last: number) => {
     if (current > last) return "text-green-500";
-    if (current < last) return "text-muted-foreground";
-    return "text-muted-foreground";
+    if (current < last) return "text-muted-foreground/60";
+    return "text-muted-foreground/60";
   };
 
   return (
@@ -228,9 +227,9 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   <div className="flex items-baseline gap-2">
                     <p className="text-xl font-bold">{stat.value}</p>
                     {stat.comparison !== undefined && (
-                      <span className={cn("text-[9px] font-bold flex items-center", getComparisonColor(parseInt(stat.value), stat.comparison))}>
+                      <span className={cn("text-[9px] font-bold flex items-center whitespace-nowrap", getComparisonColor(parseInt(stat.value), stat.comparison))}>
                         {parseInt(stat.value) > stat.comparison ? <ArrowUpRight className="w-2.5 h-2.5 mr-0.5" /> : parseInt(stat.value) < stat.comparison ? <ArrowDownRight className="w-2.5 h-2.5 mr-0.5" /> : null}
-                        vs {stat.comparison}
+                        {stat.comparison} <span className="ml-1 opacity-60 font-medium">mes pasado</span>
                       </span>
                     )}
                   </div>

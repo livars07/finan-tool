@@ -473,13 +473,16 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                         Plazo (Meses) <Calendar className="w-3 h-3" />
                       </Label>
                       <div className="relative">
-                        <Input 
-                          type="number" 
-                          placeholder="192" 
-                          className="bg-background h-10 text-sm border-primary/20 font-bold"
-                          value={customTerm}
-                          onChange={(e) => setCustomTerm(e.target.value)}
-                        />
+                        {/* Se mantiene la estructura idéntica a los inputs anteriores para asegurar alineación vertical perfecta */}
+                        <div className="flex items-center">
+                          <Input 
+                            type="number" 
+                            placeholder="192" 
+                            className="bg-background h-10 text-sm border-primary/20 font-bold"
+                            value={customTerm}
+                            onChange={(e) => setCustomTerm(e.target.value)}
+                          />
+                        </div>
                       </div>
                       <p className="text-[9px] text-muted-foreground">Altera el factor de mensualidad.</p>
                     </div>
