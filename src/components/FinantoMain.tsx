@@ -1,7 +1,7 @@
 
 "use client"
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import CreditCalculator from '@/components/calculator/CreditCalculator';
 import AppointmentsDashboard from '@/components/appointments/AppointmentsDashboard';
 import { Card, CardContent } from '@/components/ui/card';
@@ -82,6 +82,12 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const [timerKey, setTimerKey] = useState(0);
   const { toast } = useToast();
 
+  const statsRef = useRef(stats);
+
+  useEffect(() => {
+    statsRef.current = stats;
+  }, [stats]);
+
   useEffect(() => {
     const savedTheme = localStorage.getItem('finanto-theme') as Theme;
     if (savedTheme) {
@@ -115,6 +121,23 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
     const intervalId = setInterval(() => api.scrollNext(), 18000);
     return () => clearInterval(intervalId);
   }, [api, timerKey]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    const timer = setTimeout(() => {
+      const currentStats = statsRef.current;
+      const unconfirmed = currentStats.todayCount - currentStats.todayConfirmed;
+      if (unconfirmed > 0) {
+        toast({
+          title: "Acción Requerida",
+          description: `Faltan ${unconfirmed} ${unconfirmed === 1 ? 'cita' : 'citas'} de hoy por confirmar asistencia.`,
+        });
+      }
+    }, 30000);
+
+    return () => clearTimeout(timer);
+  }, [isLoaded, toast]);
 
   const resetTimer = useCallback(() => setTimerKey(prev => prev + 1), []);
   const handleNext = useCallback(() => { if (api) { api.scrollNext(); resetTimer(); } }, [api, resetTimer]);
