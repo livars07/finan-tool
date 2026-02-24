@@ -58,7 +58,7 @@ const CalculatorInputs = ({
   formatWithCommas: (val: string) => string,
   customTerm?: string
 }) => {
-  const baseFactor = 0.0071815; // Actualizado para reflejar 7.2% anual
+  const baseFactor = 0.0071815; // Tasa de 7.2% anual
   const term = parseInt(customTerm) || 192;
   const displayFactor = ((baseFactor * (192 / term)) * 100).toFixed(4);
 
@@ -123,7 +123,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const { toast } = useToast();
   
-  const BASE_FACTOR = 0.0071815; // Tasa de 7.2% anual (anteriormente 0.006982 para 7%)
+  const BASE_FACTOR = 0.0071815; // Tasa de 7.2% anual
   const FACTOR_ENGANCHE = 0.03; 
   const INCOME_RATIO = 0.35; 
 
@@ -266,27 +266,27 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
       return;
     }
 
+    const totalInitialInvestment = totalDownPayment + totalOperatingExpenses;
+
     let summaryParts = [
       `📊 *RESUMEN DE COTIZACIÓN - FINANTO*`,
-      `• Crédito: ${formatCurrency(rawP)}`,
+      `• Monto Crédito: ${formatCurrency(rawP)}`,
       `• Plazo: ${currentTerm} meses`,
-      `• Enganche Final: ${formatCurrency(totalDownPayment)}`,
       `• Mensualidad: ${formatCurrency(totalMonthlyLoad)}`,
       `--------------------------`,
-      `💼 *GASTOS OPERATIVOS (ESTIMADOS)*`,
-      `• Est. Escrituración (5%): ${formatCurrency(estimatedClosingCosts)}`,
-      `• Est. Avalúo Pericial: ${formatCurrency(appraisalCost)}`,
-      `• Inversión Inicial Total: ${formatCurrency(totalDownPayment + totalOperatingExpenses)}`,
+      `💰 *INVERSIÓN INICIAL*`,
+      `• Total a Pagar: ${formatCurrency(totalInitialInvestment)}`,
+      `  (Incluye Enganche, Escrituración y Avalúo)`,
     ];
 
     let notes = [];
-    if (extraDown > 0) notes.push(`• Se aplicó un enganche adicional de ${formatCurrency(extraDown)}.`);
-    if (currentTerm < 192) notes.push(`• Se optimizó el plazo a ${currentTerm} meses.`);
-    if (currentExtraMonthly > 0) notes.push(`• Se incluyó una aportación mensual extra de ${formatCurrency(currentExtraMonthly)}.`);
+    if (extraDown > 0) notes.push(`• Enganche adicional: ${formatCurrency(extraDown)}`);
+    if (currentTerm < 192) notes.push(`• Plazo optimizado a ${currentTerm} meses`);
+    if (currentExtraMonthly > 0) notes.push(`• Aportación extra: ${formatCurrency(currentExtraMonthly)}/mes`);
 
     if (notes.length > 0) {
       summaryParts.push(`--------------------------`);
-      summaryParts.push(`📝 *NOTAS DE PERSONALIZACIÓN*`);
+      summaryParts.push(`📝 *PERSONALIZACIÓN*`);
       summaryParts.push(...notes);
     }
 
@@ -297,7 +297,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
     navigator.clipboard.writeText(summaryText).then(() => {
       toast({
         title: "Resumen copiado",
-        description: "Datos listos para enviar al interesado.",
+        description: "Ficha técnica lista para enviar.",
       });
     });
   };
