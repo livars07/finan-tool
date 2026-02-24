@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -12,7 +11,7 @@ import { PlusCircle, UserPlus, Plus, Calendar as CalendarIcon, ArrowRight } from
 import { useToast } from "@/hooks/use-toast";
 import { AppointmentType, AppointmentProduct } from '@/services/appointment-service';
 import { cn } from "@/lib/utils";
-import { addDays, format, nextSaturday, isSaturday } from 'date-fns';
+import { addDays, format, nextSaturday } from 'date-fns';
 
 interface AppointmentFormProps {
   onAdd: (app: { name: string; phone: string; date: string; time: string; type: AppointmentType; product: AppointmentProduct }) => void;
@@ -60,7 +59,6 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
 
   const setDateNextSaturday = () => {
     const today = new Date();
-    // Si hoy es sábado, nextSaturday devolverá el siguiente sábado
     const nextSat = format(nextSaturday(today), 'yyyy-MM-dd');
     setDate(nextSat);
   };
@@ -121,7 +119,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
                       className="justify-start h-8 text-xs font-semibold hover:bg-blue-500/10 text-blue-500 hover:text-blue-600"
                       onClick={setDateNextSaturday}
                     >
-                      <CalendarIcon className="w-3 h-3 mr-2" /> Próximo Sábado
+                      <CalendarIcon className="w-3 h-3 mr-2" /> Sábado
                     </Button>
                   </PopoverContent>
                 </Popover>

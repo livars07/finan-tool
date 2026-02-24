@@ -136,8 +136,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
 
   const getComparisonColor = (current: number, last: number) => {
     if (current > last) return "text-green-500";
-    if (current < last) return "text-muted-foreground/60";
-    return "text-muted-foreground/60";
+    return "text-muted-foreground/40";
   };
 
   return (
@@ -217,7 +216,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
           ].map((stat, i) => (
             <Card 
               key={i} 
-              className="bg-card/30 backdrop-blur-md border-border/40 animate-periodic-glow"
+              className="bg-card/30 backdrop-blur-md border-border/40 animate-periodic-glow hover:border-primary/50 transition-all"
               style={{ animationDelay: `${i * 0.15}s` }}
             >
               <CardContent className="p-4 flex items-center gap-3">
@@ -229,7 +228,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                     {stat.comparison !== undefined && (
                       <span className={cn("text-[9px] font-bold flex items-center whitespace-nowrap", getComparisonColor(parseInt(stat.value), stat.comparison))}>
                         {parseInt(stat.value) > stat.comparison ? <ArrowUpRight className="w-2.5 h-2.5 mr-0.5" /> : parseInt(stat.value) < stat.comparison ? <ArrowDownRight className="w-2.5 h-2.5 mr-0.5" /> : null}
-                        {stat.comparison} <span className="ml-1 opacity-60 font-medium">mes pasado</span>
+                        {stat.comparison} <span className="ml-1 font-medium text-muted-foreground/40">mes pasado</span>
                       </span>
                     )}
                   </div>

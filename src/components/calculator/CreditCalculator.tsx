@@ -58,7 +58,7 @@ const CalculatorInputs = ({
   formatWithCommas: (val: string) => string,
   customTerm?: string
 }) => {
-  const baseFactor = 0.0071815; // Tasa de 7.2% anual
+  const baseFactor = 0.006982; // Mensualidad al 0.6982%
   const term = parseInt(customTerm) || 192;
   const displayFactor = ((baseFactor * (192 / term)) * 100).toFixed(4);
 
@@ -123,7 +123,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const { toast } = useToast();
   
-  const BASE_FACTOR = 0.0071815; // Tasa de 7.2% anual
+  const BASE_FACTOR = 0.006982; // Mensualidad al 0.6982%
   const FACTOR_ENGANCHE = 0.03; 
   const INCOME_RATIO = 0.35; 
 
@@ -473,16 +473,13 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                         Plazo (Meses) <Calendar className="w-3 h-3" />
                       </Label>
                       <div className="relative">
-                        {/* Se mantiene la estructura idéntica a los inputs anteriores para asegurar alineación vertical perfecta */}
-                        <div className="flex items-center">
-                          <Input 
-                            type="number" 
-                            placeholder="192" 
-                            className="bg-background h-10 text-sm border-primary/20 font-bold"
-                            value={customTerm}
-                            onChange={(e) => setCustomTerm(e.target.value)}
-                          />
-                        </div>
+                        <Input 
+                          type="number" 
+                          placeholder="192" 
+                          className="bg-background h-10 text-sm border-primary/20 font-bold"
+                          value={customTerm}
+                          onChange={(e) => setCustomTerm(e.target.value)}
+                        />
                       </div>
                       <p className="text-[9px] text-muted-foreground">Altera el factor de mensualidad.</p>
                     </div>
