@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -59,7 +58,7 @@ const CalculatorInputs = ({
   formatWithCommas: (val: string) => string,
   customTerm?: string
 }) => {
-  const baseFactor = 0.006982;
+  const baseFactor = 0.0071815; // Actualizado para reflejar 7.2% anual
   const term = parseInt(customTerm) || 192;
   const displayFactor = ((baseFactor * (192 / term)) * 100).toFixed(4);
 
@@ -124,7 +123,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const { toast } = useToast();
   
-  const BASE_FACTOR = 0.006982; 
+  const BASE_FACTOR = 0.0071815; // Tasa de 7.2% anual (anteriormente 0.006982 para 7%)
   const FACTOR_ENGANCHE = 0.03; 
   const INCOME_RATIO = 0.35; 
 
