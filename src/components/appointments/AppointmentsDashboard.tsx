@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -192,21 +193,6 @@ export default function AppointmentsDashboard({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex flex-col items-center sm:items-start group cursor-help">
-                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-green-500 transition-colors">Cierres Mes</span>
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-green-500/10 text-green-500 border border-green-500/20"><CheckCircle2 className="w-3.5 h-3.5"/></div>
-                      <span className="text-sm font-bold text-foreground">{stats.currentMonthSales}</span>
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-xs">Número de trámites concretados con éxito en el mes actual.</p>
-                </TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="hidden md:flex flex-col items-center sm:items-start group cursor-help">
                     <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-blue-500 transition-colors">Apartados</span>
                     <div className="flex items-center gap-2">
                       <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-500 border border-blue-500/20"><Coins className="w-3.5 h-3.5"/></div>
@@ -216,6 +202,32 @@ export default function AppointmentsDashboard({
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-xs">Clientes que han realizado un apartado en el mes actual.</p>
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex flex-col items-center sm:items-start group cursor-help">
+                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-green-500 transition-colors">Cierres Mes</span>
+                    <div className="flex flex-col items-center sm:items-start">
+                      <div className="flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-green-500/10 text-green-500 border border-green-500/20"><CheckCircle2 className="w-3.5 h-3.5"/></div>
+                        <span className="text-sm font-bold text-foreground">{stats.currentMonthSales}</span>
+                      </div>
+                      <div className="flex items-center mt-1">
+                         <span className={cn(
+                           "text-[8px] font-bold flex items-center whitespace-nowrap", 
+                           stats.currentMonthSales >= stats.lastMonthSales ? "text-green-500" : "text-muted-foreground/40"
+                         )}>
+                           {stats.currentMonthSales > stats.lastMonthSales ? <ArrowUpRight className="w-2 h-2 mr-0.5" /> : stats.currentMonthSales < stats.lastMonthSales ? <ArrowDownRight className="w-2 h-2 mr-0.5" /> : null}
+                           {stats.lastMonthSales} <span className="ml-1 font-medium text-muted-foreground/30">mes pasado</span>
+                         </span>
+                      </div>
+                    </div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">Número de trámites concretados con éxito comparado con el mes pasado.</p>
                 </TooltipContent>
               </Tooltip>
 
@@ -367,6 +379,7 @@ export default function AppointmentsDashboard({
         open={!!selectedAppId} 
         onOpenChange={handleOpenChange}
         onEdit={editAppointment}
+        onAdd={addAppointment}
         formatFriendlyDate={formatFriendlyDate}
         format12hTime={format12hTime}
       />
