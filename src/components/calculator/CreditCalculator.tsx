@@ -59,7 +59,7 @@ const CalculatorInputs = ({
   formatWithCommas: (val: string) => string,
   customTerm?: string
 }) => {
-  const baseFactor = 0.006982; // Mensualidad al 0.6982%
+  const baseFactor = 0.006982; 
   const term = parseInt(customTerm) || 192;
   const displayFactor = ((baseFactor * (192 / term)) * 100).toFixed(4);
 
@@ -124,7 +124,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const { toast } = useToast();
   
-  const BASE_FACTOR = 0.006982; // Mensualidad al 0.6982%
+  const BASE_FACTOR = 0.006982; 
   const FACTOR_ENGANCHE = 0.03; 
   const INCOME_RATIO = 0.35; 
 
@@ -443,11 +443,11 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                     <span className="text-[10px] text-muted-foreground uppercase font-bold italic opacity-60">Impacto en el financiamiento</span>
                   </div>
                   <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-                    <div className="space-y-2">
+                    <div className="space-y-2 h-full flex flex-col">
                       <div className="h-4 flex items-center">
                         <Label className="text-[10px] font-bold uppercase text-muted-foreground">Enganche Extra</Label>
                       </div>
-                      <div className="relative">
+                      <div className="relative mt-auto">
                          <span className="absolute left-3 top-2.5 text-xs text-muted-foreground">$</span>
                          <Input 
                           placeholder="Ej. 50,000" 
@@ -456,13 +456,13 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                           onChange={(e) => handleExtraDownChange(e.target.value)}
                         />
                       </div>
-                      <p className="text-[9px] text-muted-foreground h-3">Descuenta el monto a financiar.</p>
+                      <p className="text-[9px] text-muted-foreground h-3 mt-1">Descuenta el monto a financiar.</p>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 h-full flex flex-col">
                       <div className="h-4 flex items-center">
                         <Label className="text-[10px] font-bold uppercase text-muted-foreground">Aportación Extra Mensual</Label>
                       </div>
-                      <div className="relative">
+                      <div className="relative mt-auto">
                          <span className="absolute left-3 top-2.5 text-xs text-muted-foreground">$</span>
                          <Input 
                           placeholder="Ej. 2,000" 
@@ -471,13 +471,13 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                           onChange={(e) => handleExtraMonthlyChange(e.target.value)}
                         />
                       </div>
-                      <p className="text-[9px] text-muted-foreground h-3">Suma a la carga de pago mensual.</p>
+                      <p className="text-[9px] text-muted-foreground h-3 mt-1">Suma a la carga de pago mensual.</p>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 h-full flex flex-col">
                       <div className="h-4 flex items-center">
                         <Label className="text-[10px] font-bold uppercase text-muted-foreground">Plazo (Meses)</Label>
                       </div>
-                      <div className="relative">
+                      <div className="relative mt-auto">
                         <Input 
                           type="number" 
                           placeholder="192" 
@@ -486,7 +486,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                           onChange={(e) => setCustomTerm(e.target.value)}
                         />
                       </div>
-                      <p className="text-[9px] text-muted-foreground h-3">Altera el factor de mensualidad.</p>
+                      <p className="text-[9px] text-muted-foreground h-3 mt-1">Altera el factor de mensualidad.</p>
                     </div>
                   </div>
                 </Card>
@@ -512,15 +512,15 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-                  <div className="p-6 rounded-2xl border border-primary/20 bg-primary/5 space-y-4">
-                    <div className="flex items-center justify-between">
+                  <div className="p-6 rounded-2xl border border-primary/20 bg-primary/5 space-y-4 flex flex-col">
+                    <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2 text-primary">
                         <TrendingUp className="w-5 h-5" />
                         <h4 className="text-[10px] font-bold uppercase tracking-widest">Estructura del Crédito</h4>
                       </div>
                       <span className="text-[10px] font-bold text-muted-foreground/50">Plazo: {currentTerm} meses</span>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4 flex-1">
                       <div className="space-y-1">
                         <span className="text-[10px] uppercase font-bold text-muted-foreground">Monto Base</span>
                         <p className="font-bold text-lg">{formatCurrency(rawP)}</p>
@@ -537,29 +537,29 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                         <span className="text-[10px] uppercase font-bold text-muted-foreground">Carga Mensual Total</span>
                         <p className="font-bold text-lg text-primary">{formatCurrency(totalMonthlyLoad)}</p>
                       </div>
-                      <div className="space-y-1 col-span-2 pt-2 border-t border-primary/10">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] uppercase font-bold text-primary flex items-center gap-1">
-                            Inversión Final Proyectada
-                            <Tooltip>
-                              <TooltipTrigger asChild><Info className="w-3 h-3 text-muted-foreground/40 cursor-help" /></TooltipTrigger>
-                              <TooltipContent>Suma total de todas las mensualidades + enganche + gastos operativos al final del plazo.</TooltipContent>
-                            </Tooltip>
-                          </span>
-                        </div>
-                        <p className="font-bold text-2xl text-primary">{formatCurrency(totalCostOfCredit)}</p>
+                    </div>
+                    <div className="pt-4 mt-auto border-t border-primary/20">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] uppercase font-bold text-primary flex items-center gap-1">
+                          Inversión Final Proyectada
+                          <Tooltip>
+                            <TooltipTrigger asChild><Info className="w-3 h-3 text-muted-foreground/40 cursor-help" /></TooltipTrigger>
+                            <TooltipContent>Suma total de todas las mensualidades + enganche + gastos operativos al final del plazo.</TooltipContent>
+                          </Tooltip>
+                        </span>
                       </div>
+                      <p className="font-bold text-2xl text-primary">{formatCurrency(totalCostOfCredit)}</p>
                     </div>
                   </div>
 
-                  <div className="p-6 rounded-2xl border border-accent/20 bg-accent/5 space-y-4">
-                    <div className="flex items-center justify-between">
+                  <div className="p-6 rounded-2xl border border-accent/20 bg-accent/5 space-y-4 flex flex-col">
+                    <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2 text-accent">
                         <Receipt className="w-5 h-5" />
                         <h4 className="text-[10px] font-bold uppercase tracking-widest">Gastos Operativos e Inversión</h4>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4 flex-1">
                       <div className="space-y-1">
                         <div className="flex items-center gap-1">
                           <span className="text-[10px] uppercase font-bold text-muted-foreground">Escrituración</span>
@@ -584,18 +584,18 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                         <span className="text-[10px] uppercase font-bold text-muted-foreground">Inversión Inicial Total</span>
                         <p className="font-bold text-lg text-accent">{formatCurrency(totalInitialInvestment)}</p>
                       </div>
-                      <div className="space-y-1 col-span-2 pt-2 border-t border-accent/10">
-                        <div className="flex items-center gap-1">
-                          <span className="text-[10px] uppercase font-bold text-accent flex items-center gap-1">
-                            Saldo Líquido
-                            <Tooltip>
-                              <TooltipTrigger asChild><Info className="w-3 h-3 text-muted-foreground/40 cursor-help" /></TooltipTrigger>
-                              <TooltipContent>Monto de crédito que queda disponible tras cubrir los gastos operativos.</TooltipContent>
-                            </Tooltip>
-                          </span>
-                        </div>
-                        <p className="font-bold text-2xl text-accent">{formatCurrency(netLiquidCredit)}</p>
+                    </div>
+                    <div className="pt-4 mt-auto border-t border-accent/20">
+                      <div className="flex items-center gap-1">
+                        <span className="text-[10px] uppercase font-bold text-accent flex items-center gap-1">
+                          Saldo Líquido
+                          <Tooltip>
+                            <TooltipTrigger asChild><Info className="w-3 h-3 text-muted-foreground/40 cursor-help" /></TooltipTrigger>
+                            <TooltipContent>Monto de crédito que queda disponible tras cubrir los gastos operativos.</TooltipContent>
+                          </Tooltip>
+                        </span>
                       </div>
+                      <p className="font-bold text-2xl text-accent">{formatCurrency(netLiquidCredit)}</p>
                     </div>
                   </div>
               </div>

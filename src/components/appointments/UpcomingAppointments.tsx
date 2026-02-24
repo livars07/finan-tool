@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -94,7 +95,6 @@ export default function UpcomingAppointments({
     const app = appointments.find(a => a.id === finId);
     if (!app) return;
 
-    // Actualizar estado global y preparar transición
     updateStatus(finId, status, finNotes);
     
     const updatedApp = { ...app, status, notes: finNotes };
@@ -115,8 +115,8 @@ export default function UpcomingAppointments({
       setTimeout(() => {
         onSelect(updatedApp);
         toast({
-          title: "Cita finalizada",
-          description: `${app.name} movido al historial.`,
+          title: "Consulta finalizada",
+          description: `${app.name} ha sido movido al historial con estatus: ${status}.`,
         });
       }, 300);
     }

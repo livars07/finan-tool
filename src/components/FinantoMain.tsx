@@ -135,11 +135,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
 
   if (!isLoaded) return null;
 
-  const getComparisonColor = (current: number, last: number) => {
-    if (current > last) return "text-green-500";
-    return "text-muted-foreground/40";
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
       <header className="border-b border-border/40 sticky top-0 z-50 backdrop-blur-[12px] bg-card/10 shrink-0">
@@ -217,7 +212,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
           ].map((stat, i) => (
             <Card 
               key={i} 
-              className="bg-card/30 backdrop-blur-md border-border/40 animate-periodic-glow hover:border-primary/50 transition-all"
+              className="bg-card/30 backdrop-blur-md border-border/40 animate-periodic-glow hover:border-primary/50 transition-all cursor-default"
               style={{ animationDelay: `${i * 0.15}s` }}
             >
               <CardContent className="p-4 flex items-center gap-3">
@@ -227,9 +222,9 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   <div className="flex items-baseline gap-2">
                     <p className="text-xl font-bold">{stat.value}</p>
                     {stat.comparison !== undefined && (
-                      <span className={cn("text-[9px] font-bold flex items-center whitespace-nowrap", getComparisonColor(parseInt(stat.value), stat.comparison))}>
+                      <span className="text-[9px] font-bold flex items-center whitespace-nowrap text-muted-foreground/40">
                         {parseInt(stat.value) > stat.comparison ? <ArrowUpRight className="w-2.5 h-2.5 mr-0.5" /> : parseInt(stat.value) < stat.comparison ? <ArrowDownRight className="w-2.5 h-2.5 mr-0.5" /> : null}
-                        {stat.comparison} <span className="ml-1 font-medium text-muted-foreground/40">mes pasado</span>
+                        {stat.comparison} <span className="ml-1 font-medium text-muted-foreground/30">mes pasado</span>
                       </span>
                     )}
                   </div>
