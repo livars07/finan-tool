@@ -1,39 +1,28 @@
-# Finanto - Sistema de Gestión para Ejecutivos en Financiamiento Inmobiliario (v1.1)
+# Finanto - Tutorial de Inicio Rápido (v1.1)
 
-Bienvenido a Finanto, la plataforma técnica diseñada para optimizar la operación diaria de los ejecutivos en financiamiento inmobiliario, garantizando rapidez, organización y un perfilamiento profesional ante los prospectos.
+Bienvenido a tu nueva herramienta de productividad. Finanto está diseñado para que te veas como un experto frente a tus clientes y no pierdas ni un solo prospecto.
 
-## 🛠️ Herramientas de Productividad
+## 🚀 Paso 1: Perfilamiento Profesional (Calculadora)
+Cuando tengas un interesado, no adivines números. Usa la **Calculadora Rápida**:
+*   **Ingresa el crédito**: El sistema te dará el enganche, la mensualidad y el ingreso mínimo al instante.
+*   **Modo Pantalla Completa**: Usa el icono de expansión para mostrarle los números al cliente en una vista limpia y profesional.
+*   **Copia y Envía**: Usa el botón "Copiar Resumen" para mandar una ficha técnica impecable por WhatsApp.
 
-### 1. Proyecciones de Crédito en Tiempo Real
-*   **Perfilamiento Instantáneo**: Permite determinar montos aproximados de crédito, mensualidad y enganche durante una llamada inicial o durante la primera consulta presencial.
-*   **Modo Presentación Profesional**: Visualización limpia de escenarios financieros para el cliente (Modo Pantalla Completa), facilitando el "tanteo" de montos y capacidades de pago sin depender de herramientas externas o conexión a red.
-*   **Resumen Ejecutivo para WhatsApp**: Generación de fichas técnicas simplificadas de la cotización para envío inmediato tras la sesión.
+## 📅 Paso 2: Control de tu Agenda (Gestor)
+No confíes en tu memoria o en papeles sueltos. Registra cada cita:
+*   **Botón Registrar**: Anota nombre, teléfono y el motivo (1ra consulta, seguimiento, etc.).
+*   **Confirma tu Asistencia**: Antes de salir a la financiera, usa el botón de confirmación en las citas de "Hoy" para asegurar que el cliente asistirá.
+*   **Reporte Diario**: Haz clic en "Reporte Diario" para copiar tus estadísticas del día y pegarlas en tu grupo de equipo.
 
-### 2. Administración de Agenda y Optimización de Tiempos
-*   **Priorización Diaria**: Panel de control con las citas asignadas al día para una mejor planeación del tiempo.
-*   **Eficiencia en Traslados**: Sistema de confirmación de asistencia con un clic, diseñado para evitar desplazamientos innecesarios y optimizar la logística del ejecutivo.
-*   **Trazabilidad de Prospectos**: Registro histórico de resultados (cierre, apartado, reagendado) para mantener un control estricto sobre la cartera de clientes.
+## ✨ Paso 3: El Sello del Cierre
+Cuando logres una venta, haz que cuente:
+*   **Finalizar Consulta**: Selecciona el estatus "Cierre".
+*   **Registro Administrativo**: Al marcar cierre, el sistema te pedirá notas. Anota aquí el Monto Final, la Comisión y la Fecha de Firma.
+*   **Historial**: Todas tus ventas y seguimientos quedan guardados en la pestaña "Historial" para que nunca pierdas el hilo de un cliente.
 
-### 3. Registro Administrativo de Cierres
-*   **Control de Datos Finales**: Al concretar un trámite y marcarlo como "Cierre", el sistema habilita un panel técnico para el registro de datos críticos: Monto del Crédito Final, Comisiones, Fecha de Firma y observaciones del expediente.
-*   **Métricas Mensuales**: Visualización de objetivos alcanzados en comparación con el periodo anterior para un monitoreo constante del desempeño comercial.
-
----
-
-## 💡 Información Técnica y Seguridad
-
-*   **Persistencia Local de Datos**: Toda la información capturada se almacena exclusivamente en la memoria técnica del navegador (LocalStorage) del equipo utilizado.
-*   **Privacidad Total**: Al no existir procesamiento en la nube, los datos de los clientes y las comisiones son privados y solo accesibles desde el dispositivo original.
-*   **Detección de Primera Visita**: El sistema está configurado para mostrar el Manual Técnico automáticamente en la primera sesión para asegurar una correcta adopción de los procesos.
+## 🎨 Tips de Personalización
+*   **Temas**: Cambia el color del sistema en el icono de la esquina superior. Usa el tema **"Corporativo"** para mostrar la pantalla a tus clientes.
+*   **Notas**: El área de notas tiene espacio extendido (300px) para que escribas todo lo que pactaste con el cliente.
 
 ---
-
-## 🚀 Sugerencias de Mejora (IA Advisor)
-
-Como asistente técnico, sugiero las siguientes optimizaciones de interfaz y funcionalidad para futuras versiones (enfocadas en frontend):
-
-1. **Gráficos de Rendimiento**: Integrar `shadcn/ui charts` para visualizar la tasa de conversión de prospectos a cierres directamente en el Dashboard.
-2. **Exportación Técnica**: Añadir un botón para descargar la base de datos local en formato CSV o JSON, permitiendo al ejecutivo llevar un respaldo físico en Excel.
-3. **Comparador de Escenarios**: Permitir guardar dos cotizaciones en la calculadora para mostrarlas lado a lado al cliente, facilitando la toma de decisiones.
-4. **Sistema de Alertas Visuales**: Implementar indicadores de color (badges) que parpadeen cuando una cita esté a menos de 15 minutos de comenzar.
-5. **Personalización de Marca**: Opción para que el ejecutivo cargue temporalmente el logo de su desarrollo inmobiliario específico para el "Modo Presentación".
+**Nota de Seguridad**: Tus datos se guardan **solo en este navegador**. No borres el historial ni el caché del navegador para no perder tus registros.
