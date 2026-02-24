@@ -197,7 +197,11 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
             { label: 'Prospectos Mes', value: stats.currentMonthProspects.toString(), icon: Users, color: 'text-accent' },
             { label: 'Ventas Mes', value: stats.currentMonthSales.toString(), icon: CheckCircle2, color: 'text-green-500' },
           ].map((stat, i) => (
-            <Card key={i} className="bg-card/30 backdrop-blur-md border-border/40 animate-periodic-glow">
+            <Card 
+              key={i} 
+              className="bg-card/30 backdrop-blur-md border-border/40 animate-periodic-glow"
+              style={{ animationDelay: `${i * 0.15}s` }}
+            >
               <CardContent className="p-4 flex items-center gap-3">
                 <div className={cn("p-2 rounded-full bg-muted/50", stat.color)}><stat.icon className="w-5 h-5" /></div>
                 <div>

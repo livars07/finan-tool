@@ -441,7 +441,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                     </div>
                     <span className="text-[10px] text-muted-foreground uppercase font-bold italic opacity-60">Impacto en el financiamiento</span>
                   </div>
-                  <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                     <div className="space-y-2">
                       <Label className="text-[10px] font-bold uppercase text-muted-foreground">Enganche Extra</Label>
                       <div className="relative">
@@ -472,13 +472,15 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                       <Label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1">
                         Plazo (Meses) <Calendar className="w-3 h-3" />
                       </Label>
-                      <Input 
-                        type="number" 
-                        placeholder="192" 
-                        className="bg-background h-10 text-sm border-primary/20 font-bold"
-                        value={customTerm}
-                        onChange={(e) => setCustomTerm(e.target.value)}
-                      />
+                      <div className="relative">
+                        <Input 
+                          type="number" 
+                          placeholder="192" 
+                          className="bg-background h-10 text-sm border-primary/20 font-bold"
+                          value={customTerm}
+                          onChange={(e) => setCustomTerm(e.target.value)}
+                        />
+                      </div>
                       <p className="text-[9px] text-muted-foreground">Altera el factor de mensualidad.</p>
                     </div>
                   </div>
@@ -575,15 +577,17 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                         <span className="text-[10px] uppercase font-bold text-muted-foreground">Inversión Inicial Total</span>
                         <p className="font-bold text-lg text-accent">{formatCurrency(totalInitialInvestment)}</p>
                       </div>
-                      <div className="space-y-1">
+                      <div className="col-span-2 pt-2 border-t border-accent/10">
                         <div className="flex items-center gap-1">
-                          <span className="text-[10px] uppercase font-bold text-muted-foreground">Saldo Líquido</span>
-                          <Tooltip>
-                            <TooltipTrigger asChild><Info className="w-3 h-3 text-muted-foreground/40 cursor-help" /></TooltipTrigger>
-                            <TooltipContent>Monto de crédito que queda disponible tras cubrir los gastos operativos.</TooltipContent>
-                          </Tooltip>
+                          <span className="text-[10px] uppercase font-bold text-accent flex items-center gap-1">
+                            Saldo Líquido
+                            <Tooltip>
+                              <TooltipTrigger asChild><Info className="w-3 h-3 text-muted-foreground/40 cursor-help" /></TooltipTrigger>
+                              <TooltipContent>Monto de crédito que queda disponible tras cubrir los gastos operativos.</TooltipContent>
+                            </Tooltip>
+                          </span>
                         </div>
-                        <p className="font-bold text-lg text-accent">{formatCurrency(netLiquidCredit)}</p>
+                        <p className="font-bold text-2xl text-accent">{formatCurrency(netLiquidCredit)}</p>
                       </div>
                     </div>
                   </div>
