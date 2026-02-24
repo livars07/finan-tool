@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -443,7 +444,9 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                   </div>
                   <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold uppercase text-muted-foreground">Enganche Extra</Label>
+                      <div className="h-4 flex items-center">
+                        <Label className="text-[10px] font-bold uppercase text-muted-foreground">Enganche Extra</Label>
+                      </div>
                       <div className="relative">
                          <span className="absolute left-3 top-2.5 text-xs text-muted-foreground">$</span>
                          <Input 
@@ -453,10 +456,12 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                           onChange={(e) => handleExtraDownChange(e.target.value)}
                         />
                       </div>
-                      <p className="text-[9px] text-muted-foreground">Descuenta el monto a financiar.</p>
+                      <p className="text-[9px] text-muted-foreground h-3">Descuenta el monto a financiar.</p>
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold uppercase text-muted-foreground">Aportación Extra Mensual</Label>
+                      <div className="h-4 flex items-center">
+                        <Label className="text-[10px] font-bold uppercase text-muted-foreground">Aportación Extra Mensual</Label>
+                      </div>
                       <div className="relative">
                          <span className="absolute left-3 top-2.5 text-xs text-muted-foreground">$</span>
                          <Input 
@@ -466,12 +471,12 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                           onChange={(e) => handleExtraMonthlyChange(e.target.value)}
                         />
                       </div>
-                      <p className="text-[9px] text-muted-foreground">Suma a la carga de pago mensual.</p>
+                      <p className="text-[9px] text-muted-foreground h-3">Suma a la carga de pago mensual.</p>
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1">
-                        Plazo (Meses) <Calendar className="w-3 h-3" />
-                      </Label>
+                      <div className="h-4 flex items-center">
+                        <Label className="text-[10px] font-bold uppercase text-muted-foreground">Plazo (Meses)</Label>
+                      </div>
                       <div className="relative">
                         <Input 
                           type="number" 
@@ -481,7 +486,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                           onChange={(e) => setCustomTerm(e.target.value)}
                         />
                       </div>
-                      <p className="text-[9px] text-muted-foreground">Altera el factor de mensualidad.</p>
+                      <p className="text-[9px] text-muted-foreground h-3">Altera el factor de mensualidad.</p>
                     </div>
                   </div>
                 </Card>
