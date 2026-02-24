@@ -419,7 +419,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
           </DialogHeader>
 
           <TooltipProvider>
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin">
               <section className="bg-muted/30 p-6 rounded-2xl border border-border/50 shadow-inner">
                 <CalculatorInputs 
                   isModal={true}
@@ -548,9 +548,11 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                   </div>
 
                   <div className="p-6 rounded-2xl border border-accent/20 bg-accent/5 space-y-4">
-                    <div className="flex items-center gap-2 text-accent">
-                      <Receipt className="w-5 h-5" />
-                      <h4 className="text-[10px] font-bold uppercase tracking-widest">Gastos Operativos e Inversión</h4>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-accent">
+                        <Receipt className="w-5 h-5" />
+                        <h4 className="text-[10px] font-bold uppercase tracking-widest">Gastos Operativos e Inversión</h4>
+                      </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">
@@ -577,7 +579,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                         <span className="text-[10px] uppercase font-bold text-muted-foreground">Inversión Inicial Total</span>
                         <p className="font-bold text-lg text-accent">{formatCurrency(totalInitialInvestment)}</p>
                       </div>
-                      <div className="col-span-2 pt-2 border-t border-accent/10">
+                      <div className="space-y-1 col-span-2 pt-2 border-t border-accent/10">
                         <div className="flex items-center gap-1">
                           <span className="text-[10px] uppercase font-bold text-accent flex items-center gap-1">
                             Saldo Líquido
