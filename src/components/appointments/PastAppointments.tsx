@@ -1,4 +1,3 @@
-
 "use client"
 
 import React from 'react';
@@ -26,7 +25,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { format, isToday, parseISO } from 'date-fns';
+import { format, isToday, parseISO, isBefore } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 interface Props {
@@ -136,9 +135,13 @@ export default function PastAppointments({
                 const isSelected = activeId === app.id;
                 const isCierre = app.status === 'Cierre' || app.status === 'Apartado';
                 const isCommissionPaid = isCierre && app.commissionStatus === 'Pagada';
-                const isCommissionOverdue = isCierre && app.commissionStatus !== 'Pagada';
-                const isArchiving = archivingIds.has(app.id);
+                const isPending = isCierre && app.commissionStatus !== 'Pagada';
                 
+                const paymentDate = getCommissionPaymentDate(app.date);
+                const isCommissionOverdue = isPending && isBefore(paymentDate, new Date());
+                const isCommissionUpcoming = isPending && !isCommissionOverdue;
+                
+                const isArchiving = archivingIds.has(app.id);
                 const commissionValue = (app.finalCreditAmount || 0) * 0.007 * ((app.commissionPercent || 0) / 100);
 
                 return (
@@ -257,7 +260,7 @@ export default function PastAppointments({
                                   <CheckCircle2 className="w-3 h-3" /> Comisión Liquidada
                                 </div>
                                 <div className="text-[10px] font-bold text-foreground">
-                                  Monto: {formatCurrency(commissionValue)}
+                                  Monto Ganado: {formatCurrency(commissionValue)}
                                 </div>
                                 <div className="text-[9px] text-muted-foreground">
                                   Participación: <span className="text-foreground font-bold">{app.commissionPercent}%</span>
@@ -273,8 +276,14 @@ export default function PastAppointments({
                         )}
 
                         {isCommissionOverdue && (
-                          <div title="Pago Pendiente">
+                          <div title="PAGO VENCIDO">
                             <ShieldAlert className="w-3.5 h-3.5 text-destructive animate-pulse" />
+                          </div>
+                        )}
+
+                        {isCommissionUpcoming && (
+                          <div title="Pago Pendiente (En Tiempo)">
+                            <ShieldAlert className="w-3.5 h-3.5 text-yellow-500" />
                           </div>
                         )}
                       </div>

@@ -1,15 +1,14 @@
-
 "use client"
 
 import React, { useState } from 'react';
-import { Appointment, AppointmentStatus } from '@/services/appointment-service';
+import { Appointment, AppointmentStatus, getCommissionPaymentDate } from '@/services/appointment-service';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { 
   Clock, Calendar, Info, CheckCircle2, AlertCircle, 
   CheckCircle, Trophy, PartyPopper, Sparkles, Copy, 
   ClipboardCheck, Phone, Box, ChevronRight, ShieldAlert, UserCog, Trash2
 } from "lucide-react";
-import { parseISO, isToday, addDays } from 'date-fns';
+import { parseISO, isToday, addDays, isBefore } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -229,8 +228,13 @@ export default function UpcomingAppointments({
                 {appointments.map((app) => {
                   const appToday = isActuallyToday(app.date);
                   const isSelected = activeId === app.id;
-                  const isCierre = app.status === 'Cierre';
-                  const isCommissionPending = isCierre && app.commissionStatus !== 'Pagada';
+                  const isCierreStatus = app.status === 'Cierre' || app.status === 'Apartado';
+                  const isCommissionPending = isCierreStatus && app.commissionStatus !== 'Pagada';
+                  
+                  const paymentDate = getCommissionPaymentDate(app.date);
+                  const isCommissionOverdue = isCommissionPending && isBefore(paymentDate, new Date());
+                  const isCommissionUpcoming = isCommissionPending && !isCommissionOverdue;
+                  
                   const isArchiving = archivingIds.has(app.id);
                   
                   return (
@@ -321,8 +325,13 @@ export default function UpcomingAppointments({
                               )}
                             </div>
                           )}
-                          {isCommissionPending && (
+                          {isCommissionOverdue && (
                             <div className="flex items-center gap-1 mt-1 text-[8px] font-bold text-destructive animate-pulse">
+                              <ShieldAlert className="w-2.5 h-2.5" /> PAGO VENCIDO
+                            </div>
+                          )}
+                          {isCommissionUpcoming && (
+                            <div className="flex items-center gap-1 mt-1 text-[8px] font-bold text-yellow-500">
                               <ShieldAlert className="w-2.5 h-2.5" /> PAGO PENDIENTE
                             </div>
                           )}
