@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -219,37 +220,43 @@ Número: *${appointment.phone}*`;
   // Edit Mode Date Helpers
   const setEditDateTomorrow = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const tomorrow = addDays(new Date(), 1).toISOString();
-    setEditData({...editData, date: tomorrow});
+    setEditData(prev => ({...prev, date: tomorrow}));
   };
 
   const setEditDateNextSaturday = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const nextSat = nextSaturday(new Date()).toISOString();
-    setEditData({...editData, date: nextSat});
+    setEditData(prev => ({...prev, date: nextSat}));
   };
 
   const setEditDateNextSunday = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const nextSun = nextSunday(new Date()).toISOString();
-    setEditData({...editData, date: nextSun});
+    setEditData(prev => ({...prev, date: nextSun}));
   };
 
   // Rescheduling Mode Date Helpers
   const setNewDateTomorrow = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const tomorrow = format(addDays(new Date(), 1), 'yyyy-MM-dd');
     setNewDate(tomorrow);
   };
 
   const setNewDateNextSaturday = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const nextSat = format(nextSaturday(new Date()), 'yyyy-MM-dd');
     setNewDate(nextSat);
   };
 
   const setNewDateNextSunday = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const nextSun = format(nextSunday(new Date()), 'yyyy-MM-dd');
     setNewDate(nextSun);
   };
@@ -434,7 +441,7 @@ Número: *${appointment.phone}*`;
                             variant="ghost" 
                             size="sm" 
                             className="justify-start h-8 text-xs font-semibold hover:bg-primary/10"
-                            onClick={setEditDateTomorrow}
+                            onMouseDown={setEditDateTomorrow}
                           >
                             <ArrowRight className="w-3 h-3 mr-2 text-primary" /> Mañana
                           </Button>
@@ -443,7 +450,7 @@ Número: *${appointment.phone}*`;
                             variant="ghost" 
                             size="sm" 
                             className="justify-start h-8 text-xs font-semibold hover:bg-blue-500/10 text-blue-500 hover:text-blue-600"
-                            onClick={setEditDateNextSaturday}
+                            onMouseDown={setEditDateNextSaturday}
                           >
                             <CalendarIcon className="w-3 h-3 mr-2" /> Sábado
                           </Button>
@@ -452,7 +459,7 @@ Número: *${appointment.phone}*`;
                             variant="ghost" 
                             size="sm" 
                             className="justify-start h-8 text-xs font-semibold hover:bg-orange-500/10 text-orange-600 hover:text-orange-700"
-                            onClick={setEditDateNextSunday}
+                            onMouseDown={setEditDateNextSunday}
                           >
                             <CalendarIcon className="w-3 h-3 mr-2" /> Domingo
                           </Button>
@@ -800,7 +807,7 @@ Número: *${appointment.phone}*`;
                         variant="ghost" 
                         size="sm" 
                         className="justify-start h-8 text-xs font-semibold hover:bg-primary/10"
-                        onClick={setNewDateTomorrow}
+                        onMouseDown={setNewDateTomorrow}
                       >
                         <ArrowRight className="w-3 h-3 mr-2 text-primary" /> Mañana
                       </Button>
@@ -809,7 +816,7 @@ Número: *${appointment.phone}*`;
                         variant="ghost" 
                         size="sm" 
                         className="justify-start h-8 text-xs font-semibold hover:bg-blue-500/10 text-blue-500 hover:text-blue-600"
-                        onClick={setNewDateNextSaturday}
+                        onMouseDown={setNewDateNextSaturday}
                       >
                         <CalendarIcon className="w-3 h-3 mr-2" /> Sábado
                       </Button>
@@ -818,7 +825,7 @@ Número: *${appointment.phone}*`;
                         variant="ghost" 
                         size="sm" 
                         className="justify-start h-8 text-xs font-semibold hover:bg-orange-500/10 text-orange-600 hover:text-orange-700"
-                        onClick={setNewDateNextSunday}
+                        onMouseDown={setNewDateNextSunday}
                       >
                         <CalendarIcon className="w-3 h-3 mr-2" /> Domingo
                       </Button>

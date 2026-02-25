@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -73,12 +74,14 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
 
   const setDateTomorrow = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const tomorrow = format(addDays(new Date(), 1), 'yyyy-MM-dd');
     setDate(tomorrow);
   };
 
   const setDateNextSaturday = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const today = new Date();
     const nextSat = format(nextSaturday(today), 'yyyy-MM-dd');
     setDate(nextSat);
@@ -86,6 +89,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
 
   const setDateNextSunday = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const today = new Date();
     const nextSun = format(nextSunday(today), 'yyyy-MM-dd');
     setDate(nextSun);
@@ -138,7 +142,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
                       variant="ghost" 
                       size="sm" 
                       className="justify-start h-8 text-xs font-semibold hover:bg-primary/10"
-                      onClick={setDateTomorrow}
+                      onMouseDown={setDateTomorrow}
                     >
                       <ArrowRight className="w-3 h-3 mr-2 text-primary" /> Mañana
                     </Button>
@@ -147,7 +151,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
                       variant="ghost" 
                       size="sm" 
                       className="justify-start h-8 text-xs font-semibold hover:bg-blue-500/10 text-blue-500 hover:text-blue-600"
-                      onClick={setDateNextSaturday}
+                      onMouseDown={setDateNextSaturday}
                     >
                       <CalendarIcon className="w-3 h-3 mr-2" /> Sábado
                     </Button>
@@ -156,7 +160,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
                       variant="ghost" 
                       size="sm" 
                       className="justify-start h-8 text-xs font-semibold hover:bg-orange-500/10 text-orange-600 hover:text-orange-700"
-                      onClick={setDateNextSunday}
+                      onMouseDown={setDateNextSunday}
                     >
                       <CalendarIcon className="w-3 h-3 mr-2" /> Domingo
                     </Button>
