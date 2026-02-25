@@ -2,7 +2,7 @@
 "use client"
 
 import React from 'react';
-import { Appointment, AppointmentStatus } from '@/services/appointment-service';
+import { Appointment, AppointmentStatus, getCommissionPaymentDate } from '@/services/appointment-service';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { 
   MessageSquare, 
@@ -12,7 +12,9 @@ import {
   FileText, 
   ChevronRight,
   ShieldAlert,
-  UserCog
+  UserCog,
+  CheckCircle2,
+  Info
 } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -24,6 +26,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 interface Props {
   appointments: Appointment[];
@@ -109,7 +113,7 @@ export default function PastAppointments({
           <Table className="border-collapse separate border-spacing-0">
             <TableHeader className="sticky top-0 z-30 bg-card shadow-sm border-b">
               <TableRow className="hover:bg-transparent">
-                <TableHead className={cn("bg-card", expanded ? "w-[180px]" : "")}>Nombre / Teléfono</TableHead>
+                <TableHead className={cn("bg-card pl-4", expanded ? "w-[180px]" : "")}>Nombre / Teléfono</TableHead>
                 {expanded && <TableHead className="bg-card w-[140px]">Contacto</TableHead>}
                 <TableHead className="bg-card">Motivo</TableHead>
                 {expanded && <TableHead className="bg-card">Producto</TableHead>}
@@ -123,7 +127,8 @@ export default function PastAppointments({
               {visibleAppointments.map((app) => {
                 const isSelected = activeId === app.id;
                 const isCierre = app.status === 'Cierre' || app.status === 'Apartado';
-                const isCommissionPending = isCierre && app.commissionStatus !== 'Pagada';
+                const isCommissionPaid = isCierre && app.commissionStatus === 'Pagada';
+                const isCommissionOverdue = isCierre && app.commissionStatus !== 'Pagada';
                 const isArchiving = archivingIds.has(app.id);
 
                 return (
@@ -132,11 +137,15 @@ export default function PastAppointments({
                     onClick={() => onSelect(app)}
                     className={cn(
                       "hover:bg-primary/10 transition-colors cursor-pointer relative h-16",
-                      isSelected && "bg-primary/20 border-l-4 border-l-primary z-20",
-                      isArchiving && "bg-destructive/20 border-l-destructive animate-pulse opacity-60 pointer-events-none"
+                      isSelected && "bg-primary/20 z-20",
+                      isArchiving && "bg-destructive/20 animate-pulse opacity-60 pointer-events-none"
                     )}
                   >
-                    <TableCell className="align-middle">
+                    <TableCell className={cn(
+                      "align-middle pl-4",
+                      isSelected && "border-l-4 border-l-primary",
+                      isArchiving && "border-l-4 border-l-destructive"
+                    )}>
                       <div className="flex items-center gap-2">
                         <div className="font-bold text-sm text-foreground">{app.name}</div>
                         {app.prospectorName && (
@@ -223,7 +232,33 @@ export default function PastAppointments({
                         )}>
                           {app.status || 'N/A'}
                         </div>
-                        {isCommissionPending && (
+                        
+                        {isCommissionPaid && (
+                          <TooltipProvider>
+                            <Tooltip delayDuration={0}>
+                              <TooltipTrigger asChild>
+                                <div className="p-1 bg-green-500/20 rounded-full border border-green-500/30 cursor-help">
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent className="bg-card border-green-500/20 p-3 space-y-1">
+                                <div className="flex items-center gap-2 text-green-500 font-bold text-[10px] uppercase tracking-widest">
+                                  <CheckCircle2 className="w-3 h-3" /> Comisión Liquidada
+                                </div>
+                                <div className="text-[9px] text-muted-foreground">
+                                  Participación: <span className="text-foreground font-bold">{app.commissionPercent}%</span>
+                                </div>
+                                <div className="text-[9px] text-muted-foreground">
+                                  Pagada el: <span className="text-foreground font-bold">
+                                    {format(getCommissionPaymentDate(app.date), "d 'de' MMMM", { locale: es })}
+                                  </span>
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
+
+                        {isCommissionOverdue && (
                           <div title="Pago Pendiente">
                             <ShieldAlert className="w-3.5 h-3.5 text-orange-500 animate-pulse" />
                           </div>
@@ -268,4 +303,3 @@ export default function PastAppointments({
     </div>
   );
 }
-

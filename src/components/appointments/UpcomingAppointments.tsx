@@ -216,7 +216,7 @@ export default function UpcomingAppointments({
             <Table className="border-collapse separate border-spacing-0">
               <TableHeader className="sticky top-0 z-30 bg-card shadow-sm border-b">
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className={cn("bg-card", expanded ? "w-[180px]" : "")}>Nombre / Teléfono</TableHead>
+                  <TableHead className={cn("bg-card pl-4", expanded ? "w-[180px]" : "")}>Nombre / Teléfono</TableHead>
                   {expanded && <TableHead className="bg-card w-[140px]">Contacto</TableHead>}
                   <TableHead className="bg-card">Motivo</TableHead>
                   {expanded && <TableHead className="bg-card">Producto</TableHead>}
@@ -239,12 +239,17 @@ export default function UpcomingAppointments({
                       onClick={() => onSelect(app)}
                       className={cn(
                         "hover:bg-primary/10 transition-colors cursor-pointer group relative h-16",
-                        appToday && "bg-primary/5 border-l-4 border-l-primary",
-                        isSelected && "bg-primary/20 border-l-4 border-l-primary z-10",
-                        isArchiving && "bg-destructive/20 border-l-destructive animate-pulse opacity-60 pointer-events-none"
+                        appToday && "bg-primary/5",
+                        isSelected && "bg-primary/20 z-10",
+                        isArchiving && "bg-destructive/20 animate-pulse opacity-60 pointer-events-none"
                       )}
                     >
-                      <TableCell className="align-middle">
+                      <TableCell className={cn(
+                        "align-middle pl-4",
+                        appToday && "border-l-4 border-l-primary",
+                        isSelected && !appToday && "border-l-4 border-l-primary/40",
+                        isArchiving && "border-l-4 border-l-destructive"
+                      )}>
                         <div className="flex items-center gap-2">
                           <div className="font-bold text-sm leading-tight text-foreground">{app.name}</div>
                           {app.prospectorName && (
@@ -477,4 +482,3 @@ export default function UpcomingAppointments({
     </div>
   );
 }
-
