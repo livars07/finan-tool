@@ -83,6 +83,18 @@ export default function PastAppointments({
     });
   };
 
+  const copyProspectorPhone = (e: React.MouseEvent, app: Appointment) => {
+    e.stopPropagation();
+    if (!app.prospectorPhone) return;
+    onHighlight(app);
+    navigator.clipboard.writeText(app.prospectorPhone).then(() => {
+      toast({
+        title: "Prospectador copiado",
+        description: `${app.prospectorName}: ${app.prospectorPhone} listo.`,
+      });
+    });
+  };
+
   const visibleAppointments = appointments.slice(0, visibleCount);
 
   return (
@@ -127,13 +139,16 @@ export default function PastAppointments({
                           <TooltipProvider>
                             <Tooltip delayDuration={0}>
                               <TooltipTrigger asChild>
-                                <div className="p-1 rounded-full bg-primary/10 text-primary cursor-help">
+                                <div 
+                                  className="p-1 rounded-full bg-primary/10 text-primary cursor-pointer hover:bg-primary/20 transition-colors"
+                                  onClick={(e) => copyProspectorPhone(e, app)}
+                                >
                                   <UserCog className="h-3 w-3" />
                                 </div>
                               </TooltipTrigger>
                               <TooltipContent side="top">
-                                <p className="text-[10px] font-bold uppercase">Prospectado por: {app.prospectorName}</p>
-                                {app.prospectorPhone && <p className="text-[9px] text-muted-foreground">{app.prospectorPhone}</p>}
+                                <p className="text-[10px] font-bold uppercase">Agendado por: {app.prospectorName}</p>
+                                {app.prospectorPhone && <p className="text-[9px] text-muted-foreground">Click para copiar: {app.prospectorPhone}</p>}
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>

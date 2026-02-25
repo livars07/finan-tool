@@ -77,14 +77,6 @@ export default function UpcomingAppointments({
 
   const isActuallyToday = (dateStr: string) => isToday(parseISO(dateStr));
 
-  const isActuallyTomorrow = (dateStr: string) => {
-    const d = parseISO(dateStr);
-    const tomorrow = addDays(new Date(), 1);
-    return d.getDate() === tomorrow.getDate() && 
-           d.getMonth() === tomorrow.getMonth() && 
-           d.getFullYear() === tomorrow.getFullYear();
-  };
-
   const handleConfirmAction = () => {
     if (confirmId) {
       const app = appointments.find(a => a.id === confirmId);
@@ -144,6 +136,18 @@ export default function UpcomingAppointments({
       toast({
         title: "Número copiado",
         description: `${app.name}: ${app.phone} listo para usar.`,
+      });
+    });
+  };
+
+  const copyProspectorPhone = (e: React.MouseEvent, app: Appointment) => {
+    e.stopPropagation();
+    if (!app.prospectorPhone) return;
+    onHighlight(app);
+    navigator.clipboard.writeText(app.prospectorPhone).then(() => {
+      toast({
+        title: "Prospectador copiado",
+        description: `${app.prospectorName}: ${app.prospectorPhone} listo.`,
       });
     });
   };
@@ -241,13 +245,16 @@ export default function UpcomingAppointments({
                             <TooltipProvider>
                               <Tooltip delayDuration={0}>
                                 <TooltipTrigger asChild>
-                                  <div className="p-1 rounded-full bg-primary/10 text-primary cursor-help">
+                                  <div 
+                                    className="p-1 rounded-full bg-primary/10 text-primary cursor-pointer hover:bg-primary/20 transition-colors"
+                                    onClick={(e) => copyProspectorPhone(e, app)}
+                                  >
                                     <UserCog className="h-3 w-3" />
                                   </div>
                                 </TooltipTrigger>
                                 <TooltipContent side="top">
-                                  <p className="text-[10px] font-bold uppercase">Prospectado por: {app.prospectorName}</p>
-                                  {app.prospectorPhone && <p className="text-[9px] text-muted-foreground">{app.prospectorPhone}</p>}
+                                  <p className="text-[10px] font-bold uppercase">Agendado por: {app.prospectorName}</p>
+                                  {app.prospectorPhone && <p className="text-[9px] text-muted-foreground">Click para copiar: {app.prospectorPhone}</p>}
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -298,7 +305,7 @@ export default function UpcomingAppointments({
                                   <CheckCircle className="w-2.5 h-2.5" /> Confirmada
                                 </div>
                               ) : (
-                                <Button variant="outline" size="sm" className="h-5 px-2 text-[8px] font-bold border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10" onClick={() => setConfirmId(app.id)}>
+                                <Button variant="outline" size="sm" className="h-5 px-2 text-[8px] font-bold border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10" onClick={() => setConfirmId(app.id)} onOpenAutoFocus={(e) => e.preventDefault()}>
                                   <AlertCircle className="w-2.5 h-2.5 mr-1" /> Confirmar
                                 </Button>
                               )}
@@ -398,7 +405,7 @@ export default function UpcomingAppointments({
             </div>
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setFinId(null)} className="h-9 text-xs">Volver</Button>
+            <Button variant="outline" onClick={() => setFinId(null)} className="h-9 text-xs" onOpenAutoFocus={(e) => e.preventDefault()}>Volver</Button>
             <Button onClick={handleFinalize} className={cn("h-9 text-xs font-bold shadow-lg", status === 'Cierre' ? "bg-green-600 hover:bg-green-700 text-white" : "bg-primary text-primary-foreground")}>
               {status === 'Cierre' ? 'Confirmar Venta' : 'Cerrar Consulta'}
             </Button>
@@ -452,7 +459,7 @@ export default function UpcomingAppointments({
             <AlertDialogDescription className="text-muted-foreground">Marcarás esta cita como confirmada para el día de hoy.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Volver</AlertDialogCancel>
+            <AlertDialogCancel onOpenAutoFocus={(e) => e.preventDefault()}>Volver</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmAction} className="bg-green-600 hover:bg-green-700 text-white font-bold">Sí, confirmar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

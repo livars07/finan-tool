@@ -21,7 +21,7 @@ import {
 import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct } from '@/services/appointment-service';
 import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Percent, Coins, CalendarDays, UserCog, ChevronDown } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
-import { parseISO, format, getDay, addDays } from 'date-fns';
+import { parseISO, format, getDay, addDays, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import {
@@ -122,6 +122,16 @@ export default function AppointmentDetailsDialog({
     });
   };
 
+  const copyProspectorPhone = () => {
+    if (!appointment.prospectorPhone) return;
+    navigator.clipboard.writeText(appointment.prospectorPhone).then(() => {
+      toast({
+        title: "Contacto de prospectador",
+        description: `${appointment.prospectorName}: ${appointment.prospectorPhone} copiado.`,
+      });
+    });
+  };
+
   const copyToWhatsAppFormat = () => {
     const dateObj = parseISO(appointment.date);
     const dateFormatted = format(dateObj, "EEEE d 'de' MMMM yyyy", { locale: es });
@@ -204,12 +214,17 @@ Número: *${appointment.phone}*`;
   };
 
   const isCierre = appointment.status === 'Cierre';
+  const daysSinceStart = differenceInDays(new Date(), parseISO(appointment.date));
 
   return (
     <>
       <Dialog open={open} onOpenChange={(o) => { 
-        if(!o) setIsEditing(false);
-        onOpenChange(o); 
+        if(!o) {
+          setIsEditing(false);
+          onOpenChange(false);
+        } else {
+          onOpenChange(true);
+        }
       }}>
         <DialogContent 
           onOpenAutoFocus={(e) => e.preventDefault()}
@@ -230,6 +245,7 @@ Número: *${appointment.phone}*`;
                   </TooltipTrigger>
                   <TooltipContent side="right">
                     <p className="text-[10px] font-mono uppercase tracking-widest">ID: {appointment.id}</p>
+                    <p className="text-[9px] text-muted-foreground mt-1">Días en seguimiento: {daysSinceStart}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -247,7 +263,7 @@ Número: *${appointment.phone}*`;
                   Copiar datos
                 </Button>
               )}
-              <DialogClose className="h-7 w-7 flex items-center justify-center rounded-full bg-destructive/10 text-destructive hover:bg-destructive transition-colors group backdrop-blur-md border border-destructive/20">
+              <DialogClose className="h-7 w-7 flex items-center justify-center rounded-full bg-destructive/10 text-destructive hover:bg-destructive transition-colors group backdrop-blur-md border border-destructive/20" onOpenAutoFocus={(e) => e.preventDefault()}>
                 <span className="text-[10px] font-bold group-hover:text-white">✕</span>
               </DialogClose>
             </div>
@@ -433,11 +449,11 @@ Número: *${appointment.phone}*`;
                 </div>
 
                 {appointment.prospectorName && (
-                  <div className="flex items-center gap-3 border-t border-border/10 pt-3">
-                    <div className="p-2 bg-primary/10 rounded-lg"><UserCog className="w-4 h-4 text-primary" /></div>
+                  <div onClick={copyProspectorPhone} className="flex items-center gap-3 border-t border-border/10 pt-3 cursor-pointer group/prospector">
+                    <div className="p-2 bg-primary/10 rounded-lg group-hover/prospector:bg-primary/20 transition-colors"><UserCog className="w-4 h-4 text-primary" /></div>
                     <div>
                       <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Agendado por</p>
-                      <p className="text-xs font-bold text-primary">
+                      <p className="text-xs font-bold text-primary group-hover/prospector:underline">
                         {appointment.prospectorName} {appointment.prospectorPhone ? `(${appointment.prospectorPhone})` : ''}
                       </p>
                     </div>
@@ -513,7 +529,7 @@ Número: *${appointment.phone}*`;
                   </div>
                   <div className="space-y-1">
                     <div className="flex items-center gap-1">
-                      <Label className="text-[9px] font-bold uppercase text-muted-foreground">Comisión</Label>
+                      <Label className="text-[9px] font-bold uppercase text-muted-foreground">Participación %</Label>
                       <TooltipProvider>
                         <Tooltip delayDuration={0}>
                           <TooltipTrigger asChild>
