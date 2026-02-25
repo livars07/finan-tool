@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -15,16 +14,11 @@ import {
   Maximize2, 
   X, 
   LayoutDashboard,
-  Target,
   CheckCircle2,
   CalendarDays,
   TrendingUp,
   Coins,
-  ArrowRight,
-  Info,
-  ArrowUpRight,
-  ArrowDownRight,
-  Trash2
+  ArrowRight
 } from 'lucide-react';
 import { Appointment, AppointmentStatus } from '@/services/appointment-service';
 import { parseISO, format } from 'date-fns';
@@ -64,8 +58,6 @@ interface DashboardContentProps {
   visibleCountPast: number;
   setVisibleCountPast: (count: number | ((prev: number) => number)) => void;
   stats: any;
-  archivingIds: Set<string>;
-  onOpenTrash: () => void;
 }
 
 const DashboardContent = ({ 
@@ -84,9 +76,7 @@ const DashboardContent = ({
   activeId,
   visibleCountPast,
   setVisibleCountPast,
-  stats,
-  archivingIds,
-  onOpenTrash
+  stats
 }: DashboardContentProps) => (
   <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
     <div className={cn("flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 shrink-0", expanded && "bg-muted/10 p-6 rounded-2xl border border-border/30 backdrop-blur-md")}>
@@ -107,7 +97,7 @@ const DashboardContent = ({
 
       {expanded && (
         <TooltipProvider delayDuration={0}>
-          <div className="grid grid-cols-3 md:grid-cols-5 gap-6 items-center flex-1 ml-0 sm:ml-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 items-center flex-1 ml-0 sm:ml-8">
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex flex-col items-center sm:items-start group cursor-help">
@@ -153,23 +143,7 @@ const DashboardContent = ({
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex flex-col items-center sm:items-start group cursor-help">
-                  <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-green-500 transition-colors">Cierres Mes</span>
-                  <div className="flex flex-col items-center sm:items-start">
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-green-500/10 text-green-500 border border-green-500/20"><CheckCircle2 className="w-3.5 h-3.5"/></div>
-                      <span className="text-sm font-bold text-foreground">{stats.currentMonthSales}</span>
-                    </div>
-                  </div>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-xs">Número de trámites concretados con éxito comparado con el mes pasado.</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="hidden md:flex flex-col items-center sm:items-start group cursor-help">
-                  <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-primary transition-colors">Conversión Mes</span>
+                  <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-green-500 transition-colors">Conversión Mes</span>
                   <div className="flex items-center gap-2">
                     <div className="p-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20"><TrendingUp className="w-3.5 h-3.5"/></div>
                     <span className="text-sm font-bold text-foreground">{stats.conversionRate}%</span>
@@ -177,7 +151,7 @@ const DashboardContent = ({
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p className="text-xs">Efectividad de ventas este mes comparado con el anterior.</p>
+                <p className="text-xs">Efectividad de ventas este mes.</p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -198,7 +172,6 @@ const DashboardContent = ({
           toggleConfirmation={toggleConfirmation}
           activeId={activeId}
           expanded={expanded}
-          archivingIds={archivingIds}
         />
       </TabsContent>
       <TabsContent value="past" className="mt-0 h-full">
@@ -212,7 +185,6 @@ const DashboardContent = ({
           expanded={expanded}
           visibleCount={visibleCountPast}
           setVisibleCount={setVisibleCountPast}
-          archivingIds={archivingIds}
         />
       </TabsContent>
     </div>
@@ -223,11 +195,9 @@ interface AppointmentsDashboardProps {
   appointments: Appointment[];
   upcoming: Appointment[];
   past: Appointment[];
-  archivingIds: Set<string>;
   addAppointment: (app: any) => void;
   updateStatus: (id: string, status: AppointmentStatus, notes?: string) => void;
   editAppointment: (id: string, data: Partial<Appointment>) => void;
-  archiveAppointment: (id: string) => void;
   toggleConfirmation: (id: string) => void;
   formatFriendlyDate: (date: string) => string;
   format12hTime: (time: string) => string;
@@ -235,28 +205,22 @@ interface AppointmentsDashboardProps {
   onExpandedChange?: (expanded: boolean) => void;
   selectedAppId: string | null;
   onSelectAppId: (id: string | null) => void;
-  onOpenTrash: () => void;
-  archivedCount: number;
 }
 
 export default function AppointmentsDashboard({
   appointments,
   upcoming,
   past,
-  archivingIds,
   addAppointment,
   updateStatus,
   editAppointment,
-  archiveAppointment,
   toggleConfirmation,
   formatFriendlyDate,
   format12hTime,
   initialExpanded = false,
   onExpandedChange,
   selectedAppId,
-  onSelectAppId,
-  onOpenTrash,
-  archivedCount
+  onSelectAppId
 }: AppointmentsDashboardProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -369,24 +333,6 @@ export default function AppointmentsDashboard({
                     <Button 
                       variant="ghost" 
                       size="icon" 
-                      onClick={onOpenTrash}
-                      className="h-9 w-9 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all relative"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      {archivedCount > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-destructive text-white text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
-                          {archivedCount}
-                        </span>
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Papelera de Citas</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
                       onClick={() => setIsExpanded(true)}
                       className="h-9 w-9 rounded-lg text-muted-foreground/60 hover:text-blue-600 hover:bg-blue-600/10 transition-all border border-transparent hover:border-blue-600/20"
                     >
@@ -411,12 +357,10 @@ export default function AppointmentsDashboard({
               handleHighlight={handleHighlight}
               updateStatus={updateStatus}
               toggleConfirmation={toggleConfirmation}
-              onOpenTrash={onOpenTrash}
               activeId={activeId}
               visibleCountPast={visibleCountPast}
               setVisibleCountPast={setVisibleCountPast}
               stats={stats}
-              archivingIds={archivingIds}
             />
           </CardContent>
         </Card>
@@ -447,19 +391,6 @@ export default function AppointmentsDashboard({
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={onOpenTrash}
-                className="h-10 w-10 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all relative"
-              >
-                <Trash2 className="w-5 h-5" />
-                {archivedCount > 0 && (
-                  <span className="absolute top-0 right-0 bg-destructive text-white text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
-                    {archivedCount}
-                  </span>
-                )}
-              </Button>
               <DialogClose asChild>
                 <Button variant="ghost" size="icon" className="rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors h-10 w-10">
                   <X className="w-5 h-5" />
@@ -481,12 +412,10 @@ export default function AppointmentsDashboard({
               handleHighlight={handleHighlight}
               updateStatus={updateStatus}
               toggleConfirmation={toggleConfirmation}
-              onOpenTrash={onOpenTrash}
               activeId={activeId}
               visibleCountPast={visibleCountPast}
               setVisibleCountPast={setVisibleCountPast}
               stats={stats}
-              archivingIds={archivingIds}
             />
           </div>
         </DialogContent>
@@ -498,7 +427,6 @@ export default function AppointmentsDashboard({
         onOpenChange={(o) => !o && onSelectAppId(null)}
         onEdit={editAppointment}
         onAdd={addAppointment}
-        onArchive={archiveAppointment}
         formatFriendlyDate={formatFriendlyDate}
         format12hTime={format12hTime}
       />

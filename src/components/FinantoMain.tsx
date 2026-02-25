@@ -1,17 +1,15 @@
-
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import CreditCalculator from '@/components/calculator/CreditCalculator';
 import AppointmentsDashboard from '@/components/appointments/AppointmentsDashboard';
-import TrashDialog from '@/components/appointments/TrashDialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
-  Wallet, CalendarDays, Users, CheckCircle2, ShieldCheck, TrendingUp, RotateCcw,
-  Palette, Moon, Sun, Cpu, Phone, BookOpen, Info, Calculator, Maximize2, Sparkles, History,
-  ClipboardList, Target, Calendar, Copy, Crown, Zap, Snowflake, Trash2, Rocket, ShieldAlert,
-  Smartphone, MessageSquare, CalendarClock, Coins, Star, ArrowUpRight, ArrowDownRight,
-  HandCoins, CheckCircle, Search, BadgeAlert, MoreHorizontal, Settings2
+  Wallet, CalendarDays, Users, CheckCircle2, ShieldCheck, RotateCcw,
+  Palette, Moon, Sun, Cpu, BookOpen, Calculator, Maximize2, Sparkles,
+  ClipboardList, Calendar, Copy, Crown, Snowflake, Trash2, Rocket, 
+  MessageSquare, CalendarClock, HandCoins, CheckCircle, Search, BadgeAlert, 
+  MoreHorizontal, ArrowUpRight, ArrowDownRight, Coins
 } from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
 import { Button } from '@/components/ui/button';
@@ -75,15 +73,12 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const appointmentState = useAppointments();
   const { 
     appointments, stats, isLoaded, resetData, clearAll, 
-    updateStatus, editAppointment, archiveAppointment, 
-    restoreAppointment, deletePermanent, archivingIds,
-    archived
+    updateStatus, editAppointment, upcoming, past
   } = appointmentState;
   
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showHelp, setShowHelp] = useState(initialSection === 'guia');
-  const [showTrash, setShowTrash] = useState(false);
   const [isSimulatorExpanded, setIsSimulatorExpanded] = useState(initialSection === 'simulador');
   const [isGestorExpanded, setIsGestorExpanded] = useState(initialSection === 'gestor');
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
@@ -91,7 +86,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [timerKey, setTimerKey] = useState(0);
   
-  // Estados para el motor de comisiones
   const [pendingCommissionApp, setPendingCommissionApp] = useState<Service.Appointment | null>(null);
   const shownCommissionIds = useRef<Set<string>>(new Set());
   const overdueQueue = useRef<Service.Appointment[]>([]);
@@ -188,10 +182,9 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       const overdueCommissions = currentApps.filter(app => {
         const isSalesStatus = app.status === 'Cierre' || app.status === 'Apartado';
         const isPending = (app.commissionStatus || 'Pendiente') === 'Pendiente';
-        const notArchived = !app.isArchived;
         const notShownYet = !shownCommissionIds.current.has(app.id);
         
-        if (!isSalesStatus || !isPending || !notArchived || !notShownYet) return false;
+        if (!isSalesStatus || !isPending || !notShownYet) return false;
 
         const paymentDate = Service.getCommissionPaymentDate(app.date);
         return isBefore(paymentDate, today);
@@ -274,6 +267,14 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
 
   if (!isLoaded) return null;
 
+  const formatCurrency = (val: number) => {
+    return new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency: 'MXN',
+      maximumFractionDigits: 0
+    }).format(val);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
       <header className="border-b border-border/40 sticky top-0 z-50 backdrop-blur-[12px] bg-card/10 shrink-0">
@@ -331,7 +332,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       </header>
 
       <main className="flex-1 container mx-auto px-4 py-6 md:py-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           {[
             { label: 'Citas hoy', value: stats.todayCount.toString(), icon: CalendarDays, color: 'text-primary' },
             { label: 'Pendientes', value: stats.pendingCount.toString(), icon: Wallet, color: 'text-primary' },
@@ -349,6 +350,14 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
               color: 'text-green-500',
               comparison: stats.lastMonthSales
             },
+            { 
+              label: 'Comisiones Mes', 
+              value: formatCurrency(stats.currentMonthCommission), 
+              icon: Coins, 
+              color: 'text-yellow-500',
+              comparison: stats.lastMonthCommission,
+              isCurrency: true
+            },
           ].map((stat, i) => (
             <Card 
               key={i} 
@@ -357,15 +366,26 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
             >
               <CardContent className="p-4 flex items-center gap-3">
                 <div className={cn("p-2 rounded-full bg-muted/50", stat.color)}><stat.icon className="w-5 h-5" /></div>
-                <div className="flex-1">
-                  <p className="text-[10px] uppercase font-bold text-muted-foreground">{stat.label}</p>
+                <div className="flex-1 overflow-hidden">
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground truncate">{stat.label}</p>
                   <div className="flex items-baseline gap-2">
-                    <p className="text-xl font-bold">{stat.value}</p>
+                    <p className="text-lg font-bold truncate">{stat.value}</p>
                     {stat.comparison !== undefined && (
-                      <span className="text-[9px] font-bold flex items-center whitespace-nowrap text-muted-foreground/40">
-                        {parseInt(stat.value) > stat.comparison ? <ArrowUpRight className="w-2.5 h-2.5 mr-0.5" /> : parseInt(stat.value) < stat.comparison ? <ArrowDownRight className="w-2.5 h-2.5 mr-0.5" /> : null}
-                        {stat.comparison} <span className="ml-1 font-medium text-muted-foreground/30">mes pasado</span>
-                      </span>
+                      <div className="flex flex-col">
+                        <span className="text-[8px] font-bold flex items-center whitespace-nowrap text-muted-foreground/40">
+                          {stat.isCurrency ? (
+                             <>
+                               {stats.currentMonthCommission > stats.lastMonthCommission ? <ArrowUpRight className="w-2.5 h-2.5 mr-0.5" /> : <ArrowDownRight className="w-2.5 h-2.5 mr-0.5" />}
+                               {formatCurrency(stat.comparison)}
+                             </>
+                          ) : (
+                            <>
+                              {parseInt(stat.value) > stat.comparison ? <ArrowUpRight className="w-2.5 h-2.5 mr-0.5" /> : parseInt(stat.value) < stat.comparison ? <ArrowDownRight className="w-2.5 h-2.5 mr-0.5" /> : null}
+                              {stat.comparison}
+                            </>
+                          )}
+                        </span>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -407,19 +427,15 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
               onExpandedChange={setIsGestorExpanded}
               selectedAppId={selectedAppId}
               onSelectAppId={setSelectedAppId}
-              onOpenTrash={() => setShowTrash(true)}
               appointments={appointmentState.appointments} 
               upcoming={appointmentState.upcoming} 
               past={appointmentState.past} 
-              archivingIds={appointmentState.archivingIds}
               addAppointment={appointmentState.addAppointment} 
               updateStatus={appointmentState.updateStatus} 
               editAppointment={appointmentState.editAppointment} 
-              archiveAppointment={appointmentState.archiveAppointment}
               toggleConfirmation={appointmentState.toggleConfirmation} 
               formatFriendlyDate={appointmentState.formatFriendlyDate} 
               format12hTime={appointmentState.format12hTime} 
-              archivedCount={archived.length}
             />
           </section>
         </div>
@@ -540,15 +556,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   </ul>
                 </div>
               </section>
-              <div className="p-6 border border-destructive/20 rounded-2xl bg-destructive/5 flex items-start gap-4">
-                <ShieldAlert className="w-6 h-6 text-destructive shrink-0 mt-1" />
-                <div className="space-y-1">
-                  <h4 className="text-sm font-bold text-destructive">Nota Importante de Seguridad</h4>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Tus datos se guardan <strong>solo en este navegador</strong>. No borres el caché o historial si no quieres perder tus registros. Contacta a Olivares para dudas técnicas.
-                  </p>
-                </div>
-              </div>
             </div>
           </ScrollArea>
           <DialogFooter className="p-4 border-t bg-muted/20">
@@ -622,16 +629,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      <TrashDialog 
-        open={showTrash} 
-        onOpenChange={setShowTrash}
-        archivedAppointments={archived}
-        onRestore={restoreAppointment}
-        onDelete={deletePermanent}
-        formatDate={appointmentState.formatFriendlyDate}
-        format12hTime={appointmentState.format12hTime}
-      />
     </div>
   );
 }

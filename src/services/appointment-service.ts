@@ -1,4 +1,3 @@
-
 /**
  * @fileOverview Servicio de Gestión de Datos - Finanto
  * 
@@ -91,7 +90,6 @@ export const getFromDisk = (): Appointment[] => {
   if (!rawData) return [];
   try {
     const parsed = JSON.parse(rawData) as Appointment[];
-    // Asegurar que isArchived exista por defecto como false
     return parsed.map(app => ({ ...app, isArchived: app.isArchived ?? false }));
   } catch (e) {
     return [];
@@ -183,12 +181,12 @@ export const generateSeedData = (): Appointment[] => {
     return base.toString().substring(0, 10);
   };
 
-  // 30 Citas Próximas (Variedad de fechas y prospectadores)
+  // 30 Citas Próximas
   for (let i = 0; i < 30; i++) {
     let appDate;
-    if (i < 6) appDate = now; // Hoy
-    else if (i < 12) appDate = addDays(now, 1); // Mañana
-    else appDate = addDays(now, (i % 7) + 2); // Próximos días
+    if (i < 6) appDate = now; 
+    else if (i < 12) appDate = addDays(now, 1);
+    else appDate = addDays(now, (i % 7) + 2);
     
     const isTodayApp = isToday(appDate);
     
@@ -208,7 +206,7 @@ export const generateSeedData = (): Appointment[] => {
     });
   }
 
-  // 30 Citas Pasadas (Historial con Cierres, Comisiones y Prospectadores)
+  // 30 Citas Pasadas
   for (let i = 0; i < 30; i++) {
     const pastDate = i < 5 ? subDays(now, 1) : i < 15 ? subDays(now, (i % 14) + 2) : subMonths(now, 1);
     const globalIndex = i + 30;
@@ -227,7 +225,6 @@ export const generateSeedData = (): Appointment[] => {
       isConfirmed: true,
       isArchived: false,
       notes: isSale ? `Venta exitosa. Expediente completo enviado a notaría.` : `Seguimiento de ${products[i % products.length]}.`,
-      // Lógica de comisiones específica: 300k a 2M, 50% o 100%
       commissionStatus: isSale ? (i % 2 === 0 ? 'Pagada' : 'Pendiente') : undefined,
       commissionPercent: isSale ? (i % 3 === 0 ? 50 : 100) : undefined,
       finalCreditAmount: isSale ? Math.floor(300000 + Math.random() * 1700000) : undefined,
@@ -255,6 +252,14 @@ export const calculateStats = (appointments: Appointment[]) => {
   const lastMonthProspects = activeApps.filter(a => isSameMonth(parseISO(a.date), lastMonth)).length;
   const lastMonthSales = activeApps.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), lastMonth)).length;
 
+  const currentMonthCommission = activeApps
+    .filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), now))
+    .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
+
+  const lastMonthCommission = activeApps
+    .filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), lastMonth))
+    .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
+
   const todayTotal = activeApps.filter(a => isToday(parseISO(a.date))).length;
   const todayConfirmed = activeApps.filter(a => isToday(parseISO(a.date)) && a.isConfirmed).length;
   const tomorrowTotal = activeApps.filter(a => {
@@ -264,7 +269,6 @@ export const calculateStats = (appointments: Appointment[]) => {
   }).length;
 
   const conversionRate = currentMonthProspects > 0 ? (currentMonthSales / currentMonthProspects) * 100 : 0;
-  const lastMonthConversionRate = lastMonthProspects > 0 ? (lastMonthSales / lastMonthProspects) * 100 : 0;
 
   return {
     todayCount: todayTotal,
@@ -279,7 +283,8 @@ export const calculateStats = (appointments: Appointment[]) => {
     currentMonthSales,
     currentMonthApartados,
     lastMonthSales,
+    currentMonthCommission,
+    lastMonthCommission,
     conversionRate: parseFloat(conversionRate.toFixed(1)),
-    lastMonthConversionRate: parseFloat(lastMonthConversionRate.toFixed(1)),
   };
 };

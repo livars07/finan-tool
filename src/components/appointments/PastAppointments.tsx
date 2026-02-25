@@ -12,8 +12,7 @@ import {
   ChevronRight,
   ShieldAlert,
   UserCog,
-  CheckCircle2,
-  Info
+  CheckCircle2
 } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -38,7 +37,6 @@ interface Props {
   expanded?: boolean;
   visibleCount: number;
   setVisibleCount: (count: number | ((prev: number) => number)) => void;
-  archivingIds?: Set<string>;
 }
 
 export default function PastAppointments({ 
@@ -50,8 +48,7 @@ export default function PastAppointments({
   activeId, 
   expanded = false,
   visibleCount,
-  setVisibleCount,
-  archivingIds = new Set()
+  setVisibleCount
 }: Props) {
   const { toast } = useToast();
 
@@ -141,7 +138,6 @@ export default function PastAppointments({
                 const isCommissionOverdue = isPending && isBefore(paymentDate, new Date());
                 const isCommissionUpcoming = isPending && !isCommissionOverdue;
                 
-                const isArchiving = archivingIds.has(app.id);
                 const commissionValue = (app.finalCreditAmount || 0) * 0.007 * ((app.commissionPercent || 0) / 100);
 
                 return (
@@ -151,14 +147,10 @@ export default function PastAppointments({
                     className={cn(
                       "hover:bg-primary/10 transition-colors cursor-pointer relative h-16",
                       appToday && "bg-primary/10",
-                      isSelected && "bg-primary/20 z-20",
-                      isArchiving && "bg-destructive/20 animate-pulse opacity-60 pointer-events-none"
+                      isSelected && "bg-primary/20 z-20"
                     )}
                   >
-                    <TableCell className={cn(
-                      "align-middle pl-4",
-                      isArchiving && "border-l-4 border-l-destructive"
-                    )}>
+                    <TableCell className="align-middle pl-4">
                       <div className="flex items-center gap-2">
                         {appToday && <div className="w-2.5 h-2.5 rounded-full bg-primary shrink-0 animate-pulse shadow-[0_0_8px_hsl(var(--primary))]" title="Cita para hoy" />}
                         <div className="font-bold text-sm text-foreground">{app.name}</div>

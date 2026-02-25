@@ -1,10 +1,9 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
 import { 
   Dialog, DialogContent, DialogHeader, DialogTitle, 
-  DialogFooter, DialogClose, DialogDescription
+  DialogFooter, DialogClose
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,18 +17,8 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { 
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct, getCommissionPaymentDate } from '@/services/appointment-service';
-import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Percent, Coins, CalendarDays, UserCog, ChevronDown, Calendar as CalendarIcon, ArrowRight, History as HistoryIcon, Plus, Trash2 } from 'lucide-react';
+import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Coins, CalendarDays, UserCog, ChevronDown, History as HistoryIcon } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format, getDay, addDays, isToday, isTomorrow, isYesterday, differenceInCalendarDays, startOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -40,7 +29,6 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface Props {
   appointment: Appointment | null;
@@ -48,7 +36,6 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   onEdit: (id: string, data: Partial<Appointment>) => void;
   onAdd: (app: Omit<Appointment, 'id'>) => void;
-  onArchive?: (id: string) => void;
   formatFriendlyDate: (date: string) => string;
   format12hTime: (time: string) => string;
 }
@@ -59,12 +46,10 @@ export default function AppointmentDetailsDialog({
   onOpenChange, 
   onEdit,
   onAdd,
-  onArchive,
   format12hTime
 }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [isRescheduling, setIsRescheduling] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showEditProspector, setShowEditProspector] = useState(false);
   const [editData, setEditData] = useState<Partial<Appointment>>({});
   
@@ -124,19 +109,6 @@ export default function AppointmentDetailsDialog({
 
     setIsRescheduling(false);
     toast({ title: "Cita Agendada", description: `Nueva cita de ${newType} registrada para ${newName}.` });
-  };
-
-  const handleDelete = () => {
-    if (onArchive) {
-      onArchive(appointment.id);
-      setShowDeleteConfirm(false);
-      onOpenChange(false);
-      toast({
-        variant: "destructive",
-        title: "Cita movida a la papelera",
-        description: `Se iniciará el archivado de ${appointment.name}. Desaparecerá en 5s.`,
-      });
-    }
   };
 
   const copyPhoneOnly = () => {
@@ -202,7 +174,6 @@ Número: *${appointment.phone}*`;
     const newStatus = checked ? 'Pagada' : 'Pendiente';
     const updates: Partial<Appointment> = { commissionStatus: newStatus };
     
-    // Regla de negocio: Si se paga la comisión de un apartado, se convierte en Cierre
     if (checked && editData.status === 'Apartado') {
       updates.status = 'Cierre';
     }
@@ -248,32 +219,6 @@ Número: *${appointment.phone}*`;
     headerTimeText = `Han pasado ${Math.abs(diffCalendar)} ${Math.abs(diffCalendar) === 1 ? 'día' : 'días'} desde la cita`;
   }
 
-  const setDateTomorrow = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const tomorrow = format(addDays(new Date(), 1), 'yyyy-MM-dd');
-    if (isEditing) setEditData({...editData, date: new Date(tomorrow + 'T12:00:00Z').toISOString()});
-    else setNewDate(tomorrow);
-  };
-
-  const setDateNextSaturday = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const today = new Date();
-    const nextSat = format(addDays(today, (6 - getDay(today) + 7) % 7 || 7), 'yyyy-MM-dd');
-    if (isEditing) setEditData({...editData, date: new Date(nextSat + 'T12:00:00Z').toISOString()});
-    else setNewDate(nextSat);
-  };
-
-  const setDateNextSunday = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const today = new Date();
-    const nextSun = format(addDays(today, (7 - getDay(today) + 7) % 7 || 7), 'yyyy-MM-dd');
-    if (isEditing) setEditData({...editData, date: new Date(nextSun + 'T12:00:00Z').toISOString()});
-    else setNewDate(nextSun);
-  };
-
   return (
     <>
       <Dialog open={open} onOpenChange={(o) => { 
@@ -288,23 +233,9 @@ Número: *${appointment.phone}*`;
           className="sm:max-w-[550px] bg-card border-border p-0 shadow-xl backdrop-blur-md z-[70] overflow-hidden flex flex-col max-h-[95vh]"
         >
           <DialogHeader className="px-6 py-3 border-b border-border/40 flex flex-row items-center justify-between bg-card/10 shrink-0">
-            <div className="flex items-center gap-2">
-              <DialogTitle className="text-lg font-headline font-bold text-foreground">
-                {isEditing ? 'Editar Registro' : 'Detalles de la Cita'}
-              </DialogTitle>
-              <TooltipProvider>
-                <Tooltip delayDuration={0}>
-                  <TooltipTrigger asChild>
-                    <div className="p-1 rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive cursor-pointer transition-colors">
-                      <Trash2 className="h-4 w-4" onClick={() => setShowDeleteConfirm(true)} />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-destructive">Eliminar Cita</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
+            <DialogTitle className="text-lg font-headline font-bold text-foreground">
+              {isEditing ? 'Editar Registro' : 'Detalles de la Cita'}
+            </DialogTitle>
 
             <div className="flex items-center gap-2">
               {!isEditing && (
@@ -326,7 +257,7 @@ Número: *${appointment.phone}*`;
 
           <div className="px-6 py-4 space-y-4 overflow-y-auto flex-1 scrollbar-thin">
             {!isEditing && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-primary/5 border border-primary/20 rounded-lg animate-in fade-in slide-in-from-top-1">
+              <div className="flex items-center gap-2 px-3 py-2 bg-primary/5 border border-primary/20 rounded-lg">
                 <HistoryIcon className="w-4 h-4 text-primary" />
                 <p className="text-xs font-bold text-primary">
                   {headerTimeText}
@@ -361,7 +292,7 @@ Número: *${appointment.phone}*`;
                   </Button>
 
                   {showEditProspector && (
-                    <div className="grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-1">
+                    <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1">
                         <Label className="text-[10px] font-bold uppercase text-muted-foreground/60">Nombre Prospectador</Label>
                         <Input 
@@ -435,9 +366,7 @@ Número: *${appointment.phone}*`;
                     </Select>
                   </div>
                   <div className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-[10px] font-bold uppercase text-muted-foreground">Fecha</Label>
-                    </div>
+                    <Label className="text-[10px] font-bold uppercase text-muted-foreground">Fecha</Label>
                     <Input 
                       type="date" 
                       value={editData.date ? parseISO(editData.date).toISOString().split('T')[0] : ''} 
@@ -472,7 +401,6 @@ Número: *${appointment.phone}*`;
                             </TooltipTrigger>
                             <TooltipContent side="top">
                               <p className="text-[10px] font-bold uppercase">Prospectado por: {appointment.prospectorName}</p>
-                              {appointment.prospectorPhone && <p className="text-[9px] text-muted-foreground">{appointment.prospectorPhone}</p>}
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
@@ -515,18 +443,6 @@ Número: *${appointment.phone}*`;
                   </div>
                 </div>
 
-                {appointment.prospectorName && (
-                  <div onClick={copyProspectorPhone} className="flex items-center gap-3 border-t border-border/10 pt-3 cursor-pointer group/prospector">
-                    <div className="p-2 bg-primary/10 rounded-lg group-hover/prospector:bg-primary/20 transition-colors"><UserCog className="w-4 h-4 text-primary" /></div>
-                    <div>
-                      <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Agendado por</p>
-                      <p className="text-xs font-bold text-primary group-hover/prospector:underline">
-                        {appointment.prospectorName} {appointment.prospectorPhone ? `(${appointment.prospectorPhone})` : ''}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
                 <div className="flex items-center gap-3 border-t border-border/10 pt-3">
                   <div className="p-2 bg-primary/10 rounded-lg"><CalendarDays className="w-4 h-4 text-primary" /></div>
                   <div>
@@ -550,7 +466,7 @@ Número: *${appointment.phone}*`;
             )}
 
             {showCommissionPanel && (
-              <div className="bg-card border-2 border-border/40 p-4 rounded-xl space-y-4 shadow-sm animate-in fade-in slide-in-from-top-2">
+              <div className="bg-card border-2 border-border/40 p-4 rounded-xl space-y-4 shadow-sm">
                 <div className="flex items-center justify-between border-b border-border/20 pb-2">
                   <div className="flex items-center gap-2">
                     <div className="p-1.5 bg-accent/10 rounded-md"><Receipt className="w-3.5 h-3.5 text-accent" /></div>
@@ -566,10 +482,6 @@ Número: *${appointment.phone}*`;
                     <Switch 
                       checked={(editData.commissionStatus || 'Pendiente') === 'Pagada'} 
                       onCheckedChange={handleCommissionToggle}
-                      className={cn(
-                        "scale-75",
-                        (editData.commissionStatus || 'Pagada') === 'Pagada' ? "data-[state=checked]:bg-green-500" : "data-[state=unchecked]:bg-yellow-500"
-                      )}
                     />
                   </div>
                 </div>
@@ -580,34 +492,18 @@ Número: *${appointment.phone}*`;
                       <Coins className="w-3 h-3" /> Crédito Final
                     </Label>
                     {isEditing ? (
-                      <div className="relative flex items-center">
-                        <span className="absolute left-2 text-xs font-bold text-muted-foreground/60">$</span>
-                        <Input 
-                          type="text" 
-                          value={editData.finalCreditAmount?.toString() || ''} 
-                          onChange={e => handleFinalCreditChange(e.target.value)}
-                          className="h-8 pl-5 bg-muted/20 text-xs font-bold"
-                          placeholder="0.00"
-                        />
-                      </div>
+                      <Input 
+                        type="text" 
+                        value={editData.finalCreditAmount?.toString() || ''} 
+                        onChange={e => handleFinalCreditChange(e.target.value)}
+                        className="h-8 bg-muted/20 text-xs font-bold"
+                      />
                     ) : (
                       <p className="text-sm font-bold text-foreground">{formatCurrency(appointment.finalCreditAmount || 0)}</p>
                     )}
                   </div>
                   <div className="space-y-1">
-                    <div className="flex items-center gap-1">
-                      <Label className="text-[9px] font-bold uppercase text-muted-foreground">Participación %</Label>
-                      <TooltipProvider>
-                        <Tooltip delayDuration={0}>
-                          <TooltipTrigger asChild>
-                            <Info className="h-2.5 w-2.5 cursor-help opacity-40 hover:opacity-100" />
-                          </TooltipTrigger>
-                          <TooltipContent side="top">
-                            <p className="text-[10px] leading-tight">La comisión completa es de 0.7% del valor del crédito.</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
+                    <Label className="text-[9px] font-bold uppercase text-muted-foreground">Participación %</Label>
                     {isEditing ? (
                       <Input 
                         type="number" 
@@ -615,7 +511,6 @@ Número: *${appointment.phone}*`;
                         value={editData.commissionPercent || ''} 
                         onChange={e => handleCommissionPercentChange(e.target.value)}
                         className="h-8 bg-muted/20 text-xs font-bold text-accent"
-                        placeholder="Ej. 100"
                       />
                     ) : (
                       <p className="text-sm font-bold text-accent">{appointment.commissionPercent || 0}%</p>
@@ -626,31 +521,11 @@ Número: *${appointment.phone}*`;
                 <div className="grid grid-cols-2 gap-4 pt-2 border-t border-border/10">
                   <div className="space-y-1">
                     <span className="text-[9px] font-bold uppercase text-muted-foreground block">Valor Comisión</span>
-                    <div className="px-3 py-1 bg-accent/5 border border-accent/20 rounded-lg">
-                      <p className="text-sm font-bold text-accent">{formatCurrency(commissionValue)}</p>
-                    </div>
+                    <p className="text-sm font-bold text-accent">{formatCurrency(commissionValue)}</p>
                   </div>
                   <div className="space-y-1">
-                    <div className="flex items-center gap-1">
-                      <Label className="text-[9px] font-bold uppercase text-muted-foreground flex items-center gap-1">
-                        <CalendarDays className="w-3 h-3" /> Fecha de Pago
-                      </Label>
-                      <TooltipProvider>
-                        <Tooltip delayDuration={0}>
-                          <TooltipTrigger asChild>
-                            <Info className="h-2.5 w-2.5 cursor-help opacity-40 hover:opacity-100" />
-                          </TooltipTrigger>
-                          <TooltipContent side="top" className="max-w-[200px]">
-                            <p className="text-[10px] leading-tight text-center">
-                              Ventas de Domingo a Martes se liquidan el viernes de la siguiente semana. Ventas de Miércoles a Sábado tienen una semana adicional de desfase.
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                    <div className="px-3 py-1 bg-primary/5 border border-primary/20 rounded-lg">
-                      <p className="text-[11px] font-bold text-primary">{calculatePaymentDateText(appointment.date)}</p>
-                    </div>
+                    <Label className="text-[9px] font-bold uppercase text-muted-foreground">Fecha de Pago</Label>
+                    <p className="text-[11px] font-bold text-primary">{calculatePaymentDateText(appointment.date)}</p>
                   </div>
                 </div>
               </div>
@@ -660,10 +535,7 @@ Número: *${appointment.phone}*`;
               <Label className="flex items-center gap-2 text-muted-foreground text-[10px] font-bold uppercase tracking-wider shrink-0 mb-1">📝 Notas del cliente</Label>
               <Textarea 
                 placeholder="Detalles importantes..."
-                className={cn(
-                  "bg-muted/10 border-border/30 focus-visible:ring-primary resize-none text-xs backdrop-blur-sm scrollbar-thin",
-                  "h-[200px] min-h-[200px] overflow-y-auto"
-                )}
+                className="bg-muted/10 border-border/30 h-[200px] resize-none text-xs backdrop-blur-sm"
                 value={isEditing ? editData.notes : appointment.notes}
                 onChange={e => setEditData({...editData, notes: e.target.value})}
                 readOnly={!isEditing}
@@ -764,9 +636,7 @@ Número: *${appointment.phone}*`;
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <Label className="text-[10px] font-bold uppercase text-muted-foreground">Nueva Fecha</Label>
-                </div>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Nueva Fecha</Label>
                 <Input type="date" value={newDate} onChange={e => setNewDate(e.target.value)} className="h-9 bg-muted/20 text-sm" />
               </div>
               <div className="space-y-1.5">
@@ -794,23 +664,6 @@ Número: *${appointment.phone}*`;
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <AlertDialogContent className="z-[85]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Mover a la papelera?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta acción ocultará la cita de tus listas activas. El registro desaparecerá en 5 segundos.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel type="button">Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90 text-white font-bold" type="button">
-              Sí, archivar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }

@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -13,7 +12,6 @@ import { Appointment, AppointmentStatus, AppointmentType } from '@/services/appo
 export function useAppointments() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [archivingIds, setArchivingIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const saved = Service.getFromDisk();
@@ -48,33 +46,6 @@ export function useAppointments() {
     setAppointments(updated);
   };
 
-  const archiveAppointment = (id: string) => {
-    // Iniciamos animación visual de 5 segundos
-    setArchivingIds(prev => new Set(prev).add(id));
-    
-    setTimeout(() => {
-      const updated = Service.updateAppointment(id, { isArchived: true });
-      setAppointments(updated);
-      setArchivingIds(prev => {
-        const next = new Set(prev);
-        next.delete(id);
-        return next;
-      });
-    }, 5000);
-  };
-
-  const restoreAppointment = (id: string) => {
-    const updated = Service.updateAppointment(id, { isArchived: false });
-    setAppointments(updated);
-  };
-
-  const deletePermanent = (id: string) => {
-    const all = Service.getFromDisk();
-    const filtered = all.filter(app => app.id !== id);
-    Service.saveToDisk(filtered);
-    setAppointments(filtered);
-  };
-
   const toggleConfirmation = (id: string) => {
     const updated = Service.updateAppointment(id, { isConfirmed: true });
     setAppointments(updated);
@@ -95,8 +66,7 @@ export function useAppointments() {
     return appointments
       .filter(a => {
         const d = startOfDay(parseISO(a.date));
-        const active = !a.isArchived || archivingIds.has(a.id);
-        return active && (isToday(d) || isAfter(d, today)) && !a.status;
+        return (isToday(d) || isAfter(d, today)) && !a.status;
       })
       .sort((a, b) => {
         const dateA = parseISO(a.date).getTime();
@@ -104,15 +74,14 @@ export function useAppointments() {
         if (dateA !== dateB) return dateA - dateB;
         return a.time.localeCompare(b.time);
       });
-  }, [appointments, archivingIds]);
+  }, [appointments]);
 
   const past = useMemo(() => {
     const today = startOfDay(new Date());
     return appointments
       .filter(a => {
         const d = startOfDay(parseISO(a.date));
-        const active = !a.isArchived || archivingIds.has(a.id);
-        return active && (isBefore(d, today) || !!a.status);
+        return isBefore(d, today) || !!a.status;
       })
       .sort((a, b) => {
         const dateA = parseISO(a.date).getTime();
@@ -120,10 +89,6 @@ export function useAppointments() {
         if (dateA !== dateB) return dateB - dateA;
         return b.time.localeCompare(a.time);
       });
-  }, [appointments, archivingIds]);
-
-  const archived = useMemo(() => {
-    return appointments.filter(a => a.isArchived);
   }, [appointments]);
 
   const formatFriendlyDate = (dateStr: string) => {
@@ -136,7 +101,6 @@ export function useAppointments() {
     if (diff === 1) return "Mañana";
     if (diff === -1) return "Ayer";
 
-    // Regla de los 6 días: No usar "pasado" o "este" si está en un rango de 6 días
     if (Math.abs(diff) < 7) {
       const dayName = format(d, 'EEEE', { locale: es });
       return dayName.charAt(0).toUpperCase() + dayName.slice(1);
@@ -157,10 +121,8 @@ export function useAppointments() {
   const stats = useMemo(() => Service.calculateStats(appointments), [appointments]);
 
   return {
-    appointments, upcoming, past, archived, addAppointment, updateStatus, editAppointment,
-    archiveAppointment, restoreAppointment, deletePermanent, archivingIds,
+    appointments, upcoming, past, addAppointment, updateStatus, editAppointment,
     toggleConfirmation, resetData, clearAll, formatFriendlyDate, format12hTime,
     stats, isLoaded
   };
 }
-

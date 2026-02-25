@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -7,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { 
   Clock, Calendar, Info, CheckCircle2, AlertCircle, 
   CheckCircle, Trophy, PartyPopper, Sparkles, Copy, 
-  ClipboardCheck, Phone, Box, ChevronRight, ShieldAlert, UserCog, Trash2
+  ClipboardCheck, Phone, Box, ChevronRight, ShieldAlert, UserCog
 } from "lucide-react";
 import { parseISO, isToday, addDays, isBefore } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -52,7 +51,6 @@ interface Props {
   toggleConfirmation: (id: string) => void;
   activeId?: string | null;
   expanded?: boolean;
-  archivingIds?: Set<string>;
 }
 
 export default function UpcomingAppointments({ 
@@ -65,8 +63,7 @@ export default function UpcomingAppointments({
   updateStatus, 
   toggleConfirmation, 
   activeId,
-  expanded = false,
-  archivingIds = new Set()
+  expanded = false
 }: Props) {
   const [finId, setFinId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
@@ -234,8 +231,6 @@ export default function UpcomingAppointments({
                   const isCommissionOverdue = isCommissionPending && isBefore(paymentDate, new Date());
                   const isCommissionUpcoming = isCommissionPending && !isCommissionOverdue;
                   
-                  const isArchiving = archivingIds.has(app.id);
-                  
                   return (
                     <TableRow 
                       key={app.id} 
@@ -243,14 +238,10 @@ export default function UpcomingAppointments({
                       className={cn(
                         "hover:bg-primary/10 transition-colors cursor-pointer group relative h-16",
                         appToday && "bg-primary/10",
-                        isSelected && "bg-primary/20 z-10",
-                        isArchiving && "bg-destructive/20 animate-pulse opacity-60 pointer-events-none"
+                        isSelected && "bg-primary/20 z-10"
                       )}
                     >
-                      <TableCell className={cn(
-                        "align-middle pl-4",
-                        isArchiving && "border-l-4 border-l-destructive"
-                      )}>
+                      <TableCell className="align-middle pl-4">
                         <div className="flex items-center gap-2">
                           {appToday && <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shrink-0 shadow-[0_0_8px_hsl(var(--primary))]" title="Cita para hoy" />}
                           <div className="font-bold text-sm leading-tight text-foreground">{app.name}</div>
@@ -339,7 +330,7 @@ export default function UpcomingAppointments({
                       </TableCell>
                       <TableCell className="align-middle text-center" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-center gap-1">
-                          {appToday && !isArchiving && (
+                          {appToday && (
                             <Button
                               variant="ghost"
                               size="icon"
