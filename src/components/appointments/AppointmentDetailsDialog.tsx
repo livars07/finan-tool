@@ -21,7 +21,7 @@ import {
 import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct } from '@/services/appointment-service';
 import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Percent, Coins, CalendarDays, UserCog, ChevronDown, Calendar as CalendarIcon, ArrowRight, History as HistoryIcon, Plus } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
-import { parseISO, format, getDay, addDays, isToday, isTomorrow, isYesterday, differenceInCalendarDays } from 'date-fns';
+import { parseISO, format, getDay, addDays, isToday, isTomorrow, isYesterday, differenceInCalendarDays, startOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import {
@@ -207,9 +207,10 @@ Número: *${appointment.phone}*`;
 
   const isCierre = appointment.status === 'Cierre';
   
-  // Lógica temporal mejorada
-  const appDate = parseISO(appointment.date);
-  const diffCalendar = differenceInCalendarDays(appDate, new Date());
+  // Lógica temporal mejorada con startOfDay
+  const appDate = startOfDay(parseISO(appointment.date));
+  const today = startOfDay(new Date());
+  const diffCalendar = differenceInCalendarDays(appDate, today);
   
   let headerTimeText = "";
   if (isToday(appDate)) {

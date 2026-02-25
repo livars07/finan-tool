@@ -101,12 +101,13 @@ export function useAppointments() {
 
     if (diff === 0) return "Hoy";
     if (diff === 1) return "Mañana";
-    if (diff === 2) return "Pasado mañana";
     if (diff === -1) return "Ayer";
-    if (diff === -2) return "Antier";
 
-    if (diff > 2 && diff < 7) return `Este ${format(d, 'EEEE', { locale: es })}`;
-    if (diff < -2 && diff > -7) return `${format(d, 'EEEE', { locale: es })} pasado`;
+    // Regla de los 6 días: No usar "pasado" ni "este" si han pasado menos de 7 días
+    if (Math.abs(diff) < 7) {
+      const dayName = format(d, 'EEEE', { locale: es });
+      return dayName.charAt(0).toUpperCase() + dayName.slice(1);
+    }
 
     const f = format(d, "EEEE d 'de' MMMM 'del' yyyy", { locale: es });
     return f.charAt(0).toUpperCase() + f.slice(1);
