@@ -12,7 +12,7 @@ import { PlusCircle, UserPlus, Plus, Calendar as CalendarIcon, ArrowRight, UserC
 import { useToast } from "@/hooks/use-toast";
 import { AppointmentType, AppointmentProduct } from '@/services/appointment-service';
 import { cn } from "@/lib/utils";
-import { addDays, format, nextSaturday } from 'date-fns';
+import { addDays, format, nextSaturday, nextSunday } from 'date-fns';
 
 interface AppointmentFormProps {
   onAdd: (app: { name: string; phone: string; date: string; time: string; type: AppointmentType; product: AppointmentProduct; prospectorName?: string; prospectorPhone?: string }) => void;
@@ -82,6 +82,12 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
     setDate(nextSat);
   };
 
+  const setDateNextSunday = () => {
+    const today = new Date();
+    const nextSun = format(nextSunday(today), 'yyyy-MM-dd');
+    setDate(nextSun);
+  };
+
   return (
     <Card className="bg-card border-border shadow-md backdrop-blur-lg">
       <CardHeader className="py-4 border-b border-border/50">
@@ -139,6 +145,14 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
                       onClick={setDateNextSaturday}
                     >
                       <CalendarIcon className="w-3 h-3 mr-2" /> Sábado
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="justify-start h-8 text-xs font-semibold hover:bg-orange-500/10 text-orange-600 hover:text-orange-700"
+                      onClick={setDateNextSunday}
+                    >
+                      <CalendarIcon className="w-3 h-3 mr-2" /> Domingo
                     </Button>
                   </PopoverContent>
                 </Popover>
@@ -214,7 +228,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
                   <SelectItem value="1ra consulta">1ra consulta</SelectItem>
                   <SelectItem value="2da consulta">2da consulta</SelectItem>
                   <SelectItem value="cierre">Cierre</SelectItem>
-                  <SelectItem value="seguimiento">Seguimiento</SelectItem>
+                  <SelectItem value="Seguimiento">Seguimiento</SelectItem>
                 </SelectContent>
               </Select>
             </div>

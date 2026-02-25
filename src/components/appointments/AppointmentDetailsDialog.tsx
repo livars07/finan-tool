@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -18,10 +17,11 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct } from '@/services/appointment-service';
-import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Percent, Coins, CalendarDays, UserCog, ChevronDown } from 'lucide-react';
+import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Percent, Coins, CalendarDays, UserCog, ChevronDown, Calendar as CalendarIcon, ArrowRight, History as HistoryIcon } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
-import { parseISO, format, getDay, addDays, differenceInDays } from 'date-fns';
+import { parseISO, format, getDay, addDays, differenceInDays, nextSaturday, nextSunday } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import {
@@ -214,7 +214,22 @@ Número: *${appointment.phone}*`;
   };
 
   const isCierre = appointment.status === 'Cierre';
-  const daysSinceStart = differenceInDays(new Date(), parseISO(appointment.date));
+  const daysElapsed = differenceInDays(new Date(), parseISO(appointment.date));
+
+  const setEditDateTomorrow = () => {
+    const tomorrow = addDays(new Date(), 1).toISOString();
+    setEditData({...editData, date: tomorrow});
+  };
+
+  const setEditDateNextSaturday = () => {
+    const nextSat = nextSaturday(new Date()).toISOString();
+    setEditData({...editData, date: nextSat});
+  };
+
+  const setEditDateNextSunday = () => {
+    const nextSun = nextSunday(new Date()).toISOString();
+    setEditData({...editData, date: nextSun});
+  };
 
   return (
     <>
@@ -245,7 +260,6 @@ Número: *${appointment.phone}*`;
                   </TooltipTrigger>
                   <TooltipContent side="right">
                     <p className="text-[10px] font-mono uppercase tracking-widest">ID: {appointment.id}</p>
-                    <p className="text-[9px] text-muted-foreground mt-1">Días en seguimiento: {daysSinceStart}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -270,6 +284,19 @@ Número: *${appointment.phone}*`;
           </DialogHeader>
 
           <div className="px-6 py-4 space-y-4 overflow-y-auto flex-1 scrollbar-thin">
+            {!isEditing && (
+              <div className="flex items-center gap-2 px-3 py-2 bg-primary/5 border border-primary/20 rounded-lg animate-in fade-in slide-in-from-top-1">
+                <HistoryIcon className="w-4 h-4 text-primary" />
+                <p className="text-xs font-bold text-primary">
+                  {daysElapsed === 0 
+                    ? 'Hoy es el día de la cita' 
+                    : daysElapsed > 0 
+                      ? `Han pasado ${daysElapsed} ${daysElapsed === 1 ? 'día' : 'días'} desde la cita` 
+                      : `Faltan ${Math.abs(daysElapsed)} ${Math.abs(daysElapsed) === 1 ? 'día' : 'días'} para la cita`}
+                </p>
+              </div>
+            )}
+
             {isEditing ? (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
@@ -370,7 +397,43 @@ Número: *${appointment.phone}*`;
                     </Select>
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-[10px] font-bold uppercase text-muted-foreground">Fecha</Label>
+                    <div className="flex items-center justify-between">
+                      <Label className="text-[10px] font-bold uppercase text-muted-foreground">Fecha</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-4 w-4 rounded-full bg-primary/10 text-primary hover:bg-primary/20">
+                            <Plus className="h-2.5 w-2.5" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent side="top" className="w-48 p-2 flex flex-col gap-1 backdrop-blur-md bg-card/90 border-primary/20">
+                          <p className="text-[10px] font-bold uppercase text-muted-foreground px-2 mb-1">Reprogramado rápido</p>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="justify-start h-8 text-xs font-semibold hover:bg-primary/10"
+                            onClick={setEditDateTomorrow}
+                          >
+                            <ArrowRight className="w-3 h-3 mr-2 text-primary" /> Mañana
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="justify-start h-8 text-xs font-semibold hover:bg-blue-500/10 text-blue-500 hover:text-blue-600"
+                            onClick={setEditDateNextSaturday}
+                          >
+                            <CalendarIcon className="w-3 h-3 mr-2" /> Sábado
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="justify-start h-8 text-xs font-semibold hover:bg-orange-500/10 text-orange-600 hover:text-orange-700"
+                            onClick={setEditDateNextSunday}
+                          >
+                            <CalendarIcon className="w-3 h-3 mr-2" /> Domingo
+                          </Button>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
                     <Input 
                       type="date" 
                       value={editData.date ? parseISO(editData.date).toISOString().split('T')[0] : ''} 
