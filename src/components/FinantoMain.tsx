@@ -228,11 +228,22 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
 
   const handleConfirmCommissionPayment = () => {
     if (pendingCommissionApp) {
-      editAppointment(pendingCommissionApp.id, { commissionStatus: 'Pagada' });
+      const updates: Partial<Service.Appointment> = { commissionStatus: 'Pagada' };
+      
+      // Regla de negocio: Si se paga la comisión de un apartado, se convierte en Cierre
+      if (pendingCommissionApp.status === 'Apartado') {
+        updates.status = 'Cierre';
+      }
+
+      editAppointment(pendingCommissionApp.id, updates);
+      
       toast({
-        title: "Comisión Conciliada",
-        description: `Se ha registrado el pago de ${pendingCommissionApp.name}.`,
+        title: updates.status === 'Cierre' ? "¡Venta Cerrada!" : "Comisión Conciliada",
+        description: updates.status === 'Cierre' 
+          ? `El apartado de ${pendingCommissionApp.name} se ha convertido en Cierre tras el pago.`
+          : `Se ha registrado el pago de ${pendingCommissionApp.name}.`,
       });
+      
       setPendingCommissionApp(null);
     }
   };
@@ -604,4 +615,3 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
     </div>
   );
 }
-

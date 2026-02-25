@@ -200,12 +200,21 @@ Número: *${appointment.phone}*`;
 
   const handleCommissionToggle = (checked: boolean) => {
     const newStatus = checked ? 'Pagada' : 'Pendiente';
-    setEditData(prev => ({ ...prev, commissionStatus: newStatus }));
-    onEdit(appointment.id, { commissionStatus: newStatus });
+    const updates: Partial<Appointment> = { commissionStatus: newStatus };
+    
+    // Regla de negocio: Si se paga la comisión de un apartado, se convierte en Cierre
+    if (checked && editData.status === 'Apartado') {
+      updates.status = 'Cierre';
+    }
+
+    setEditData(prev => ({ ...prev, ...updates }));
+    onEdit(appointment.id, updates);
     
     toast({ 
-      title: newStatus === 'Pagada' ? "Comisión Pagada" : "Comisión Pendiente", 
-      description: `Estatus actualizado para ${appointment.name}.` 
+      title: updates.status === 'Cierre' ? "¡Venta Cerrada!" : (newStatus === 'Pagada' ? "Comisión Pagada" : "Comisión Pendiente"), 
+      description: updates.status === 'Cierre' 
+        ? `El apartado de ${appointment.name} ahora es Cierre tras recibir el pago.`
+        : `Estatus actualizado para ${appointment.name}.` 
     });
   };
 
@@ -428,25 +437,6 @@ Número: *${appointment.phone}*`;
                   <div className="space-y-1">
                     <div className="flex items-center justify-between">
                       <Label className="text-[10px] font-bold uppercase text-muted-foreground">Fecha</Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button type="button" variant="ghost" size="icon" className="h-5 w-5 rounded-full bg-primary/10 text-primary hover:bg-primary/20">
-                            <Plus className="h-3 w-3" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent side="top" className="w-48 p-2 flex flex-col gap-1 backdrop-blur-md bg-card/90 border-primary/20">
-                          <p className="text-[10px] font-bold uppercase text-muted-foreground px-2 mb-1">Agendado rápido</p>
-                          <Button onMouseDown={setDateTomorrow} variant="ghost" size="sm" className="justify-start h-8 text-xs font-semibold hover:bg-primary/10">
-                            <ArrowRight className="w-3 h-3 mr-2 text-primary" /> Mañana
-                          </Button>
-                          <Button onMouseDown={setDateNextSaturday} variant="ghost" size="sm" className="justify-start h-8 text-xs font-semibold hover:bg-blue-500/10 text-blue-500">
-                            <CalendarIcon className="w-3 h-3 mr-2" /> Sábado
-                          </Button>
-                          <Button onMouseDown={setDateNextSunday} variant="ghost" size="sm" className="justify-start h-8 text-xs font-semibold hover:bg-orange-500/10 text-orange-600">
-                            <CalendarIcon className="w-3 h-3 mr-2" /> Domingo
-                          </Button>
-                        </PopoverContent>
-                      </Popover>
                     </div>
                     <Input 
                       type="date" 
@@ -776,25 +766,6 @@ Número: *${appointment.phone}*`;
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <Label className="text-[10px] font-bold uppercase text-muted-foreground">Nueva Fecha</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button type="button" variant="ghost" size="icon" className="h-5 w-5 rounded-full bg-primary/10 text-primary hover:bg-primary/20">
-                        <Plus className="h-3 w-3" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent side="top" className="w-48 p-2 flex flex-col gap-1 backdrop-blur-md bg-card/90 border-primary/20">
-                      <p className="text-[10px] font-bold uppercase text-muted-foreground px-2 mb-1">Agendado rápido</p>
-                      <Button onMouseDown={setDateTomorrow} variant="ghost" size="sm" className="justify-start h-8 text-xs font-semibold hover:bg-primary/10">
-                        <ArrowRight className="w-3 h-3 mr-2 text-primary" /> Mañana
-                      </Button>
-                      <Button onMouseDown={setDateNextSaturday} variant="ghost" size="sm" className="justify-start h-8 text-xs font-semibold hover:bg-blue-500/10 text-blue-500">
-                        <CalendarIcon className="w-3 h-3 mr-2" /> Sábado
-                      </Button>
-                      <Button onMouseDown={setDateNextSunday} variant="ghost" size="sm" className="justify-start h-8 text-xs font-semibold hover:bg-orange-500/10 text-orange-600">
-                        <CalendarIcon className="w-3 h-3 mr-2" /> Domingo
-                      </Button>
-                    </PopoverContent>
-                  </Popover>
                 </div>
                 <Input type="date" value={newDate} onChange={e => setNewDate(e.target.value)} className="h-9 bg-muted/20 text-sm" />
               </div>
@@ -843,4 +814,3 @@ Número: *${appointment.phone}*`;
     </>
   );
 }
-
