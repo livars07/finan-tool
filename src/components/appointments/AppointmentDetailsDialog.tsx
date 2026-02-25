@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -19,9 +18,9 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct, getCommissionPaymentDate } from '@/services/appointment-service';
-import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Coins, CalendarDays, UserCog, ChevronDown, History as HistoryIcon } from 'lucide-react';
+import { User, Phone, Clock, Edit2, Save, Copy, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Coins, CalendarDays, UserCog, ChevronDown, History as HistoryIcon } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
-import { parseISO, format, getDay, addDays, isToday, isTomorrow, isYesterday, differenceInCalendarDays, startOfDay } from 'date-fns';
+import { parseISO, format, isToday, isTomorrow, isYesterday, differenceInCalendarDays, startOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import {

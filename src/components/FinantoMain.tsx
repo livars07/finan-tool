@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -8,8 +7,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { 
   Wallet, CalendarDays, Users, CheckCircle2, ShieldCheck, RotateCcw,
   Palette, Moon, Sun, Cpu, BookOpen, Calculator, Maximize2, Sparkles,
-  ClipboardList, Calendar, Copy, Crown, Snowflake, Rocket, 
-  MessageSquare, CalendarClock, HandCoins, CheckCircle, Search, BadgeAlert, 
+  ClipboardList, Copy, Crown, Snowflake, MessageSquare, 
+  CalendarClock, HandCoins, CheckCircle, Search, BadgeAlert, 
   MoreHorizontal, ArrowUpRight, ArrowDownRight, Coins, Star, Trophy, PartyPopper
 } from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
@@ -418,7 +417,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                     <TooltipTrigger asChild>
                       {cardContent}
                     </TooltipTrigger>
-                    <TooltipContent side="bottom" sideOffset={4} className="bg-card border-border shadow-xl">
+                    <TooltipContent side="bottom" sideOffset={1} className="bg-card border-border shadow-xl z-[100]">
                       <p className="text-xs font-bold uppercase tracking-widest text-primary">{stat.tooltip}</p>
                     </TooltipContent>
                   </Tooltip>
@@ -540,7 +539,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
           <DialogHeader className="p-6 border-b bg-primary/5 shrink-0">
             <div className="flex items-center gap-3">
               <div className="p-3 border border-primary/30 rounded-xl bg-primary/10">
-                <Rocket className="w-6 h-6 text-primary" />
+                <Sparkles className="w-6 h-6 text-primary" />
               </div>
               <div>
                 <DialogTitle className="text-2xl font-bold font-headline">Guía de Inicio Rápido</DialogTitle>
