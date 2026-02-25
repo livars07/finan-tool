@@ -142,7 +142,7 @@ export const updateAppointment = (id: string, partialData: Partial<Appointment>)
 };
 
 /**
- * Genera datos de prueba realistas (60 registros).
+ * Genera datos de prueba realistas y variados (60 registros).
  */
 export const generateSeedData = (): Appointment[] => {
   const data: Appointment[] = [];
@@ -174,42 +174,51 @@ export const generateSeedData = (): Appointment[] => {
 
   const getName = (index: number) => {
     const fname = firstNames[index % firstNames.length];
-    const lname = lastNames[index % lastNames.length];
+    const lname = lastNames[(index + 5) % lastNames.length];
     return `${fname} ${lname}`;
   };
 
-  // 30 Citas Próximas
+  const getPhone = (index: number) => {
+    const base = 6640000000 + (index * 12345) % 9999999;
+    return base.toString().substring(0, 10);
+  };
+
+  // 30 Citas Próximas (Variedad de fechas y prospectadores)
   for (let i = 0; i < 30; i++) {
-    const daysAhead = Math.floor(i / 6); 
-    const futureDate = addDays(now, daysAhead);
-    const isTodayApp = isToday(futureDate);
+    let appDate;
+    if (i < 6) appDate = now; // Hoy
+    else if (i < 12) appDate = addDays(now, 1); // Mañana
+    else appDate = addDays(now, (i % 7) + 2); // Próximos días
+    
+    const isTodayApp = isToday(appDate);
     
     data.push({
       id: uuidv4(),
       name: getName(i),
-      phone: `664 ${Math.floor(100+Math.random()*900)} ${Math.floor(1000+Math.random()*9000)}`,
-      date: futureDate.toISOString(),
+      phone: formatPhoneNumber(getPhone(i)),
+      date: appDate.toISOString(),
       time: hours[i % hours.length],
       type: types[i % types.length],
       product: products[i % products.length],
-      isConfirmed: isTodayApp ? Math.random() > 0.5 : false,
+      isConfirmed: isTodayApp ? Math.random() > 0.4 : false,
       isArchived: false,
-      notes: `Nota #${i + 1}: Interesado en ${products[i % products.length]}.`,
-      prospectorName: i % 5 === 0 ? `Prospectador ${i}` : undefined,
-      prospectorPhone: i % 5 === 0 ? '664 999 0000' : undefined
+      notes: i % 3 === 0 ? `Cliente muy interesado en ${products[i % products.length]}. Requiere crédito alto.` : '',
+      prospectorName: i % 4 === 0 ? `Agente Externo ${i}` : undefined,
+      prospectorPhone: i % 4 === 0 ? formatPhoneNumber(getPhone(i + 100)) : undefined
     });
   }
 
-  // 30 Citas Pasadas (Historial)
+  // 30 Citas Pasadas (Historial con Cierres, Comisiones y Prospectadores)
   for (let i = 0; i < 30; i++) {
-    const pastDate = i < 10 ? subMonths(now, 1) : subDays(now, (i % 20) + 1);
+    const pastDate = i < 5 ? subDays(now, 1) : i < 15 ? subDays(now, (i % 14) + 2) : subMonths(now, 1);
     const globalIndex = i + 30;
     const status = statuses[i % statuses.length];
+    const isSale = status === 'Cierre' || status === 'Apartado';
     
     data.push({
       id: uuidv4(),
       name: getName(globalIndex),
-      phone: `664 ${Math.floor(100+Math.random()*900)} ${Math.floor(1000+Math.random()*9000)}`,
+      phone: formatPhoneNumber(getPhone(globalIndex)),
       date: pastDate.toISOString(),
       time: hours[i % hours.length],
       type: types[i % types.length],
@@ -217,12 +226,13 @@ export const generateSeedData = (): Appointment[] => {
       status: status,
       isConfirmed: true,
       isArchived: false,
-      notes: `Registro #${i + 1}. El cliente ${status.toLowerCase()}.`,
-      commissionStatus: status === 'Cierre' || status === 'Apartado' ? (Math.random() > 0.5 ? 'Pagada' : 'Pendiente') : undefined,
-      commissionPercent: status === 'Cierre' || status === 'Apartado' ? 100 : undefined,
-      finalCreditAmount: status === 'Cierre' || status === 'Apartado' ? Math.floor(1500000 + Math.random() * 2000000) : undefined,
-      prospectorName: i % 4 === 0 ? `Asistente ${i}` : undefined,
-      prospectorPhone: i % 4 === 0 ? '664 888 1111' : undefined
+      notes: isSale ? `Venta exitosa. Expediente completo enviado a notaría.` : `Seguimiento de ${products[i % products.length]}.`,
+      // Lógica de comisiones específica: 300k a 2M, 50% o 100%
+      commissionStatus: isSale ? (i % 2 === 0 ? 'Pagada' : 'Pendiente') : undefined,
+      commissionPercent: isSale ? (i % 3 === 0 ? 50 : 100) : undefined,
+      finalCreditAmount: isSale ? Math.floor(300000 + Math.random() * 1700000) : undefined,
+      prospectorName: i % 5 === 0 ? `Prospectador Senior ${i}` : undefined,
+      prospectorPhone: i % 5 === 0 ? formatPhoneNumber(getPhone(globalIndex + 50)) : undefined
     });
   }
   
@@ -273,4 +283,3 @@ export const calculateStats = (appointments: Appointment[]) => {
     lastMonthConversionRate: parseFloat(lastMonthConversionRate.toFixed(1)),
   };
 };
-
