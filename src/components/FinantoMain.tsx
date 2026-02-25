@@ -95,6 +95,8 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const [pendingCommissionApp, setPendingCommissionApp] = useState<Service.Appointment | null>(null);
   const shownCommissionIds = useRef<Set<string>>(new Set());
   const overdueQueue = useRef<Service.Appointment[]>([]);
+  const lastClosedTimeRef = useRef<number>(0); // Timestamp del último cierre del popup
+  const pendingAppRef = useRef<Service.Appointment | null>(null);
   
   const { toast } = useToast();
 
@@ -105,6 +107,11 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
     statsRef.current = stats;
     appointmentsRef.current = appointments;
   }, [stats, appointments]);
+
+  // Sincronizar ref con estado para uso en intervalos estables
+  useEffect(() => {
+    pendingAppRef.current = pendingCommissionApp;
+  }, [pendingCommissionApp]);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('finanto-theme') as Theme;
@@ -172,7 +179,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
     };
   }, [isLoaded, toast]);
 
-  // Motor de búsqueda de comisiones pendientes (MODAL SECUENCIAL)
+  // Motor de búsqueda de comisiones pendientes con COOLDOWN de 30s
   useEffect(() => {
     if (!isLoaded) return;
 
@@ -197,15 +204,21 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
     };
 
     const showNextPending = () => {
-      // Si ya hay uno abierto, no abrimos otro todavía
-      if (pendingCommissionApp) return;
+      // 1. Si ya hay uno abierto, no hacemos nada
+      if (pendingAppRef.current) return;
 
-      // Si no hay nada en cola, buscamos de nuevo
+      // 2. Respetar el COOLDOWN de 30 segundos tras cerrar el anterior
+      const now = Date.now();
+      if (lastClosedTimeRef.current > 0 && (now - lastClosedTimeRef.current < 30000)) {
+        return;
+      }
+
+      // 3. Si no hay nada en cola, buscamos de nuevo
       if (overdueQueue.current.length === 0) {
         performCommissionSearch();
       }
 
-      // Si después de buscar sigue habiendo algo, mostramos el primero
+      // 4. Si después de buscar sigue habiendo algo, mostramos el primero
       if (overdueQueue.current.length > 0) {
         const nextApp = overdueQueue.current.shift();
         if (nextApp) {
@@ -220,16 +233,16 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       }
     };
 
-    // Inicio a los 15 segundos
+    // Inicio inicial a los 15 segundos
     const startTimer = setTimeout(() => {
       showNextPending();
-      // Intervalo de revisión cada 20 segundos para mostrar el siguiente de la cola
-      const intervalId = setInterval(showNextPending, 20000);
+      // Revisión frecuente cada 5 segundos para detectar el fin del cooldown de 30s
+      const intervalId = setInterval(showNextPending, 5000);
       return () => clearInterval(intervalId);
     }, 15000);
 
     return () => clearTimeout(startTimer);
-  }, [isLoaded, pendingCommissionApp]);
+  }, [isLoaded]); // Solo depende de isLoaded para que el ciclo sea estable
 
   const resetTimer = useCallback(() => setTimerKey(prev => prev + 1), []);
   const handleNext = useCallback(() => { if (api) { api.scrollNext(); resetTimer(); } }, [api, resetTimer]);
@@ -270,6 +283,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       });
       
       setPendingCommissionApp(null);
+      lastClosedTimeRef.current = Date.now(); // Inicia el temporizador de 30s al confirmar
     }
   };
 
@@ -553,8 +567,16 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Popup de Monitoreo de Comisiones SECUENCIAL */}
-      <Dialog open={!!pendingCommissionApp} onOpenChange={(open) => !open && setPendingCommissionApp(null)}>
+      {/* Popup de Monitoreo de Comisiones SECUENCIAL con COOLDOWN */}
+      <Dialog 
+        open={!!pendingCommissionApp} 
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingCommissionApp(null);
+            lastClosedTimeRef.current = Date.now(); // Inicia el temporizador de 30s al cerrar manual
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-[450px] border-accent/30 bg-card shadow-2xl backdrop-blur-md z-[80]">
           <DialogHeader>
             <div className="flex items-center justify-between mb-2">
@@ -611,6 +633,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   onClick={() => {
                     setSelectedAppId(pendingCommissionApp.id);
                     setPendingCommissionApp(null);
+                    lastClosedTimeRef.current = Date.now(); // Inicia cooldown al ver detalles
                   }}
                   className="text-[10px] font-bold uppercase text-primary hover:bg-primary/10 gap-2 h-8"
                   type="button"
@@ -627,7 +650,10 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
           <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button 
               variant="outline" 
-              onClick={() => setPendingCommissionApp(null)}
+              onClick={() => {
+                setPendingCommissionApp(null);
+                lastClosedTimeRef.current = Date.now(); // Inicia cooldown al posponer
+              }}
               className="w-full sm:flex-1 h-11 text-xs font-bold uppercase"
               type="button"
             >
@@ -656,4 +682,3 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
     </div>
   );
 }
-
