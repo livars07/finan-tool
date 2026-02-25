@@ -36,8 +36,8 @@ export function Toaster() {
         let volume = 0.3;
 
         if (isWelcome) {
-          soundUrl = "https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"; // Fanfarria/Bienvenida
-          volume = 0.8; // Volumen alto solicitado
+          soundUrl = "https://assets.mixkit.co/active_storage/sfx/1999/1999-preview.mp3"; // Nuevo sonido de bienvenida más suave
+          volume = 0.8; 
         } else if (isActionRequired) {
           soundUrl = "https://assets.mixkit.co/active_storage/sfx/2356/2356-preview.mp3"; // Alerta sistema/Advertencia
           volume = 0.4;

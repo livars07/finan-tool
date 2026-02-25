@@ -152,7 +152,11 @@ export default function UpcomingAppointments({
     const todaySales = allAppointments.filter(a => isActuallyToday(a.date) && a.status === 'Cierre').length;
     const todayTotal = allAppointments.filter(a => isActuallyToday(a.date)).length;
     const todayConfirmed = allAppointments.filter(a => isActuallyToday(a.date) && a.isConfirmed).length;
-    const tomorrowTotal = allAppointments.filter(a => isActuallyTomorrow(a.date)).length;
+    const tomorrowTotal = allAppointments.filter(a => {
+      const d = parseISO(a.date);
+      const tomorrow = addDays(new Date(), 1);
+      return d.getDate() === tomorrow.getDate() && d.getMonth() === tomorrow.getMonth() && d.getFullYear() === tomorrow.getFullYear();
+    }).length;
 
     const reportText = `✅ Ventas: *${todaySales}*
 ✅ Citas para hoy: *${todayTotal}*
@@ -204,8 +208,8 @@ export default function UpcomingAppointments({
             <Table>
               <TableHeader className="bg-card sticky top-0 z-30 shadow-sm border-b">
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className={expanded ? "w-[250px]" : ""}>Nombre / Teléfono</TableHead>
-                  {expanded && <TableHead>Contacto</TableHead>}
+                  <TableHead className={expanded ? "w-[180px]" : ""}>Nombre / Teléfono</TableHead>
+                  {expanded && <TableHead className="w-[140px]">Contacto</TableHead>}
                   <TableHead>Motivo</TableHead>
                   {expanded && <TableHead>Producto</TableHead>}
                   <TableHead>Fecha / Estado</TableHead>
@@ -250,17 +254,28 @@ export default function UpcomingAppointments({
                           )}
                         </div>
                         {!expanded && (
-                          <div onClick={(e) => copyPhone(e, app)} className="text-[10px] text-muted-foreground hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1 mt-0.5">
-                            <Phone className="w-2.5 h-2.5" /> {app.phone}
+                          <div className="text-[10px] text-muted-foreground inline-flex items-center gap-1 mt-0.5">
+                            <Phone className="w-2.5 h-2.5" /> 
+                            <span 
+                              onClick={(e) => copyPhone(e, app)} 
+                              className="hover:text-primary transition-colors cursor-pointer font-medium"
+                            >
+                              {app.phone}
+                            </span>
                           </div>
                         )}
                       </TableCell>
                       
                       {expanded && (
                         <TableCell className="align-middle">
-                          <div onClick={(e) => copyPhone(e, app)} className="flex items-center gap-2 text-xs font-medium hover:text-primary cursor-pointer">
+                          <div className="flex items-center gap-2 text-xs font-medium">
                             <div className="p-1.5 rounded-lg bg-primary/10 text-primary"><Phone className="w-3.5 h-3.5" /></div>
-                            {app.phone}
+                            <span 
+                              onClick={(e) => copyPhone(e, app)} 
+                              className="hover:text-primary transition-colors cursor-pointer font-bold"
+                            >
+                              {app.phone}
+                            </span>
                           </div>
                         </TableCell>
                       )}
