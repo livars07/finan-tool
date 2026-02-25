@@ -18,7 +18,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct } from '@/services/appointment-service';
+import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct, getCommissionPaymentDate } from '@/services/appointment-service';
 import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Percent, Coins, CalendarDays, UserCog, ChevronDown, Calendar as CalendarIcon, ArrowRight, History as HistoryIcon, Plus } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format, getDay, addDays, isToday, isTomorrow, isYesterday, differenceInCalendarDays, startOfDay } from 'date-fns';
@@ -159,18 +159,8 @@ Número: *${appointment.phone}*`;
   
   const commissionValue = (editData.finalCreditAmount || 0) * 0.007 * ((editData.commissionPercent || 0) / 100);
 
-  const calculatePaymentDate = (dateStr: string) => {
-    const d = parseISO(dateStr);
-    const dayOfWeek = getDay(d); 
-    
-    let daysToAdd = 0;
-    if (dayOfWeek <= 2) {
-      daysToAdd = (5 - dayOfWeek) + 7;
-    } else {
-      daysToAdd = (5 - dayOfWeek) + 14;
-    }
-    
-    const paymentDate = addDays(d, daysToAdd);
+  const calculatePaymentDateText = (dateStr: string) => {
+    const paymentDate = getCommissionPaymentDate(dateStr);
     const formatted = format(paymentDate, "EEEE d 'de' MMMM", { locale: es });
     return formatted.charAt(0).toUpperCase() + formatted.slice(1);
   };
@@ -207,7 +197,6 @@ Número: *${appointment.phone}*`;
 
   const isCierre = appointment.status === 'Cierre';
   
-  // Lógica temporal mejorada con startOfDay
   const appDate = startOfDay(parseISO(appointment.date));
   const today = startOfDay(new Date());
   const diffCalendar = differenceInCalendarDays(appDate, today);
@@ -598,7 +587,7 @@ Número: *${appointment.phone}*`;
                       </TooltipProvider>
                     </div>
                     <div className="px-3 py-1 bg-primary/5 border border-primary/20 rounded-lg">
-                      <p className="text-[11px] font-bold text-primary">{calculatePaymentDate(appointment.date)}</p>
+                      <p className="text-[11px] font-bold text-primary">{calculatePaymentDateText(appointment.date)}</p>
                     </div>
                   </div>
                 </div>

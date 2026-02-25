@@ -15,6 +15,7 @@ import {
   isSameMonth, 
   subDays, 
   addDays, 
+  getDay
 } from 'date-fns';
 
 export type AppointmentStatus = 
@@ -51,6 +52,25 @@ export interface Appointment {
 }
 
 export const STORAGE_KEY = 'FINANTO_DATA_V1.1_50SEED';
+
+/**
+ * Calcula la fecha de pago estimada para una comisión.
+ */
+export const getCommissionPaymentDate = (dateStr: string): Date => {
+  const d = parseISO(dateStr);
+  const dayOfWeek = getDay(d); // 0=Dom, 1=Lun, 2=Mar, 3=Mié...
+  
+  let daysToAdd = 0;
+  if (dayOfWeek <= 2) {
+    // Domingo a Martes -> Viernes de la siguiente semana
+    daysToAdd = (5 - dayOfWeek) + 7;
+  } else {
+    // Miércoles a Sábado -> Viernes de la subsiguiente semana
+    daysToAdd = (5 - dayOfWeek) + 14;
+  }
+  
+  return addDays(d, daysToAdd);
+};
 
 /**
  * Guarda la lista de citas en el almacenamiento local (localStorage).
@@ -174,7 +194,7 @@ export const generateSeedData = (): Appointment[] => {
     });
   }
 
-  // 30 Citas Pasadas (Historial) - Algunas del mes pasado
+  // 30 Citas Pasadas (Historial) - Algunas del mes pasado con comisiones para monitoreo
   for (let i = 0; i < 30; i++) {
     const pastDate = i < 10 ? subMonths(now, 1) : subDays(now, (i % 20) + 1);
     const globalIndex = i + 30;
