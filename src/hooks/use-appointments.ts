@@ -3,11 +3,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { 
   isToday, isAfter, isBefore, startOfDay, parseISO, 
-  format, differenceInDays, isSameMonth, isSameYear, subMonths
+  format, differenceInDays, subMonths
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import * as Service from '@/services/appointment-service';
-import { Appointment, AppointmentStatus, AppointmentType } from '@/services/appointment-service';
+import { Appointment, AppointmentStatus } from '@/services/appointment-service';
 
 export function useAppointments() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);

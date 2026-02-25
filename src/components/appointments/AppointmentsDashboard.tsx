@@ -14,7 +14,6 @@ import {
   Maximize2, 
   X, 
   LayoutDashboard,
-  CheckCircle2,
   CalendarDays,
   TrendingUp,
   Coins,

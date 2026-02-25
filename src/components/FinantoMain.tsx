@@ -7,9 +7,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { 
   Wallet, CalendarDays, Users, CheckCircle2, ShieldCheck, RotateCcw,
   Palette, Moon, Sun, Cpu, BookOpen, Calculator, Maximize2, Sparkles,
-  ClipboardList, Calendar, Copy, Crown, Snowflake, Trash2, Rocket, 
+  ClipboardList, Calendar, Copy, Crown, Snowflake, Rocket, 
   MessageSquare, CalendarClock, HandCoins, CheckCircle, Search, BadgeAlert, 
-  MoreHorizontal, ArrowUpRight, ArrowDownRight, Coins
+  MoreHorizontal, ArrowUpRight, ArrowDownRight, Coins, Star, Trophy, PartyPopper
 } from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
 import { Button } from '@/components/ui/button';
@@ -58,8 +58,8 @@ type Theme = 'corporativo' | 'tranquilo' | 'moderno' | 'discreto' | 'olivares' |
 const APP_TIPS = [
   { icon: Calculator, title: "Calculadora Rápida", color: "text-primary", text: "Usa la calculadora rapida en caso de tener una llamada con un interesado que pregunte montos aproximados." },
   { icon: ClipboardList, title: "Gestión Eficiente", color: "text-accent", text: "Nunca olvides registrar todas tus citas en el gestionador de citas, para tener un orden eficiente de fechas y datos en un solo lugar." },
-  { icon: ShieldCheck, title: "Seguridad de Datos", color: "text-destructive", text: "Recuerda, tus citas son guardadas dentro de este navegador, si cambias de navegador o de dispositivo contacta al desarrollador." },
-  { icon: Sparkles, title: "Próximas Mejoras", color: "text-yellow-500", text: "IA para automatización de mensajes personalizados, sincronización en la nube y más gráficas de rendimiento." },
+  { icon: ShieldCheck, title: "Seguridad de Datos", color: "text-destructive", text: "Recuerda, tus citas se guardan localmente para tu privacidad." },
+  { icon: Sparkles, title: "IA Integrada", color: "text-yellow-500", text: "IA para automatización de mensajes personalizados y seguimiento de cierres." },
   { icon: Maximize2, title: "Modo Presentación", color: "text-primary", text: "Usa el icono de expansión para mostrar los números al cliente de forma limpia y profesional." },
   { icon: Palette, title: "Imagen Corporativa", color: "text-accent", text: "Usa el tema <<corporativo>> para mostrar pantalla a tus clientes presenciales." },
   { icon: Copy, title: "Envío a WhatsApp", color: "text-green-500", text: "Copia los datos de cada cliente para mandarlos por el grupo de WhatsApp rápidamente." }
@@ -73,7 +73,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const appointmentState = useAppointments();
   const { 
     appointments, stats, isLoaded, resetData, clearAll, 
-    updateStatus, editAppointment, upcoming, past
+    editAppointment, upcoming, past
   } = appointmentState;
   
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -91,6 +91,10 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const overdueQueue = useRef<Service.Appointment[]>([]);
   const lastClosedTimeRef = useRef<number>(0); 
   const pendingAppRef = useRef<Service.Appointment | null>(null);
+
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [lastFinishedApp, setLastFinishedApp] = useState<Service.Appointment | null>(null);
+  const onSelectAppId = (id: string | null) => setSelectedAppId(id);
   
   const { toast } = useToast();
 
@@ -426,7 +430,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
               initialExpanded={initialSection === 'gestor'}
               onExpandedChange={setIsGestorExpanded}
               selectedAppId={selectedAppId}
-              onSelectAppId={setSelectedAppId}
+              onSelectAppId={onSelectAppId}
               appointments={appointmentState.appointments} 
               upcoming={appointmentState.upcoming} 
               past={appointmentState.past} 
@@ -462,7 +466,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   <span className="text-xs font-semibold">Reiniciar Seed</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setShowClearConfirm(true)} className="cursor-pointer gap-2 py-2 text-destructive focus:text-destructive">
-                  <Trash2 className="w-4 h-4" />
+                  <RotateCcw className="w-4 h-4" />
                   <span className="text-xs font-semibold">Limpiar Datos</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -609,7 +613,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                 <div className="flex justify-between items-center">
                   <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Fecha de Pago</span>
                   <span className="text-sm font-bold text-primary">
-                    {new Intl.DateTimeFormat('es-MX', { dateStyle: 'long' }).format(Service.getCommissionPaymentDate(pendingCommissionApp.date))}
+                    {new Intl.NumberFormat('es-MX', { dateStyle: 'long' } as any).format(Service.getCommissionPaymentDate(pendingCommissionApp.date))}
                   </span>
                 </div>
               </div>
@@ -626,6 +630,26 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
             <Button onClick={handleConfirmCommissionPayment} className="w-full sm:flex-1 h-11 bg-accent hover:bg-accent/80 text-accent-foreground font-bold shadow-lg gap-2" type="button">
               <CheckCircle className="w-4 h-4" /> Sí, ya se pagó
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <DialogContent className="sm:max-w-[550px] border shadow-2xl backdrop-blur-md overflow-hidden p-0 bg-green-950 border-green-500/50 text-white z-[90]">
+          <div className="p-8 space-y-6">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="bg-green-500/20 p-5 rounded-full border border-green-400/30 relative z-10">
+                <Trophy className="w-16 h-16 text-green-400" />
+              </div>
+              <DialogTitle className="text-3xl font-headline font-bold flex items-center gap-3 text-white">
+                <PartyPopper className="text-yellow-500" /> ¡FELICIDADES! <PartyPopper className="text-yellow-500" />
+              </DialogTitle>
+              <DialogDescription className="text-lg text-center mx-auto text-green-100">
+                Has concretado el crédito de <strong className="text-white">{lastFinishedApp?.name}</strong> con éxito.
+              </DialogDescription>
+            </div>
+          </div>
+          <DialogFooter className="p-6 bg-green-900/50 border-t border-green-800/50 sm:justify-center">
+            <Button onClick={() => setShowSuccessDialog(false)} className="bg-green-600 hover:bg-green-700 text-white font-bold px-12 h-14 rounded-2xl text-xl shadow-xl transition-all transform hover:scale-105" type="button">Continuar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
