@@ -23,7 +23,7 @@ interface Props {
   onSelect: (app: Appointment) => void;
   formatDate: (date: string) => string;
   format12hTime: (time: string) => string;
-  highlightedId?: string | null;
+  activeId?: string | null;
   expanded?: boolean;
 }
 
@@ -32,7 +32,7 @@ export default function PastAppointments({
   onSelect, 
   formatDate, 
   format12hTime, 
-  highlightedId, 
+  activeId, 
   expanded = false
 }: Props) {
   const [visibleCount, setVisibleCount] = useState(15);
@@ -94,7 +94,7 @@ export default function PastAppointments({
             </TableHeader>
             <TableBody>
               {visibleAppointments.map((app) => {
-                const isHighlighted = highlightedId === app.id;
+                const isSelected = activeId === app.id;
                 const isCierre = app.status === 'Cierre' || app.status === 'Apartado';
                 const isCommissionPending = isCierre && app.commissionStatus !== 'Pagada';
 
@@ -104,7 +104,7 @@ export default function PastAppointments({
                     onClick={() => onSelect(app)}
                     className={cn(
                       "hover:bg-primary/10 transition-colors cursor-pointer relative h-16",
-                      isHighlighted && "bg-accent/20 animate-pulse border-2 border-accent/40 z-20"
+                      isSelected && "bg-primary/20 border-l-4 border-l-primary z-20"
                     )}
                   >
                     <TableCell className="align-middle">

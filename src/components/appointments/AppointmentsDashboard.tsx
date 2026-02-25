@@ -75,7 +75,7 @@ export default function AppointmentsDashboard({
 }: AppointmentsDashboardProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
-  const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const [activeTab, setActiveTab] = useState('upcoming');
 
@@ -139,12 +139,9 @@ export default function AppointmentsDashboard({
     return appointments.find(app => app.id === selectedAppId) || null;
   }, [appointments, selectedAppId]);
 
-  const handleOpenChange = (open: boolean) => {
-    if (!open && selectedAppId) {
-      setHighlightedId(selectedAppId);
-      setTimeout(() => setHighlightedId(null), 4000);
-    }
-    if (!open) setSelectedAppId(null);
+  const handleSelect = (app: Appointment) => {
+    setActiveId(app.id);
+    setSelectedAppId(app.id);
   };
 
   const DashboardContent = ({ expanded = false }: { expanded?: boolean }) => (
@@ -276,10 +273,10 @@ export default function AppointmentsDashboard({
             allAppointments={appointments}
             formatDate={formatFriendlyDate}
             format12hTime={format12hTime}
-            onSelect={(app) => setSelectedAppId(app.id)}
+            onSelect={handleSelect}
             updateStatus={updateStatus}
             toggleConfirmation={toggleConfirmation}
-            highlightedId={highlightedId}
+            activeId={activeId}
             expanded={expanded}
           />
         </TabsContent>
@@ -288,8 +285,8 @@ export default function AppointmentsDashboard({
             appointments={filteredPast} 
             formatDate={formatFriendlyDate}
             format12hTime={format12hTime}
-            onSelect={(app) => setSelectedAppId(app.id)}
-            highlightedId={highlightedId}
+            onSelect={handleSelect}
+            activeId={activeId}
             expanded={expanded}
           />
         </TabsContent>
@@ -385,7 +382,7 @@ export default function AppointmentsDashboard({
       <AppointmentDetailsDialog 
         appointment={selectedApp} 
         open={!!selectedAppId} 
-        onOpenChange={handleOpenChange}
+        onOpenChange={(o) => !o && setSelectedAppId(null)}
         onEdit={editAppointment}
         onAdd={addAppointment}
         formatFriendlyDate={formatFriendlyDate}

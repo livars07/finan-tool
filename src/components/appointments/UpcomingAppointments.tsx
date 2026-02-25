@@ -43,7 +43,7 @@ interface Props {
   onSelect: (app: Appointment) => void;
   updateStatus: (id: string, status: AppointmentStatus, notes?: string) => void;
   toggleConfirmation: (id: string) => void;
-  highlightedId?: string | null;
+  activeId?: string | null;
   expanded?: boolean;
 }
 
@@ -55,7 +55,7 @@ export default function UpcomingAppointments({
   onSelect, 
   updateStatus, 
   toggleConfirmation, 
-  highlightedId,
+  activeId,
   expanded = false
 }: Props) {
   const [finId, setFinId] = useState<string | null>(null);
@@ -207,7 +207,7 @@ export default function UpcomingAppointments({
               <TableBody>
                 {appointments.map((app) => {
                   const appToday = isActuallyToday(app.date);
-                  const isHighlighted = highlightedId === app.id;
+                  const isSelected = activeId === app.id;
                   const isCierre = app.status === 'Cierre';
                   const isCommissionPending = isCierre && app.commissionStatus !== 'Pagada';
                   
@@ -218,7 +218,7 @@ export default function UpcomingAppointments({
                       className={cn(
                         "hover:bg-primary/10 transition-colors cursor-pointer group relative h-16",
                         appToday && "bg-primary/5 border-l-4 border-l-primary",
-                        isHighlighted && "bg-accent/20 animate-pulse border-2 border-accent/40"
+                        isSelected && "bg-primary/20 border-l-4 border-l-primary z-10"
                       )}
                     >
                       <TableCell className="align-middle">

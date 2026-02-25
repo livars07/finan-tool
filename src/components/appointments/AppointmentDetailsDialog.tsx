@@ -220,7 +220,11 @@ Número: *${appointment.phone}*`;
         } 
         onOpenChange(o); 
       }}>
-        <DialogContent className="sm:max-w-[550px] bg-card border-border p-0 shadow-xl backdrop-blur-md z-[70] overflow-hidden flex flex-col max-h-[95vh]">
+        <DialogContent 
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          onCloseAutoFocus={(e) => e.preventDefault()}
+          className="sm:max-w-[550px] bg-card border-border p-0 shadow-xl backdrop-blur-md z-[70] overflow-hidden flex flex-col max-h-[95vh]"
+        >
           <DialogHeader className="px-6 py-3 border-b border-border/40 flex flex-row items-center justify-between bg-card/10 shrink-0">
             <div className="flex items-center gap-2">
               <DialogTitle className="text-lg font-headline font-bold text-foreground">
@@ -559,7 +563,11 @@ Número: *${appointment.phone}*`;
       </Dialog>
 
       <Dialog open={isRescheduling} onOpenChange={setIsRescheduling}>
-        <DialogContent className="sm:max-w-[450px] bg-card border-border shadow-2xl backdrop-blur-md z-[80]">
+        <DialogContent 
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          onCloseAutoFocus={(e) => e.preventDefault()}
+          className="sm:max-w-[450px] bg-card border-border shadow-2xl backdrop-blur-md z-[80]"
+        >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <CalendarPlus className="w-5 h-5 text-primary" />
