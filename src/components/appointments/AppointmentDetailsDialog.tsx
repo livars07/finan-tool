@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -18,9 +19,9 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct } from '@/services/appointment-service';
-import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Percent, Coins } from 'lucide-react';
+import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Percent, Coins, CalendarDays } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
-import { parseISO, format } from 'date-fns';
+import { parseISO, format, getDay, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import {
@@ -152,7 +153,27 @@ Número: *${appointment.phone}*`;
   };
 
   const showCommissionPanel = appointment.status === 'Cierre' || appointment.status === 'Apartado';
-  const commissionValue = (editData.finalCreditAmount || 0) * ((editData.commissionPercent || 0) / 100);
+  
+  // Formula: Full commission is 0.7% (0.007). Percent input modifies that 0.7%.
+  const commissionValue = (editData.finalCreditAmount || 0) * 0.007 * ((editData.commissionPercent || 0) / 100);
+
+  const calculatePaymentDate = (dateStr: string) => {
+    const d = parseISO(dateStr);
+    const dayOfWeek = getDay(d); // Sun=0, Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6
+    
+    let daysToAdd = 0;
+    if (dayOfWeek <= 2) { // Sun, Mon, Tue -> Cutoff is Tue, payment is upcoming Fri
+      daysToAdd = (5 - dayOfWeek + 7) % 7;
+      if (daysToAdd === 0 && dayOfWeek > 2) daysToAdd = 7; // Security measure
+    } else { // Wed and after -> Payment is next week Fri
+      daysToAdd = (5 - dayOfWeek + 14) % 14;
+      if (daysToAdd < 7) daysToAdd += 7;
+    }
+    
+    const paymentDate = addDays(d, daysToAdd);
+    const formatted = format(paymentDate, "EEEE d 'de' MMMM", { locale: es });
+    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+  };
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('es-MX', {
@@ -390,14 +411,14 @@ Número: *${appointment.phone}*`;
                   </div>
                   <div className="space-y-1">
                     <Label className="text-[9px] font-bold uppercase text-muted-foreground flex items-center gap-1">
-                      <Percent className="w-3 h-3" /> % Comisión
+                      <Percent className="w-3 h-3" /> Comisión
                       <TooltipProvider>
                         <Tooltip delayDuration={0}>
                           <TooltipTrigger asChild>
                             <Info className="h-2.5 w-2.5 cursor-help opacity-40 hover:opacity-100" />
                           </TooltipTrigger>
                           <TooltipContent side="top">
-                            <p className="text-[10px] leading-tight">La comisión completa proyectada es de 0.007 (0.7%) del valor del crédito.</p>
+                            <p className="text-[10px] leading-tight">La comisión completa es de 0.7% del valor del crédito.</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -416,10 +437,20 @@ Número: *${appointment.phone}*`;
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-border/10 flex items-center justify-between">
-                  <span className="text-[9px] font-bold uppercase text-muted-foreground">Valor Comisión</span>
-                  <div className="px-3 py-1 bg-accent/5 border border-accent/20 rounded-lg">
-                    <p className="text-sm font-bold text-accent">{formatCurrency(commissionValue)}</p>
+                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-border/10">
+                  <div className="space-y-1">
+                    <span className="text-[9px] font-bold uppercase text-muted-foreground block">Valor Comisión</span>
+                    <div className="px-3 py-1 bg-accent/5 border border-accent/20 rounded-lg">
+                      <p className="text-sm font-bold text-accent">{formatCurrency(commissionValue)}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[9px] font-bold uppercase text-muted-foreground flex items-center gap-1">
+                      <CalendarDays className="w-3 h-3" /> Fecha de Pago
+                    </span>
+                    <div className="px-3 py-1 bg-primary/5 border border-primary/20 rounded-lg">
+                      <p className="text-[11px] font-bold text-primary">{calculatePaymentDate(appointment.date)}</p>
+                    </div>
                   </div>
                 </div>
               </div>

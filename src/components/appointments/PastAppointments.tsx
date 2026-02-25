@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -9,7 +10,8 @@ import {
   Phone, 
   Box, 
   FileText, 
-  ChevronRight 
+  ChevronRight,
+  ShieldAlert
 } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -93,6 +95,9 @@ export default function PastAppointments({
             <TableBody>
               {visibleAppointments.map((app) => {
                 const isHighlighted = highlightedId === app.id;
+                const isCierre = app.status === 'Cierre' || app.status === 'Apartado';
+                const isCommissionPending = isCierre && app.commissionStatus !== 'Pagada';
+
                 return (
                   <TableRow 
                     key={app.id} 
@@ -157,11 +162,18 @@ export default function PastAppointments({
                     )}
 
                     <TableCell className="align-middle">
-                      <div className={cn(
-                        "text-[9px] uppercase font-bold px-2 py-1 rounded-full border w-fit text-center min-w-[80px]",
-                        getStatusColor(app.status)
-                      )}>
-                        {app.status || 'N/A'}
+                      <div className="flex items-center gap-2">
+                        <div className={cn(
+                          "text-[9px] uppercase font-bold px-2 py-1 rounded-full border w-fit text-center min-w-[80px]",
+                          getStatusColor(app.status)
+                        )}>
+                          {app.status || 'N/A'}
+                        </div>
+                        {isCommissionPending && (
+                          <div title="Pago Pendiente">
+                            <ShieldAlert className="w-3.5 h-3.5 text-orange-500 animate-pulse" />
+                          </div>
+                        )}
                       </div>
                     </TableCell>
 

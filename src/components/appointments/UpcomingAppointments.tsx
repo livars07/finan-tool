@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { 
   Clock, Calendar, Info, CheckCircle2, AlertCircle, 
   CheckCircle, Trophy, PartyPopper, Sparkles, Copy, 
-  ClipboardCheck, Phone, Box, ChevronRight 
+  ClipboardCheck, Phone, Box, ChevronRight, ShieldAlert 
 } from "lucide-react";
 import { parseISO, isToday, addDays } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -208,6 +208,8 @@ export default function UpcomingAppointments({
                 {appointments.map((app) => {
                   const appToday = isActuallyToday(app.date);
                   const isHighlighted = highlightedId === app.id;
+                  const isCierre = app.status === 'Cierre';
+                  const isCommissionPending = isCierre && app.commissionStatus !== 'Pagada';
                   
                   return (
                     <TableRow 
@@ -259,6 +261,11 @@ export default function UpcomingAppointments({
                                   <AlertCircle className="w-2.5 h-2.5 mr-1" /> Confirmar
                                 </Button>
                               )}
+                            </div>
+                          )}
+                          {isCommissionPending && (
+                            <div className="flex items-center gap-1 mt-1 text-[8px] font-bold text-orange-500 animate-pulse">
+                              <ShieldAlert className="w-2.5 h-2.5" /> PAGO PENDIENTE
                             </div>
                           )}
                         </div>
