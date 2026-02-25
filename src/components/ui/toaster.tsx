@@ -32,17 +32,21 @@ export function Toaster() {
 
         const isActionRequired = titleStr.includes('Acción Requerida');
 
-        let soundUrl = "https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"; // Éxito/Info
+        // Sonido base simple (limpio y profesional)
+        let soundUrl = "https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"; 
         let volume = 0.3;
 
         if (isWelcome) {
-          soundUrl = "https://assets.mixkit.co/active_storage/sfx/1999/1999-preview.mp3"; // Nuevo sonido de bienvenida más suave
+          // Sonido de bienvenida simple (un ding elegante)
+          soundUrl = "https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"; 
           volume = 0.8; 
         } else if (isActionRequired) {
-          soundUrl = "https://assets.mixkit.co/active_storage/sfx/2356/2356-preview.mp3"; // Alerta sistema/Advertencia
+          // Sonido de aviso del sistema
+          soundUrl = "https://assets.mixkit.co/active_storage/sfx/2356/2356-preview.mp3"; 
           volume = 0.4;
         } else if (t.variant === 'destructive' || isCopyAction) {
-          soundUrl = "https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3"; // Error/Copia
+          // Sonido de acción corta/error
+          soundUrl = "https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3"; 
           volume = 0.5;
         }
           
