@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -18,7 +19,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct } from '@/services/appointment-service';
-import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Percent, Coins, CalendarDays, UserCog } from 'lucide-react';
+import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Percent, Coins, CalendarDays, UserCog, ChevronDown } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format, getDay, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -50,6 +51,7 @@ export default function AppointmentDetailsDialog({
 }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [isRescheduling, setIsRescheduling] = useState(false);
+  const [showEditProspector, setShowEditProspector] = useState(false);
   const [editData, setEditData] = useState<Partial<Appointment>>({});
   
   const [newName, setNewName] = useState('');
@@ -65,6 +67,7 @@ export default function AppointmentDetailsDialog({
   useEffect(() => {
     if (appointment) {
       setEditData(appointment);
+      setShowEditProspector(!!appointment.prospectorName);
     }
   }, [appointment]);
 
@@ -74,19 +77,11 @@ export default function AppointmentDetailsDialog({
       setNewPhone(appointment.phone || '');
       setNewProduct(appointment.product || 'Casa');
       setNewNotes(appointment.notes || '');
-      setNewType(appointment.status === 'Cierre' ? 'seguimiento' : '2da consulta');
+      setNewType(appointment.status === 'Cierre' ? 'Seguimiento' : '2da consulta');
       setNewDate('');
       setNewTime('');
     }
   }, [isRescheduling, appointment]);
-
-  const forceDOMCleanup = () => {
-    if (typeof document === 'undefined') return;
-    setTimeout(() => {
-      document.body.style.pointerEvents = 'auto';
-      document.body.style.overflow = 'auto';
-    }, 150);
-  };
 
   if (!appointment) return null;
 
@@ -122,7 +117,7 @@ export default function AppointmentDetailsDialog({
     navigator.clipboard.writeText(appointment.phone).then(() => {
       toast({
         title: "Número copiado",
-        description: `${appointment.phone} listo para usar.`,
+        description: `${appointment.name}: ${appointment.phone} listo para usar.`,
       });
     });
   };
@@ -213,10 +208,7 @@ Número: *${appointment.phone}*`;
   return (
     <>
       <Dialog open={open} onOpenChange={(o) => { 
-        if(!o) {
-          setIsEditing(false);
-          forceDOMCleanup();
-        } 
+        if(!o) setIsEditing(false);
         onOpenChange(o); 
       }}>
         <DialogContent 
@@ -276,30 +268,39 @@ Número: *${appointment.phone}*`;
                 </div>
 
                 <div className="p-3 border rounded-lg bg-muted/10 border-border/30 space-y-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <UserCog className="w-3.5 h-3.5 text-primary" />
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Datos del Prospectador</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <Label className="text-[10px] font-bold uppercase text-muted-foreground/60">Nombre Prospectador</Label>
-                      <Input 
-                        value={editData.prospectorName || ''} 
-                        onChange={e => setEditData({...editData, prospectorName: e.target.value})} 
-                        className="h-8 bg-background text-sm" 
-                        placeholder="Ej. Juan Perez"
-                      />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowEditProspector(!showEditProspector)}
+                    className="h-7 text-[10px] font-bold uppercase text-primary hover:bg-primary/10 px-0"
+                  >
+                    <UserCog className="w-3.5 h-3.5 mr-2" />
+                    {showEditProspector ? 'Ocultar prospectador' : '¿Viene de otro prospectador?'}
+                    <ChevronDown className={cn("ml-2 h-3.5 w-3.5 transition-transform", showEditProspector && "rotate-180")} />
+                  </Button>
+
+                  {showEditProspector && (
+                    <div className="grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-1">
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-bold uppercase text-muted-foreground/60">Nombre Prospectador</Label>
+                        <Input 
+                          value={editData.prospectorName || ''} 
+                          onChange={e => setEditData({...editData, prospectorName: e.target.value})} 
+                          className="h-8 bg-background text-sm" 
+                          placeholder="Ej. Juan Perez"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-bold uppercase text-muted-foreground/60">Teléfono Prospectador</Label>
+                        <Input 
+                          value={editData.prospectorPhone || ''} 
+                          onChange={e => setEditData({...editData, prospectorPhone: e.target.value})} 
+                          className="h-8 bg-background text-sm" 
+                          placeholder="664 000 0000"
+                        />
+                      </div>
                     </div>
-                    <div className="space-y-1">
-                      <Label className="text-[10px] font-bold uppercase text-muted-foreground/60">Teléfono Prospectador</Label>
-                      <Input 
-                        value={editData.prospectorPhone || ''} 
-                        onChange={e => setEditData({...editData, prospectorPhone: e.target.value})} 
-                        className="h-8 bg-background text-sm" 
-                        placeholder="664 000 0000"
-                      />
-                    </div>
-                  </div>
+                  )}
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3">
@@ -313,7 +314,7 @@ Número: *${appointment.phone}*`;
                         <SelectItem value="1ra consulta">1ra consulta</SelectItem>
                         <SelectItem value="2da consulta">2da consulta</SelectItem>
                         <SelectItem value="cierre">Cierre</SelectItem>
-                        <SelectItem value="seguimiento">Seguimiento</SelectItem>
+                        <SelectItem value="Seguimiento">Seguimiento</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -673,7 +674,7 @@ Número: *${appointment.phone}*`;
                     <SelectItem value="1ra consulta">1ra consulta</SelectItem>
                     <SelectItem value="2da consulta">2da consulta</SelectItem>
                     <SelectItem value="cierre">Cierre</SelectItem>
-                    <SelectItem value="seguimiento">Seguimiento</SelectItem>
+                    <SelectItem value="Seguimiento">Seguimiento</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
