@@ -274,7 +274,7 @@ export default function PastAppointments({
 
                         {isCommissionOverdue && (
                           <div title="Pago Pendiente">
-                            <ShieldAlert className="w-3.5 h-3.5 text-orange-500 animate-pulse" />
+                            <ShieldAlert className="w-3.5 h-3.5 text-destructive animate-pulse" />
                           </div>
                         )}
                       </div>

@@ -322,7 +322,7 @@ export default function UpcomingAppointments({
                             </div>
                           )}
                           {isCommissionPending && (
-                            <div className="flex items-center gap-1 mt-1 text-[8px] font-bold text-orange-500 animate-pulse">
+                            <div className="flex items-center gap-1 mt-1 text-[8px] font-bold text-destructive animate-pulse">
                               <ShieldAlert className="w-2.5 h-2.5" /> PAGO PENDIENTE
                             </div>
                           )}
