@@ -1,3 +1,4 @@
+
 "use client"
 
 import React from 'react';
@@ -67,7 +68,7 @@ export default function PastAppointments({
       case 'Apartado': return 'text-green-100/90 bg-green-500/20 border-green-400/30';
       case 'No asistencia': return 'text-destructive bg-destructive/10 border-destructive/20';
       case 'Reagendó': return 'text-primary bg-primary/10 border-primary/20';
-      case 'Asistencia': return 'text-accent bg-accent/10 border-accent/20';
+      case 'Asistencia': return 'text-blue-600 bg-blue-600/10 border-blue-600/20 font-bold';
       case 'Reembolso': return 'text-orange-400 bg-orange-400/10 border-orange-400/20';
       case 'Continuación en otra cita': return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
       default: return 'text-muted-foreground bg-muted/10 border-border/20';
@@ -247,7 +248,7 @@ export default function PastAppointments({
                                   <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
                                 </div>
                               </TooltipTrigger>
-                              <TooltipContent className="bg-card border-green-500/20 p-3 space-y-1 z-[100]">
+                              <TooltipContent side="top" sideOffset={1} className="bg-card border-green-500/20 p-3 space-y-1 z-[100]">
                                 <div className="flex items-center gap-2 text-green-500 font-bold text-[10px] uppercase tracking-widest">
                                   <CheckCircle2 className="w-3 h-3" /> Comisión Liquidada
                                 </div>

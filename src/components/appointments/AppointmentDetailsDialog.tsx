@@ -457,7 +457,12 @@ Número: *${appointment.phone}*`;
                     <div className="p-2 bg-green-500/10 rounded-lg"><CheckCircle2 className="w-4 h-4 text-green-400" /></div>
                     <div>
                       <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Resultado</p>
-                      <p className="text-xs font-bold text-green-500">{appointment.status}</p>
+                      <p className={cn(
+                        "text-xs font-bold",
+                        appointment.status === 'Asistencia' ? "text-blue-600" : "text-green-500"
+                      )}>
+                        {appointment.status}
+                      </p>
                     </div>
                   </div>
                 )}

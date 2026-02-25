@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -375,7 +376,7 @@ export default function UpcomingAppointments({
           <div className="py-2 space-y-4">
             <div className="space-y-1.5">
               <Label className="text-[10px] font-bold uppercase text-muted-foreground">Estatus Final</Label>
-              <select value={status} onChange={(e) => setStatus(e.target.value as AppointmentStatus)} className={cn("flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm focus:ring-2 focus:ring-ring", status === 'Cierre' && "border-green-500 text-green-600 bg-green-500/5 font-bold")}>
+              <select value={status} onChange={(e) => setStatus(e.target.value as AppointmentStatus)} className={cn("flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm focus:ring-2 focus:ring-ring transition-colors", status === 'Cierre' && "border-green-500 text-green-600 bg-green-500/5 font-bold", status === 'Asistencia' && "border-blue-500 text-blue-600 bg-blue-500/5 font-bold")}>
                 <option value="Asistencia">Asistencia</option>
                 <option value="No asistencia">No asistencia</option>
                 <option value="Continuación en otra cita">Continuación en otra cita</option>
@@ -392,8 +393,8 @@ export default function UpcomingAppointments({
           </div>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setFinId(null)} className="h-9 text-xs" type="button">Volver</Button>
-            <Button onClick={handleFinalize} className={cn("h-9 text-xs font-bold shadow-lg", status === 'Cierre' ? "bg-green-600 hover:bg-green-700 text-white" : "bg-primary text-primary-foreground")} type="button">
-              {status === 'Cierre' ? 'Confirmar Venta' : 'Cerrar Consulta'}
+            <Button onClick={handleFinalize} className={cn("h-9 text-xs font-bold shadow-lg", status === 'Cierre' ? "bg-green-600 hover:bg-green-700 text-white" : status === 'Asistencia' ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-primary text-primary-foreground")} type="button">
+              {status === 'Cierre' ? 'Confirmar Venta' : status === 'Asistencia' ? 'Confirmar Asistencia' : 'Cerrar Consulta'}
             </Button>
           </DialogFooter>
         </DialogContent>
