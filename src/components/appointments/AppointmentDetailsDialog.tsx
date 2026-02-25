@@ -44,7 +44,6 @@ interface Props {
 export default function AppointmentDetailsDialog({ 
   appointment, 
   open, 
-  open: dialogOpen,
   onOpenChange, 
   onEdit,
   onAdd,
@@ -167,12 +166,15 @@ Número: *${appointment.phone}*`;
 
   const calculatePaymentDate = (dateStr: string) => {
     const d = parseISO(dateStr);
-    const dayOfWeek = getDay(d);
+    const dayOfWeek = getDay(d); // 0 = Sun, 1 = Mon, 2 = Tue...
     
     let daysToAdd = 0;
+    // Corte el martes: si se vende Dom(0), Lun(1) o Mar(2)
     if (dayOfWeek <= 2) {
+      // Liquidación el viernes de la siguiente semana (2 viernes después)
       daysToAdd = (5 - dayOfWeek) + 7;
     } else {
+      // Liquidación una semana extra después (Viernes posterior a la siguiente)
       daysToAdd = (5 - dayOfWeek) + 14;
     }
     
@@ -453,7 +455,7 @@ Número: *${appointment.phone}*`;
                   </div>
                   <div className="space-y-1">
                     <Label className="text-[9px] font-bold uppercase text-muted-foreground flex items-center gap-1">
-                      <Percent className="w-3 h-3" /> Comisión (%)
+                      Comisión (%)
                       <TooltipProvider>
                         <Tooltip delayDuration={0}>
                           <TooltipTrigger asChild>
@@ -488,9 +490,21 @@ Número: *${appointment.phone}*`;
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-[9px] font-bold uppercase text-muted-foreground flex items-center gap-1">
+                    <Label className="text-[9px] font-bold uppercase text-muted-foreground flex items-center gap-1">
                       <CalendarDays className="w-3 h-3" /> Fecha de Pago
-                    </span>
+                      <TooltipProvider>
+                        <Tooltip delayDuration={0}>
+                          <TooltipTrigger asChild>
+                            <Info className="h-2.5 w-2.5 cursor-help opacity-40 hover:opacity-100" />
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-[200px]">
+                            <p className="text-[10px] leading-tight text-center">
+                              Ventas de Domingo a Martes se liquidan el viernes de la siguiente semana. Ventas de Miércoles a Sábado tienen una semana adicional de desfase.
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </Label>
                     <div className="px-3 py-1 bg-primary/5 border border-primary/20 rounded-lg">
                       <p className="text-[11px] font-bold text-primary">{calculatePaymentDate(appointment.date)}</p>
                     </div>
@@ -635,3 +649,4 @@ Número: *${appointment.phone}*`;
     </>
   );
 }
+
