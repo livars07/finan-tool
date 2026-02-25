@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useEffect, useRef } from "react"
@@ -23,6 +24,8 @@ export function Toaster() {
         const titleStr = t.title?.toString() || '';
         const descStr = t.description?.toString() || '';
         
+        const isWelcome = titleStr.includes('¡Bienvenido a Finanto!');
+        
         const isCopyAction = 
           titleStr.toLowerCase().includes('copia') || 
           descStr.toLowerCase().includes('copia');
@@ -32,7 +35,10 @@ export function Toaster() {
         let soundUrl = "https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"; // Éxito/Info
         let volume = 0.3;
 
-        if (isActionRequired) {
+        if (isWelcome) {
+          soundUrl = "https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"; // Fanfarria/Bienvenida
+          volume = 0.8; // Volumen alto solicitado
+        } else if (isActionRequired) {
           soundUrl = "https://assets.mixkit.co/active_storage/sfx/2356/2356-preview.mp3"; // Alerta sistema/Advertencia
           volume = 0.4;
         } else if (t.variant === 'destructive' || isCopyAction) {

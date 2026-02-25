@@ -125,6 +125,14 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   useEffect(() => {
     if (!isLoaded) return;
 
+    // Notificación de Bienvenida a los 4 segundos
+    const welcomeTimer = setTimeout(() => {
+      toast({
+        title: "¡Bienvenido a Finanto!",
+        description: "Listo para el éxito inmobiliario. Tu agenda y herramientas están sincronizadas.",
+      });
+    }, 4000);
+
     const checkConfirmations = () => {
       const currentStats = statsRef.current;
       const unconfirmed = currentStats.todayCount - currentStats.todayConfirmed;
@@ -137,13 +145,14 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       }
     };
 
-    // Primer recordatorio a los 20 segundos
+    // Primer recordatorio de confirmación a los 20 segundos
     const initialTimer = setTimeout(checkConfirmations, 20000);
 
     // Recordatorio recurrente cada 20 minutos
     const intervalTimer = setInterval(checkConfirmations, 1200000);
 
     return () => {
+      clearTimeout(welcomeTimer);
       clearTimeout(initialTimer);
       clearInterval(intervalTimer);
     };
