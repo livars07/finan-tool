@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -124,7 +123,8 @@ export default function AppointmentsDashboard({
         normalizeStr(app.name).includes(s) || 
         app.phone.includes(s) || 
         (app.status && normalizeStr(app.status).includes(s)) ||
-        (app.product && normalizeStr(app.product).includes(s));
+        (app.product && normalizeStr(app.product).includes(s)) ||
+        (app.prospectorName && normalizeStr(app.prospectorName).includes(s));
       
       if (basicMatch) return true;
       if (friendlyDate.includes(s)) return true;

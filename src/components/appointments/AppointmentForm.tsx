@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -8,14 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { PlusCircle, UserPlus, Plus, Calendar as CalendarIcon, ArrowRight } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { PlusCircle, UserPlus, Plus, Calendar as CalendarIcon, ArrowRight, UserCog, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AppointmentType, AppointmentProduct } from '@/services/appointment-service';
 import { cn } from "@/lib/utils";
 import { addDays, format, nextSaturday } from 'date-fns';
 
 interface AppointmentFormProps {
-  onAdd: (app: { name: string; phone: string; date: string; time: string; type: AppointmentType; product: AppointmentProduct }) => void;
+  onAdd: (app: { name: string; phone: string; date: string; time: string; type: AppointmentType; product: AppointmentProduct; prospectorName?: string; prospectorPhone?: string }) => void;
 }
 
 export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
@@ -25,6 +25,10 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
   const [time, setTime] = useState('');
   const [type, setType] = useState<AppointmentType>('1ra consulta');
   const [product, setProduct] = useState<AppointmentProduct>('Casa');
+  const [prospectorName, setProspectorName] = useState('');
+  const [prospectorPhone, setProspectorPhone] = useState('');
+  const [showProspector, setShowProspector] = useState(false);
+
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -40,13 +44,27 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
     
     const isoDate = new Date(date + 'T12:00:00Z').toISOString();
     
-    onAdd({ name, phone, date: isoDate, time, type, product });
+    onAdd({ 
+      name, 
+      phone, 
+      date: isoDate, 
+      time, 
+      type, 
+      product,
+      prospectorName: prospectorName || undefined,
+      prospectorPhone: prospectorPhone || undefined
+    });
+
     setName('');
     setPhone('');
     setDate('');
     setTime('');
     setType('1ra consulta');
     setProduct('Casa');
+    setProspectorName('');
+    setProspectorPhone('');
+    setShowProspector(false);
+
     toast({
       title: "Cita agregada",
       description: `Cita de ${type} para ${name} registrada.`,
@@ -151,6 +169,40 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
             </div>
           </div>
           
+          <Collapsible open={showProspector} onOpenChange={setShowProspector} className="space-y-2">
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-7 text-[10px] font-bold uppercase text-primary hover:bg-primary/10 px-0">
+                <UserCog className="w-3.5 h-3.5 mr-2" />
+                {showProspector ? 'Ocultar prospectador' : '¿Viene de otro prospectador?'}
+                <ChevronDown className={cn("ml-2 h-3.5 w-3.5 transition-transform", showProspector && "rotate-180")} />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-4 animate-in slide-in-from-top-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 border rounded-lg bg-muted/20 border-border/40">
+                <div className="space-y-2">
+                  <Label htmlFor="prospectorName" className="text-xs uppercase font-bold text-muted-foreground/70">Nombre del Prospectador</Label>
+                  <Input 
+                    id="prospectorName" 
+                    value={prospectorName} 
+                    onChange={(e) => setProspectorName(e.target.value)} 
+                    placeholder="¿Quién agendó?" 
+                    className="bg-background border-border/40 text-sm h-10" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="prospectorPhone" className="text-xs uppercase font-bold text-muted-foreground/70">Teléfono del Prospectador</Label>
+                  <Input 
+                    id="prospectorPhone" 
+                    value={prospectorPhone} 
+                    onChange={(e) => setProspectorPhone(e.target.value)} 
+                    placeholder="Ej. 664 000 0000" 
+                    className="bg-background border-border/40 text-sm h-10" 
+                  />
+                </div>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
             <div className="md:col-span-5 space-y-2">
               <Label htmlFor="type" className="text-xs uppercase font-bold text-muted-foreground/70">Motivo de la Consulta</Label>

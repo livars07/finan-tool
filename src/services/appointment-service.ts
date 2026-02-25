@@ -45,6 +45,9 @@ export interface Appointment {
   commissionPercent?: number;
   commissionStatus?: 'Pagada' | 'Pendiente';
   finalCreditAmount?: number;
+  // Datos de prospectador externo
+  prospectorName?: string;
+  prospectorPhone?: string;
 }
 
 export const STORAGE_KEY = 'FINANTO_DATA_V1.1_50SEED';
@@ -165,7 +168,9 @@ export const generateSeedData = (): Appointment[] => {
       type: types[i % types.length],
       product: products[i % products.length],
       isConfirmed: isTodayApp ? Math.random() > 0.5 : false,
-      notes: `Nota #${i + 1}: Interesado en ${products[i % products.length]}.`
+      notes: `Nota #${i + 1}: Interesado en ${products[i % products.length]}.`,
+      prospectorName: i % 5 === 0 ? `Prospectador ${i}` : undefined,
+      prospectorPhone: i % 5 === 0 ? '664 999 0000' : undefined
     });
   }
 
@@ -189,6 +194,8 @@ export const generateSeedData = (): Appointment[] => {
       commissionStatus: status === 'Cierre' || status === 'Apartado' ? (Math.random() > 0.5 ? 'Pagada' : 'Pendiente') : undefined,
       commissionPercent: status === 'Cierre' || status === 'Apartado' ? 100 : undefined,
       finalCreditAmount: status === 'Cierre' || status === 'Apartado' ? Math.floor(1500000 + Math.random() * 2000000) : undefined,
+      prospectorName: i % 4 === 0 ? `Asistente ${i}` : undefined,
+      prospectorPhone: i % 4 === 0 ? '664 888 1111' : undefined
     });
   }
   

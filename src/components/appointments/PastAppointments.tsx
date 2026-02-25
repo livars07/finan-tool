@@ -1,4 +1,3 @@
-
 "use client"
 
 import React from 'react';
@@ -11,12 +10,19 @@ import {
   Box, 
   FileText, 
   ChevronRight,
-  ShieldAlert
+  ShieldAlert,
+  UserCog
 } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { useToast } from "@/hooks/use-toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Props {
   appointments: Appointment[];
@@ -78,12 +84,12 @@ export default function PastAppointments({
   return (
     <div className="space-y-4 flex flex-col h-full">
       <div className={cn(
-        "border rounded-xl overflow-hidden bg-card/10 relative backdrop-blur-sm flex flex-col",
+        "border rounded-xl overflow-hidden relative backdrop-blur-sm bg-card/10 flex flex-col",
         !expanded ? "h-[400px]" : "h-full flex-1"
       )}>
         <ScrollArea className="flex-1 scrollbar-thin">
           <Table>
-            <TableHeader className="bg-muted sticky top-0 z-20 shadow-sm">
+            <TableHeader className="bg-card sticky top-0 z-30 shadow-sm border-b">
               <TableRow className="hover:bg-transparent">
                 <TableHead className={expanded ? "w-[250px]" : ""}>Nombre / Teléfono</TableHead>
                 {expanded && <TableHead>Contacto</TableHead>}
@@ -111,7 +117,24 @@ export default function PastAppointments({
                     )}
                   >
                     <TableCell className="align-middle">
-                      <div className="font-bold text-sm text-foreground">{app.name}</div>
+                      <div className="flex items-center gap-2">
+                        <div className="font-bold text-sm text-foreground">{app.name}</div>
+                        {app.prospectorName && (
+                          <TooltipProvider>
+                            <Tooltip delayDuration={0}>
+                              <TooltipTrigger asChild>
+                                <div className="p-1 rounded-full bg-primary/10 text-primary cursor-help">
+                                  <UserCog className="h-3 w-3" />
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent side="top">
+                                <p className="text-[10px] font-bold uppercase">Prospectado por: {app.prospectorName}</p>
+                                {app.prospectorPhone && <p className="text-[9px] text-muted-foreground">{app.prospectorPhone}</p>}
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
+                      </div>
                       {!expanded && (
                         <div 
                           onClick={(e) => copyPhone(e, app.phone)}

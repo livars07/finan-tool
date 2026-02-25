@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -19,7 +18,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct } from '@/services/appointment-service';
-import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Percent, Coins, CalendarDays } from 'lucide-react';
+import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Percent, Coins, CalendarDays, UserCog } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format, getDay, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -264,7 +263,7 @@ Número: *${appointment.phone}*`;
 
           <div className="px-6 py-4 space-y-4 overflow-y-auto flex-1 scrollbar-thin">
             {isEditing ? (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <Label className="text-[10px] font-bold uppercase text-muted-foreground">Nombre</Label>
@@ -273,6 +272,33 @@ Número: *${appointment.phone}*`;
                   <div className="space-y-1">
                     <Label className="text-[10px] font-bold uppercase text-muted-foreground">Teléfono</Label>
                     <Input value={editData.phone || ''} onChange={e => setEditData({...editData, phone: e.target.value})} className="h-8 bg-muted/20 text-sm" />
+                  </div>
+                </div>
+
+                <div className="p-3 border rounded-lg bg-muted/10 border-border/30 space-y-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <UserCog className="w-3.5 h-3.5 text-primary" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Datos del Prospectador</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-bold uppercase text-muted-foreground/60">Nombre Prospectador</Label>
+                      <Input 
+                        value={editData.prospectorName || ''} 
+                        onChange={e => setEditData({...editData, prospectorName: e.target.value})} 
+                        className="h-8 bg-background text-sm" 
+                        placeholder="Ej. Juan Perez"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-bold uppercase text-muted-foreground/60">Teléfono Prospectador</Label>
+                      <Input 
+                        value={editData.prospectorPhone || ''} 
+                        onChange={e => setEditData({...editData, prospectorPhone: e.target.value})} 
+                        className="h-8 bg-background text-sm" 
+                        placeholder="664 000 0000"
+                      />
+                    </div>
                   </div>
                 </div>
                 
@@ -348,9 +374,26 @@ Número: *${appointment.phone}*`;
               <div className="grid grid-cols-1 gap-3 bg-muted/10 p-4 rounded-xl border border-border/30 backdrop-blur-sm shrink-0">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-primary/10 rounded-lg"><User className="w-4 h-4 text-primary" /></div>
-                  <div>
+                  <div className="flex-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Cliente</p>
-                    <p className="text-sm font-bold">{appointment.name}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-bold">{appointment.name}</p>
+                      {appointment.prospectorName && (
+                        <TooltipProvider>
+                          <Tooltip delayDuration={0}>
+                            <TooltipTrigger asChild>
+                              <div className="p-1 rounded-full bg-primary/10 text-primary cursor-help">
+                                <UserCog className="h-3 w-3" />
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent side="top">
+                              <p className="text-[10px] font-bold uppercase">Prospectado por: {appointment.prospectorName}</p>
+                              {appointment.prospectorPhone && <p className="text-[9px] text-muted-foreground">{appointment.prospectorPhone}</p>}
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
+                    </div>
                   </div>
                 </div>
                 
@@ -387,6 +430,18 @@ Número: *${appointment.phone}*`;
                     </div>
                   </div>
                 </div>
+
+                {appointment.prospectorName && (
+                  <div className="flex items-center gap-3 border-t border-border/10 pt-3">
+                    <div className="p-2 bg-primary/10 rounded-lg"><UserCog className="w-4 h-4 text-primary" /></div>
+                    <div>
+                      <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Agendado por</p>
+                      <p className="text-xs font-bold text-primary">
+                        {appointment.prospectorName} {appointment.prospectorPhone ? `(${appointment.prospectorPhone})` : ''}
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex items-center gap-3 border-t border-border/10 pt-3">
                   <div className="p-2 bg-primary/10 rounded-lg"><CalendarDays className="w-4 h-4 text-primary" /></div>
@@ -456,8 +511,8 @@ Número: *${appointment.phone}*`;
                     )}
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-[9px] font-bold uppercase text-muted-foreground flex items-center gap-1">
-                      Comisión
+                    <div className="flex items-center gap-1">
+                      <Label className="text-[9px] font-bold uppercase text-muted-foreground">Comisión</Label>
                       <TooltipProvider>
                         <Tooltip delayDuration={0}>
                           <TooltipTrigger asChild>
@@ -468,7 +523,7 @@ Número: *${appointment.phone}*`;
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
-                    </Label>
+                    </div>
                     {isEditing ? (
                       <Input 
                         type="number" 
@@ -492,8 +547,10 @@ Número: *${appointment.phone}*`;
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-[9px] font-bold uppercase text-muted-foreground flex items-center gap-1">
-                      <CalendarDays className="w-3 h-3" /> Fecha de Pago
+                    <div className="flex items-center gap-1">
+                      <Label className="text-[9px] font-bold uppercase text-muted-foreground flex items-center gap-1">
+                        <CalendarDays className="w-3 h-3" /> Fecha de Pago
+                      </Label>
                       <TooltipProvider>
                         <Tooltip delayDuration={0}>
                           <TooltipTrigger asChild>
@@ -506,7 +563,7 @@ Número: *${appointment.phone}*`;
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
-                    </Label>
+                    </div>
                     <div className="px-3 py-1 bg-primary/5 border border-primary/20 rounded-lg">
                       <p className="text-[11px] font-bold text-primary">{calculatePaymentDate(appointment.date)}</p>
                     </div>
