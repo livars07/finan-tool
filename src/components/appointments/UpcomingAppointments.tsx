@@ -208,16 +208,16 @@ export default function UpcomingAppointments({
           </div>
         ) : (
           <ScrollArea className="flex-1 scrollbar-thin">
-            <Table>
-              <TableHeader className="bg-card sticky top-0 z-30 shadow-sm border-b">
+            <Table className="border-collapse separate border-spacing-0">
+              <TableHeader className="sticky top-0 z-30 bg-card shadow-sm border-b">
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className={expanded ? "w-[180px]" : ""}>Nombre / Teléfono</TableHead>
-                  {expanded && <TableHead className="w-[140px]">Contacto</TableHead>}
-                  <TableHead>Motivo</TableHead>
-                  {expanded && <TableHead>Producto</TableHead>}
-                  <TableHead>Fecha / Estado</TableHead>
-                  <TableHead>Hora</TableHead>
-                  <TableHead className="w-12 text-center">Acción</TableHead>
+                  <TableHead className={cn("bg-card", expanded ? "w-[180px]" : "")}>Nombre / Teléfono</TableHead>
+                  {expanded && <TableHead className="bg-card w-[140px]">Contacto</TableHead>}
+                  <TableHead className="bg-card">Motivo</TableHead>
+                  {expanded && <TableHead className="bg-card">Producto</TableHead>}
+                  <TableHead className="bg-card">Fecha / Estado</TableHead>
+                  <TableHead className="bg-card">Hora</TableHead>
+                  <TableHead className="bg-card w-12 text-center">Acción</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -304,7 +304,7 @@ export default function UpcomingAppointments({
                                   <CheckCircle className="w-2.5 h-2.5" /> Confirmada
                                 </div>
                               ) : (
-                                <Button variant="outline" size="sm" className="h-5 px-2 text-[8px] font-bold border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10" onClick={() => setConfirmId(app.id)}>
+                                <Button variant="outline" size="sm" className="h-5 px-2 text-[8px] font-bold border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10" onClick={() => setConfirmId(app.id)} type="button">
                                   <AlertCircle className="w-2.5 h-2.5 mr-1" /> Confirmar
                                 </Button>
                               )}
@@ -332,12 +332,13 @@ export default function UpcomingAppointments({
                               size="icon"
                               className="h-8 w-8 text-primary hover:bg-primary/20"
                               onClick={() => { setFinId(app.id); setFinNotes(app.notes || ''); setStatus('Asistencia'); }}
+                              type="button"
                             >
                               <CheckCircle2 className="h-5 h-5" />
                             </Button>
                           )}
                           {expanded && (
-                             <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => onSelect(app)}>
+                             <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => onSelect(app)} type="button">
                               <ChevronRight className="h-4 w-4" />
                             </Button>
                           )}
@@ -353,11 +354,11 @@ export default function UpcomingAppointments({
       </div>
 
       <div className="flex flex-wrap justify-end gap-3 pt-2 shrink-0">
-        <Button variant="outline" size="sm" onClick={copyDailyReport} className="text-[10px] font-bold uppercase border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 h-9 gap-2 px-4">
+        <Button variant="outline" size="sm" onClick={copyDailyReport} className="text-[10px] font-bold uppercase border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 h-9 gap-2 px-4" type="button">
           <ClipboardCheck className="w-4 h-4" /> Reporte Diario
         </Button>
         {hasTodayApps && (
-          <Button variant="outline" size="sm" onClick={copyAllToday} className="text-[10px] font-bold uppercase border-green-500/40 text-green-500 hover:bg-green-500/10 h-9 gap-2 px-4">
+          <Button variant="outline" size="sm" onClick={copyAllToday} className="text-[10px] font-bold uppercase border-green-500/40 text-green-500 hover:bg-green-500/10 h-9 gap-2 px-4" type="button">
             <Copy className="w-4 h-4" /> Citas Hoy
           </Button>
         )}
@@ -365,8 +366,6 @@ export default function UpcomingAppointments({
 
       <Dialog open={!!finId} onOpenChange={(open) => !open && setFinId(null)}>
         <DialogContent 
-          onOpenAutoFocus={(e) => e.preventDefault()}
-          onCloseAutoFocus={(e) => e.preventDefault()}
           className="sm:max-w-[450px] bg-card border-border shadow-2xl backdrop-blur-[12px] z-[80]"
         >
           <DialogHeader>
@@ -404,8 +403,8 @@ export default function UpcomingAppointments({
             </div>
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setFinId(null)} className="h-9 text-xs">Volver</Button>
-            <Button onClick={handleFinalize} className={cn("h-9 text-xs font-bold shadow-lg", status === 'Cierre' ? "bg-green-600 hover:bg-green-700 text-white" : "bg-primary text-primary-foreground")}>
+            <Button variant="outline" onClick={() => setFinId(null)} className="h-9 text-xs" type="button">Volver</Button>
+            <Button onClick={handleFinalize} className={cn("h-9 text-xs font-bold shadow-lg", status === 'Cierre' ? "bg-green-600 hover:bg-green-700 text-white" : "bg-primary text-primary-foreground")} type="button">
               {status === 'Cierre' ? 'Confirmar Venta' : 'Cerrar Consulta'}
             </Button>
           </DialogFooter>
@@ -414,8 +413,6 @@ export default function UpcomingAppointments({
 
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <DialogContent 
-          onOpenAutoFocus={(e) => e.preventDefault()}
-          onCloseAutoFocus={(e) => e.preventDefault()}
           className="sm:max-w-[550px] border shadow-2xl backdrop-blur-md overflow-hidden p-0 bg-green-950 border-green-500/50 text-white z-[90]"
         >
           <div className="p-8 space-y-6">
@@ -442,15 +439,13 @@ export default function UpcomingAppointments({
             </div>
           </div>
           <DialogFooter className="p-6 bg-green-900/50 border-t border-green-800/50 sm:justify-center">
-            <Button onClick={handleSuccessClose} className="bg-green-600 hover:bg-green-700 text-white font-bold px-12 h-14 rounded-2xl text-xl shadow-xl transition-all transform hover:scale-105">Continuar</Button>
+            <Button onClick={handleSuccessClose} className="bg-green-600 hover:bg-green-700 text-white font-bold px-12 h-14 rounded-2xl text-xl shadow-xl transition-all transform hover:scale-105" type="button">Continuar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <AlertDialog open={!!confirmId} onOpenChange={(open) => !open && setConfirmId(null)}>
         <AlertDialogContent 
-          onOpenAutoFocus={(e) => e.preventDefault()}
-          onCloseAutoFocus={(e) => e.preventDefault()}
           className="bg-card border-border shadow-2xl backdrop-blur-md z-[85]"
         >
           <AlertDialogHeader>
@@ -458,8 +453,8 @@ export default function UpcomingAppointments({
             <AlertDialogDescription className="text-muted-foreground">Marcarás esta cita como confirmada para el día de hoy.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Volver</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmAction} className="bg-green-600 hover:bg-green-700 text-white font-bold">Sí, confirmar</AlertDialogAction>
+            <AlertDialogCancel type="button">Volver</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmAction} className="bg-green-600 hover:bg-green-700 text-white font-bold" type="button">Sí, confirmar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

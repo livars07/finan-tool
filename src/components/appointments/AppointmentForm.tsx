@@ -71,18 +71,21 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
     });
   };
 
-  const setDateTomorrow = () => {
+  const setDateTomorrow = (e: React.MouseEvent) => {
+    e.preventDefault();
     const tomorrow = format(addDays(new Date(), 1), 'yyyy-MM-dd');
     setDate(tomorrow);
   };
 
-  const setDateNextSaturday = () => {
+  const setDateNextSaturday = (e: React.MouseEvent) => {
+    e.preventDefault();
     const today = new Date();
     const nextSat = format(nextSaturday(today), 'yyyy-MM-dd');
     setDate(nextSat);
   };
 
-  const setDateNextSunday = () => {
+  const setDateNextSunday = (e: React.MouseEvent) => {
+    e.preventDefault();
     const today = new Date();
     const nextSun = format(nextSunday(today), 'yyyy-MM-dd');
     setDate(nextSun);
@@ -124,13 +127,14 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
                 <Label htmlFor="date" className="text-xs uppercase font-bold text-muted-foreground/70">Fecha</Label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-5 w-5 rounded-full bg-primary/10 text-primary hover:bg-primary/20">
+                    <Button type="button" variant="ghost" size="icon" className="h-5 w-5 rounded-full bg-primary/10 text-primary hover:bg-primary/20">
                       <Plus className="h-3 w-3" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent side="top" className="w-48 p-2 flex flex-col gap-1 backdrop-blur-md bg-card/90 border-primary/20">
                     <p className="text-[10px] font-bold uppercase text-muted-foreground px-2 mb-1">Agendado rápido</p>
                     <Button 
+                      type="button"
                       variant="ghost" 
                       size="sm" 
                       className="justify-start h-8 text-xs font-semibold hover:bg-primary/10"
@@ -139,6 +143,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
                       <ArrowRight className="w-3 h-3 mr-2 text-primary" /> Mañana
                     </Button>
                     <Button 
+                      type="button"
                       variant="ghost" 
                       size="sm" 
                       className="justify-start h-8 text-xs font-semibold hover:bg-blue-500/10 text-blue-500 hover:text-blue-600"
@@ -147,6 +152,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
                       <CalendarIcon className="w-3 h-3 mr-2" /> Sábado
                     </Button>
                     <Button 
+                      type="button"
                       variant="ghost" 
                       size="sm" 
                       className="justify-start h-8 text-xs font-semibold hover:bg-orange-500/10 text-orange-600 hover:text-orange-700"
@@ -185,7 +191,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
           
           <Collapsible open={showProspector} onOpenChange={setShowProspector} className="space-y-2">
             <CollapsibleTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-7 text-[10px] font-bold uppercase text-primary hover:bg-primary/10 px-0">
+              <Button type="button" variant="ghost" size="sm" className="h-7 text-[10px] font-bold uppercase text-primary hover:bg-primary/10 px-0">
                 <UserCog className="w-3.5 h-3.5 mr-2" />
                 {showProspector ? 'Ocultar prospectador' : '¿Viene de otro prospectador?'}
                 <ChevronDown className={cn("ml-2 h-3.5 w-3.5 transition-transform", showProspector && "rotate-180")} />

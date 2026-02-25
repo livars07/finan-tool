@@ -103,17 +103,17 @@ export default function PastAppointments({
         !expanded ? "h-[400px]" : "h-full flex-1"
       )}>
         <ScrollArea className="flex-1 scrollbar-thin">
-          <Table>
-            <TableHeader className="bg-card sticky top-0 z-30 shadow-sm border-b">
+          <Table className="border-collapse separate border-spacing-0">
+            <TableHeader className="sticky top-0 z-30 bg-card shadow-sm border-b">
               <TableRow className="hover:bg-transparent">
-                <TableHead className={expanded ? "w-[180px]" : ""}>Nombre / Teléfono</TableHead>
-                {expanded && <TableHead className="w-[140px]">Contacto</TableHead>}
-                <TableHead>Motivo</TableHead>
-                {expanded && <TableHead>Producto</TableHead>}
-                <TableHead>Fecha / Hora</TableHead>
-                {expanded && <TableHead className="w-[300px]">Notas rápidas</TableHead>}
-                <TableHead>Resultado</TableHead>
-                {expanded && <TableHead className="w-12"></TableHead>}
+                <TableHead className={cn("bg-card", expanded ? "w-[180px]" : "")}>Nombre / Teléfono</TableHead>
+                {expanded && <TableHead className="bg-card w-[140px]">Contacto</TableHead>}
+                <TableHead className="bg-card">Motivo</TableHead>
+                {expanded && <TableHead className="bg-card">Producto</TableHead>}
+                <TableHead className="bg-card">Fecha / Hora</TableHead>
+                {expanded && <TableHead className="bg-card w-[300px]">Notas rápidas</TableHead>}
+                <TableHead className="bg-card">Resultado</TableHead>
+                {expanded && <TableHead className="bg-card w-12"></TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -233,6 +233,7 @@ export default function PastAppointments({
                           size="icon"
                           className="h-8 w-8 text-muted-foreground hover:text-primary"
                           onClick={() => onSelect(app)}
+                          type="button"
                         >
                           <ChevronRight className="h-4 w-4" />
                         </Button>
@@ -253,6 +254,7 @@ export default function PastAppointments({
             size="sm" 
             onClick={() => setVisibleCount(p => p + 25)}
             className="text-xs font-bold uppercase tracking-widest border-dashed hover:bg-primary/10 backdrop-blur-md h-9 px-6"
+            type="button"
           >
             <ChevronDown className="mr-2 h-4 w-4" /> Cargar más historial
           </Button>
