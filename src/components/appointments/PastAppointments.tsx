@@ -247,7 +247,7 @@ export default function PastAppointments({
                                   <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
                                 </div>
                               </TooltipTrigger>
-                              <TooltipContent className="bg-card border-green-500/20 p-3 space-y-1">
+                              <TooltipContent className="bg-card border-green-500/20 p-3 space-y-1 z-[100]">
                                 <div className="flex items-center gap-2 text-green-500 font-bold text-[10px] uppercase tracking-widest">
                                   <CheckCircle2 className="w-3 h-3" /> Comisión Liquidada
                                 </div>

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Appointment, AppointmentStatus, getCommissionPaymentDate } from '@/services/appointment-service';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { 
-  Clock, Calendar, Info, CheckCircle2, AlertCircle, 
+  Clock, Calendar, CheckCircle2, AlertCircle, 
   CheckCircle, Trophy, PartyPopper, Sparkles, Copy, 
   ClipboardCheck, Phone, Box, ChevronRight, ShieldAlert, UserCog
 } from "lucide-react";

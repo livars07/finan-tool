@@ -50,8 +50,8 @@ import {
 } from "@/components/ui/carousel"
 import {
   Tooltip,
-  TooltipContent,
   TooltipProvider,
+  TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useToast } from "@/hooks/use-toast";
@@ -85,15 +85,14 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const [theme, setTheme] = useState<Theme>('corporativo');
   const [api, setApi] = useState<CarouselApi>();
   const [timerKey, setTimerKey] = useState(0);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [lastFinishedApp, setLastFinishedApp] = useState<Service.Appointment | null>(null);
   
   const [pendingCommissionApp, setPendingCommissionApp] = useState<Service.Appointment | null>(null);
   const shownCommissionIds = useRef<Set<string>>(new Set());
   const overdueQueue = useRef<Service.Appointment[]>([]);
   const lastClosedTimeRef = useRef<number>(0); 
   const pendingAppRef = useRef<Service.Appointment | null>(null);
-
-  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [lastFinishedApp, setLastFinishedApp] = useState<Service.Appointment | null>(null);
 
   const appointmentState = useAppointments();
   const { 
@@ -205,12 +204,9 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
     };
 
     const showNextPending = () => {
-      if (pendingAppRef.current) return;
-
       const now = Date.now();
-      if (lastClosedTimeRef.current > 0 && (now - lastClosedTimeRef.current < 30000)) {
-        return;
-      }
+      if (pendingAppRef.current) return;
+      if (lastClosedTimeRef.current > 0 && (now - lastClosedTimeRef.current < 30000)) return;
 
       if (overdueQueue.current.length === 0) {
         performCommissionSearch();
@@ -643,7 +639,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                 <div className="flex justify-between items-center">
                   <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Fecha de Pago</span>
                   <span className="text-sm font-bold text-primary">
-                    {new Intl.NumberFormat('es-MX', { dateStyle: 'long' } as any).format(Service.getCommissionPaymentDate(pendingCommissionApp.date))}
+                    {new Intl.DateTimeFormat('es-MX', { dateStyle: 'long' }).format(Service.getCommissionPaymentDate(pendingCommissionApp.date))}
                   </span>
                 </div>
               </div>
@@ -663,6 +659,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <DialogContent className="sm:max-w-[550px] border shadow-2xl backdrop-blur-md overflow-hidden p-0 bg-green-950 border-green-500/50 text-white z-[90]">
           <div className="p-8 space-y-6">
