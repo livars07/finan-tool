@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -45,19 +46,195 @@ import {
 import { cn } from '@/lib/utils';
 import * as Service from '@/services/appointment-service';
 
-interface AppointmentsDashboardProps {
+interface DashboardContentProps {
+  expanded?: boolean;
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  filteredUpcoming: Appointment[];
+  filteredPast: Appointment[];
   appointments: Appointment[];
-  upcoming: Appointment[];
-  past: Appointment[];
-  addAppointment: (newApp: Omit<Appointment, 'id'>) => void;
-  updateStatus: (id: string, status: AppointmentStatus, notes?: string) => void;
-  editAppointment: (id: string, updatedData: Partial<Appointment>) => void;
-  toggleConfirmation: (id: string) => void;
   formatFriendlyDate: (date: string) => string;
   format12hTime: (time: string) => string;
-  initialExpanded?: boolean;
-  onExpandedChange?: (expanded: boolean) => void;
+  handleSelect: (app: Appointment) => void;
+  handleHighlight: (app: Appointment) => void;
+  updateStatus: (id: string, status: AppointmentStatus, notes?: string) => void;
+  toggleConfirmation: (id: string) => void;
+  activeId: string | null;
+  visibleCountPast: number;
+  setVisibleCountPast: (count: number | ((prev: number) => number)) => void;
+  stats: any;
 }
+
+const DashboardContent = ({ 
+  expanded = false, 
+  activeTab, 
+  setActiveTab,
+  filteredUpcoming,
+  filteredPast,
+  appointments,
+  formatFriendlyDate,
+  format12hTime,
+  handleSelect,
+  handleHighlight,
+  updateStatus,
+  toggleConfirmation,
+  activeId,
+  visibleCountPast,
+  setVisibleCountPast,
+  stats
+}: DashboardContentProps) => (
+  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
+    <div className={cn("flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 shrink-0", expanded && "bg-muted/10 p-6 rounded-2xl border border-border/30 backdrop-blur-md")}>
+      <TabsList className="grid w-full sm:w-80 grid-cols-2 h-10 p-1 bg-muted/40 border border-border/20 shadow-inner rounded-lg">
+        <TabsTrigger 
+          value="upcoming" 
+          className="h-full rounded-md text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
+        >
+          Próximas ({filteredUpcoming.length})
+        </TabsTrigger>
+        <TabsTrigger 
+          value="past" 
+          className="h-full rounded-md text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
+        >
+          Historial ({filteredPast.length})
+        </TabsTrigger>
+      </TabsList>
+
+      {expanded && (
+        <TooltipProvider delayDuration={0}>
+          <div className="grid grid-cols-3 md:grid-cols-5 gap-6 items-center flex-1 ml-0 sm:ml-8">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex flex-col items-center sm:items-start group cursor-help">
+                  <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-primary transition-colors">Hoy</span>
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 border border-blue-500/20"><CalendarDays className="w-3.5 h-3.5"/></div>
+                    <span className="text-sm font-bold text-foreground">{stats.todayConfirmed}<span className="text-muted-foreground/40 mx-0.5">/</span>{stats.todayCount}</span>
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-xs">Citas confirmadas vs. citas totales para el día de hoy.</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex flex-col items-center sm:items-start group cursor-help">
+                  <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-accent transition-colors">Mañana</span>
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-accent/10 text-accent border border-accent/20"><ArrowRight className="w-3.5 h-3.5"/></div>
+                    <span className="text-sm font-bold text-foreground">{stats.tomorrowTotal}</span>
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-xs">Volumen de citas programadas para el día de mañana.</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex flex-col items-center sm:items-start group cursor-help">
+                  <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-blue-500 transition-colors">Apartados</span>
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-500 border border-blue-500/20"><Coins className="w-3.5 h-3.5"/></div>
+                    <span className="text-sm font-bold text-foreground">{stats.currentMonthApartados}</span>
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-xs">Clientes que han realizado un apartado en el mes actual.</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex flex-col items-center sm:items-start group cursor-help">
+                  <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-green-500 transition-colors">Cierres Mes</span>
+                  <div className="flex flex-col items-center sm:items-start">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-green-500/10 text-green-500 border border-green-500/20"><CheckCircle2 className="w-3.5 h-3.5"/></div>
+                      <span className="text-sm font-bold text-foreground">{stats.currentMonthSales}</span>
+                    </div>
+                    <div className="flex items-center mt-1">
+                       <span className={cn(
+                         "text-[8px] font-bold flex items-center whitespace-nowrap", 
+                         stats.currentMonthSales >= stats.lastMonthSales ? "text-green-500" : "text-muted-foreground/40"
+                       )}>
+                         {stats.currentMonthSales > stats.lastMonthSales ? <ArrowUpRight className="w-2 h-2 mr-0.5" /> : stats.currentMonthSales < stats.lastMonthSales ? <ArrowDownRight className="w-2 h-2 mr-0.5" /> : null}
+                         {stats.lastMonthSales} <span className="ml-1 font-medium text-muted-foreground/30">mes pasado</span>
+                       </span>
+                    </div>
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-xs">Número de trámites concretados con éxito comparado con el mes pasado.</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="hidden md:flex flex-col items-center sm:items-start group cursor-help">
+                  <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-primary transition-colors">Conversión Mes</span>
+                  <div className="flex flex-col items-center sm:items-start">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20"><TrendingUp className="w-3.5 h-3.5"/></div>
+                      <span className="text-sm font-bold text-foreground">{stats.conversionRate}%</span>
+                    </div>
+                    <div className="flex items-center mt-1">
+                       <span className={cn(
+                         "text-[8px] font-bold flex items-center whitespace-nowrap", 
+                         stats.conversionRate >= stats.lastMonthConversionRate ? "text-green-500" : "text-muted-foreground/40"
+                       )}>
+                         {stats.conversionRate > stats.lastMonthConversionRate ? <ArrowUpRight className="w-2 h-2 mr-0.5" /> : stats.conversionRate < stats.lastMonthConversionRate ? <ArrowDownRight className="w-2 h-2 mr-0.5" /> : null}
+                         {stats.lastMonthConversionRate}% <span className="ml-1 font-medium text-muted-foreground/30">mes pasado</span>
+                       </span>
+                    </div>
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-xs">Efectividad de ventas este mes comparado con el anterior.</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
+      )}
+    </div>
+
+    <div className="flex-1 min-h-0 overflow-hidden">
+      <TabsContent value="upcoming" className="mt-0 h-full">
+        <UpcomingAppointments 
+          appointments={filteredUpcoming} 
+          allAppointments={appointments}
+          formatDate={formatFriendlyDate}
+          format12hTime={format12hTime}
+          onSelect={handleSelect}
+          onHighlight={handleHighlight}
+          updateStatus={updateStatus}
+          toggleConfirmation={toggleConfirmation}
+          activeId={activeId}
+          expanded={expanded}
+        />
+      </TabsContent>
+      <TabsContent value="past" className="mt-0 h-full">
+        <PastAppointments 
+          appointments={filteredPast} 
+          formatDate={formatFriendlyDate}
+          format12hTime={format12hTime}
+          onSelect={handleSelect}
+          onHighlight={handleHighlight}
+          activeId={activeId}
+          expanded={expanded}
+          visibleCount={visibleCountPast}
+          setVisibleCount={setVisibleCountPast}
+        />
+      </TabsContent>
+    </div>
+  </Tabs>
+);
 
 export default function AppointmentsDashboard({
   appointments,
@@ -78,8 +255,7 @@ export default function AppointmentsDashboard({
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const [activeTab, setActiveTab] = useState('upcoming');
   
-  // Estado persistente para la carga de citas en el historial
-  const [visibleCountPast, setVisibleCountPast] = useState(15);
+  const [visibleCountPast, setVisibleCountPast] = useState(25);
 
   const stats = useMemo(() => Service.calculateStats(appointments), [appointments]);
 
@@ -147,157 +323,9 @@ export default function AppointmentsDashboard({
     setSelectedAppId(app.id);
   };
 
-  const DashboardContent = ({ expanded = false }: { expanded?: boolean }) => (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
-      <div className={cn("flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 shrink-0", expanded && "bg-muted/10 p-6 rounded-2xl border border-border/30 backdrop-blur-md")}>
-        <TabsList className="grid w-full sm:w-80 grid-cols-2 h-10 p-1 bg-muted/40 border border-border/20 shadow-inner rounded-lg">
-          <TabsTrigger 
-            value="upcoming" 
-            className="h-full rounded-md text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
-          >
-            Próximas ({filteredUpcoming.length})
-          </TabsTrigger>
-          <TabsTrigger 
-            value="past" 
-            className="h-full rounded-md text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
-          >
-            Historial ({filteredPast.length})
-          </TabsTrigger>
-        </TabsList>
-
-        {expanded && (
-          <TooltipProvider delayDuration={0}>
-            <div className="grid grid-cols-3 md:grid-cols-5 gap-6 items-center flex-1 ml-0 sm:ml-8">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex flex-col items-center sm:items-start group cursor-help">
-                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-primary transition-colors">Hoy</span>
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 border border-blue-500/20"><CalendarDays className="w-3.5 h-3.5"/></div>
-                      <span className="text-sm font-bold text-foreground">{stats.todayConfirmed}<span className="text-muted-foreground/40 mx-0.5">/</span>{stats.todayCount}</span>
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-xs">Citas confirmadas vs. citas totales para el día de hoy.</p>
-                </TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex flex-col items-center sm:items-start group cursor-help">
-                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-accent transition-colors">Mañana</span>
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-accent/10 text-accent border border-accent/20"><ArrowRight className="w-3.5 h-3.5"/></div>
-                      <span className="text-sm font-bold text-foreground">{stats.tomorrowTotal}</span>
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-xs">Volumen de citas programadas para el día de mañana.</p>
-                </TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex flex-col items-center sm:items-start group cursor-help">
-                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-blue-500 transition-colors">Apartados</span>
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-500 border border-blue-500/20"><Coins className="w-3.5 h-3.5"/></div>
-                      <span className="text-sm font-bold text-foreground">{stats.currentMonthApartados}</span>
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-xs">Clientes que han realizado un apartado en el mes actual.</p>
-                </TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex flex-col items-center sm:items-start group cursor-help">
-                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-green-500 transition-colors">Cierres Mes</span>
-                    <div className="flex flex-col items-center sm:items-start">
-                      <div className="flex items-center gap-2">
-                        <div className="p-1.5 rounded-lg bg-green-500/10 text-green-500 border border-green-500/20"><CheckCircle2 className="w-3.5 h-3.5"/></div>
-                        <span className="text-sm font-bold text-foreground">{stats.currentMonthSales}</span>
-                      </div>
-                      <div className="flex items-center mt-1">
-                         <span className={cn(
-                           "text-[8px] font-bold flex items-center whitespace-nowrap", 
-                           stats.currentMonthSales >= stats.lastMonthSales ? "text-green-500" : "text-muted-foreground/40"
-                         )}>
-                           {stats.currentMonthSales > stats.lastMonthSales ? <ArrowUpRight className="w-2 h-2 mr-0.5" /> : stats.currentMonthSales < stats.lastMonthSales ? <ArrowDownRight className="w-2 h-2 mr-0.5" /> : null}
-                           {stats.lastMonthSales} <span className="ml-1 font-medium text-muted-foreground/30">mes pasado</span>
-                         </span>
-                      </div>
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-xs">Número de trámites concretados con éxito comparado con el mes pasado.</p>
-                </TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="hidden md:flex flex-col items-center sm:items-start group cursor-help">
-                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-primary transition-colors">Conversión Mes</span>
-                    <div className="flex flex-col items-center sm:items-start">
-                      <div className="flex items-center gap-2">
-                        <div className="p-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20"><TrendingUp className="w-3.5 h-3.5"/></div>
-                        <span className="text-sm font-bold text-foreground">{stats.conversionRate}%</span>
-                      </div>
-                      <div className="flex items-center mt-1">
-                         <span className={cn(
-                           "text-[8px] font-bold flex items-center whitespace-nowrap", 
-                           stats.conversionRate >= stats.lastMonthConversionRate ? "text-green-500" : "text-muted-foreground/40"
-                         )}>
-                           {stats.conversionRate > stats.lastMonthConversionRate ? <ArrowUpRight className="w-2 h-2 mr-0.5" /> : stats.conversionRate < stats.lastMonthConversionRate ? <ArrowDownRight className="w-2 h-2 mr-0.5" /> : null}
-                           {stats.lastMonthConversionRate}% <span className="ml-1 font-medium text-muted-foreground/30">mes pasado</span>
-                         </span>
-                      </div>
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-xs">Efectividad de ventas este mes comparado con el anterior.</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          </TooltipProvider>
-        )}
-      </div>
-
-      <div className="flex-1 min-h-0 overflow-hidden">
-        <TabsContent value="upcoming" className="mt-0 h-full">
-          <UpcomingAppointments 
-            appointments={filteredUpcoming} 
-            allAppointments={appointments}
-            formatDate={formatFriendlyDate}
-            format12hTime={format12hTime}
-            onSelect={handleSelect}
-            updateStatus={updateStatus}
-            toggleConfirmation={toggleConfirmation}
-            activeId={activeId}
-            expanded={expanded}
-          />
-        </TabsContent>
-        <TabsContent value="past" className="mt-0 h-full">
-          <PastAppointments 
-            appointments={filteredPast} 
-            formatDate={formatFriendlyDate}
-            format12hTime={format12hTime}
-            onSelect={handleSelect}
-            activeId={activeId}
-            expanded={expanded}
-            visibleCount={visibleCountPast}
-            setVisibleCount={setVisibleCountPast}
-          />
-        </TabsContent>
-      </div>
-    </Tabs>
-  );
+  const handleHighlight = (app: Appointment) => {
+    setActiveId(app.id);
+  };
 
   return (
     <div className="space-y-6">
@@ -339,7 +367,23 @@ export default function AppointmentsDashboard({
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            <DashboardContent />
+            <DashboardContent 
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              filteredUpcoming={filteredUpcoming}
+              filteredPast={filteredPast}
+              appointments={appointments}
+              formatFriendlyDate={formatFriendlyDate}
+              format12hTime={format12hTime}
+              handleSelect={handleSelect}
+              handleHighlight={handleHighlight}
+              updateStatus={updateStatus}
+              toggleConfirmation={toggleConfirmation}
+              activeId={activeId}
+              visibleCountPast={visibleCountPast}
+              setVisibleCountPast={setVisibleCountPast}
+              stats={stats}
+            />
           </CardContent>
         </Card>
       </div>
@@ -381,7 +425,24 @@ export default function AppointmentsDashboard({
           </DialogHeader>
 
           <div className="flex-1 p-6 overflow-hidden flex flex-col">
-            <DashboardContent expanded={true} />
+            <DashboardContent 
+              expanded={true}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              filteredUpcoming={filteredUpcoming}
+              filteredPast={filteredPast}
+              appointments={appointments}
+              formatFriendlyDate={formatFriendlyDate}
+              format12hTime={format12hTime}
+              handleSelect={handleSelect}
+              handleHighlight={handleHighlight}
+              updateStatus={updateStatus}
+              toggleConfirmation={toggleConfirmation}
+              activeId={activeId}
+              visibleCountPast={visibleCountPast}
+              setVisibleCountPast={setVisibleCountPast}
+              stats={stats}
+            />
           </div>
         </DialogContent>
       </Dialog>

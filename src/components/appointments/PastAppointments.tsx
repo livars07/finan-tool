@@ -1,3 +1,4 @@
+
 "use client"
 
 import React from 'react';
@@ -27,6 +28,7 @@ import {
 interface Props {
   appointments: Appointment[];
   onSelect: (app: Appointment) => void;
+  onHighlight: (app: Appointment) => void;
   formatDate: (date: string) => string;
   format12hTime: (time: string) => string;
   activeId?: string | null;
@@ -38,6 +40,7 @@ interface Props {
 export default function PastAppointments({ 
   appointments, 
   onSelect, 
+  onHighlight,
   formatDate, 
   format12hTime, 
   activeId, 
@@ -69,12 +72,13 @@ export default function PastAppointments({
     }
   };
 
-  const copyPhone = (e: React.MouseEvent, phone: string) => {
+  const copyPhone = (e: React.MouseEvent, app: Appointment) => {
     e.stopPropagation();
-    navigator.clipboard.writeText(phone).then(() => {
+    onHighlight(app);
+    navigator.clipboard.writeText(app.phone).then(() => {
       toast({
         title: "Número copiado",
-        description: `${phone} se ha copiado al portapapeles.`,
+        description: `${app.name}: ${app.phone} listo para usar.`,
       });
     });
   };
@@ -137,7 +141,7 @@ export default function PastAppointments({
                       </div>
                       {!expanded && (
                         <div 
-                          onClick={(e) => copyPhone(e, app.phone)}
+                          onClick={(e) => copyPhone(e, app)}
                           className="text-[10px] text-muted-foreground hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1 mt-0.5"
                         >
                           <Phone className="w-2.5 h-2.5" /> {app.phone}
@@ -148,7 +152,7 @@ export default function PastAppointments({
                     {expanded && (
                       <TableCell className="align-middle">
                         <div 
-                          onClick={(e) => copyPhone(e, app.phone)}
+                          onClick={(e) => copyPhone(e, app)}
                           className="flex items-center gap-2 text-xs font-medium hover:text-primary transition-colors cursor-pointer"
                         >
                           <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
@@ -228,7 +232,7 @@ export default function PastAppointments({
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={() => setVisibleCount(p => p + 15)}
+            onClick={() => setVisibleCount(p => p + 25)}
             className="text-xs font-bold uppercase tracking-widest border-dashed hover:bg-primary/10 backdrop-blur-md h-9 px-6"
           >
             <ChevronDown className="mr-2 h-4 w-4" /> Cargar más historial

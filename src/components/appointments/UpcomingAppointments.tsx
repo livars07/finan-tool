@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -46,6 +47,7 @@ interface Props {
   formatDate: (date: string) => string;
   format12hTime: (time: string) => string;
   onSelect: (app: Appointment) => void;
+  onHighlight: (app: Appointment) => void;
   updateStatus: (id: string, status: AppointmentStatus, notes?: string) => void;
   toggleConfirmation: (id: string) => void;
   activeId?: string | null;
@@ -58,6 +60,7 @@ export default function UpcomingAppointments({
   formatDate, 
   format12hTime, 
   onSelect, 
+  onHighlight,
   updateStatus, 
   toggleConfirmation, 
   activeId,
@@ -134,12 +137,13 @@ export default function UpcomingAppointments({
     }
   };
 
-  const copyPhone = (e: React.MouseEvent, phone: string) => {
+  const copyPhone = (e: React.MouseEvent, app: Appointment) => {
     e.stopPropagation();
-    navigator.clipboard.writeText(phone).then(() => {
+    onHighlight(app);
+    navigator.clipboard.writeText(app.phone).then(() => {
       toast({
         title: "Número copiado",
-        description: `${phone} se ha copiado al portapapeles.`,
+        description: `${app.name}: ${app.phone} listo para usar.`,
       });
     });
   };
@@ -246,7 +250,7 @@ export default function UpcomingAppointments({
                           )}
                         </div>
                         {!expanded && (
-                          <div onClick={(e) => copyPhone(e, app.phone)} className="text-[10px] text-muted-foreground hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1 mt-0.5">
+                          <div onClick={(e) => copyPhone(e, app)} className="text-[10px] text-muted-foreground hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1 mt-0.5">
                             <Phone className="w-2.5 h-2.5" /> {app.phone}
                           </div>
                         )}
@@ -254,7 +258,7 @@ export default function UpcomingAppointments({
                       
                       {expanded && (
                         <TableCell className="align-middle">
-                          <div onClick={(e) => copyPhone(e, app.phone)} className="flex items-center gap-2 text-xs font-medium hover:text-primary cursor-pointer">
+                          <div onClick={(e) => copyPhone(e, app)} className="flex items-center gap-2 text-xs font-medium hover:text-primary cursor-pointer">
                             <div className="p-1.5 rounded-lg bg-primary/10 text-primary"><Phone className="w-3.5 h-3.5" /></div>
                             {app.phone}
                           </div>
