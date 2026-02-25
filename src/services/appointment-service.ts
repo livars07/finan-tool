@@ -246,6 +246,12 @@ export const calculateStats = (appointments: Appointment[]) => {
   const currentMonthSales = activeApps.filter(a => (a.status === 'Cierre' || a.status === 'Apartado') && isSameMonth(parseISO(a.date), now)).length;
   const lastMonthSales = activeApps.filter(a => (a.status === 'Cierre' || a.status === 'Apartado') && isSameMonth(parseISO(a.date), lastMonth)).length;
 
+  const currentMonthOnlyCierre = activeApps.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), now)).length;
+  const lastMonthOnlyCierre = activeApps.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), lastMonth)).length;
+
+  const currentMonthApartados = activeApps.filter(a => a.status === 'Apartado' && isSameMonth(parseISO(a.date), now)).length;
+  const lastMonthApartados = activeApps.filter(a => a.status === 'Apartado' && isSameMonth(parseISO(a.date), lastMonth)).length;
+
   const currentMonthCommission = activeApps
     .filter(a => (a.status === 'Cierre' || a.status === 'Apartado') && isSameMonth(parseISO(a.date), now))
     .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
@@ -267,6 +273,7 @@ export const calculateStats = (appointments: Appointment[]) => {
   }).length;
 
   const conversionRate = currentMonthProspects > 0 ? (currentMonthSales / currentMonthProspects) * 100 : 0;
+  const lastMonthConversionRate = lastMonthProspects > 0 ? (lastMonthSales / lastMonthProspects) * 100 : 0;
 
   return {
     todayCount: todayTotal,
@@ -280,9 +287,14 @@ export const calculateStats = (appointments: Appointment[]) => {
     lastMonthProspects,
     currentMonthSales,
     lastMonthSales,
+    currentMonthOnlyCierre,
+    lastMonthOnlyCierre,
+    currentMonthApartados,
+    lastMonthApartados,
     currentMonthCommission,
     lastMonthCommission,
     currentMonthPaidCommission,
     conversionRate: parseFloat(conversionRate.toFixed(1)),
+    lastMonthConversionRate: parseFloat(lastMonthConversionRate.toFixed(1)),
   };
 };

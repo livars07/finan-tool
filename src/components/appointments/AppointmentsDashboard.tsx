@@ -17,7 +17,8 @@ import {
   CalendarDays,
   TrendingUp,
   Coins,
-  ArrowRight
+  ArrowRight,
+  CheckCircle2
 } from 'lucide-react';
 import { Appointment, AppointmentStatus } from '@/services/appointment-service';
 import { parseISO, format } from 'date-fns';
@@ -96,7 +97,7 @@ const DashboardContent = ({
 
       {expanded && (
         <TooltipProvider delayDuration={0}>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 items-center flex-1 ml-0 sm:ml-8">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6 items-center flex-1 ml-0 sm:ml-8">
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex flex-col items-center sm:items-start group cursor-help">
@@ -107,50 +108,94 @@ const DashboardContent = ({
                   </div>
                 </div>
               </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-xs">Citas confirmadas vs. citas totales para el día de hoy.</p>
+              <TooltipContent side="bottom" sideOffset={1}>
+                <p className="text-xs">Citas para mañana: {stats.tomorrowTotal}</p>
               </TooltipContent>
             </Tooltip>
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex flex-col items-center sm:items-start group cursor-help">
-                  <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-accent transition-colors">Mañana</span>
-                  <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-lg bg-accent/10 text-accent border border-accent/20"><ArrowRight className="w-3.5 h-3.5"/></div>
-                    <span className="text-sm font-bold text-foreground">{stats.tomorrowTotal}</span>
+                  <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-primary transition-colors">Cierres Mes</span>
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-green-500/10 text-green-600 border border-green-500/20"><CheckCircle2 className="w-3.5 h-3.5"/></div>
+                      <span className="text-sm font-bold text-foreground">{stats.currentMonthOnlyCierre}</span>
+                    </div>
+                    <div className="flex items-center mt-1 text-[7px] font-bold text-muted-foreground/40 uppercase">
+                      {stats.currentMonthOnlyCierre > stats.lastMonthOnlyCierre && <TrendingUp className="w-2 h-2 text-green-500 mr-0.5" />}
+                      Mes pasado: {stats.lastMonthOnlyCierre}
+                    </div>
                   </div>
                 </div>
               </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-xs">Volumen de citas programadas para el día de mañana.</p>
+              <TooltipContent side="bottom" sideOffset={1}>
+                <p className="text-xs">Total de trámites formalizados este mes.</p>
               </TooltipContent>
             </Tooltip>
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex flex-col items-center sm:items-start group cursor-help">
                   <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-blue-500 transition-colors">Apartados</span>
-                  <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-500 border border-blue-500/20"><Coins className="w-3.5 h-3.5"/></div>
-                    <span className="text-sm font-bold text-foreground">{stats.currentMonthApartados}</span>
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-500 border border-blue-500/20"><Coins className="w-3.5 h-3.5"/></div>
+                      <span className="text-sm font-bold text-foreground">{stats.currentMonthApartados}</span>
+                    </div>
+                    <div className="flex items-center mt-1 text-[7px] font-bold text-muted-foreground/40 uppercase">
+                      {stats.currentMonthApartados > stats.lastMonthApartados && <TrendingUp className="w-2 h-2 text-green-500 mr-0.5" />}
+                      Mes pasado: {stats.lastMonthApartados}
+                    </div>
                   </div>
                 </div>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent side="bottom" sideOffset={1}>
                 <p className="text-xs">Clientes que han realizado un apartado en el mes actual.</p>
               </TooltipContent>
             </Tooltip>
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex flex-col items-center sm:items-start group cursor-help">
                   <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-green-500 transition-colors">Conversión Mes</span>
-                  <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20"><TrendingUp className="w-3.5 h-3.5"/></div>
-                    <span className="text-sm font-bold text-foreground">{stats.conversionRate}%</span>
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20"><TrendingUp className="w-3.5 h-3.5"/></div>
+                      <span className="text-sm font-bold text-foreground">{stats.conversionRate}%</span>
+                    </div>
+                    <div className="flex items-center mt-1 text-[7px] font-bold text-muted-foreground/40 uppercase">
+                      {stats.conversionRate > stats.lastMonthConversionRate && <TrendingUp className="w-2 h-2 text-green-500 mr-0.5" />}
+                      Mes pasado: {stats.lastMonthConversionRate}%
+                    </div>
                   </div>
                 </div>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent side="bottom" sideOffset={1}>
                 <p className="text-xs">Efectividad de ventas este mes.</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex flex-col items-center sm:items-start group cursor-help">
+                  <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-yellow-500 transition-colors">Ingresos Mes</span>
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-yellow-500/10 text-yellow-600 border border-yellow-500/20"><Coins className="w-3.5 h-3.5"/></div>
+                      <span className="text-sm font-bold text-foreground">
+                        {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(stats.currentMonthCommission)}
+                      </span>
+                    </div>
+                    <div className="flex items-center mt-1 text-[7px] font-bold text-muted-foreground/40 uppercase">
+                      {stats.currentMonthCommission > stats.lastMonthCommission && <TrendingUp className="w-2 h-2 text-green-500 mr-0.5" />}
+                      Mes pasado: {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(stats.lastMonthCommission)}
+                    </div>
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" sideOffset={1}>
+                <p className="text-xs">Dinero recibido: {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(stats.currentMonthPaidCommission)}</p>
               </TooltipContent>
             </Tooltip>
           </div>
