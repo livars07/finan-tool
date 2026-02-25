@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -283,7 +284,13 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   };
 
   const statsCards = [
-    { label: 'Citas hoy', value: stats.todayCount.toString(), icon: CalendarDays, color: 'text-primary' },
+    { 
+      label: 'Citas hoy', 
+      value: stats.todayCount.toString(), 
+      icon: CalendarDays, 
+      color: 'text-primary',
+      tooltip: `Citas para mañana: ${stats.tomorrowTotal}`
+    },
     { label: 'Pendientes', value: stats.pendingCount.toString(), icon: Wallet, color: 'text-primary' },
     { 
       label: 'Prospectos Mes', 
@@ -411,9 +418,8 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                     <TooltipTrigger asChild>
                       {cardContent}
                     </TooltipTrigger>
-                    <TooltipContent side="top" className="bg-card border-border shadow-xl">
+                    <TooltipContent side="bottom" className="bg-card border-border shadow-xl">
                       <p className="text-xs font-bold uppercase tracking-widest text-primary">{stat.tooltip}</p>
-                      <p className="text-[10px] text-muted-foreground mt-1">Suma de comisiones con estatus "Pagada".</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
