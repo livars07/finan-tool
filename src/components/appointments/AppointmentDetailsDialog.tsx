@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Dialog, DialogContent, DialogHeader, DialogTitle, 
-  DialogFooter, DialogClose
+  DialogDescription, DialogFooter, DialogClose
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -117,16 +117,6 @@ export default function AppointmentDetailsDialog({
       toast({
         title: "Número copiado",
         description: `${appointment.name}: ${appointment.phone} listo para usar.`,
-      });
-    });
-  };
-
-  const copyProspectorPhone = () => {
-    if (!appointment.prospectorPhone) return;
-    navigator.clipboard.writeText(appointment.prospectorPhone).then(() => {
-      toast({
-        title: "Contacto de prospectador",
-        description: `${appointment.prospectorName}: ${appointment.prospectorPhone} copiado.`,
       });
     });
   };
