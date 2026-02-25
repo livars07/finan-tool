@@ -122,7 +122,6 @@ const DashboardContent = ({
                 <p className="text-xs">Citas confirmadas vs. citas totales para el día de hoy.</p>
               </TooltipContent>
             </Tooltip>
-
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex flex-col items-center sm:items-start group cursor-help">
@@ -137,7 +136,6 @@ const DashboardContent = ({
                 <p className="text-xs">Volumen de citas programadas para el día de mañana.</p>
               </TooltipContent>
             </Tooltip>
-
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex flex-col items-center sm:items-start group cursor-help">
@@ -152,7 +150,6 @@ const DashboardContent = ({
                 <p className="text-xs">Clientes que han realizado un apartado en el mes actual.</p>
               </TooltipContent>
             </Tooltip>
-
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex flex-col items-center sm:items-start group cursor-help">
@@ -162,15 +159,6 @@ const DashboardContent = ({
                       <div className="p-1.5 rounded-lg bg-green-500/10 text-green-500 border border-green-500/20"><CheckCircle2 className="w-3.5 h-3.5"/></div>
                       <span className="text-sm font-bold text-foreground">{stats.currentMonthSales}</span>
                     </div>
-                    <div className="flex items-center mt-1">
-                       <span className={cn(
-                         "text-[8px] font-bold flex items-center whitespace-nowrap", 
-                         stats.currentMonthSales >= stats.lastMonthSales ? "text-green-500" : "text-muted-foreground/40"
-                       )}>
-                         {stats.currentMonthSales > stats.lastMonthSales ? <ArrowUpRight className="w-2 h-2 mr-0.5" /> : stats.currentMonthSales < stats.lastMonthSales ? <ArrowDownRight className="w-2 h-2 mr-0.5" /> : null}
-                         {stats.lastMonthSales} <span className="ml-1 font-medium text-muted-foreground/30">mes pasado</span>
-                       </span>
-                    </div>
                   </div>
                 </div>
               </TooltipTrigger>
@@ -178,25 +166,13 @@ const DashboardContent = ({
                 <p className="text-xs">Número de trámites concretados con éxito comparado con el mes pasado.</p>
               </TooltipContent>
             </Tooltip>
-
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="hidden md:flex flex-col items-center sm:items-start group cursor-help">
                   <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-primary transition-colors">Conversión Mes</span>
-                  <div className="flex flex-col items-center sm:items-start">
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20"><TrendingUp className="w-3.5 h-3.5"/></div>
-                      <span className="text-sm font-bold text-foreground">{stats.conversionRate}%</span>
-                    </div>
-                    <div className="flex items-center mt-1">
-                       <span className={cn(
-                         "text-[8px] font-bold flex items-center whitespace-nowrap", 
-                         stats.conversionRate >= stats.lastMonthConversionRate ? "text-green-500" : "text-muted-foreground/40"
-                       )}>
-                         {stats.conversionRate > stats.lastMonthConversionRate ? <ArrowUpRight className="w-2 h-2 mr-0.5" /> : stats.conversionRate < stats.lastMonthConversionRate ? <ArrowDownRight className="w-2 h-2 mr-0.5" /> : null}
-                         {stats.lastMonthConversionRate}% <span className="ml-1 font-medium text-muted-foreground/30">mes pasado</span>
-                       </span>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20"><TrendingUp className="w-3.5 h-3.5"/></div>
+                    <span className="text-sm font-bold text-foreground">{stats.conversionRate}%</span>
                   </div>
                 </div>
               </TooltipTrigger>
@@ -220,7 +196,6 @@ const DashboardContent = ({
           onHighlight={handleHighlight}
           updateStatus={updateStatus}
           toggleConfirmation={toggleConfirmation}
-          onOpenTrash={onOpenTrash}
           activeId={activeId}
           expanded={expanded}
           archivingIds={archivingIds}
@@ -261,6 +236,7 @@ interface AppointmentsDashboardProps {
   selectedAppId: string | null;
   onSelectAppId: (id: string | null) => void;
   onOpenTrash: () => void;
+  archivedCount: number;
 }
 
 export default function AppointmentsDashboard({
@@ -279,7 +255,8 @@ export default function AppointmentsDashboard({
   onExpandedChange,
   selectedAppId,
   onSelectAppId,
-  onOpenTrash
+  onOpenTrash,
+  archivedCount
 }: AppointmentsDashboardProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -386,14 +363,39 @@ export default function AppointmentsDashboard({
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => setIsExpanded(true)}
-                className="h-9 w-9 rounded-lg text-muted-foreground/60 hover:text-blue-600 hover:bg-blue-600/10 transition-all border border-transparent hover:border-blue-600/20"
-              >
-                <Maximize2 className="w-4 h-4" />
-              </Button>
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={onOpenTrash}
+                      className="h-9 w-9 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all relative"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      {archivedCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-destructive text-white text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
+                          {archivedCount}
+                        </span>
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Papelera de Citas</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => setIsExpanded(true)}
+                      className="h-9 w-9 rounded-lg text-muted-foreground/60 hover:text-blue-600 hover:bg-blue-600/10 transition-all border border-transparent hover:border-blue-600/20"
+                    >
+                      <Maximize2 className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Expandir Dashboard</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -435,7 +437,6 @@ export default function AppointmentsDashboard({
                 <DialogDescription className="text-xs">Vista completa del flujo de prospectos y operaciones mensuales.</DialogDescription>
               </div>
             </div>
-            
             <div className="flex items-center gap-4">
                <div className="relative w-80 hidden md:block">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -446,6 +447,19 @@ export default function AppointmentsDashboard({
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={onOpenTrash}
+                className="h-10 w-10 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all relative"
+              >
+                <Trash2 className="w-5 h-5" />
+                {archivedCount > 0 && (
+                  <span className="absolute top-0 right-0 bg-destructive text-white text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
+                    {archivedCount}
+                  </span>
+                )}
+              </Button>
               <DialogClose asChild>
                 <Button variant="ghost" size="icon" className="rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors h-10 w-10">
                   <X className="w-5 h-5" />
@@ -453,7 +467,6 @@ export default function AppointmentsDashboard({
               </DialogClose>
             </div>
           </DialogHeader>
-
           <div className="flex-1 p-6 overflow-hidden flex flex-col relative">
             <DashboardContent 
               expanded={true}
@@ -492,4 +505,3 @@ export default function AppointmentsDashboard({
     </div>
   );
 }
-

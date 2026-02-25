@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -49,7 +50,6 @@ interface Props {
   onHighlight: (app: Appointment) => void;
   updateStatus: (id: string, status: AppointmentStatus, notes?: string) => void;
   toggleConfirmation: (id: string) => void;
-  onOpenTrash: () => void;
   activeId?: string | null;
   expanded?: boolean;
   archivingIds?: Set<string>;
@@ -64,7 +64,6 @@ export default function UpcomingAppointments({
   onHighlight,
   updateStatus, 
   toggleConfirmation, 
-  onOpenTrash,
   activeId,
   expanded = false,
   archivingIds = new Set()
@@ -286,7 +285,6 @@ export default function UpcomingAppointments({
                           </div>
                         )}
                       </TableCell>
-                      
                       {expanded && (
                         <TableCell className="align-middle">
                           <div className="flex items-center gap-2 text-xs font-medium">
@@ -300,15 +298,12 @@ export default function UpcomingAppointments({
                           </div>
                         </TableCell>
                       )}
-
                       <TableCell className="align-middle text-[10px] font-bold text-muted-foreground uppercase">{app.type}</TableCell>
-
                       {expanded && (
                         <TableCell className="align-middle">
                           <div className="flex items-center gap-2 text-xs font-semibold"><Box className="w-3.5 h-3.5 text-accent" /> {app.product || 'N/A'}</div>
                         </TableCell>
                       )}
-
                       <TableCell className="align-middle">
                         <div className="flex flex-col justify-center">
                           <span className={cn("text-[10px] font-bold uppercase mb-1.5", appToday ? "text-primary" : "text-muted-foreground")}>{formatDate(app.date)}</span>
@@ -337,13 +332,11 @@ export default function UpcomingAppointments({
                           )}
                         </div>
                       </TableCell>
-                      
                       <TableCell className="align-middle">
                         <div className="flex items-center gap-1.5 text-accent font-bold text-[10px] bg-accent/5 w-fit px-2 py-1 rounded-md border border-accent/20">
                           <Clock className="w-3 h-3" /> {format12hTime(app.time)}
                         </div>
                       </TableCell>
-                      
                       <TableCell className="align-middle text-center" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-center gap-1">
                           {appToday && !isArchiving && (
@@ -372,17 +365,7 @@ export default function UpcomingAppointments({
           </ScrollArea>
         )}
       </div>
-
       <div className="flex flex-wrap justify-end gap-3 pt-2 shrink-0">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={onOpenTrash}
-          className="text-[10px] font-bold uppercase border-muted-foreground/40 bg-muted/10 text-muted-foreground hover:bg-muted/20 h-9 gap-2 px-4 shadow-sm"
-          type="button"
-        >
-          <Trash2 className="w-4 h-4" /> Papelera
-        </Button>
         <Button variant="outline" size="sm" onClick={copyDailyReport} className="text-[10px] font-bold uppercase border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 h-9 gap-2 px-4" type="button">
           <ClipboardCheck className="w-4 h-4" /> Reporte Diario
         </Button>
@@ -392,11 +375,8 @@ export default function UpcomingAppointments({
           </Button>
         )}
       </div>
-
       <Dialog open={!!finId} onOpenChange={(open) => !open && setFinId(null)}>
-        <DialogContent 
-          className="sm:max-w-[450px] bg-card border-border shadow-2xl backdrop-blur-[12px] z-[80]"
-        >
+        <DialogContent className="sm:max-w-[450px] bg-card border-border shadow-2xl backdrop-blur-[12px] z-[80]">
           <DialogHeader>
             <DialogTitle className="text-foreground flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-primary" /> Finalizar Consulta</DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">Registra el resultado de la reunión con el prospecto.</DialogDescription>
@@ -404,14 +384,7 @@ export default function UpcomingAppointments({
           <div className="py-2 space-y-4">
             <div className="space-y-1.5">
               <Label className="text-[10px] font-bold uppercase text-muted-foreground">Estatus Final</Label>
-              <select 
-                value={status} 
-                onChange={(e) => setStatus(e.target.value as AppointmentStatus)}
-                className={cn(
-                  "flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm focus:ring-2 focus:ring-ring",
-                  status === 'Cierre' && "border-green-500 text-green-600 bg-green-500/5 font-bold"
-                )}
-              >
+              <select value={status} onChange={(e) => setStatus(e.target.value as AppointmentStatus)} className={cn("flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm focus:ring-2 focus:ring-ring", status === 'Cierre' && "border-green-500 text-green-600 bg-green-500/5 font-bold")}>
                 <option value="Asistencia">Asistencia</option>
                 <option value="No asistencia">No asistencia</option>
                 <option value="Continuación en otra cita">Continuación en otra cita</option>
@@ -423,12 +396,7 @@ export default function UpcomingAppointments({
             </div>
             <div className="space-y-1.5">
               <Label className="text-[10px] font-bold uppercase text-muted-foreground">Acuerdos y Notas</Label>
-              <Textarea 
-                placeholder="Escribe montos, fechas o acuerdos aquí..." 
-                className="bg-muted/10 border-border/30 min-h-[120px] resize-none text-xs"
-                value={finNotes}
-                onChange={(e) => setFinNotes(e.target.value)}
-              />
+              <Textarea placeholder="Escribe montos, fechas o acuerdos aquí..." className="bg-muted/10 border-border/30 min-h-[120px] resize-none text-xs" value={finNotes} onChange={(e) => setFinNotes(e.target.value)} />
             </div>
           </div>
           <DialogFooter className="gap-2">
@@ -439,11 +407,8 @@ export default function UpcomingAppointments({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent 
-          className="sm:max-w-[550px] border shadow-2xl backdrop-blur-md overflow-hidden p-0 bg-green-950 border-green-500/50 text-white z-[90]"
-        >
+        <DialogContent className="sm:max-w-[550px] border shadow-2xl backdrop-blur-md overflow-hidden p-0 bg-green-950 border-green-500/50 text-white z-[90]">
           <div className="p-8 space-y-6">
             <div className="flex flex-col items-center text-center space-y-4">
               <div className="bg-green-500/20 p-5 rounded-full border border-green-400/30 relative z-10">
@@ -472,11 +437,8 @@ export default function UpcomingAppointments({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       <AlertDialog open={!!confirmId} onOpenChange={(open) => !open && setConfirmId(null)}>
-        <AlertDialogContent 
-          className="bg-card border-border shadow-2xl backdrop-blur-md z-[85]"
-        >
+        <AlertDialogContent className="bg-card border-border shadow-2xl backdrop-blur-md z-[85]">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-foreground">¿Confirmar asistencia?</AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground">Marcarás esta cita como confirmada para el día de hoy.</AlertDialogDescription>

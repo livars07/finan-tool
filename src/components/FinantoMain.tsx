@@ -11,7 +11,7 @@ import {
   Palette, Moon, Sun, Cpu, Phone, BookOpen, Info, Calculator, Maximize2, Sparkles, History,
   ClipboardList, Target, Calendar, Copy, Crown, Zap, Snowflake, Trash2, Rocket, ShieldAlert,
   Smartphone, MessageSquare, CalendarClock, Coins, Star, ArrowUpRight, ArrowDownRight,
-  HandCoins, CheckCircle, Search, BadgeAlert
+  HandCoins, CheckCircle, Search, BadgeAlert, MoreHorizontal, Settings2
 } from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
 import { Button } from '@/components/ui/button';
@@ -95,7 +95,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const [pendingCommissionApp, setPendingCommissionApp] = useState<Service.Appointment | null>(null);
   const shownCommissionIds = useRef<Set<string>>(new Set());
   const overdueQueue = useRef<Service.Appointment[]>([]);
-  const lastClosedTimeRef = useRef<number>(0); // Timestamp del último cierre del popup
+  const lastClosedTimeRef = useRef<number>(0); 
   const pendingAppRef = useRef<Service.Appointment | null>(null);
   
   const { toast } = useToast();
@@ -108,7 +108,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
     appointmentsRef.current = appointments;
   }, [stats, appointments]);
 
-  // Sincronizar ref con estado para uso en intervalos estables
   useEffect(() => {
     pendingAppRef.current = pendingCommissionApp;
   }, [pendingCommissionApp]);
@@ -179,7 +178,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
     };
   }, [isLoaded, toast]);
 
-  // Motor de búsqueda de comisiones pendientes con COOLDOWN de 30s
   useEffect(() => {
     if (!isLoaded) return;
 
@@ -187,7 +185,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       const currentApps = appointmentsRef.current;
       const today = new Date();
 
-      // Buscamos todas las que ya pasaron su fecha de pago y siguen pendientes
       const overdueCommissions = currentApps.filter(app => {
         const isSalesStatus = app.status === 'Cierre' || app.status === 'Apartado';
         const isPending = (app.commissionStatus || 'Pendiente') === 'Pendiente';
@@ -204,28 +201,23 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
     };
 
     const showNextPending = () => {
-      // 1. Si ya hay uno abierto, no hacemos nada
       if (pendingAppRef.current) return;
 
-      // 2. Respetar el COOLDOWN de 30 segundos tras cerrar el anterior
       const now = Date.now();
       if (lastClosedTimeRef.current > 0 && (now - lastClosedTimeRef.current < 30000)) {
         return;
       }
 
-      // 3. Si no hay nada en cola, buscamos de nuevo
       if (overdueQueue.current.length === 0) {
         performCommissionSearch();
       }
 
-      // 4. Si después de buscar sigue habiendo algo, mostramos el primero
       if (overdueQueue.current.length > 0) {
         const nextApp = overdueQueue.current.shift();
         if (nextApp) {
           shownCommissionIds.current.add(nextApp.id);
           setPendingCommissionApp(nextApp);
           
-          // Efecto de sonido al aparecer el popup
           const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3");
           audio.volume = 0.4;
           audio.play().catch(() => {});
@@ -233,16 +225,14 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       }
     };
 
-    // Inicio inicial a los 15 segundos
     const startTimer = setTimeout(() => {
       showNextPending();
-      // Revisión frecuente cada 5 segundos para detectar el fin del cooldown de 30s
       const intervalId = setInterval(showNextPending, 5000);
       return () => clearInterval(intervalId);
     }, 15000);
 
     return () => clearTimeout(startTimer);
-  }, [isLoaded]); // Solo depende de isLoaded para que el ciclo sea estable
+  }, [isLoaded]);
 
   const resetTimer = useCallback(() => setTimerKey(prev => prev + 1), []);
   const handleNext = useCallback(() => { if (api) { api.scrollNext(); resetTimer(); } }, [api, resetTimer]);
@@ -267,23 +257,18 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const handleConfirmCommissionPayment = () => {
     if (pendingCommissionApp) {
       const updates: Partial<Service.Appointment> = { commissionStatus: 'Pagada' };
-      
-      // Regla de negocio: Si se paga la comisión de un apartado, se convierte en Cierre
       if (pendingCommissionApp.status === 'Apartado') {
         updates.status = 'Cierre';
       }
-
       editAppointment(pendingCommissionApp.id, updates);
-      
       toast({
         title: updates.status === 'Cierre' ? "¡Venta Cerrada!" : "Comisión Conciliada",
         description: updates.status === 'Cierre' 
           ? `El apartado de ${pendingCommissionApp.name} se ha convertido en Cierre tras el pago.`
           : `Se ha registrado el pago de ${pendingCommissionApp.name}.`,
       });
-      
       setPendingCommissionApp(null);
-      lastClosedTimeRef.current = Date.now(); // Inicia el temporizador de 30s al confirmar
+      lastClosedTimeRef.current = Date.now();
     }
   };
 
@@ -434,6 +419,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
               toggleConfirmation={appointmentState.toggleConfirmation} 
               formatFriendlyDate={appointmentState.formatFriendlyDate} 
               format12hTime={appointmentState.format12hTime} 
+              archivedCount={archived.length}
             />
           </section>
         </div>
@@ -445,13 +431,26 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
             <span className="font-bold text-foreground">Finanto v1.1</span>
             <span>© 2026 - Sistema de Gestión Inmobiliaria</span>
           </div>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" className="h-7 text-[10px] hover:text-destructive" onClick={() => setShowClearConfirm(true)}>
-              <Trash2 className="w-3 h-3 mr-1" /> Limpiar Datos
-            </Button>
-            <Button variant="ghost" size="sm" className="h-7 text-[10px]" onClick={() => setShowResetConfirm(true)}>
-              <RotateCcw className="w-3 h-3 mr-1" /> Reiniciar Seed
-            </Button>
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground">
+                  <MoreHorizontal className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 backdrop-blur-lg">
+                <DropdownMenuLabel className="text-[10px] uppercase font-bold text-muted-foreground">Administración</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setShowResetConfirm(true)} className="cursor-pointer gap-2 py-2">
+                  <RotateCcw className="w-4 h-4 text-primary" />
+                  <span className="text-xs font-semibold">Reiniciar Seed</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowClearConfirm(true)} className="cursor-pointer gap-2 py-2 text-destructive focus:text-destructive">
+                  <Trash2 className="w-4 h-4" />
+                  <span className="text-xs font-semibold">Limpiar Datos</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </footer>
@@ -485,9 +484,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       </AlertDialog>
 
       <Dialog open={showHelp} onOpenChange={setShowHelp}>
-        <DialogContent 
-          className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 overflow-hidden bg-card shadow-2xl z-[70]"
-        >
+        <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 overflow-hidden bg-card shadow-2xl z-[70]">
           <DialogHeader className="p-6 border-b bg-primary/5 shrink-0">
             <div className="flex items-center gap-3">
               <div className="p-3 border border-primary/30 rounded-xl bg-primary/10">
@@ -499,7 +496,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
               </div>
             </div>
           </DialogHeader>
-          
           <ScrollArea className="flex-1">
             <div className="p-6 space-y-10 pb-20">
               <section className="space-y-4">
@@ -516,7 +512,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   </ul>
                 </div>
               </section>
-
               <section className="space-y-4">
                 <div className="flex items-center gap-2 text-accent">
                   <CalendarClock className="w-5 h-5" />
@@ -531,7 +526,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   </ul>
                 </div>
               </section>
-
               <section className="space-y-4">
                 <div className="flex items-center gap-2 text-green-500">
                   <Star className="w-5 h-5" />
@@ -546,7 +540,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   </ul>
                 </div>
               </section>
-
               <div className="p-6 border border-destructive/20 rounded-2xl bg-destructive/5 flex items-start gap-4">
                 <ShieldAlert className="w-6 h-6 text-destructive shrink-0 mt-1" />
                 <div className="space-y-1">
@@ -558,7 +551,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
               </div>
             </div>
           </ScrollArea>
-          
           <DialogFooter className="p-4 border-t bg-muted/20">
             <Button onClick={() => setShowHelp(false)} className="w-full h-10 font-bold rounded-xl shadow-lg" type="button">
               ¡Entendido, comencemos!
@@ -567,16 +559,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Popup de Monitoreo de Comisiones SECUENCIAL con COOLDOWN */}
-      <Dialog 
-        open={!!pendingCommissionApp} 
-        onOpenChange={(open) => {
-          if (!open) {
-            setPendingCommissionApp(null);
-            lastClosedTimeRef.current = Date.now(); // Inicia el temporizador de 30s al cerrar manual
-          }
-        }}
-      >
+      <Dialog open={!!pendingCommissionApp} onOpenChange={(open) => { if (!open) { setPendingCommissionApp(null); lastClosedTimeRef.current = Date.now(); } }}>
         <DialogContent className="sm:max-w-[450px] border-accent/30 bg-card shadow-2xl backdrop-blur-md z-[80]">
           <DialogHeader>
             <div className="flex items-center justify-between mb-2">
@@ -590,11 +573,8 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
               </div>
             </div>
             <DialogTitle className="text-xl font-headline font-bold">Verificación de Pago</DialogTitle>
-            <DialogDescription className="text-sm">
-              Confirmación de recepción de comisión para trámite finalizado.
-            </DialogDescription>
+            <DialogDescription className="text-sm">Confirmación de recepción de comisión para trámite finalizado.</DialogDescription>
           </DialogHeader>
-          
           {pendingCommissionApp && (
             <div className="py-4 space-y-4">
               <div className="p-4 bg-muted/30 rounded-xl border border-border/40 space-y-3">
@@ -627,43 +607,16 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                 </div>
               </div>
               <div className="flex justify-center">
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => {
-                    setSelectedAppId(pendingCommissionApp.id);
-                    setPendingCommissionApp(null);
-                    lastClosedTimeRef.current = Date.now(); // Inicia cooldown al ver detalles
-                  }}
-                  className="text-[10px] font-bold uppercase text-primary hover:bg-primary/10 gap-2 h-8"
-                  type="button"
-                >
+                <Button variant="ghost" size="sm" onClick={() => { setSelectedAppId(pendingCommissionApp.id); setPendingCommissionApp(null); lastClosedTimeRef.current = Date.now(); }} className="text-[10px] font-bold uppercase text-primary hover:bg-primary/10 gap-2 h-8" type="button">
                   <Search className="w-3.5 h-3.5" /> Ver expediente completo
                 </Button>
               </div>
-              <p className="text-xs text-center text-muted-foreground font-medium px-4">
-                ¿Confirmas que esta comisión ya fue liquidada y el monto está en tu cuenta?
-              </p>
+              <p className="text-xs text-center text-muted-foreground font-medium px-4">¿Confirmas que esta comisión ya fue liquidada y el monto está en tu cuenta?</p>
             </div>
           )}
-
           <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                setPendingCommissionApp(null);
-                lastClosedTimeRef.current = Date.now(); // Inicia cooldown al posponer
-              }}
-              className="w-full sm:flex-1 h-11 text-xs font-bold uppercase"
-              type="button"
-            >
-              Aún no recibida
-            </Button>
-            <Button 
-              onClick={handleConfirmCommissionPayment}
-              className="w-full sm:flex-1 h-11 bg-accent hover:bg-accent/80 text-accent-foreground font-bold shadow-lg gap-2"
-              type="button"
-            >
+            <Button variant="outline" onClick={() => { setPendingCommissionApp(null); lastClosedTimeRef.current = Date.now(); }} className="w-full sm:flex-1 h-11 text-xs font-bold uppercase" type="button">Aún no recibida</Button>
+            <Button onClick={handleConfirmCommissionPayment} className="w-full sm:flex-1 h-11 bg-accent hover:bg-accent/80 text-accent-foreground font-bold shadow-lg gap-2" type="button">
               <CheckCircle className="w-4 h-4" /> Sí, ya se pagó
             </Button>
           </DialogFooter>
