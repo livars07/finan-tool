@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -333,7 +334,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       </footer>
 
       <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
-        <AlertDialogContent>
+        <AlertDialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Confirmar reinicio?</AlertDialogTitle>
             <AlertDialogDescription>Se borrará tu información actual para restaurar los datos de prueba iniciales.</AlertDialogDescription>
@@ -346,7 +347,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       </AlertDialog>
 
       <AlertDialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
-        <AlertDialogContent>
+        <AlertDialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar todo?</AlertDialogTitle>
             <AlertDialogDescription>Esta acción borrará todas tus citas permanentemente. No se puede deshacer.</AlertDialogDescription>
@@ -361,7 +362,11 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       </AlertDialog>
 
       <Dialog open={showHelp} onOpenChange={setShowHelp}>
-        <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 overflow-hidden bg-card shadow-2xl">
+        <DialogContent 
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          onCloseAutoFocus={(e) => e.preventDefault()}
+          className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 overflow-hidden bg-card shadow-2xl"
+        >
           <DialogHeader className="p-6 border-b bg-primary/5 shrink-0">
             <div className="flex items-center gap-3">
               <div className="p-3 border border-primary/30 rounded-xl bg-primary/10">

@@ -400,6 +400,8 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
       <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
         <DialogContent 
           data-calculator-dialog="true"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          onCloseAutoFocus={(e) => e.preventDefault()}
           className="max-w-none w-screen h-screen m-0 rounded-none bg-background border-none shadow-none p-0 flex flex-col overflow-hidden z-[60]"
         >
           <DialogHeader className="px-6 py-4 border-b border-border/40 flex flex-row items-center justify-between bg-card/10 shrink-0">

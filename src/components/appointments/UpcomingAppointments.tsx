@@ -317,7 +317,11 @@ export default function UpcomingAppointments({
       </div>
 
       <Dialog open={!!finId} onOpenChange={(open) => !open && setFinId(null)}>
-        <DialogContent className="sm:max-w-[450px] bg-card border-border shadow-2xl backdrop-blur-[12px] z-[80]">
+        <DialogContent 
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          onCloseAutoFocus={(e) => e.preventDefault()}
+          className="sm:max-w-[450px] bg-card border-border shadow-2xl backdrop-blur-[12px] z-[80]"
+        >
           <DialogHeader>
             <DialogTitle className="text-foreground flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-primary" /> Finalizar Consulta</DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">Registra el resultado de la reunión con el prospecto.</DialogDescription>
@@ -362,7 +366,11 @@ export default function UpcomingAppointments({
       </Dialog>
 
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent className="sm:max-w-[550px] border shadow-2xl backdrop-blur-md overflow-hidden p-0 bg-green-950 border-green-500/50 text-white z-[90]">
+        <DialogContent 
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          onCloseAutoFocus={(e) => e.preventDefault()}
+          className="sm:max-w-[550px] border shadow-2xl backdrop-blur-md overflow-hidden p-0 bg-green-950 border-green-500/50 text-white z-[90]"
+        >
           <div className="p-8 space-y-6">
             <div className="flex flex-col items-center text-center space-y-4">
               <div className="bg-green-500/20 p-5 rounded-full border border-green-400/30 relative z-10">
@@ -393,7 +401,10 @@ export default function UpcomingAppointments({
       </Dialog>
 
       <AlertDialog open={!!confirmId} onOpenChange={(open) => !open && setConfirmId(null)}>
-        <AlertDialogContent className="bg-card border-border shadow-2xl backdrop-blur-md z-[85]">
+        <AlertDialogContent 
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          className="bg-card border-border shadow-2xl backdrop-blur-md z-[85]"
+        >
           <AlertDialogHeader>
             <AlertDialogTitle className="text-foreground">¿Confirmar asistencia?</AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground">Marcarás esta cita como confirmada para el día de hoy.</AlertDialogDescription>
