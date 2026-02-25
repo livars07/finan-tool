@@ -403,6 +403,7 @@ export default function UpcomingAppointments({
       <AlertDialog open={!!confirmId} onOpenChange={(open) => !open && setConfirmId(null)}>
         <AlertDialogContent 
           onOpenAutoFocus={(e) => e.preventDefault()}
+          onCloseAutoFocus={(e) => e.preventDefault()}
           className="bg-card border-border shadow-2xl backdrop-blur-md z-[85]"
         >
           <AlertDialogHeader>

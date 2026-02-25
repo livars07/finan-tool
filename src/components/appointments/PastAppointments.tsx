@@ -1,7 +1,7 @@
 
 "use client"
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Appointment, AppointmentStatus } from '@/services/appointment-service';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { 
@@ -25,6 +25,8 @@ interface Props {
   format12hTime: (time: string) => string;
   activeId?: string | null;
   expanded?: boolean;
+  visibleCount: number;
+  setVisibleCount: (count: number | ((prev: number) => number)) => void;
 }
 
 export default function PastAppointments({ 
@@ -33,9 +35,10 @@ export default function PastAppointments({
   formatDate, 
   format12hTime, 
   activeId, 
-  expanded = false
+  expanded = false,
+  visibleCount,
+  setVisibleCount
 }: Props) {
-  const [visibleCount, setVisibleCount] = useState(15);
   const { toast } = useToast();
 
   if (appointments.length === 0) {

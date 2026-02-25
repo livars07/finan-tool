@@ -78,6 +78,9 @@ export default function AppointmentsDashboard({
   const [activeId, setActiveId] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const [activeTab, setActiveTab] = useState('upcoming');
+  
+  // Estado persistente para la carga de citas en el historial
+  const [visibleCountPast, setVisibleCountPast] = useState(15);
 
   const stats = useMemo(() => Service.calculateStats(appointments), [appointments]);
 
@@ -288,6 +291,8 @@ export default function AppointmentsDashboard({
             onSelect={handleSelect}
             activeId={activeId}
             expanded={expanded}
+            visibleCount={visibleCountPast}
+            setVisibleCount={setVisibleCountPast}
           />
         </TabsContent>
       </div>
