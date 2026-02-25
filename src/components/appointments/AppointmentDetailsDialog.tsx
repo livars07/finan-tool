@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -158,6 +159,14 @@ Número: *${appointment.phone}*`;
       style: 'currency',
       currency: 'MXN',
     }).format(val);
+  };
+
+  const formatWithCommas = (val: string) => {
+    const num = val.replace(/[^0-9.]/g, '');
+    if (!num) return '';
+    const parts = num.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return parts.join('.');
   };
 
   const handleCommissionToggle = (checked: boolean) => {
@@ -477,31 +486,41 @@ Número: *${appointment.phone}*`;
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <Label className="text-[9px] font-bold uppercase text-muted-foreground flex items-center gap-1">
-                      <Coins className="w-3 h-3" /> Crédito Final
-                    </Label>
+                  <div className="space-y-1.5">
+                    <div className="h-4 flex items-center">
+                      <Label className="text-[9px] font-bold uppercase text-muted-foreground flex items-center gap-1">
+                        <Coins className="w-3 h-3" /> Crédito Final
+                      </Label>
+                    </div>
                     {isEditing ? (
-                      <Input 
-                        type="text" 
-                        value={editData.finalCreditAmount?.toString() || ''} 
-                        onChange={e => handleFinalCreditChange(e.target.value)}
-                        className="h-8 bg-muted/20 text-xs font-bold"
-                      />
+                      <div className="relative flex items-center">
+                        <span className="absolute left-2.5 text-[10px] font-bold text-muted-foreground">$</span>
+                        <Input 
+                          type="text" 
+                          value={formatWithCommas(editData.finalCreditAmount?.toString() || '')} 
+                          onChange={e => handleFinalCreditChange(e.target.value)}
+                          className="h-8 pl-5 bg-muted/20 text-xs font-bold w-full"
+                        />
+                      </div>
                     ) : (
                       <p className="text-sm font-bold text-foreground">{formatCurrency(appointment.finalCreditAmount || 0)}</p>
                     )}
                   </div>
-                  <div className="space-y-1">
-                    <Label className="text-[9px] font-bold uppercase text-muted-foreground">Participación %</Label>
+                  <div className="space-y-1.5">
+                    <div className="h-4 flex items-center">
+                      <Label className="text-[9px] font-bold uppercase text-muted-foreground">Participación</Label>
+                    </div>
                     {isEditing ? (
-                      <Input 
-                        type="number" 
-                        max={100}
-                        value={editData.commissionPercent || ''} 
-                        onChange={e => handleCommissionPercentChange(e.target.value)}
-                        className="h-8 bg-muted/20 text-xs font-bold text-accent"
-                      />
+                      <div className="relative flex items-center">
+                        <Input 
+                          type="number" 
+                          max={100}
+                          value={editData.commissionPercent || ''} 
+                          onChange={e => handleCommissionPercentChange(e.target.value)}
+                          className="h-8 pr-6 bg-muted/20 text-xs font-bold text-accent w-full"
+                        />
+                        <span className="absolute right-2.5 text-[10px] font-bold text-accent">%</span>
+                      </div>
                     ) : (
                       <p className="text-sm font-bold text-accent">{appointment.commissionPercent || 0}%</p>
                     )}
