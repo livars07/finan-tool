@@ -11,7 +11,7 @@ import {
   Palette, Moon, Sun, Cpu, Phone, BookOpen, Info, Calculator, Maximize2, Sparkles, History,
   ClipboardList, Target, Calendar, Copy, Crown, Zap, Snowflake, Trash2, Rocket, ShieldAlert,
   Smartphone, MessageSquare, CalendarClock, Coins, Star, ArrowUpRight, ArrowDownRight,
-  HandCoins, CheckCircle, Search
+  HandCoins, CheckCircle, Search, BadgeAlert
 } from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
 import { Button } from '@/components/ui/button';
@@ -90,7 +90,12 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const [theme, setTheme] = useState<Theme>('corporativo');
   const [api, setApi] = useState<CarouselApi>();
   const [timerKey, setTimerKey] = useState(0);
+  
+  // Estados para el motor de comisiones
   const [pendingCommissionApp, setPendingCommissionApp] = useState<Service.Appointment | null>(null);
+  const shownCommissionIds = useRef<Set<string>>(new Set());
+  const overdueQueue = useRef<Service.Appointment[]>([]);
+  
   const { toast } = useToast();
 
   const statsRef = useRef(stats);
@@ -167,44 +172,64 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
     };
   }, [isLoaded, toast]);
 
-  // Motor de búsqueda de comisiones pendientes
+  // Motor de búsqueda de comisiones pendientes (MODAL SECUENCIAL)
   useEffect(() => {
     if (!isLoaded) return;
-
-    let searchInterval: NodeJS.Timeout | null = null;
 
     const performCommissionSearch = () => {
       const currentApps = appointmentsRef.current;
       const today = new Date();
 
+      // Buscamos todas las que ya pasaron su fecha de pago y siguen pendientes
       const overdueCommissions = currentApps.filter(app => {
         const isSalesStatus = app.status === 'Cierre' || app.status === 'Apartado';
         const isPending = (app.commissionStatus || 'Pendiente') === 'Pendiente';
         const notArchived = !app.isArchived;
-        if (!isSalesStatus || !isPending || !notArchived) return false;
+        const notShownYet = !shownCommissionIds.current.has(app.id);
+        
+        if (!isSalesStatus || !isPending || !notArchived || !notShownYet) return false;
 
         const paymentDate = Service.getCommissionPaymentDate(app.date);
         return isBefore(paymentDate, today);
       });
 
-      if (overdueCommissions.length > 0) {
-        setPendingCommissionApp(overdueCommissions[0]);
-      } else if (searchInterval) {
-        clearInterval(searchInterval);
-        searchInterval = null;
+      overdueQueue.current = overdueCommissions;
+    };
+
+    const showNextPending = () => {
+      // Si ya hay uno abierto, no abrimos otro todavía
+      if (pendingCommissionApp) return;
+
+      // Si no hay nada en cola, buscamos de nuevo
+      if (overdueQueue.current.length === 0) {
+        performCommissionSearch();
+      }
+
+      // Si después de buscar sigue habiendo algo, mostramos el primero
+      if (overdueQueue.current.length > 0) {
+        const nextApp = overdueQueue.current.shift();
+        if (nextApp) {
+          shownCommissionIds.current.add(nextApp.id);
+          setPendingCommissionApp(nextApp);
+          
+          // Efecto de sonido al aparecer el popup
+          const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3");
+          audio.volume = 0.4;
+          audio.play().catch(() => {});
+        }
       }
     };
 
+    // Inicio a los 15 segundos
     const startTimer = setTimeout(() => {
-      performCommissionSearch();
-      searchInterval = setInterval(performCommissionSearch, 60000);
+      showNextPending();
+      // Intervalo de revisión cada 20 segundos para mostrar el siguiente de la cola
+      const intervalId = setInterval(showNextPending, 20000);
+      return () => clearInterval(intervalId);
     }, 15000);
 
-    return () => {
-      clearTimeout(startTimer);
-      if (searchInterval) clearInterval(searchInterval);
-    };
-  }, [isLoaded]);
+    return () => clearTimeout(startTimer);
+  }, [isLoaded, pendingCommissionApp]);
 
   const resetTimer = useCallback(() => setTimerKey(prev => prev + 1), []);
   const handleNext = useCallback(() => { if (api) { api.scrollNext(); resetTimer(); } }, [api, resetTimer]);
@@ -528,28 +553,44 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Popup de Monitoreo de Comisiones */}
+      {/* Popup de Monitoreo de Comisiones SECUENCIAL */}
       <Dialog open={!!pendingCommissionApp} onOpenChange={(open) => !open && setPendingCommissionApp(null)}>
         <DialogContent className="sm:max-w-[450px] border-accent/30 bg-card shadow-2xl backdrop-blur-md z-[80]">
           <DialogHeader>
-            <div className="bg-accent/10 p-3 rounded-full w-fit mb-2">
-              <HandCoins className="w-8 h-8 text-accent animate-bounce" />
+            <div className="flex items-center justify-between mb-2">
+              <div className="bg-accent/10 p-3 rounded-full w-fit">
+                <HandCoins className="w-8 h-8 text-accent animate-bounce" />
+              </div>
+              <div className="bg-destructive/10 px-3 py-1 rounded-full border border-destructive/20">
+                <span className="text-[10px] font-bold text-destructive uppercase tracking-widest flex items-center gap-1">
+                  <BadgeAlert className="w-3 h-3" /> Pago Vencido
+                </span>
+              </div>
             </div>
             <DialogTitle className="text-xl font-headline font-bold">Verificación de Pago</DialogTitle>
             <DialogDescription className="text-sm">
-              Se ha detectado una comisión pendiente cuya fecha estimada de pago ya pasó.
+              Confirmación de recepción de comisión para trámite finalizado.
             </DialogDescription>
           </DialogHeader>
           
           {pendingCommissionApp && (
             <div className="py-4 space-y-4">
-              <div className="p-4 bg-muted/30 rounded-xl border border-border/40 space-y-2">
+              <div className="p-4 bg-muted/30 rounded-xl border border-border/40 space-y-3">
+                <div className="flex justify-between items-center border-b border-border/10 pb-2">
+                  <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Resultado</span>
+                  <span className={cn(
+                    "text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border",
+                    pendingCommissionApp.status === 'Cierre' ? "bg-green-500/10 text-green-500 border-green-500/20" : "bg-blue-500/10 text-blue-500 border-blue-500/20"
+                  )}>
+                    {pendingCommissionApp.status}
+                  </span>
+                </div>
                 <div className="flex justify-between items-center">
                   <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Cliente</span>
                   <span className="text-sm font-bold text-foreground">{pendingCommissionApp.name}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Monto Estimado</span>
+                  <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Ganancia Estimada</span>
                   <span className="text-sm font-bold text-accent">
                     {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(
                       (pendingCommissionApp.finalCreditAmount || 0) * 0.007 * ((pendingCommissionApp.commissionPercent || 0) / 100)
@@ -557,7 +598,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Fecha Corte</span>
+                  <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Fecha de Pago</span>
                   <span className="text-sm font-bold text-primary">
                     {new Intl.DateTimeFormat('es-MX', { dateStyle: 'long' }).format(Service.getCommissionPaymentDate(pendingCommissionApp.date))}
                   </span>
@@ -577,8 +618,8 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   <Search className="w-3.5 h-3.5" /> Ver expediente completo
                 </Button>
               </div>
-              <p className="text-xs text-center text-muted-foreground font-medium">
-                ¿Confirmas que esta comisión ya fue liquidada?
+              <p className="text-xs text-center text-muted-foreground font-medium px-4">
+                ¿Confirmas que esta comisión ya fue liquidada y el monto está en tu cuenta?
               </p>
             </div>
           )}
@@ -615,3 +656,4 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
     </div>
   );
 }
+
