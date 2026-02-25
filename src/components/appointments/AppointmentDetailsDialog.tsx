@@ -44,6 +44,7 @@ interface Props {
 export default function AppointmentDetailsDialog({ 
   appointment, 
   open, 
+  open: dialogOpen,
   onOpenChange, 
   onEdit,
   onAdd,
@@ -152,6 +153,18 @@ Número: *${appointment.phone}*`;
     });
   };
 
+  const formatWithCommas = (val: string) => {
+    const num = val.replace(/,/g, '');
+    if (!num || isNaN(Number(num))) return '';
+    const parts = num.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return parts.join('.');
+  };
+
+  const parseNumber = (val: string) => {
+    return parseFloat(val.replace(/,/g, '')) || 0;
+  };
+
   const showCommissionPanel = appointment.status === 'Cierre' || appointment.status === 'Apartado';
   
   // Formula: Full commission is 0.7% (0.007). Percent input modifies that 0.7%.
@@ -162,12 +175,15 @@ Número: *${appointment.phone}*`;
     const dayOfWeek = getDay(d); // Sun=0, Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6
     
     let daysToAdd = 0;
-    if (dayOfWeek <= 2) { // Sun, Mon, Tue -> Cutoff is Tue, payment is upcoming Fri
-      daysToAdd = (5 - dayOfWeek + 7) % 7;
-      if (daysToAdd === 0 && dayOfWeek > 2) daysToAdd = 7; // Security measure
-    } else { // Wed and after -> Payment is next week Fri
-      daysToAdd = (5 - dayOfWeek + 14) % 14;
-      if (daysToAdd < 7) daysToAdd += 7;
+    // User logic: "2 Fridays away if before cutoff (Tue)"
+    // If Sun(0), Mon(1), Tue(2) -> Cutoff met. 
+    // Target is Friday of NEXT week (not this week's Friday).
+    if (dayOfWeek <= 2) {
+      daysToAdd = (5 - dayOfWeek) + 7;
+    } else {
+      // If Wed(3), Thu(4), Fri(5), Sat(6) -> Cutoff missed.
+      // Target is Friday of the week AFTER next.
+      daysToAdd = (5 - dayOfWeek) + 14;
     }
     
     const paymentDate = addDays(d, daysToAdd);
@@ -193,6 +209,18 @@ Número: *${appointment.phone}*`;
       title: newStatus === 'Pagada' ? "Comisión Pagada" : "Comisión Pendiente", 
       description: `Estatus actualizado para ${appointment.name}.` 
     });
+  };
+
+  const handleFinalCreditChange = (val: string) => {
+    const cleanVal = val.replace(/,/g, '');
+    const num = parseFloat(cleanVal) || 0;
+    setEditData(prev => ({ ...prev, finalCreditAmount: num }));
+  };
+
+  const handleCommissionPercentChange = (val: string) => {
+    let num = parseFloat(val) || 0;
+    if (num > 100) num = 100;
+    setEditData(prev => ({ ...prev, commissionPercent: num }));
   };
 
   return (
@@ -411,20 +439,23 @@ Número: *${appointment.phone}*`;
                       <Coins className="w-3 h-3" /> Crédito Final
                     </Label>
                     {isEditing ? (
-                      <Input 
-                        type="number" 
-                        value={editData.finalCreditAmount || ''} 
-                        onChange={e => setEditData({...editData, finalCreditAmount: parseFloat(e.target.value)})}
-                        className="h-8 bg-muted/20 text-xs font-bold"
-                        placeholder="Monto acordado"
-                      />
+                      <div className="relative flex items-center">
+                        <span className="absolute left-2 text-xs font-bold text-muted-foreground/60">$</span>
+                        <Input 
+                          type="text" 
+                          value={formatWithCommas(editData.finalCreditAmount?.toString() || '')} 
+                          onChange={e => handleFinalCreditChange(e.target.value)}
+                          className="h-8 pl-5 bg-muted/20 text-xs font-bold"
+                          placeholder="0.00"
+                        />
+                      </div>
                     ) : (
                       <p className="text-sm font-bold text-foreground">{formatCurrency(appointment.finalCreditAmount || 0)}</p>
                     )}
                   </div>
                   <div className="space-y-1">
                     <Label className="text-[9px] font-bold uppercase text-muted-foreground flex items-center gap-1">
-                      <Percent className="w-3 h-3" /> Comisión
+                      <Percent className="w-3 h-3" /> Comisión (%)
                       <TooltipProvider>
                         <Tooltip delayDuration={0}>
                           <TooltipTrigger asChild>
@@ -439,8 +470,9 @@ Número: *${appointment.phone}*`;
                     {isEditing ? (
                       <Input 
                         type="number" 
+                        max={100}
                         value={editData.commissionPercent || ''} 
-                        onChange={e => setEditData({...editData, commissionPercent: parseFloat(e.target.value)})}
+                        onChange={e => handleCommissionPercentChange(e.target.value)}
                         className="h-8 bg-muted/20 text-xs font-bold text-accent"
                         placeholder="Ej. 100"
                       />
