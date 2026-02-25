@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useEffect, useRef } from "react"
@@ -17,30 +16,36 @@ export function Toaster() {
   const processedToastIds = useRef(new Set<string>())
 
   useEffect(() => {
-    // Play sound for every new toast immediately
     toasts.forEach((t) => {
       if (!processedToastIds.current.has(t.id)) {
         processedToastIds.current.add(t.id)
         
-        // Determinar si es un toast de copiado buscando la palabra en el título o descripción
+        const titleStr = t.title?.toString() || '';
+        const descStr = t.description?.toString() || '';
+        
         const isCopyAction = 
-          t.title?.toString().toLowerCase().includes('copia') || 
-          t.description?.toString().toLowerCase().includes('copia');
+          titleStr.toLowerCase().includes('copia') || 
+          descStr.toLowerCase().includes('copia');
 
-        // Determinar el sonido: error y copiado usan el mismo sonido de alerta
-        const soundUrl = (t.variant === 'destructive' || isCopyAction)
-          ? "https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3" // Sonido de alerta/error/copiado
-          : "https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"; // Sonido de éxito/info
+        const isActionRequired = titleStr.includes('Acción Requerida');
+
+        let soundUrl = "https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"; // Éxito/Info
+        let volume = 0.3;
+
+        if (isActionRequired) {
+          soundUrl = "https://assets.mixkit.co/active_storage/sfx/2356/2356-preview.mp3"; // Alerta sistema/Advertencia
+          volume = 0.4;
+        } else if (t.variant === 'destructive' || isCopyAction) {
+          soundUrl = "https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3"; // Error/Copia
+          volume = 0.5;
+        }
           
         const audio = new Audio(soundUrl)
-        audio.volume = (t.variant === 'destructive' || isCopyAction) ? 0.5 : 0.3
-        audio.play().catch(() => {
-          // Ignore browser auto-play prevention errors
-        })
+        audio.volume = volume;
+        audio.play().catch(() => {})
       }
     })
 
-    // Housekeeping: remove IDs of toasts that are no longer in the array
     const currentIds = new Set(toasts.map(t => t.id))
     processedToastIds.current.forEach(id => {
       if (!currentIds.has(id)) {

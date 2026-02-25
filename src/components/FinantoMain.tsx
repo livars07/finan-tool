@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -125,18 +124,28 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   useEffect(() => {
     if (!isLoaded) return;
 
-    const timer = setTimeout(() => {
+    const checkConfirmations = () => {
       const currentStats = statsRef.current;
       const unconfirmed = currentStats.todayCount - currentStats.todayConfirmed;
       if (unconfirmed > 0) {
         toast({
+          variant: "warning",
           title: "Acción Requerida",
           description: `Faltan ${unconfirmed} ${unconfirmed === 1 ? 'cita' : 'citas'} de hoy por confirmar asistencia.`,
         });
       }
-    }, 30000);
+    };
 
-    return () => clearTimeout(timer);
+    // Primer recordatorio a los 20 segundos
+    const initialTimer = setTimeout(checkConfirmations, 20000);
+
+    // Recordatorio recurrente cada 20 minutos
+    const intervalTimer = setInterval(checkConfirmations, 1200000);
+
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(intervalTimer);
+    };
   }, [isLoaded, toast]);
 
   const resetTimer = useCallback(() => setTimerKey(prev => prev + 1), []);

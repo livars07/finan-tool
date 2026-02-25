@@ -32,6 +32,8 @@ const toastVariants = cva(
         default: "border bg-background text-foreground",
         destructive:
           "destructive group border-destructive bg-destructive text-destructive-foreground",
+        warning: 
+          "border-yellow-500/50 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400",
       },
     },
     defaultVariants: {
@@ -50,8 +52,7 @@ const Toast = React.forwardRef<
       ref={ref}
       className={cn(toastVariants({ variant }), className)}
       onClick={(e) => {
-        // Dismiss on click anywhere on the toast
-        // We trigger the Close button's behavior
+        e.stopPropagation(); // Prevenir cierre de popups de fondo
         const target = e.currentTarget as HTMLElement;
         const closeBtn = target.querySelector('[toast-close]') as HTMLButtonElement;
         if (closeBtn) closeBtn.click();
@@ -72,7 +73,7 @@ const ToastAction = React.forwardRef<
       "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive",
       className
     )}
-    onClick={(e) => e.stopPropagation()} // Prevent closing toast when clicking the action button specifically
+    onClick={(e) => e.stopPropagation()} 
     {...props}
   />
 ))
