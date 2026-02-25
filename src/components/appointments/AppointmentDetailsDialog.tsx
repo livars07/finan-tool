@@ -182,6 +182,19 @@ Número: *${appointment.phone}*`;
     }).format(val);
   };
 
+  const handleCommissionToggle = (checked: boolean) => {
+    const newStatus = checked ? 'Pagada' : 'Pendiente';
+    // Update local state for immediate visual feedback
+    setEditData(prev => ({ ...prev, commissionStatus: newStatus }));
+    // Save immediately to persistent storage
+    onEdit(appointment.id, { commissionStatus: newStatus });
+    
+    toast({ 
+      title: newStatus === 'Pagada' ? "Comisión Pagada" : "Comisión Pendiente", 
+      description: `Estatus actualizado para ${appointment.name}.` 
+    });
+  };
+
   return (
     <>
       <Dialog open={open} onOpenChange={(o) => { 
@@ -383,7 +396,7 @@ Número: *${appointment.phone}*`;
                     </span>
                     <Switch 
                       checked={(editData.commissionStatus || 'Pendiente') === 'Pagada'} 
-                      onCheckedChange={(checked) => setEditData({...editData, commissionStatus: checked ? 'Pagada' : 'Pendiente'})}
+                      onCheckedChange={handleCommissionToggle}
                       className={cn(
                         "scale-75",
                         (editData.commissionStatus || 'Pendiente') === 'Pagada' ? "data-[state=checked]:bg-green-500" : "data-[state=unchecked]:bg-yellow-500"
