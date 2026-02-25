@@ -19,7 +19,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct, getCommissionPaymentDate } from '@/services/appointment-service';
-import { User, Phone, Clock, Edit2, Save, Copy, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Coins, CalendarDays, UserCog, ChevronDown, History as HistoryIcon } from 'lucide-react';
+import { User, Phone, Clock, Edit2, Save, Copy, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Coins, CalendarDays, UserCog, ChevronDown, History as HistoryIcon, Info } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format, isToday, isTomorrow, isYesterday, differenceInCalendarDays, startOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -118,6 +118,16 @@ export default function AppointmentDetailsDialog({
       toast({
         title: "Número copiado",
         description: `${appointment.name}: ${appointment.phone} listo para usar.`,
+      });
+    });
+  };
+
+  const copyProspectorPhone = () => {
+    if (!appointment.prospectorPhone) return;
+    navigator.clipboard.writeText(appointment.prospectorPhone).then(() => {
+      toast({
+        title: "Prospectador copiado",
+        description: `${appointment.prospectorName}: ${appointment.prospectorPhone} listo.`,
       });
     });
   };
@@ -388,23 +398,7 @@ Número: *${appointment.phone}*`;
                   <div className="p-2 bg-primary/10 rounded-lg"><User className="w-4 h-4 text-primary" /></div>
                   <div className="flex-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Cliente</p>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-bold">{appointment.name}</p>
-                      {appointment.prospectorName && (
-                        <TooltipProvider>
-                          <Tooltip delayDuration={0}>
-                            <TooltipTrigger asChild>
-                              <div className="p-1 rounded-full bg-primary/10 text-primary cursor-help">
-                                <UserCog className="h-3 w-3" />
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent side="top">
-                              <p className="text-[10px] font-bold uppercase">Prospectado por: {appointment.prospectorName}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      )}
-                    </div>
+                    <p className="text-sm font-bold">{appointment.name}</p>
                   </div>
                 </div>
                 
@@ -452,9 +446,29 @@ Número: *${appointment.phone}*`;
                   </div>
                 </div>
 
+                {appointment.prospectorName && (
+                  <div className="flex items-center gap-3 border-t border-border/10 pt-3 group/prospector">
+                    <div className="p-2 bg-blue-500/10 rounded-lg"><UserCog className="w-4 h-4 text-blue-500" /></div>
+                    <div className="flex-1">
+                      <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Prospectado por</p>
+                      <p className="text-xs font-bold">{appointment.prospectorName}</p>
+                    </div>
+                    {appointment.prospectorPhone && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={copyProspectorPhone} 
+                        className="h-8 w-8 text-muted-foreground hover:text-blue-500 hover:bg-blue-500/10"
+                      >
+                        <Copy className="h-3.5 h-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                )}
+
                 {appointment.status && (
                   <div className="flex items-center gap-3 border-t border-border/20 pt-3">
-                    <div className="p-2 bg-green-500/10 rounded-lg"><CheckCircle2 className="w-4 h-4 text-green-400" /></div>
+                    <div className="p-2 bg-blue-500/10 rounded-lg"><CheckCircle2 className="w-4 h-4 text-blue-600" /></div>
                     <div>
                       <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Resultado</p>
                       <p className={cn(
@@ -512,8 +526,18 @@ Número: *${appointment.phone}*`;
                     )}
                   </div>
                   <div className="space-y-1.5">
-                    <div className="h-4 flex items-center">
+                    <div className="h-4 flex items-center gap-1">
                       <Label className="text-[9px] font-bold uppercase text-muted-foreground">Participación</Label>
+                      <TooltipProvider>
+                        <Tooltip delayDuration={0}>
+                          <TooltipTrigger asChild>
+                            <Info className="w-3 h-3 text-muted-foreground/60 cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent className="z-[100] max-w-[200px] text-[10px] leading-tight" side="top">
+                            Define el porcentaje de la comisión total (0.7% del crédito) que te corresponde por este cierre.
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                     {isEditing ? (
                       <div className="relative flex items-center">
@@ -538,7 +562,20 @@ Número: *${appointment.phone}*`;
                     <p className="text-sm font-bold text-accent">{formatCurrency(commissionValue)}</p>
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-[9px] font-bold uppercase text-muted-foreground">Fecha de Pago</Label>
+                    <div className="flex items-center gap-1">
+                      <Label className="text-[9px] font-bold uppercase text-muted-foreground">Fecha de Pago</Label>
+                      <TooltipProvider>
+                        <Tooltip delayDuration={0}>
+                          <TooltipTrigger asChild>
+                            <Info className="w-3 h-3 text-muted-foreground/60 cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent className="z-[100] max-w-[220px] text-[10px] leading-tight" side="top">
+                            <p className="font-bold mb-1">Ciclo de Liquidación:</p>
+                            Ventas de Domingo a Martes se pagan el viernes de la siguiente semana. Ventas de Miércoles a Sábado se pagan el viernes de la subsiguiente semana.
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
                     <p className="text-[11px] font-bold text-primary">{calculatePaymentDateText(appointment.date)}</p>
                   </div>
                 </div>
