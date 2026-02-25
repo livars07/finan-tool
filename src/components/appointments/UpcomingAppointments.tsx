@@ -193,8 +193,8 @@ export default function UpcomingAppointments({
         ) : (
           <ScrollArea className="flex-1 scrollbar-thin">
             <Table>
-              <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm">
-                <TableRow>
+              <TableHeader className="bg-muted sticky top-0 z-20 shadow-sm">
+                <TableRow className="hover:bg-transparent">
                   <TableHead className={expanded ? "w-[250px]" : ""}>Nombre / Teléfono</TableHead>
                   {expanded && <TableHead>Contacto</TableHead>}
                   <TableHead>Motivo</TableHead>
