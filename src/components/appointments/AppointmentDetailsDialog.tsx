@@ -18,11 +18,10 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct } from '@/services/appointment-service';
 import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Percent, Coins, CalendarDays, UserCog, ChevronDown, Calendar as CalendarIcon, ArrowRight, History as HistoryIcon, Plus } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
-import { parseISO, format, getDay, addDays, differenceInDays, nextSaturday, nextSunday } from 'date-fns';
+import { parseISO, format, getDay, addDays, isToday, isTomorrow, isYesterday, differenceInCalendarDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import {
@@ -156,14 +155,6 @@ Número: *${appointment.phone}*`;
     });
   };
 
-  const formatWithCommas = (val: string) => {
-    const num = val.replace(/,/g, '');
-    if (!num || isNaN(Number(num))) return '';
-    const parts = num.split('.');
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    return parts.join('.');
-  };
-
   const showCommissionPanel = appointment.status === 'Cierre' || appointment.status === 'Apartado';
   
   const commissionValue = (editData.finalCreditAmount || 0) * 0.007 * ((editData.commissionPercent || 0) / 100);
@@ -215,51 +206,23 @@ Número: *${appointment.phone}*`;
   };
 
   const isCierre = appointment.status === 'Cierre';
-  const daysElapsed = differenceInDays(new Date(), parseISO(appointment.date));
-
-  // Edit Mode Date Helpers
-  const setEditDateTomorrow = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const tomorrow = addDays(new Date(), 1).toISOString();
-    setEditData(prev => ({...prev, date: tomorrow}));
-  };
-
-  const setEditDateNextSaturday = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const nextSat = nextSaturday(new Date()).toISOString();
-    setEditData(prev => ({...prev, date: nextSat}));
-  };
-
-  const setEditDateNextSunday = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const nextSun = nextSunday(new Date()).toISOString();
-    setEditData(prev => ({...prev, date: nextSun}));
-  };
-
-  // Rescheduling Mode Date Helpers
-  const setNewDateTomorrow = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const tomorrow = format(addDays(new Date(), 1), 'yyyy-MM-dd');
-    setNewDate(tomorrow);
-  };
-
-  const setNewDateNextSaturday = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const nextSat = format(nextSaturday(new Date()), 'yyyy-MM-dd');
-    setNewDate(nextSat);
-  };
-
-  const setNewDateNextSunday = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const nextSun = format(nextSunday(new Date()), 'yyyy-MM-dd');
-    setNewDate(nextSun);
-  };
+  
+  // Lógica temporal mejorada
+  const appDate = parseISO(appointment.date);
+  const diffCalendar = differenceInCalendarDays(appDate, new Date());
+  
+  let headerTimeText = "";
+  if (isToday(appDate)) {
+    headerTimeText = "Hoy es el día de la cita";
+  } else if (isTomorrow(appDate)) {
+    headerTimeText = "La cita es mañana";
+  } else if (isYesterday(appDate)) {
+    headerTimeText = "La cita fue ayer";
+  } else if (diffCalendar > 0) {
+    headerTimeText = `Faltan ${diffCalendar} ${diffCalendar === 1 ? 'día' : 'días'} para la cita`;
+  } else {
+    headerTimeText = `Han pasado ${Math.abs(diffCalendar)} ${Math.abs(diffCalendar) === 1 ? 'día' : 'días'} desde la cita`;
+  }
 
   return (
     <>
@@ -316,11 +279,7 @@ Número: *${appointment.phone}*`;
               <div className="flex items-center gap-2 px-3 py-2 bg-primary/5 border border-primary/20 rounded-lg animate-in fade-in slide-in-from-top-1">
                 <HistoryIcon className="w-4 h-4 text-primary" />
                 <p className="text-xs font-bold text-primary">
-                  {daysElapsed === 0 
-                    ? 'Hoy es el día de la cita' 
-                    : daysElapsed > 0 
-                      ? `Han pasado ${daysElapsed} ${daysElapsed === 1 ? 'día' : 'días'} desde la cita` 
-                      : `Faltan ${Math.abs(daysElapsed)} ${Math.abs(daysElapsed) === 1 ? 'día' : 'días'} para la cita`}
+                  {headerTimeText}
                 </p>
               </div>
             )}
@@ -426,46 +385,7 @@ Número: *${appointment.phone}*`;
                     </Select>
                   </div>
                   <div className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-[10px] font-bold uppercase text-muted-foreground">Fecha</Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button type="button" variant="ghost" size="icon" className="h-4 w-4 rounded-full bg-primary/10 text-primary hover:bg-primary/20">
-                            <Plus className="h-2.5 w-2.5" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent side="top" className="w-48 p-2 flex flex-col gap-1 backdrop-blur-md bg-card/90 border-primary/20">
-                          <p className="text-[10px] font-bold uppercase text-muted-foreground px-2 mb-1">Reprogramado rápido</p>
-                          <Button 
-                            type="button"
-                            variant="ghost" 
-                            size="sm" 
-                            className="justify-start h-8 text-xs font-semibold hover:bg-primary/10"
-                            onMouseDown={setEditDateTomorrow}
-                          >
-                            <ArrowRight className="w-3 h-3 mr-2 text-primary" /> Mañana
-                          </Button>
-                          <Button 
-                            type="button"
-                            variant="ghost" 
-                            size="sm" 
-                            className="justify-start h-8 text-xs font-semibold hover:bg-blue-500/10 text-blue-500 hover:text-blue-600"
-                            onMouseDown={setEditDateNextSaturday}
-                          >
-                            <CalendarIcon className="w-3 h-3 mr-2" /> Sábado
-                          </Button>
-                          <Button 
-                            type="button"
-                            variant="ghost" 
-                            size="sm" 
-                            className="justify-start h-8 text-xs font-semibold hover:bg-orange-500/10 text-orange-600 hover:text-orange-700"
-                            onMouseDown={setEditDateNextSunday}
-                          >
-                            <CalendarIcon className="w-3 h-3 mr-2" /> Domingo
-                          </Button>
-                        </PopoverContent>
-                      </Popover>
-                    </div>
+                    <Label className="text-[10px] font-bold uppercase text-muted-foreground">Fecha</Label>
                     <Input 
                       type="date" 
                       value={editData.date ? parseISO(editData.date).toISOString().split('T')[0] : ''} 
@@ -596,7 +516,7 @@ Número: *${appointment.phone}*`;
                       onCheckedChange={handleCommissionToggle}
                       className={cn(
                         "scale-75",
-                        (editData.commissionStatus || 'Pendiente') === 'Pagada' ? "data-[state=checked]:bg-green-500" : "data-[state=unchecked]:bg-yellow-500"
+                        (editData.commissionStatus || 'Pagada') === 'Pagada' ? "data-[state=checked]:bg-green-500" : "data-[state=unchecked]:bg-yellow-500"
                       )}
                     />
                   </div>
@@ -612,7 +532,7 @@ Número: *${appointment.phone}*`;
                         <span className="absolute left-2 text-xs font-bold text-muted-foreground/60">$</span>
                         <Input 
                           type="text" 
-                          value={formatWithCommas(editData.finalCreditAmount?.toString() || '')} 
+                          value={editData.finalCreditAmount?.toString() || ''} 
                           onChange={e => handleFinalCreditChange(e.target.value)}
                           className="h-8 pl-5 bg-muted/20 text-xs font-bold"
                           placeholder="0.00"
@@ -792,46 +712,7 @@ Número: *${appointment.phone}*`;
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <Label className="text-[10px] font-bold uppercase text-muted-foreground">Nueva Fecha</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button type="button" variant="ghost" size="icon" className="h-4 w-4 rounded-full bg-primary/10 text-primary hover:bg-primary/20">
-                        <Plus className="h-2.5 w-2.5" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent side="top" className="w-48 p-2 flex flex-col gap-1 backdrop-blur-md bg-card/90 border-primary/20">
-                      <p className="text-[10px] font-bold uppercase text-muted-foreground px-2 mb-1">Agendado rápido</p>
-                      <Button 
-                        type="button"
-                        variant="ghost" 
-                        size="sm" 
-                        className="justify-start h-8 text-xs font-semibold hover:bg-primary/10"
-                        onMouseDown={setNewDateTomorrow}
-                      >
-                        <ArrowRight className="w-3 h-3 mr-2 text-primary" /> Mañana
-                      </Button>
-                      <Button 
-                        type="button"
-                        variant="ghost" 
-                        size="sm" 
-                        className="justify-start h-8 text-xs font-semibold hover:bg-blue-500/10 text-blue-500 hover:text-blue-600"
-                        onMouseDown={setNewDateNextSaturday}
-                      >
-                        <CalendarIcon className="w-3 h-3 mr-2" /> Sábado
-                      </Button>
-                      <Button 
-                        type="button"
-                        variant="ghost" 
-                        size="sm" 
-                        className="justify-start h-8 text-xs font-semibold hover:bg-orange-500/10 text-orange-600 hover:text-orange-700"
-                        onMouseDown={setNewDateNextSunday}
-                      >
-                        <CalendarIcon className="w-3 h-3 mr-2" /> Domingo
-                      </Button>
-                    </PopoverContent>
-                  </Popover>
-                </div>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Nueva Fecha</Label>
                 <Input type="date" value={newDate} onChange={e => setNewDate(e.target.value)} className="h-9 bg-muted/20 text-sm" />
               </div>
               <div className="space-y-1.5">

@@ -1,3 +1,4 @@
+
 "use client"
 
 import React from 'react';
@@ -112,7 +113,7 @@ export default function PastAppointments({
                 {expanded && <TableHead className="bg-card">Producto</TableHead>}
                 <TableHead className="bg-card">Fecha / Hora</TableHead>
                 {expanded && <TableHead className="bg-card w-[300px]">Notas rápidas</TableHead>}
-                <TableHead className="bg-card">Resultado</TableHead>
+                <TableHead className={cn("bg-card", !expanded && "w-[120px]")}>Resultado</TableHead>
                 {expanded && <TableHead className="bg-card w-12"></TableHead>}
               </TableRow>
             </TableHeader>
