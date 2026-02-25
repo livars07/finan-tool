@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -32,8 +33,6 @@ export function useAppointments() {
   const updateStatus = (id: string, status: AppointmentStatus, notes?: string) => {
     const app = appointments.find(a => a.id === id);
     
-    // Nueva lógica: si no está confirmada pero se finaliza con un estado positivo
-    // Se confirma automáticamente.
     const shouldAutoConfirm = app && !app.isConfirmed && status !== 'No asistencia' && status !== 'Reagendó';
     
     const updated = Service.updateAppointment(id, { 
@@ -109,11 +108,8 @@ export function useAppointments() {
     if (diff > 2 && diff < 7) return `Este ${format(d, 'EEEE', { locale: es })}`;
     if (diff < -2 && diff > -7) return `${format(d, 'EEEE', { locale: es })} pasado`;
 
-    if (isSameMonth(day, today) && isSameYear(day, today)) {
-      const f = format(d, "EEEE d", { locale: es });
-      return f.charAt(0).toUpperCase() + f.slice(1);
-    }
-    return format(d, 'dd/MM/yyyy');
+    const f = format(d, "EEEE d 'de' MMMM 'del' yyyy", { locale: es });
+    return f.charAt(0).toUpperCase() + f.slice(1);
   };
 
   const format12hTime = (time24h: string) => {

@@ -53,7 +53,6 @@ export default function AppointmentDetailsDialog({
   const [isRescheduling, setIsRescheduling] = useState(false);
   const [editData, setEditData] = useState<Partial<Appointment>>({});
   
-  // State for new 2nd appointment
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [newDate, setNewDate] = useState('');
@@ -76,7 +75,7 @@ export default function AppointmentDetailsDialog({
       setNewPhone(appointment.phone || '');
       setNewProduct(appointment.product || 'Casa');
       setNewNotes(appointment.notes || '');
-      setNewType('2da consulta');
+      setNewType(appointment.status === 'Cierre' ? 'seguimiento' : '2da consulta');
       setNewDate('');
       setNewTime('');
     }
@@ -166,15 +165,12 @@ Número: *${appointment.phone}*`;
 
   const calculatePaymentDate = (dateStr: string) => {
     const d = parseISO(dateStr);
-    const dayOfWeek = getDay(d); // 0 = Sun, 1 = Mon, 2 = Tue...
+    const dayOfWeek = getDay(d); 
     
     let daysToAdd = 0;
-    // Corte el martes: si se vende Dom(0), Lun(1) o Mar(2)
     if (dayOfWeek <= 2) {
-      // Liquidación el viernes de la siguiente semana (2 viernes después)
       daysToAdd = (5 - dayOfWeek) + 7;
     } else {
-      // Liquidación una semana extra después (Viernes posterior a la siguiente)
       daysToAdd = (5 - dayOfWeek) + 14;
     }
     
@@ -212,6 +208,8 @@ Número: *${appointment.phone}*`;
     if (num > 100) num = 100;
     setEditData(prev => ({ ...prev, commissionPercent: num }));
   };
+
+  const isCierre = appointment.status === 'Cierre';
 
   return (
     <>
@@ -391,7 +389,7 @@ Número: *${appointment.phone}*`;
                   <div>
                     <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Fecha Programada</p>
                     <p className="text-xs font-bold">
-                      {format(parseISO(appointment.date), "d 'de' MMMM 'del' yyyy", { locale: es })}
+                      {format(parseISO(appointment.date), "EEEE d 'de' MMMM 'del' yyyy", { locale: es })}
                     </p>
                   </div>
                 </div>
@@ -455,7 +453,7 @@ Número: *${appointment.phone}*`;
                   </div>
                   <div className="space-y-1">
                     <Label className="text-[9px] font-bold uppercase text-muted-foreground flex items-center gap-1">
-                      Comisión (%)
+                      Comisión
                       <TooltipProvider>
                         <Tooltip delayDuration={0}>
                           <TooltipTrigger asChild>
@@ -538,7 +536,7 @@ Número: *${appointment.phone}*`;
                   className="h-8 text-[10px] font-bold uppercase text-primary hover:bg-primary/10"
                 >
                   <CalendarPlus className="w-3.5 h-3.5 mr-2" />
-                  Agendar 2da cita
+                  {isCierre ? 'Agendar seguimiento' : 'Agendar 2da cita'}
                 </Button>
               )}
             </div>
@@ -649,4 +647,3 @@ Número: *${appointment.phone}*`;
     </>
   );
 }
-
