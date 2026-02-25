@@ -4,16 +4,15 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import CreditCalculator from '@/components/calculator/CreditCalculator';
 import AppointmentsDashboard from '@/components/appointments/AppointmentsDashboard';
+import TrashDialog from '@/components/appointments/TrashDialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
   Wallet, CalendarDays, Users, CheckCircle2, ShieldCheck, TrendingUp, RotateCcw,
   Palette, Moon, Sun, Cpu, Phone, BookOpen, Info, Calculator, Maximize2, Sparkles, History,
   ClipboardList, Target, Calendar, Copy, Crown, Zap, Snowflake, Trash2, Rocket, ShieldAlert,
   Smartphone, MessageSquare, CalendarClock, Coins, Star, ArrowUpRight, ArrowDownRight,
-  HandCoins,
-  CheckCircle
+  HandCoins, CheckCircle, Search
 } from 'lucide-react';
-import { Separator } from "@/components/ui/separator";
 import { useAppointments } from '@/hooks/use-appointments';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -74,12 +73,20 @@ export interface FinantoMainProps {
 
 export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const appointmentState = useAppointments();
-  const { appointments, stats, isLoaded, resetData, clearAll, updateStatus, editAppointment } = appointmentState;
+  const { 
+    appointments, stats, isLoaded, resetData, clearAll, 
+    updateStatus, editAppointment, archiveAppointment, 
+    restoreAppointment, deletePermanent, archivingIds,
+    archived
+  } = appointmentState;
+  
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showHelp, setShowHelp] = useState(initialSection === 'guia');
+  const [showTrash, setShowTrash] = useState(false);
   const [isSimulatorExpanded, setIsSimulatorExpanded] = useState(initialSection === 'simulador');
   const [isGestorExpanded, setIsGestorExpanded] = useState(initialSection === 'gestor');
+  const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
   const [theme, setTheme] = useState<Theme>('corporativo');
   const [api, setApi] = useState<CarouselApi>();
   const [timerKey, setTimerKey] = useState(0);
@@ -131,7 +138,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   useEffect(() => {
     if (!isLoaded) return;
 
-    // Notificación de Bienvenida a los 4 segundos
     const welcomeTimer = setTimeout(() => {
       toast({
         title: "¡Bienvenido a Finanto!",
@@ -151,10 +157,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       }
     };
 
-    // Primer recordatorio de confirmación a los 20 segundos
     const initialTimer = setTimeout(checkConfirmations, 20000);
-
-    // Recordatorio recurrente cada 20 minutos
     const intervalTimer = setInterval(checkConfirmations, 1200000);
 
     return () => {
@@ -174,32 +177,26 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       const currentApps = appointmentsRef.current;
       const today = new Date();
 
-      // Buscamos cierres o apartados con comisión pendiente cuya fecha de pago ya pasó
       const overdueCommissions = currentApps.filter(app => {
         const isSalesStatus = app.status === 'Cierre' || app.status === 'Apartado';
         const isPending = (app.commissionStatus || 'Pendiente') === 'Pendiente';
-        if (!isSalesStatus || !isPending) return false;
+        const notArchived = !app.isArchived;
+        if (!isSalesStatus || !isPending || !notArchived) return false;
 
         const paymentDate = Service.getCommissionPaymentDate(app.date);
         return isBefore(paymentDate, today);
       });
 
       if (overdueCommissions.length > 0) {
-        // Lanzamos popup para el primero encontrado
         setPendingCommissionApp(overdueCommissions[0]);
-      } else {
-        // Si no hay más pendientes, apagamos el motor
-        if (searchInterval) {
-          clearInterval(searchInterval);
-          searchInterval = null;
-        }
+      } else if (searchInterval) {
+        clearInterval(searchInterval);
+        searchInterval = null;
       }
     };
 
-    // Iniciamos después de 15 segundos
     const startTimer = setTimeout(() => {
       performCommissionSearch();
-      // Continuamos cada 60 segundos
       searchInterval = setInterval(performCommissionSearch, 60000);
     }, 15000);
 
@@ -373,12 +370,17 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
             <AppointmentsDashboard 
               initialExpanded={initialSection === 'gestor'}
               onExpandedChange={setIsGestorExpanded}
+              selectedAppId={selectedAppId}
+              onSelectAppId={setSelectedAppId}
+              onOpenTrash={() => setShowTrash(true)}
               appointments={appointmentState.appointments} 
               upcoming={appointmentState.upcoming} 
               past={appointmentState.past} 
+              archivingIds={appointmentState.archivingIds}
               addAppointment={appointmentState.addAppointment} 
               updateStatus={appointmentState.updateStatus} 
               editAppointment={appointmentState.editAppointment} 
+              archiveAppointment={appointmentState.archiveAppointment}
               toggleConfirmation={appointmentState.toggleConfirmation} 
               formatFriendlyDate={appointmentState.formatFriendlyDate} 
               format12hTime={appointmentState.format12hTime} 
@@ -405,27 +407,27 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       </footer>
 
       <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
-        <AlertDialogContent>
+        <AlertDialogContent className="z-[85]">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Confirmar reinicio?</AlertDialogTitle>
             <AlertDialogDescription>Se borrará tu información actual para restaurar los datos de prueba iniciales.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { resetData(); setShowResetConfirm(false); toast({ title: "Datos restaurados" }); }}>Sí, reiniciar</AlertDialogAction>
+            <AlertDialogCancel type="button">Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { resetData(); setShowResetConfirm(false); toast({ title: "Datos restaurados" }); }} type="button">Sí, reiniciar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       <AlertDialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
-        <AlertDialogContent>
+        <AlertDialogContent className="z-[85]">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar todo?</AlertDialogTitle>
             <AlertDialogDescription>Esta acción borrará todas tus citas permanentemente. No se puede deshacer.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { clearAll(); setShowClearConfirm(false); toast({ title: "Base de datos limpia", variant: "destructive" }); }} className="bg-destructive hover:bg-destructive/90 text-white">
+            <AlertDialogCancel type="button">Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { clearAll(); setShowClearConfirm(false); toast({ title: "Base de datos limpia", variant: "destructive" }); }} className="bg-destructive hover:bg-destructive/90 text-white" type="button">
               Eliminar Permanentemente
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -434,7 +436,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
 
       <Dialog open={showHelp} onOpenChange={setShowHelp}>
         <DialogContent 
-          className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 overflow-hidden bg-card shadow-2xl"
+          className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 overflow-hidden bg-card shadow-2xl z-[70]"
         >
           <DialogHeader className="p-6 border-b bg-primary/5 shrink-0">
             <div className="flex items-center gap-3">
@@ -508,7 +510,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
           </ScrollArea>
           
           <DialogFooter className="p-4 border-t bg-muted/20">
-            <Button onClick={() => setShowHelp(false)} className="w-full h-10 font-bold rounded-xl shadow-lg">
+            <Button onClick={() => setShowHelp(false)} className="w-full h-10 font-bold rounded-xl shadow-lg" type="button">
               ¡Entendido, comencemos!
             </Button>
           </DialogFooter>
@@ -517,7 +519,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
 
       {/* Popup de Monitoreo de Comisiones */}
       <Dialog open={!!pendingCommissionApp} onOpenChange={(open) => !open && setPendingCommissionApp(null)}>
-        <DialogContent className="sm:max-w-[450px] border-accent/30 bg-card shadow-2xl backdrop-blur-md">
+        <DialogContent className="sm:max-w-[450px] border-accent/30 bg-card shadow-2xl backdrop-blur-md z-[80]">
           <DialogHeader>
             <div className="bg-accent/10 p-3 rounded-full w-fit mb-2">
               <HandCoins className="w-8 h-8 text-accent animate-bounce" />
@@ -550,6 +552,20 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   </span>
                 </div>
               </div>
+              <div className="flex justify-center">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => {
+                    setSelectedAppId(pendingCommissionApp.id);
+                    setPendingCommissionApp(null);
+                  }}
+                  className="text-[10px] font-bold uppercase text-primary hover:bg-primary/10 gap-2 h-8"
+                  type="button"
+                >
+                  <Search className="w-3.5 h-3.5" /> Ver expediente completo
+                </Button>
+              </div>
               <p className="text-xs text-center text-muted-foreground font-medium">
                 ¿Confirmas que esta comisión ya fue liquidada?
               </p>
@@ -561,18 +577,31 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
               variant="outline" 
               onClick={() => setPendingCommissionApp(null)}
               className="w-full sm:flex-1 h-11 text-xs font-bold uppercase"
+              type="button"
             >
               Aún no recibida
             </Button>
             <Button 
               onClick={handleConfirmCommissionPayment}
               className="w-full sm:flex-1 h-11 bg-accent hover:bg-accent/80 text-accent-foreground font-bold shadow-lg gap-2"
+              type="button"
             >
               <CheckCircle className="w-4 h-4" /> Sí, ya se pagó
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <TrashDialog 
+        open={showTrash} 
+        onOpenChange={setShowTrash}
+        archivedAppointments={archived}
+        onRestore={restoreAppointment}
+        onDelete={deletePermanent}
+        formatDate={appointmentState.formatFriendlyDate}
+        format12hTime={appointmentState.format12hTime}
+      />
     </div>
   );
 }
+

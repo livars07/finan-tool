@@ -13,7 +13,7 @@ import { PlusCircle, UserPlus, Plus, Calendar as CalendarIcon, ArrowRight, UserC
 import { useToast } from "@/hooks/use-toast";
 import { AppointmentType, AppointmentProduct } from '@/services/appointment-service';
 import { cn } from "@/lib/utils";
-import { addDays, format, nextSaturday, nextSunday } from 'date-fns';
+import { addDays, format, getDay } from 'date-fns';
 
 interface AppointmentFormProps {
   onAdd: (app: { name: string; phone: string; date: string; time: string; type: AppointmentType; product: AppointmentProduct; prospectorName?: string; prospectorPhone?: string }) => void;
@@ -83,7 +83,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
     e.preventDefault();
     e.stopPropagation();
     const today = new Date();
-    const nextSat = format(nextSaturday(today), 'yyyy-MM-dd');
+    const nextSat = format(addDays(today, (6 - getDay(today) + 7) % 7 || 7), 'yyyy-MM-dd');
     setDate(nextSat);
   };
 
@@ -91,7 +91,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
     e.preventDefault();
     e.stopPropagation();
     const today = new Date();
-    const nextSun = format(nextSunday(today), 'yyyy-MM-dd');
+    const nextSun = format(addDays(today, (7 - getDay(today) + 7) % 7 || 7), 'yyyy-MM-dd');
     setDate(nextSun);
   };
 
@@ -150,7 +150,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
                       type="button"
                       variant="ghost" 
                       size="sm" 
-                      className="justify-start h-8 text-xs font-semibold hover:bg-blue-500/10 text-blue-500 hover:text-blue-600"
+                      className="justify-start h-8 text-xs font-semibold hover:bg-blue-500/10 text-blue-500"
                       onMouseDown={setDateNextSaturday}
                     >
                       <CalendarIcon className="w-3 h-3 mr-2" /> Sábado
@@ -159,7 +159,7 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
                       type="button"
                       variant="ghost" 
                       size="sm" 
-                      className="justify-start h-8 text-xs font-semibold hover:bg-orange-500/10 text-orange-600 hover:text-orange-700"
+                      className="justify-start h-8 text-xs font-semibold hover:bg-orange-500/10 text-orange-600"
                       onMouseDown={setDateNextSunday}
                     >
                       <CalendarIcon className="w-3 h-3 mr-2" /> Domingo
@@ -272,3 +272,4 @@ export default function AppointmentForm({ onAdd }: AppointmentFormProps) {
     </Card>
   );
 }
+

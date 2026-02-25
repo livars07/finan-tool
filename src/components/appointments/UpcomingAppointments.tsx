@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -6,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { 
   Clock, Calendar, Info, CheckCircle2, AlertCircle, 
   CheckCircle, Trophy, PartyPopper, Sparkles, Copy, 
-  ClipboardCheck, Phone, Box, ChevronRight, ShieldAlert, UserCog
+  ClipboardCheck, Phone, Box, ChevronRight, ShieldAlert, UserCog, Trash2
 } from "lucide-react";
 import { parseISO, isToday, addDays } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -49,8 +50,10 @@ interface Props {
   onHighlight: (app: Appointment) => void;
   updateStatus: (id: string, status: AppointmentStatus, notes?: string) => void;
   toggleConfirmation: (id: string) => void;
+  onOpenTrash: () => void;
   activeId?: string | null;
   expanded?: boolean;
+  archivingIds?: Set<string>;
 }
 
 export default function UpcomingAppointments({ 
@@ -62,8 +65,10 @@ export default function UpcomingAppointments({
   onHighlight,
   updateStatus, 
   toggleConfirmation, 
+  onOpenTrash,
   activeId,
-  expanded = false
+  expanded = false,
+  archivingIds = new Set()
 }: Props) {
   const [finId, setFinId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
@@ -226,6 +231,7 @@ export default function UpcomingAppointments({
                   const isSelected = activeId === app.id;
                   const isCierre = app.status === 'Cierre';
                   const isCommissionPending = isCierre && app.commissionStatus !== 'Pagada';
+                  const isArchiving = archivingIds.has(app.id);
                   
                   return (
                     <TableRow 
@@ -234,7 +240,8 @@ export default function UpcomingAppointments({
                       className={cn(
                         "hover:bg-primary/10 transition-colors cursor-pointer group relative h-16",
                         appToday && "bg-primary/5 border-l-4 border-l-primary",
-                        isSelected && "bg-primary/20 border-l-4 border-l-primary z-10"
+                        isSelected && "bg-primary/20 border-l-4 border-l-primary z-10",
+                        isArchiving && "bg-destructive/20 border-l-destructive animate-pulse opacity-60 pointer-events-none"
                       )}
                     >
                       <TableCell className="align-middle">
@@ -326,7 +333,7 @@ export default function UpcomingAppointments({
                       
                       <TableCell className="align-middle text-center" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-center gap-1">
-                          {appToday && (
+                          {appToday && !isArchiving && (
                             <Button
                               variant="ghost"
                               size="icon"
@@ -354,6 +361,15 @@ export default function UpcomingAppointments({
       </div>
 
       <div className="flex flex-wrap justify-end gap-3 pt-2 shrink-0">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={onOpenTrash}
+          className="text-[10px] font-bold uppercase border-muted-foreground/40 bg-muted/10 text-muted-foreground hover:bg-muted/20 h-9 gap-2 px-4 shadow-sm"
+          type="button"
+        >
+          <Trash2 className="w-4 h-4" /> Papelera
+        </Button>
         <Button variant="outline" size="sm" onClick={copyDailyReport} className="text-[10px] font-bold uppercase border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 h-9 gap-2 px-4" type="button">
           <ClipboardCheck className="w-4 h-4" /> Reporte Diario
         </Button>
@@ -461,3 +477,4 @@ export default function UpcomingAppointments({
     </div>
   );
 }
+

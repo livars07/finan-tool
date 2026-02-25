@@ -23,7 +23,8 @@ import {
   ArrowRight,
   Info,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Trash2
 } from 'lucide-react';
 import { Appointment, AppointmentStatus } from '@/services/appointment-service';
 import { parseISO, format } from 'date-fns';
@@ -63,6 +64,8 @@ interface DashboardContentProps {
   visibleCountPast: number;
   setVisibleCountPast: (count: number | ((prev: number) => number)) => void;
   stats: any;
+  archivingIds: Set<string>;
+  onOpenTrash: () => void;
 }
 
 const DashboardContent = ({ 
@@ -81,7 +84,9 @@ const DashboardContent = ({
   activeId,
   visibleCountPast,
   setVisibleCountPast,
-  stats
+  stats,
+  archivingIds,
+  onOpenTrash
 }: DashboardContentProps) => (
   <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
     <div className={cn("flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 shrink-0", expanded && "bg-muted/10 p-6 rounded-2xl border border-border/30 backdrop-blur-md")}>
@@ -215,8 +220,10 @@ const DashboardContent = ({
           onHighlight={handleHighlight}
           updateStatus={updateStatus}
           toggleConfirmation={toggleConfirmation}
+          onOpenTrash={onOpenTrash}
           activeId={activeId}
           expanded={expanded}
+          archivingIds={archivingIds}
         />
       </TabsContent>
       <TabsContent value="past" className="mt-0 h-full">
@@ -230,31 +237,54 @@ const DashboardContent = ({
           expanded={expanded}
           visibleCount={visibleCountPast}
           setVisibleCount={setVisibleCountPast}
+          archivingIds={archivingIds}
         />
       </TabsContent>
     </div>
   </Tabs>
 );
 
+interface AppointmentsDashboardProps {
+  appointments: Appointment[];
+  upcoming: Appointment[];
+  past: Appointment[];
+  archivingIds: Set<string>;
+  addAppointment: (app: any) => void;
+  updateStatus: (id: string, status: AppointmentStatus, notes?: string) => void;
+  editAppointment: (id: string, data: Partial<Appointment>) => void;
+  archiveAppointment: (id: string) => void;
+  toggleConfirmation: (id: string) => void;
+  formatFriendlyDate: (date: string) => string;
+  format12hTime: (time: string) => string;
+  initialExpanded?: boolean;
+  onExpandedChange?: (expanded: boolean) => void;
+  selectedAppId: string | null;
+  onSelectAppId: (id: string | null) => void;
+  onOpenTrash: () => void;
+}
+
 export default function AppointmentsDashboard({
   appointments,
   upcoming,
   past,
+  archivingIds,
   addAppointment,
   updateStatus,
   editAppointment,
+  archiveAppointment,
   toggleConfirmation,
   formatFriendlyDate,
   format12hTime,
   initialExpanded = false,
-  onExpandedChange
+  onExpandedChange,
+  selectedAppId,
+  onSelectAppId,
+  onOpenTrash
 }: AppointmentsDashboardProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const [activeTab, setActiveTab] = useState('upcoming');
-  
   const [visibleCountPast, setVisibleCountPast] = useState(25);
 
   const stats = useMemo(() => Service.calculateStats(appointments), [appointments]);
@@ -320,7 +350,7 @@ export default function AppointmentsDashboard({
 
   const handleSelect = (app: Appointment) => {
     setActiveId(app.id);
-    setSelectedAppId(app.id);
+    onSelectAppId(app.id);
   };
 
   const handleHighlight = (app: Appointment) => {
@@ -379,10 +409,12 @@ export default function AppointmentsDashboard({
               handleHighlight={handleHighlight}
               updateStatus={updateStatus}
               toggleConfirmation={toggleConfirmation}
+              onOpenTrash={onOpenTrash}
               activeId={activeId}
               visibleCountPast={visibleCountPast}
               setVisibleCountPast={setVisibleCountPast}
               stats={stats}
+              archivingIds={archivingIds}
             />
           </CardContent>
         </Card>
@@ -391,8 +423,6 @@ export default function AppointmentsDashboard({
       <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
         <DialogContent 
           data-appointments-dialog="true"
-          onOpenAutoFocus={(e) => e.preventDefault()}
-          onCloseAutoFocus={(e) => e.preventDefault()}
           className="max-w-none w-screen h-screen m-0 rounded-none bg-background border-none shadow-none p-0 flex flex-col overflow-hidden z-[60]"
         >
           <DialogHeader className="px-6 py-4 border-b border-border/40 flex flex-row items-center justify-between bg-card/10 shrink-0">
@@ -424,7 +454,7 @@ export default function AppointmentsDashboard({
             </div>
           </DialogHeader>
 
-          <div className="flex-1 p-6 overflow-hidden flex flex-col">
+          <div className="flex-1 p-6 overflow-hidden flex flex-col relative">
             <DashboardContent 
               expanded={true}
               activeTab={activeTab}
@@ -438,10 +468,12 @@ export default function AppointmentsDashboard({
               handleHighlight={handleHighlight}
               updateStatus={updateStatus}
               toggleConfirmation={toggleConfirmation}
+              onOpenTrash={onOpenTrash}
               activeId={activeId}
               visibleCountPast={visibleCountPast}
               setVisibleCountPast={setVisibleCountPast}
               stats={stats}
+              archivingIds={archivingIds}
             />
           </div>
         </DialogContent>
@@ -450,12 +482,14 @@ export default function AppointmentsDashboard({
       <AppointmentDetailsDialog 
         appointment={selectedApp} 
         open={!!selectedAppId} 
-        onOpenChange={(o) => !o && setSelectedAppId(null)}
+        onOpenChange={(o) => !o && onSelectAppId(null)}
         onEdit={editAppointment}
         onAdd={addAppointment}
+        onArchive={archiveAppointment}
         formatFriendlyDate={formatFriendlyDate}
         format12hTime={format12hTime}
       />
     </div>
   );
 }
+

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Trash2, RotateCcw, Ghost, ChevronDown } from "lucide-react";
-import { Appointment } from '@/hooks/use-appointments';
+import { Appointment } from '@/services/appointment-service';
 import { useToast } from "@/hooks/use-toast";
 import { cn } from '@/lib/utils';
 
@@ -59,7 +59,7 @@ export default function TrashDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] bg-card border-border">
+      <DialogContent className="sm:max-w-[700px] bg-card border-border shadow-2xl z-[70]">
         <DialogHeader>
           <div className="flex items-center gap-2">
             <Trash2 className="w-5 h-5 text-muted-foreground" />
@@ -77,10 +77,10 @@ export default function TrashDialog({
               <p className="font-medium text-sm">La papelera está vacía</p>
             </div>
           ) : (
-            <div className="border rounded-md overflow-hidden">
+            <div className="border rounded-md overflow-hidden bg-muted/10">
               <ScrollArea className="h-[400px]">
                 <Table>
-                  <TableHeader className="bg-muted/50 sticky top-0 z-10">
+                  <TableHeader className="bg-card sticky top-0 z-10">
                     <TableRow>
                       <TableHead>Cliente</TableHead>
                       <TableHead>Fecha / Hora</TableHead>
@@ -89,14 +89,14 @@ export default function TrashDialog({
                   </TableHeader>
                   <TableBody>
                     {visibleApps.map((app) => (
-                      <TableRow key={app.id} className="group">
+                      <TableRow key={app.id} className="group hover:bg-muted/30 transition-colors">
                         <TableCell>
-                          <div className="font-medium text-sm">{app.name}</div>
-                          <div className="text-[10px] text-muted-foreground uppercase">{app.type}</div>
+                          <div className="font-bold text-sm">{app.name}</div>
+                          <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">{app.type}</div>
                         </TableCell>
                         <TableCell>
-                          <div className="text-xs">{formatDate(app.date)}</div>
-                          <div className="text-[10px] text-muted-foreground">{format12hTime(app.time)}</div>
+                          <div className="text-xs font-semibold">{formatDate(app.date)}</div>
+                          <div className="text-[10px] text-muted-foreground font-medium">{format12hTime(app.time)}</div>
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
@@ -135,7 +135,7 @@ export default function TrashDialog({
                     className="text-[10px] font-bold uppercase tracking-wider h-8"
                   >
                     <ChevronDown className="w-3 h-3 mr-2" />
-                    Cargar 20 más
+                    Cargar más
                   </Button>
                 </div>
               )}

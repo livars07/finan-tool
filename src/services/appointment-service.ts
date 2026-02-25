@@ -1,3 +1,4 @@
+
 /**
  * @fileOverview Servicio de Gestión de Datos - Finanto
  * 
@@ -42,6 +43,7 @@ export interface Appointment {
   status?: AppointmentStatus;
   notes?: string;
   isConfirmed?: boolean;
+  isArchived?: boolean; 
   // Datos de comisión
   commissionPercent?: number;
   commissionStatus?: 'Pagada' | 'Pendiente';
@@ -88,7 +90,9 @@ export const getFromDisk = (): Appointment[] => {
   const rawData = localStorage.getItem(STORAGE_KEY);
   if (!rawData) return [];
   try {
-    return JSON.parse(rawData);
+    const parsed = JSON.parse(rawData) as Appointment[];
+    // Asegurar que isArchived exista por defecto como false
+    return parsed.map(app => ({ ...app, isArchived: app.isArchived ?? false }));
   } catch (e) {
     return [];
   }
@@ -113,6 +117,7 @@ export const createAppointment = (data: Omit<Appointment, 'id'>): Appointment[] 
     ...data,
     id: uuidv4(),
     phone: formatPhoneNumber(data.phone),
+    isArchived: false
   };
   const updatedList = [newApp, ...all];
   saveToDisk(updatedList);
@@ -188,13 +193,14 @@ export const generateSeedData = (): Appointment[] => {
       type: types[i % types.length],
       product: products[i % products.length],
       isConfirmed: isTodayApp ? Math.random() > 0.5 : false,
+      isArchived: false,
       notes: `Nota #${i + 1}: Interesado en ${products[i % products.length]}.`,
       prospectorName: i % 5 === 0 ? `Prospectador ${i}` : undefined,
       prospectorPhone: i % 5 === 0 ? '664 999 0000' : undefined
     });
   }
 
-  // 30 Citas Pasadas (Historial) - Algunas del mes pasado con comisiones para monitoreo
+  // 30 Citas Pasadas (Historial)
   for (let i = 0; i < 30; i++) {
     const pastDate = i < 10 ? subMonths(now, 1) : subDays(now, (i % 20) + 1);
     const globalIndex = i + 30;
@@ -210,6 +216,7 @@ export const generateSeedData = (): Appointment[] => {
       product: products[i % products.length],
       status: status,
       isConfirmed: true,
+      isArchived: false,
       notes: `Registro #${i + 1}. El cliente ${status.toLowerCase()}.`,
       commissionStatus: status === 'Cierre' || status === 'Apartado' ? (Math.random() > 0.5 ? 'Pagada' : 'Pendiente') : undefined,
       commissionPercent: status === 'Cierre' || status === 'Apartado' ? 100 : undefined,
@@ -227,19 +234,20 @@ export const generateSeedData = (): Appointment[] => {
  * Calcula las estadísticas globales enriquecidas.
  */
 export const calculateStats = (appointments: Appointment[]) => {
+  const activeApps = appointments.filter(a => !a.isArchived);
   const now = new Date();
   const lastMonth = subMonths(now, 1);
 
-  const currentMonthProspects = appointments.filter(a => isSameMonth(parseISO(a.date), now)).length;
-  const currentMonthSales = appointments.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), now)).length;
-  const currentMonthApartados = appointments.filter(a => a.status === 'Apartado' && isSameMonth(parseISO(a.date), now)).length;
+  const currentMonthProspects = activeApps.filter(a => isSameMonth(parseISO(a.date), now)).length;
+  const currentMonthSales = activeApps.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), now)).length;
+  const currentMonthApartados = activeApps.filter(a => a.status === 'Apartado' && isSameMonth(parseISO(a.date), now)).length;
   
-  const lastMonthProspects = appointments.filter(a => isSameMonth(parseISO(a.date), lastMonth)).length;
-  const lastMonthSales = appointments.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), lastMonth)).length;
+  const lastMonthProspects = activeApps.filter(a => isSameMonth(parseISO(a.date), lastMonth)).length;
+  const lastMonthSales = activeApps.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), lastMonth)).length;
 
-  const todayTotal = appointments.filter(a => isToday(parseISO(a.date))).length;
-  const todayConfirmed = appointments.filter(a => isToday(parseISO(a.date)) && a.isConfirmed).length;
-  const tomorrowTotal = appointments.filter(a => {
+  const todayTotal = activeApps.filter(a => isToday(parseISO(a.date))).length;
+  const todayConfirmed = activeApps.filter(a => isToday(parseISO(a.date)) && a.isConfirmed).length;
+  const tomorrowTotal = activeApps.filter(a => {
     const d = parseISO(a.date);
     const tomorrow = addDays(now, 1);
     return d.getDate() === tomorrow.getDate() && d.getMonth() === tomorrow.getMonth() && d.getFullYear() === tomorrow.getFullYear();
@@ -252,7 +260,7 @@ export const calculateStats = (appointments: Appointment[]) => {
     todayCount: todayTotal,
     todayConfirmed,
     tomorrowTotal,
-    pendingCount: appointments.filter(a => {
+    pendingCount: activeApps.filter(a => {
       const d = startOfDay(parseISO(a.date));
       return (isToday(d) || isAfter(d, startOfDay(now))) && !a.status;
     }).length,
@@ -265,3 +273,4 @@ export const calculateStats = (appointments: Appointment[]) => {
     lastMonthConversionRate: parseFloat(lastMonthConversionRate.toFixed(1)),
   };
 };
+

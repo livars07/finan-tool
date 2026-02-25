@@ -35,6 +35,7 @@ interface Props {
   expanded?: boolean;
   visibleCount: number;
   setVisibleCount: (count: number | ((prev: number) => number)) => void;
+  archivingIds?: Set<string>;
 }
 
 export default function PastAppointments({ 
@@ -46,7 +47,8 @@ export default function PastAppointments({
   activeId, 
   expanded = false,
   visibleCount,
-  setVisibleCount
+  setVisibleCount,
+  archivingIds = new Set()
 }: Props) {
   const { toast } = useToast();
 
@@ -113,7 +115,7 @@ export default function PastAppointments({
                 {expanded && <TableHead className="bg-card">Producto</TableHead>}
                 <TableHead className="bg-card">Fecha / Hora</TableHead>
                 {expanded && <TableHead className="bg-card w-[300px]">Notas rápidas</TableHead>}
-                <TableHead className={cn("bg-card", !expanded && "w-[160px]")}>Resultado</TableHead>
+                <TableHead className={cn("bg-card", !expanded ? "w-[160px]" : "w-[200px]")}>Resultado</TableHead>
                 {expanded && <TableHead className="bg-card w-12"></TableHead>}
               </TableRow>
             </TableHeader>
@@ -122,6 +124,7 @@ export default function PastAppointments({
                 const isSelected = activeId === app.id;
                 const isCierre = app.status === 'Cierre' || app.status === 'Apartado';
                 const isCommissionPending = isCierre && app.commissionStatus !== 'Pagada';
+                const isArchiving = archivingIds.has(app.id);
 
                 return (
                   <TableRow 
@@ -129,7 +132,8 @@ export default function PastAppointments({
                     onClick={() => onSelect(app)}
                     className={cn(
                       "hover:bg-primary/10 transition-colors cursor-pointer relative h-16",
-                      isSelected && "bg-primary/20 border-l-4 border-l-primary z-20"
+                      isSelected && "bg-primary/20 border-l-4 border-l-primary z-20",
+                      isArchiving && "bg-destructive/20 border-l-destructive animate-pulse opacity-60 pointer-events-none"
                     )}
                   >
                     <TableCell className="align-middle">
@@ -264,3 +268,4 @@ export default function PastAppointments({
     </div>
   );
 }
+

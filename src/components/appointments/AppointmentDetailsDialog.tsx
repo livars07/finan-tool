@@ -18,8 +18,18 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct, getCommissionPaymentDate } from '@/services/appointment-service';
-import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Percent, Coins, CalendarDays, UserCog, ChevronDown, Calendar as CalendarIcon, ArrowRight, History as HistoryIcon, Plus } from 'lucide-react';
+import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Percent, Coins, CalendarDays, UserCog, ChevronDown, Calendar as CalendarIcon, ArrowRight, History as HistoryIcon, Plus, Trash2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format, getDay, addDays, isToday, isTomorrow, isYesterday, differenceInCalendarDays, startOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -30,6 +40,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface Props {
   appointment: Appointment | null;
@@ -37,6 +48,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   onEdit: (id: string, data: Partial<Appointment>) => void;
   onAdd: (app: Omit<Appointment, 'id'>) => void;
+  onArchive?: (id: string) => void;
   formatFriendlyDate: (date: string) => string;
   format12hTime: (time: string) => string;
 }
@@ -47,10 +59,12 @@ export default function AppointmentDetailsDialog({
   onOpenChange, 
   onEdit,
   onAdd,
+  onArchive,
   format12hTime
 }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [isRescheduling, setIsRescheduling] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showEditProspector, setShowEditProspector] = useState(false);
   const [editData, setEditData] = useState<Partial<Appointment>>({});
   
@@ -112,6 +126,19 @@ export default function AppointmentDetailsDialog({
     toast({ title: "Cita Agendada", description: `Nueva cita de ${newType} registrada para ${newName}.` });
   };
 
+  const handleDelete = () => {
+    if (onArchive) {
+      onArchive(appointment.id);
+      setShowDeleteConfirm(false);
+      onOpenChange(false);
+      toast({
+        variant: "destructive",
+        title: "Cita movida a la papelera",
+        description: `Se iniciará el archivado de ${appointment.name}. Desaparecerá en 5s.`,
+      });
+    }
+  };
+
   const copyPhoneOnly = () => {
     if (!appointment.phone) return;
     navigator.clipboard.writeText(appointment.phone).then(() => {
@@ -156,7 +183,6 @@ Número: *${appointment.phone}*`;
   };
 
   const showCommissionPanel = appointment.status === 'Cierre' || appointment.status === 'Apartado';
-  
   const commissionValue = (editData.finalCreditAmount || 0) * 0.007 * ((editData.commissionPercent || 0) / 100);
 
   const calculatePaymentDateText = (dateStr: string) => {
@@ -196,7 +222,6 @@ Número: *${appointment.phone}*`;
   };
 
   const isCierre = appointment.status === 'Cierre';
-  
   const appDate = startOfDay(parseISO(appointment.date));
   const today = startOfDay(new Date());
   const diffCalendar = differenceInCalendarDays(appDate, today);
@@ -213,6 +238,32 @@ Número: *${appointment.phone}*`;
   } else {
     headerTimeText = `Han pasado ${Math.abs(diffCalendar)} ${Math.abs(diffCalendar) === 1 ? 'día' : 'días'} desde la cita`;
   }
+
+  const setDateTomorrow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const tomorrow = format(addDays(new Date(), 1), 'yyyy-MM-dd');
+    if (isEditing) setEditData({...editData, date: new Date(tomorrow + 'T12:00:00Z').toISOString()});
+    else setNewDate(tomorrow);
+  };
+
+  const setDateNextSaturday = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const today = new Date();
+    const nextSat = format(addDays(today, (6 - getDay(today) + 7) % 7 || 7), 'yyyy-MM-dd');
+    if (isEditing) setEditData({...editData, date: new Date(nextSat + 'T12:00:00Z').toISOString()});
+    else setNewDate(nextSat);
+  };
+
+  const setDateNextSunday = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const today = new Date();
+    const nextSun = format(addDays(today, (7 - getDay(today) + 7) % 7 || 7), 'yyyy-MM-dd');
+    if (isEditing) setEditData({...editData, date: new Date(nextSun + 'T12:00:00Z').toISOString()});
+    else setNewDate(nextSun);
+  };
 
   return (
     <>
@@ -235,12 +286,12 @@ Número: *${appointment.phone}*`;
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <div className="p-1 rounded-full hover:bg-muted text-muted-foreground cursor-help">
-                      <Info className="h-4 w-4" />
+                    <div className="p-1 rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive cursor-pointer transition-colors">
+                      <Trash2 className="h-4 w-4" onClick={() => setShowDeleteConfirm(true)} />
                     </div>
                   </TooltipTrigger>
                   <TooltipContent side="right">
-                    <p className="text-[10px] font-mono uppercase tracking-widest">ID: {appointment.id}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-destructive">Eliminar Cita</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -375,7 +426,28 @@ Número: *${appointment.phone}*`;
                     </Select>
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-[10px] font-bold uppercase text-muted-foreground">Fecha</Label>
+                    <div className="flex items-center justify-between">
+                      <Label className="text-[10px] font-bold uppercase text-muted-foreground">Fecha</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button type="button" variant="ghost" size="icon" className="h-5 w-5 rounded-full bg-primary/10 text-primary hover:bg-primary/20">
+                            <Plus className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent side="top" className="w-48 p-2 flex flex-col gap-1 backdrop-blur-md bg-card/90 border-primary/20">
+                          <p className="text-[10px] font-bold uppercase text-muted-foreground px-2 mb-1">Agendado rápido</p>
+                          <Button onMouseDown={setDateTomorrow} variant="ghost" size="sm" className="justify-start h-8 text-xs font-semibold hover:bg-primary/10">
+                            <ArrowRight className="w-3 h-3 mr-2 text-primary" /> Mañana
+                          </Button>
+                          <Button onMouseDown={setDateNextSaturday} variant="ghost" size="sm" className="justify-start h-8 text-xs font-semibold hover:bg-blue-500/10 text-blue-500">
+                            <CalendarIcon className="w-3 h-3 mr-2" /> Sábado
+                          </Button>
+                          <Button onMouseDown={setDateNextSunday} variant="ghost" size="sm" className="justify-start h-8 text-xs font-semibold hover:bg-orange-500/10 text-orange-600">
+                            <CalendarIcon className="w-3 h-3 mr-2" /> Domingo
+                          </Button>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
                     <Input 
                       type="date" 
                       value={editData.date ? parseISO(editData.date).toISOString().split('T')[0] : ''} 
@@ -702,7 +774,28 @@ Número: *${appointment.phone}*`;
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Nueva Fecha</Label>
+                <div className="flex items-center justify-between">
+                  <Label className="text-[10px] font-bold uppercase text-muted-foreground">Nueva Fecha</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button type="button" variant="ghost" size="icon" className="h-5 w-5 rounded-full bg-primary/10 text-primary hover:bg-primary/20">
+                        <Plus className="h-3 w-3" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent side="top" className="w-48 p-2 flex flex-col gap-1 backdrop-blur-md bg-card/90 border-primary/20">
+                      <p className="text-[10px] font-bold uppercase text-muted-foreground px-2 mb-1">Agendado rápido</p>
+                      <Button onMouseDown={setDateTomorrow} variant="ghost" size="sm" className="justify-start h-8 text-xs font-semibold hover:bg-primary/10">
+                        <ArrowRight className="w-3 h-3 mr-2 text-primary" /> Mañana
+                      </Button>
+                      <Button onMouseDown={setDateNextSaturday} variant="ghost" size="sm" className="justify-start h-8 text-xs font-semibold hover:bg-blue-500/10 text-blue-500">
+                        <CalendarIcon className="w-3 h-3 mr-2" /> Sábado
+                      </Button>
+                      <Button onMouseDown={setDateNextSunday} variant="ghost" size="sm" className="justify-start h-8 text-xs font-semibold hover:bg-orange-500/10 text-orange-600">
+                        <CalendarIcon className="w-3 h-3 mr-2" /> Domingo
+                      </Button>
+                    </PopoverContent>
+                  </Popover>
+                </div>
                 <Input type="date" value={newDate} onChange={e => setNewDate(e.target.value)} className="h-9 bg-muted/20 text-sm" />
               </div>
               <div className="space-y-1.5">
@@ -730,6 +823,24 @@ Número: *${appointment.phone}*`;
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent className="z-[85]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Mover a la papelera?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción ocultará la cita de tus listas activas. El registro desaparecerá en 5 segundos.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel type="button">Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90 text-white font-bold" type="button">
+              Sí, archivar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
+
