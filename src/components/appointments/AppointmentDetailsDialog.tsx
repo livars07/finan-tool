@@ -161,28 +161,18 @@ Número: *${appointment.phone}*`;
     return parts.join('.');
   };
 
-  const parseNumber = (val: string) => {
-    return parseFloat(val.replace(/,/g, '')) || 0;
-  };
-
   const showCommissionPanel = appointment.status === 'Cierre' || appointment.status === 'Apartado';
   
-  // Formula: Full commission is 0.7% (0.007). Percent input modifies that 0.7%.
   const commissionValue = (editData.finalCreditAmount || 0) * 0.007 * ((editData.commissionPercent || 0) / 100);
 
   const calculatePaymentDate = (dateStr: string) => {
     const d = parseISO(dateStr);
-    const dayOfWeek = getDay(d); // Sun=0, Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6
+    const dayOfWeek = getDay(d);
     
     let daysToAdd = 0;
-    // User logic: "2 Fridays away if before cutoff (Tue)"
-    // If Sun(0), Mon(1), Tue(2) -> Cutoff met. 
-    // Target is Friday of NEXT week (not this week's Friday).
     if (dayOfWeek <= 2) {
       daysToAdd = (5 - dayOfWeek) + 7;
     } else {
-      // If Wed(3), Thu(4), Fri(5), Sat(6) -> Cutoff missed.
-      // Target is Friday of the week AFTER next.
       daysToAdd = (5 - dayOfWeek) + 14;
     }
     
@@ -200,9 +190,7 @@ Número: *${appointment.phone}*`;
 
   const handleCommissionToggle = (checked: boolean) => {
     const newStatus = checked ? 'Pagada' : 'Pendiente';
-    // Update local state for immediate visual feedback
     setEditData(prev => ({ ...prev, commissionStatus: newStatus }));
-    // Save immediately to persistent storage
     onEdit(appointment.id, { commissionStatus: newStatus });
     
     toast({ 
@@ -236,7 +224,7 @@ Número: *${appointment.phone}*`;
           <DialogHeader className="px-6 py-3 border-b border-border/40 flex flex-row items-center justify-between bg-card/10 shrink-0">
             <div className="flex items-center gap-2">
               <DialogTitle className="text-lg font-headline font-bold text-foreground">
-                {isEditing ? 'Editar Registro' : 'Detalles'}
+                {isEditing ? 'Editar Registro' : 'Detalles de la Cita'}
               </DialogTitle>
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
@@ -393,6 +381,16 @@ Número: *${appointment.phone}*`;
                       <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Hora</p>
                       <p className="text-xs font-semibold">{format12hTime(appointment.time)}</p>
                     </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 border-t border-border/10 pt-3">
+                  <div className="p-2 bg-primary/10 rounded-lg"><CalendarDays className="w-4 h-4 text-primary" /></div>
+                  <div>
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Fecha Programada</p>
+                    <p className="text-xs font-bold">
+                      {format(parseISO(appointment.date), "d 'de' MMMM 'del' yyyy", { locale: es })}
+                    </p>
                   </div>
                 </div>
 
