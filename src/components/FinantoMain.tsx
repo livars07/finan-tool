@@ -418,7 +418,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                     <TooltipTrigger asChild>
                       {cardContent}
                     </TooltipTrigger>
-                    <TooltipContent side="bottom" className="bg-card border-border shadow-xl">
+                    <TooltipContent side="bottom" sideOffset={4} className="bg-card border-border shadow-xl">
                       <p className="text-xs font-bold uppercase tracking-widest text-primary">{stat.tooltip}</p>
                     </TooltipContent>
                   </Tooltip>
