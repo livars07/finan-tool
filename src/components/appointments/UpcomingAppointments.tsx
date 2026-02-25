@@ -304,7 +304,7 @@ export default function UpcomingAppointments({
                                   <CheckCircle className="w-2.5 h-2.5" /> Confirmada
                                 </div>
                               ) : (
-                                <Button variant="outline" size="sm" className="h-5 px-2 text-[8px] font-bold border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10" onClick={() => setConfirmId(app.id)} onOpenAutoFocus={(e) => e.preventDefault()}>
+                                <Button variant="outline" size="sm" className="h-5 px-2 text-[8px] font-bold border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10" onClick={() => setConfirmId(app.id)}>
                                   <AlertCircle className="w-2.5 h-2.5 mr-1" /> Confirmar
                                 </Button>
                               )}
@@ -404,7 +404,7 @@ export default function UpcomingAppointments({
             </div>
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setFinId(null)} className="h-9 text-xs" onOpenAutoFocus={(e) => e.preventDefault()}>Volver</Button>
+            <Button variant="outline" onClick={() => setFinId(null)} className="h-9 text-xs">Volver</Button>
             <Button onClick={handleFinalize} className={cn("h-9 text-xs font-bold shadow-lg", status === 'Cierre' ? "bg-green-600 hover:bg-green-700 text-white" : "bg-primary text-primary-foreground")}>
               {status === 'Cierre' ? 'Confirmar Venta' : 'Cerrar Consulta'}
             </Button>
@@ -458,7 +458,7 @@ export default function UpcomingAppointments({
             <AlertDialogDescription className="text-muted-foreground">Marcarás esta cita como confirmada para el día de hoy.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onOpenAutoFocus={(e) => e.preventDefault()}>Volver</AlertDialogCancel>
+            <AlertDialogCancel>Volver</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmAction} className="bg-green-600 hover:bg-green-700 text-white font-bold">Sí, confirmar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

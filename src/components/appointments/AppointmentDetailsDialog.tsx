@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct } from '@/services/appointment-service';
-import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Percent, Coins, CalendarDays, UserCog, ChevronDown, Calendar as CalendarIcon, ArrowRight, History as HistoryIcon } from 'lucide-react';
+import { User, Phone, Clock, Edit2, Save, Copy, Info, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Percent, Coins, CalendarDays, UserCog, ChevronDown, Calendar as CalendarIcon, ArrowRight, History as HistoryIcon, Plus } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format, getDay, addDays, differenceInDays, nextSaturday, nextSunday } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -277,7 +277,7 @@ Número: *${appointment.phone}*`;
                   Copiar datos
                 </Button>
               )}
-              <DialogClose className="h-7 w-7 flex items-center justify-center rounded-full bg-destructive/10 text-destructive hover:bg-destructive transition-colors group backdrop-blur-md border border-destructive/20" onOpenAutoFocus={(e) => e.preventDefault()}>
+              <DialogClose className="h-7 w-7 flex items-center justify-center rounded-full bg-destructive/10 text-destructive hover:bg-destructive transition-colors group backdrop-blur-md border border-destructive/20">
                 <span className="text-[10px] font-bold group-hover:text-white">✕</span>
               </DialogClose>
             </div>
