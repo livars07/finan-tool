@@ -42,7 +42,6 @@ export interface Appointment {
   status?: AppointmentStatus;
   notes?: string;
   isConfirmed?: boolean;
-  isArchived?: boolean; 
   // Datos de comisión
   commissionPercent?: number;
   commissionStatus?: 'Pagada' | 'Pendiente';
@@ -89,8 +88,7 @@ export const getFromDisk = (): Appointment[] => {
   const rawData = localStorage.getItem(STORAGE_KEY);
   if (!rawData) return [];
   try {
-    const parsed = JSON.parse(rawData) as Appointment[];
-    return parsed.map(app => ({ ...app, isArchived: app.isArchived ?? false }));
+    return JSON.parse(rawData) as Appointment[];
   } catch (e) {
     return [];
   }
@@ -114,8 +112,7 @@ export const createAppointment = (data: Omit<Appointment, 'id'>): Appointment[] 
   const newApp: Appointment = {
     ...data,
     id: uuidv4(),
-    phone: formatPhoneNumber(data.phone),
-    isArchived: false
+    phone: formatPhoneNumber(data.phone)
   };
   const updatedList = [newApp, ...all];
   saveToDisk(updatedList);
@@ -199,7 +196,6 @@ export const generateSeedData = (): Appointment[] => {
       type: types[i % types.length],
       product: products[i % products.length],
       isConfirmed: isTodayApp ? Math.random() > 0.4 : false,
-      isArchived: false,
       notes: i % 3 === 0 ? `Cliente muy interesado en ${products[i % products.length]}. Requiere crédito alto.` : '',
       prospectorName: i % 4 === 0 ? `Agente Externo ${i}` : undefined,
       prospectorPhone: i % 4 === 0 ? formatPhoneNumber(getPhone(i + 100)) : undefined
@@ -223,7 +219,6 @@ export const generateSeedData = (): Appointment[] => {
       product: products[i % products.length],
       status: status,
       isConfirmed: true,
-      isArchived: false,
       notes: isSale ? `Venta exitosa. Expediente completo enviado a notaría.` : `Seguimiento de ${products[i % products.length]}.`,
       commissionStatus: isSale ? (i % 2 === 0 ? 'Pagada' : 'Pendiente') : undefined,
       commissionPercent: isSale ? (i % 3 === 0 ? 50 : 100) : undefined,
@@ -241,23 +236,26 @@ export const generateSeedData = (): Appointment[] => {
  * Calcula las estadísticas globales enriquecidas.
  */
 export const calculateStats = (appointments: Appointment[]) => {
-  const activeApps = appointments.filter(a => !a.isArchived);
+  const activeApps = appointments;
   const now = new Date();
   const lastMonth = subMonths(now, 1);
 
   const currentMonthProspects = activeApps.filter(a => isSameMonth(parseISO(a.date), now)).length;
-  const currentMonthSales = activeApps.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), now)).length;
-  const currentMonthApartados = activeApps.filter(a => a.status === 'Apartado' && isSameMonth(parseISO(a.date), now)).length;
-  
   const lastMonthProspects = activeApps.filter(a => isSameMonth(parseISO(a.date), lastMonth)).length;
-  const lastMonthSales = activeApps.filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), lastMonth)).length;
+
+  const currentMonthSales = activeApps.filter(a => (a.status === 'Cierre' || a.status === 'Apartado') && isSameMonth(parseISO(a.date), now)).length;
+  const lastMonthSales = activeApps.filter(a => (a.status === 'Cierre' || a.status === 'Apartado') && isSameMonth(parseISO(a.date), lastMonth)).length;
 
   const currentMonthCommission = activeApps
-    .filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), now))
+    .filter(a => (a.status === 'Cierre' || a.status === 'Apartado') && isSameMonth(parseISO(a.date), now))
+    .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
+
+  const currentMonthPaidCommission = activeApps
+    .filter(a => (a.status === 'Cierre' || a.status === 'Apartado') && a.commissionStatus === 'Pagada' && isSameMonth(parseISO(a.date), now))
     .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
 
   const lastMonthCommission = activeApps
-    .filter(a => a.status === 'Cierre' && isSameMonth(parseISO(a.date), lastMonth))
+    .filter(a => (a.status === 'Cierre' || a.status === 'Apartado') && isSameMonth(parseISO(a.date), lastMonth))
     .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
 
   const todayTotal = activeApps.filter(a => isToday(parseISO(a.date))).length;
@@ -281,10 +279,10 @@ export const calculateStats = (appointments: Appointment[]) => {
     currentMonthProspects,
     lastMonthProspects,
     currentMonthSales,
-    currentMonthApartados,
     lastMonthSales,
     currentMonthCommission,
     lastMonthCommission,
+    currentMonthPaidCommission,
     conversionRate: parseFloat(conversionRate.toFixed(1)),
   };
 };

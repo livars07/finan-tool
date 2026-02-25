@@ -48,6 +48,12 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import * as Service from '@/services/appointment-service';
@@ -70,12 +76,6 @@ export interface FinantoMainProps {
 }
 
 export default function FinantoMain({ initialSection }: FinantoMainProps) {
-  const appointmentState = useAppointments();
-  const { 
-    appointments, stats, isLoaded, resetData, clearAll, 
-    editAppointment, upcoming, past
-  } = appointmentState;
-  
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showHelp, setShowHelp] = useState(initialSection === 'guia');
@@ -94,6 +94,13 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
 
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [lastFinishedApp, setLastFinishedApp] = useState<Service.Appointment | null>(null);
+
+  const appointmentState = useAppointments();
+  const { 
+    appointments, stats, isLoaded, resetData, clearAll, 
+    editAppointment
+  } = appointmentState;
+  
   const onSelectAppId = (id: string | null) => setSelectedAppId(id);
   
   const { toast } = useToast();
@@ -279,6 +286,34 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
     }).format(val);
   };
 
+  const statsCards = [
+    { label: 'Citas hoy', value: stats.todayCount.toString(), icon: CalendarDays, color: 'text-primary' },
+    { label: 'Pendientes', value: stats.pendingCount.toString(), icon: Wallet, color: 'text-primary' },
+    { 
+      label: 'Prospectos Mes', 
+      value: stats.currentMonthProspects.toString(), 
+      icon: Users, 
+      color: 'text-accent',
+      comparison: stats.lastMonthProspects 
+    },
+    { 
+      label: 'Ventas Mes', 
+      value: stats.currentMonthSales.toString(), 
+      icon: CheckCircle2, 
+      color: 'text-green-500',
+      comparison: stats.lastMonthSales
+    },
+    { 
+      label: 'Comisiones Mes', 
+      value: formatCurrency(stats.currentMonthCommission), 
+      icon: Coins, 
+      color: 'text-yellow-500',
+      comparison: stats.lastMonthCommission,
+      isCurrency: true,
+      tooltip: `Dinero recibido: ${formatCurrency(stats.currentMonthPaidCommission)}`
+    },
+  ];
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
       <header className="border-b border-border/40 sticky top-0 z-50 backdrop-blur-[12px] bg-card/10 shrink-0">
@@ -337,65 +372,60 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
 
       <main className="flex-1 container mx-auto px-4 py-6 md:py-12">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-          {[
-            { label: 'Citas hoy', value: stats.todayCount.toString(), icon: CalendarDays, color: 'text-primary' },
-            { label: 'Pendientes', value: stats.pendingCount.toString(), icon: Wallet, color: 'text-primary' },
-            { 
-              label: 'Prospectos Mes', 
-              value: stats.currentMonthProspects.toString(), 
-              icon: Users, 
-              color: 'text-accent',
-              comparison: stats.lastMonthProspects 
-            },
-            { 
-              label: 'Ventas Mes', 
-              value: stats.currentMonthSales.toString(), 
-              icon: CheckCircle2, 
-              color: 'text-green-500',
-              comparison: stats.lastMonthSales
-            },
-            { 
-              label: 'Comisiones Mes', 
-              value: formatCurrency(stats.currentMonthCommission), 
-              icon: Coins, 
-              color: 'text-yellow-500',
-              comparison: stats.lastMonthCommission,
-              isCurrency: true
-            },
-          ].map((stat, i) => (
-            <Card 
-              key={i} 
-              className="bg-card/30 backdrop-blur-md border-border/40 animate-periodic-glow hover:border-primary/50 transition-all cursor-default"
-              style={{ animationDelay: `${i * 0.15}s` }}
-            >
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className={cn("p-2 rounded-full bg-muted/50", stat.color)}><stat.icon className="w-5 h-5" /></div>
-                <div className="flex-1 overflow-hidden">
-                  <p className="text-[10px] uppercase font-bold text-muted-foreground truncate">{stat.label}</p>
-                  <div className="flex items-baseline gap-2">
-                    <p className="text-lg font-bold truncate">{stat.value}</p>
-                    {stat.comparison !== undefined && (
-                      <div className="flex flex-col">
-                        <span className="text-[8px] font-bold flex items-center whitespace-nowrap text-muted-foreground/40">
-                          {stat.isCurrency ? (
-                             <>
-                               {stats.currentMonthCommission > stats.lastMonthCommission ? <ArrowUpRight className="w-2.5 h-2.5 mr-0.5" /> : <ArrowDownRight className="w-2.5 h-2.5 mr-0.5" />}
-                               {formatCurrency(stat.comparison)}
-                             </>
-                          ) : (
-                            <>
-                              {parseInt(stat.value) > stat.comparison ? <ArrowUpRight className="w-2.5 h-2.5 mr-0.5" /> : parseInt(stat.value) < stat.comparison ? <ArrowDownRight className="w-2.5 h-2.5 mr-0.5" /> : null}
-                              {stat.comparison}
-                            </>
-                          )}
-                        </span>
-                      </div>
-                    )}
+          {statsCards.map((stat, i) => {
+            const cardContent = (
+              <Card 
+                className="bg-card/30 backdrop-blur-md border-border/40 animate-periodic-glow hover:border-primary/50 transition-all cursor-default h-full"
+                style={{ animationDelay: `${i * 0.15}s` }}
+              >
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className={cn("p-2 rounded-full bg-muted/50", stat.color)}><stat.icon className="w-5 h-5" /></div>
+                  <div className="flex-1 overflow-hidden">
+                    <p className="text-[10px] uppercase font-bold text-muted-foreground truncate">{stat.label}</p>
+                    <div className="flex items-baseline gap-2">
+                      <p className="text-lg font-bold truncate">{stat.value}</p>
+                      {stat.comparison !== undefined && (
+                        <div className="flex flex-col">
+                          <span className="text-[8px] font-bold flex items-center whitespace-nowrap text-muted-foreground/40">
+                            {stat.isCurrency ? (
+                               <>
+                                 {stats.currentMonthCommission > stats.lastMonthCommission ? <ArrowUpRight className="w-2.5 h-2.5 mr-0.5" /> : <ArrowDownRight className="w-2.5 h-2.5 mr-0.5" />}
+                                 {formatCurrency(stat.comparison)}
+                               </>
+                            ) : (
+                              <>
+                                {parseInt(stat.value) > stat.comparison ? <ArrowUpRight className="w-2.5 h-2.5 mr-0.5" /> : parseInt(stat.value) < stat.comparison ? <ArrowDownRight className="w-2.5 h-2.5 mr-0.5" /> : null}
+                                {stat.comparison}
+                              </>
+                            )}
+                          </span>
+                          <span className="text-[7px] uppercase font-bold text-muted-foreground/30">Mes pasado</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+
+            if (stat.tooltip) {
+              return (
+                <TooltipProvider key={i}>
+                  <Tooltip delayDuration={0}>
+                    <TooltipTrigger asChild>
+                      {cardContent}
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="bg-card border-border shadow-xl">
+                      <p className="text-xs font-bold uppercase tracking-widest text-primary">{stat.tooltip}</p>
+                      <p className="text-[10px] text-muted-foreground mt-1">Suma de comisiones con estatus "Pagada".</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              );
+            }
+
+            return <div key={i}>{cardContent}</div>;
+          })}
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
