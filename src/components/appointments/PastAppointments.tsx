@@ -26,7 +26,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { format } from 'date-fns';
+import { format, isToday, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 interface Props {
@@ -101,6 +101,13 @@ export default function PastAppointments({
     });
   };
 
+  const formatCurrency = (val: number) => {
+    return new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency: 'MXN',
+    }).format(val);
+  };
+
   const visibleAppointments = appointments.slice(0, visibleCount);
 
   return (
@@ -125,11 +132,14 @@ export default function PastAppointments({
             </TableHeader>
             <TableBody>
               {visibleAppointments.map((app) => {
+                const appToday = isToday(parseISO(app.date));
                 const isSelected = activeId === app.id;
                 const isCierre = app.status === 'Cierre' || app.status === 'Apartado';
                 const isCommissionPaid = isCierre && app.commissionStatus === 'Pagada';
                 const isCommissionOverdue = isCierre && app.commissionStatus !== 'Pagada';
                 const isArchiving = archivingIds.has(app.id);
+                
+                const commissionValue = (app.finalCreditAmount || 0) * 0.007 * ((app.commissionPercent || 0) / 100);
 
                 return (
                   <TableRow 
@@ -137,16 +147,17 @@ export default function PastAppointments({
                     onClick={() => onSelect(app)}
                     className={cn(
                       "hover:bg-primary/10 transition-colors cursor-pointer relative h-16",
+                      appToday && "bg-primary/10",
                       isSelected && "bg-primary/20 z-20",
                       isArchiving && "bg-destructive/20 animate-pulse opacity-60 pointer-events-none"
                     )}
                   >
                     <TableCell className={cn(
                       "align-middle pl-4",
-                      isSelected && "border-l-4 border-l-primary",
                       isArchiving && "border-l-4 border-l-destructive"
                     )}>
                       <div className="flex items-center gap-2">
+                        {appToday && <div className="w-2.5 h-2.5 rounded-full bg-primary shrink-0 animate-pulse shadow-[0_0_8px_hsl(var(--primary))]" title="Cita para hoy" />}
                         <div className="font-bold text-sm text-foreground">{app.name}</div>
                         {app.prospectorName && (
                           <TooltipProvider>
@@ -169,7 +180,7 @@ export default function PastAppointments({
                       </div>
                       {!expanded && (
                         <div className="text-[10px] text-muted-foreground inline-flex items-center gap-1 mt-0.5">
-                          <Phone className="w-2.5 h-2.5" /> 
+                          <Phone className="w-2.5 h-2.5 ml-4" /> 
                           <span 
                             onClick={(e) => copyPhone(e, app)} 
                             className="hover:text-primary transition-colors cursor-pointer font-medium"
@@ -244,6 +255,9 @@ export default function PastAppointments({
                               <TooltipContent className="bg-card border-green-500/20 p-3 space-y-1">
                                 <div className="flex items-center gap-2 text-green-500 font-bold text-[10px] uppercase tracking-widest">
                                   <CheckCircle2 className="w-3 h-3" /> Comisión Liquidada
+                                </div>
+                                <div className="text-[10px] font-bold text-foreground">
+                                  Monto: {formatCurrency(commissionValue)}
                                 </div>
                                 <div className="text-[9px] text-muted-foreground">
                                   Participación: <span className="text-foreground font-bold">{app.commissionPercent}%</span>

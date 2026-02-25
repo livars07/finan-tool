@@ -239,18 +239,17 @@ export default function UpcomingAppointments({
                       onClick={() => onSelect(app)}
                       className={cn(
                         "hover:bg-primary/10 transition-colors cursor-pointer group relative h-16",
-                        appToday && "bg-primary/5",
+                        appToday && "bg-primary/10",
                         isSelected && "bg-primary/20 z-10",
                         isArchiving && "bg-destructive/20 animate-pulse opacity-60 pointer-events-none"
                       )}
                     >
                       <TableCell className={cn(
                         "align-middle pl-4",
-                        appToday && "border-l-4 border-l-primary",
-                        isSelected && !appToday && "border-l-4 border-l-primary/40",
                         isArchiving && "border-l-4 border-l-destructive"
                       )}>
                         <div className="flex items-center gap-2">
+                          {appToday && <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shrink-0 shadow-[0_0_8px_hsl(var(--primary))]" title="Cita para hoy" />}
                           <div className="font-bold text-sm leading-tight text-foreground">{app.name}</div>
                           {app.prospectorName && (
                             <TooltipProvider>
@@ -273,7 +272,7 @@ export default function UpcomingAppointments({
                         </div>
                         {!expanded && (
                           <div className="text-[10px] text-muted-foreground inline-flex items-center gap-1 mt-0.5">
-                            <Phone className="w-2.5 h-2.5" /> 
+                            <Phone className="w-2.5 h-2.5 ml-4" /> 
                             <span 
                               onClick={(e) => copyPhone(e, app)} 
                               className="hover:text-primary transition-colors cursor-pointer font-medium"
