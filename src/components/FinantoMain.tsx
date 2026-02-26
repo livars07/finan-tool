@@ -605,63 +605,63 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       </Dialog>
 
       <Dialog open={!!pendingCommissionApp} onOpenChange={(open) => { if (!open) { setPendingCommissionApp(null); lastClosedTimeRef.current = Date.now(); } }}>
-        <DialogContent className="sm:max-w-[450px] border-accent/30 bg-card shadow-2xl backdrop-blur-md z-[80]">
+        <DialogContent className="sm:max-w-[450px] border-blue-200 bg-blue-50 shadow-2xl z-[80] text-blue-900 !bg-blue-50 !text-blue-900">
           <DialogHeader>
             <div className="flex items-center justify-between mb-2">
-              <div className="bg-accent/10 p-3 rounded-full w-fit">
-                <HandCoins className="w-8 h-8 text-accent animate-bounce" />
+              <div className="bg-blue-100 p-3 rounded-full w-fit">
+                <HandCoins className="w-8 h-8 text-blue-600 animate-bounce" />
               </div>
-              <div className="bg-destructive/10 px-3 py-1 rounded-full border border-destructive/20">
-                <span className="text-[10px] font-bold text-destructive uppercase tracking-widest flex items-center gap-1">
+              <div className="bg-red-100 px-3 py-1 rounded-full border border-red-200">
+                <span className="text-[10px] font-bold text-red-600 uppercase tracking-widest flex items-center gap-1">
                   <BadgeAlert className="w-3 h-3" /> Pago Vencido
                 </span>
               </div>
             </div>
-            <DialogTitle className="text-xl font-headline font-bold">Verificación de Pago</DialogTitle>
-            <DialogDescription className="text-sm">Confirmación de recepción de comisión para trámite finalizado.</DialogDescription>
+            <DialogTitle className="text-xl font-headline font-bold text-blue-950">Verificación de Pago</DialogTitle>
+            <DialogDescription className="text-sm text-blue-800/80">Confirmación de recepción de comisión para trámite finalizado.</DialogDescription>
           </DialogHeader>
           {pendingCommissionApp && (
             <div className="py-4 space-y-4">
-              <div className="p-4 bg-muted/30 rounded-xl border border-border/40 space-y-3">
-                <div className="flex justify-between items-center border-b border-border/10 pb-2">
-                  <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Resultado</span>
+              <div className="p-4 bg-blue-100/50 rounded-xl border border-blue-200/50 space-y-3">
+                <div className="flex justify-between items-center border-b border-blue-200/20 pb-2">
+                  <span className="text-[10px] font-bold uppercase text-blue-800 tracking-widest">Resultado</span>
                   <span className={cn(
                     "text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border",
-                    pendingCommissionApp.status === 'Cierre' ? "bg-green-500/10 text-green-500 border-green-500/20" : "bg-blue-500/10 text-blue-500 border-blue-500/20"
+                    pendingCommissionApp.status === 'Cierre' ? "bg-green-500/10 text-green-600 border-green-500/20" : "bg-blue-500/10 text-blue-600 border-blue-500/20"
                   )}>
                     {pendingCommissionApp.status}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Cliente</span>
-                  <span className="text-sm font-bold text-foreground">{pendingCommissionApp.name}</span>
+                  <span className="text-[10px] font-bold uppercase text-blue-800 tracking-widest">Cliente</span>
+                  <span className="text-sm font-bold text-blue-950">{pendingCommissionApp.name}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Ganancia Estimada</span>
-                  <span className="text-sm font-bold text-accent">
+                  <span className="text-[10px] font-bold uppercase text-blue-800 tracking-widest">Ganancia Estimada</span>
+                  <span className="text-sm font-bold text-blue-700">
                     {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(
                       (pendingCommissionApp.finalCreditAmount || 0) * 0.007 * ((pendingCommissionApp.commissionPercent || 0) / 100)
                     )}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Fecha de Pago</span>
-                  <span className="text-sm font-bold text-primary">
+                  <span className="text-[10px] font-bold uppercase text-blue-800 tracking-widest">Fecha de Pago</span>
+                  <span className="text-sm font-bold text-blue-800">
                     {new Intl.DateTimeFormat('es-MX', { dateStyle: 'long' }).format(Service.getCommissionPaymentDate(pendingCommissionApp.date))}
                   </span>
                 </div>
               </div>
               <div className="flex justify-center">
-                <Button variant="ghost" size="sm" onClick={() => { setSelectedAppId(pendingCommissionApp.id); setPendingCommissionApp(null); lastClosedTimeRef.current = Date.now(); }} className="text-[10px] font-bold uppercase text-primary hover:bg-primary/10 gap-2 h-8" type="button">
+                <Button variant="ghost" size="sm" onClick={() => { setSelectedAppId(pendingCommissionApp.id); setPendingCommissionApp(null); lastClosedTimeRef.current = Date.now(); }} className="text-[10px] font-bold uppercase text-blue-600 hover:bg-blue-100 gap-2 h-8" type="button">
                   <Search className="w-3.5 h-3.5" /> Ver expediente completo
                 </Button>
               </div>
-              <p className="text-xs text-center text-muted-foreground font-medium px-4">¿Confirmas que esta comisión ya fue liquidada y el monto está en tu cuenta?</p>
+              <p className="text-xs text-center text-blue-800 font-medium px-4">¿Confirmas que esta comisión ya fue liquidada y el monto está en tu cuenta?</p>
             </div>
           )}
           <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={() => { setPendingCommissionApp(null); lastClosedTimeRef.current = Date.now(); }} className="w-full sm:flex-1 h-11 text-xs font-bold uppercase" type="button">Aún no recibida</Button>
-            <Button onClick={handleConfirmCommissionPayment} className="w-full sm:flex-1 h-11 bg-accent hover:bg-accent/80 text-accent-foreground font-bold shadow-lg gap-2" type="button">
+            <Button variant="outline" onClick={() => { setPendingCommissionApp(null); lastClosedTimeRef.current = Date.now(); }} className="w-full sm:flex-1 h-11 text-xs font-bold uppercase border-blue-200 text-blue-700 hover:bg-blue-100" type="button">Aún no recibida</Button>
+            <Button onClick={handleConfirmCommissionPayment} className="w-full sm:flex-1 h-11 bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg gap-2" type="button">
               <CheckCircle className="w-4 h-4" /> Sí, ya se pagó
             </Button>
           </DialogFooter>
