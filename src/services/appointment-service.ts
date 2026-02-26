@@ -237,6 +237,7 @@ export const generateSeedData = (): Appointment[] => {
 export const calculateStats = (appointments: Appointment[]) => {
   const activeApps = appointments;
   const now = new Date();
+  const todayStart = startOfDay(now);
   const lastMonth = subMonths(now, 1);
 
   const currentMonthProspects = activeApps.filter(a => isSameMonth(parseISO(a.date), now)).length;
@@ -263,7 +264,6 @@ export const calculateStats = (appointments: Appointment[]) => {
     .filter(a => (a.status === 'Cierre' || a.status === 'Apartado') && isSameMonth(parseISO(a.date), lastMonth))
     .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
 
-  const todayStart = startOfDay(now);
   const dayOfWeek = getDay(todayStart);
   const daysToFriday = (5 - dayOfWeek + 7) % 7;
   const targetFriday = addDays(todayStart, daysToFriday);
@@ -274,6 +274,15 @@ export const calculateStats = (appointments: Appointment[]) => {
       if (a.commissionStatus === 'Pagada') return false;
       const payDate = startOfDay(getCommissionPaymentDate(a.date));
       return payDate.getTime() === targetFriday.getTime();
+    })
+    .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
+
+  const overdueCommission = activeApps
+    .filter(a => {
+      if (a.status !== 'Cierre' && a.status !== 'Apartado') return false;
+      if (a.commissionStatus === 'Pagada') return false;
+      const payDate = startOfDay(getCommissionPaymentDate(a.date));
+      return isBefore(payDate, todayStart);
     })
     .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
 
@@ -308,6 +317,7 @@ export const calculateStats = (appointments: Appointment[]) => {
     lastMonthCommission,
     currentMonthPaidCommission,
     thisFridayCommission,
+    overdueCommission,
     conversionRate: parseFloat(conversionRate.toFixed(1)),
     lastMonthConversionRate: parseFloat(lastMonthConversionRate.toFixed(1)),
   };

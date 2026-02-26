@@ -289,7 +289,12 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       value: stats.todayCount.toString(), 
       icon: CalendarDays, 
       color: 'text-primary',
-      tooltip: `Citas para mañana: ${stats.tomorrowTotal}`
+      tooltip: (
+        <div className="flex flex-col gap-0.5">
+          <span className="text-muted-foreground">Citas para mañana:</span>
+          <span className="text-primary font-bold">{stats.tomorrowTotal}</span>
+        </div>
+      )
     },
     { label: 'Pendientes', value: stats.pendingCount.toString(), icon: Wallet, color: 'text-primary' },
     { 
@@ -313,7 +318,22 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       color: 'text-yellow-500',
       comparison: stats.lastMonthCommission,
       isCurrency: true,
-      tooltip: `Dinero recibido: ${formatCurrency(stats.currentMonthPaidCommission)}\nCobro este viernes: ${formatCurrency(stats.thisFridayCommission)}`
+      tooltip: (
+        <div className="flex flex-col gap-1 text-[10px] leading-tight">
+          <div className="flex justify-between items-center gap-4">
+            <span className="text-muted-foreground uppercase font-medium">Dinero recibido:</span>
+            <span className="text-primary font-bold">{formatCurrency(stats.currentMonthPaidCommission)}</span>
+          </div>
+          <div className="flex justify-between items-center gap-4">
+            <span className="text-muted-foreground uppercase font-medium">Cobro este viernes:</span>
+            <span className="text-yellow-500 font-bold">{formatCurrency(stats.thisFridayCommission)}</span>
+          </div>
+          <div className="flex justify-between items-center gap-4 border-t border-border/10 pt-1">
+            <span className="text-muted-foreground uppercase font-medium">Pendiente:</span>
+            <span className="text-destructive font-bold">{formatCurrency(stats.overdueCommission)}</span>
+          </div>
+        </div>
+      )
     },
   ];
 
@@ -418,8 +438,10 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                     <TooltipTrigger asChild>
                       {cardContent}
                     </TooltipTrigger>
-                    <TooltipContent side="bottom" sideOffset={1} className="bg-card border-border shadow-xl z-[100]">
-                      <div className="text-xs font-bold uppercase tracking-widest text-primary whitespace-pre-wrap">{stat.tooltip}</div>
+                    <TooltipContent side="bottom" sideOffset={1} className="bg-card border-border shadow-xl z-[100] p-3">
+                      <div className="font-bold uppercase tracking-widest text-primary">
+                        {stat.tooltip}
+                      </div>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
