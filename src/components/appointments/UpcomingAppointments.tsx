@@ -52,6 +52,7 @@ interface Props {
   toggleConfirmation: (id: string) => void;
   activeId?: string | null;
   expanded?: boolean;
+  theme?: string;
 }
 
 export default function UpcomingAppointments({ 
@@ -64,7 +65,8 @@ export default function UpcomingAppointments({
   updateStatus, 
   toggleConfirmation, 
   activeId,
-  expanded = false
+  expanded = false,
+  theme = 'corporativo'
 }: Props) {
   const [finId, setFinId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
@@ -400,31 +402,67 @@ export default function UpcomingAppointments({
         </DialogContent>
       </Dialog>
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent className="sm:max-w-[550px] border shadow-2xl backdrop-blur-md overflow-hidden p-0 bg-green-950 border-green-500/50 text-white z-[90]">
+        <DialogContent className={cn(
+          "sm:max-w-[550px] border shadow-2xl backdrop-blur-md overflow-hidden p-0 z-[90]",
+          (theme === 'corporativo' || theme === 'corporativo-v2') 
+            ? "bg-green-50 border-green-200 text-green-900" 
+            : "bg-green-950 border-green-500/50 text-white"
+        )}>
           <div className="p-8 space-y-6">
             <div className="flex flex-col items-center text-center space-y-4">
-              <div className="bg-green-500/20 p-5 rounded-full border border-green-400/30 relative z-10">
-                <Trophy className="w-16 h-16 text-green-400" />
+              <div className={cn(
+                "p-5 rounded-full border relative z-10",
+                (theme === 'corporativo' || theme === 'corporativo-v2') 
+                  ? "bg-green-100 border-green-300" 
+                  : "bg-green-500/20 border-green-400/30"
+              )}>
+                <Trophy className={cn(
+                  "w-16 h-16",
+                  (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-green-700" : "text-green-400"
+                )} />
               </div>
-              <DialogTitle className="text-3xl font-headline font-bold flex items-center gap-3 text-white">
+              <DialogTitle className={cn(
+                "text-3xl font-headline font-bold flex items-center gap-3",
+                (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-black" : "text-white"
+              )}>
                 <PartyPopper className="text-yellow-500" /> ¡FELICIDADES! <PartyPopper className="text-yellow-500" />
               </DialogTitle>
-              <DialogDescription className="text-lg text-center mx-auto text-green-100">
-                Has concretado el crédito de <strong className="text-white">{lastFinishedApp?.name}</strong> con éxito.
+              <DialogDescription className={cn(
+                "text-lg text-center mx-auto",
+                (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-green-800" : "text-green-100"
+              )}>
+                Has concretado el crédito de <strong className={(theme === 'corporativo' || theme === 'corporativo-v2') ? "text-black" : "text-white"}>{lastFinishedApp?.name}</strong> con éxito.
               </DialogDescription>
             </div>
-            <div className="bg-green-500/10 border border-green-500/20 p-6 rounded-2xl space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-widest text-green-400 flex items-center gap-2"><Sparkles className="w-4 h-4" /> Recomendaciones de cierre</h4>
-              <p className="text-sm text-green-50/80 leading-relaxed">Para garantizar la integridad administrativa del expediente, asegúrate de haber registrado:</p>
-              <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-bold text-white">
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Monto del Crédito Final</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Cálculo de Comisiones</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Fecha estimada de Firma</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-400" /> Notas de acuerdos verbales</li>
+            <div className={cn(
+              "border p-6 rounded-2xl space-y-4",
+              (theme === 'corporativo' || theme === 'corporativo-v2') 
+                ? "bg-green-100/50 border-green-200" 
+                : "bg-green-500/10 border-green-500/20"
+            )}>
+              <h4 className={cn(
+                "text-xs font-bold uppercase tracking-widest flex items-center gap-2",
+                (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-green-800" : "text-green-400"
+              )}><Sparkles className="w-4 h-4" /> Recomendaciones de cierre</h4>
+              <p className={cn(
+                "text-sm leading-relaxed",
+                (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-green-900/80" : "text-green-50/80"
+              )}>Para garantizar la integridad administrativa del expediente, asegúrate de haber registrado:</p>
+              <ul className={cn(
+                "grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-bold",
+                (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-black" : "text-white"
+              )}>
+                <li className="flex items-center gap-2"><CheckCircle className={cn("w-3.5 h-3.5", (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-green-700" : "text-green-400")} /> Monto del Crédito Final</li>
+                <li className="flex items-center gap-2"><CheckCircle className={cn("w-3.5 h-3.5", (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-green-700" : "text-green-400")} /> Cálculo de Comisiones</li>
+                <li className="flex items-center gap-2"><CheckCircle className={cn("w-3.5 h-3.5", (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-green-700" : "text-green-400")} /> Fecha estimada de Firma</li>
+                <li className="flex items-center gap-2"><CheckCircle className={cn("w-3.5 h-3.5", (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-green-700" : "text-green-400")} /> Notas de acuerdos verbales</li>
               </ul>
             </div>
           </div>
-          <DialogFooter className="p-6 bg-green-900/50 border-t border-green-800/50 sm:justify-center">
+          <DialogFooter className={cn(
+            "p-6 border-t sm:justify-center",
+            (theme === 'corporativo' || theme === 'corporativo-v2') ? "bg-green-100/50 border-green-200" : "bg-green-900/50 border-green-800/50"
+          )}>
             <Button onClick={handleSuccessClose} className="bg-green-600 hover:bg-green-700 text-white font-bold px-12 h-14 rounded-2xl text-xl shadow-xl transition-all transform hover:scale-105" type="button">Continuar</Button>
           </DialogFooter>
         </DialogContent>

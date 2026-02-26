@@ -59,6 +59,7 @@ interface DashboardContentProps {
   visibleCountPast: number;
   setVisibleCountPast: (count: number | ((prev: number) => number)) => void;
   stats: any;
+  theme?: string;
 }
 
 const DashboardContent = ({ 
@@ -77,7 +78,8 @@ const DashboardContent = ({
   activeId,
   visibleCountPast,
   setVisibleCountPast,
-  stats
+  stats,
+  theme
 }: DashboardContentProps) => (
   <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
     <div className={cn("flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 shrink-0", expanded && "bg-muted/10 p-6 rounded-2xl border border-border/30 backdrop-blur-md")}>
@@ -217,6 +219,7 @@ const DashboardContent = ({
           toggleConfirmation={toggleConfirmation}
           activeId={activeId}
           expanded={expanded}
+          theme={theme}
         />
       </TabsContent>
       <TabsContent value="past" className="mt-0 h-full">
@@ -250,6 +253,7 @@ interface AppointmentsDashboardProps {
   onExpandedChange?: (expanded: boolean) => void;
   selectedAppId: string | null;
   onSelectAppId: (id: string | null) => void;
+  theme?: string;
 }
 
 export default function AppointmentsDashboard({
@@ -265,7 +269,8 @@ export default function AppointmentsDashboard({
   initialExpanded = false,
   onExpandedChange,
   selectedAppId,
-  onSelectAppId
+  onSelectAppId,
+  theme
 }: AppointmentsDashboardProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -406,6 +411,7 @@ export default function AppointmentsDashboard({
               visibleCountPast={visibleCountPast}
               setVisibleCountPast={setVisibleCountPast}
               stats={stats}
+              theme={theme}
             />
           </CardContent>
         </Card>
@@ -461,6 +467,7 @@ export default function AppointmentsDashboard({
               visibleCountPast={visibleCountPast}
               setVisibleCountPast={setVisibleCountPast}
               stats={stats}
+              theme={theme}
             />
           </div>
         </DialogContent>
