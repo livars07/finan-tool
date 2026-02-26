@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -119,8 +120,17 @@ const DashboardContent = ({
                     </div>
                   </div>
                 </TooltipTrigger>
-                <TooltipContent side="bottom" sideOffset={1}>
-                  <p className="text-xs">Citas para mañana: {stats.tomorrowTotal}</p>
+                <TooltipContent side="bottom" sideOffset={1} className="bg-card border-border shadow-xl z-[100] p-3">
+                  <div className="flex flex-col gap-1 text-[10px] leading-tight">
+                    <div className="flex justify-between items-center gap-4">
+                      <span className="text-muted-foreground uppercase font-medium">Mañana:</span>
+                      <span className="text-primary font-bold">{stats.tomorrowTotal}</span>
+                    </div>
+                    <div className="flex justify-between items-center gap-4">
+                      <span className="text-muted-foreground uppercase font-medium">Confirmadas:</span>
+                      <span className="text-green-500 font-bold">{stats.todayConfirmed}</span>
+                    </div>
+                  </div>
                 </TooltipContent>
               </Tooltip>
 
@@ -140,8 +150,13 @@ const DashboardContent = ({
                     </div>
                   </div>
                 </TooltipTrigger>
-                <TooltipContent side="bottom" sideOffset={1}>
-                  <p className="text-xs">Total de trámites formalizados este mes.</p>
+                <TooltipContent side="bottom" sideOffset={1} className="bg-card border-border shadow-xl z-[100] p-3">
+                  <div className="flex flex-col gap-1 text-[10px] leading-tight">
+                    <div className="flex justify-between items-center gap-4">
+                      <span className="text-muted-foreground uppercase font-medium">Total formalizado:</span>
+                      <span className="text-green-500 font-bold">{stats.currentMonthOnlyCierre}</span>
+                    </div>
+                  </div>
                 </TooltipContent>
               </Tooltip>
 
@@ -161,8 +176,13 @@ const DashboardContent = ({
                     </div>
                   </div>
                 </TooltipTrigger>
-                <TooltipContent side="bottom" sideOffset={1}>
-                  <p className="text-xs">Clientes que han realizado un apartado en el mes actual.</p>
+                <TooltipContent side="bottom" sideOffset={1} className="bg-card border-border shadow-xl z-[100] p-3">
+                  <div className="flex flex-col gap-1 text-[10px] leading-tight">
+                    <div className="flex justify-between items-center gap-4">
+                      <span className="text-muted-foreground uppercase font-medium">En proceso:</span>
+                      <span className="text-blue-500 font-bold">{stats.currentMonthApartados}</span>
+                    </div>
+                  </div>
                 </TooltipContent>
               </Tooltip>
 
@@ -182,8 +202,13 @@ const DashboardContent = ({
                     </div>
                   </div>
                 </TooltipTrigger>
-                <TooltipContent side="bottom" sideOffset={1}>
-                  <p className="text-xs">Efectividad de ventas este mes.</p>
+                <TooltipContent side="bottom" sideOffset={1} className="bg-card border-border shadow-xl z-[100] p-3">
+                  <div className="flex flex-col gap-1 text-[10px] leading-tight">
+                    <div className="flex justify-between items-center gap-4">
+                      <span className="text-muted-foreground uppercase font-medium">Efectividad:</span>
+                      <span className="text-primary font-bold">{stats.conversionRate}%</span>
+                    </div>
+                  </div>
                 </TooltipContent>
               </Tooltip>
 

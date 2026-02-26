@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -10,7 +11,7 @@ import {
   ClipboardList, Copy, Crown, Snowflake, MessageSquare, 
   CalendarClock, HandCoins, CheckCircle, Search, BadgeAlert, 
   MoreHorizontal, ArrowUpRight, ArrowDownRight, Coins, Star, Trophy, PartyPopper,
-  TrendingUp
+  TrendingUp, TrendingDown
 } from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
 import { Button } from '@/components/ui/button';
@@ -290,26 +291,73 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       icon: CalendarDays, 
       color: 'text-primary',
       tooltip: (
-        <div className="flex flex-col gap-0.5">
-          <span className="text-muted-foreground">Citas para mañana:</span>
-          <span className="text-primary font-bold">{stats.tomorrowTotal}</span>
+        <div className="flex flex-col gap-1 text-[10px] leading-tight">
+          <div className="flex justify-between items-center gap-4">
+            <span className="text-muted-foreground uppercase font-medium">Mañana:</span>
+            <span className="text-primary font-bold">{stats.tomorrowTotal}</span>
+          </div>
+          <div className="flex justify-between items-center gap-4">
+            <span className="text-muted-foreground uppercase font-medium">Confirmadas:</span>
+            <span className="text-green-500 font-bold">{stats.todayConfirmed}</span>
+          </div>
         </div>
       )
     },
-    { label: 'Pendientes', value: stats.pendingCount.toString(), icon: Wallet, color: 'text-primary' },
+    { 
+      label: 'Pendientes', 
+      value: stats.pendingCount.toString(), 
+      icon: Wallet, 
+      color: 'text-primary',
+      tooltip: (
+        <div className="flex flex-col gap-1 text-[10px] leading-tight">
+          <div className="flex justify-between items-center gap-4">
+            <span className="text-muted-foreground uppercase font-medium">Total próximos:</span>
+            <span className="text-primary font-bold">{stats.pendingCount}</span>
+          </div>
+        </div>
+      )
+    },
     { 
       label: 'Prospectos Mes', 
       value: stats.currentMonthProspects.toString(), 
       icon: Users, 
       color: 'text-accent',
-      comparison: stats.lastMonthProspects 
+      comparison: stats.lastMonthProspects,
+      tooltip: (
+        <div className="flex flex-col gap-1 text-[10px] leading-tight">
+          <div className="flex justify-between items-center gap-4">
+            <span className="text-muted-foreground uppercase font-medium">Este mes:</span>
+            <span className="text-accent font-bold">{stats.currentMonthProspects}</span>
+          </div>
+          <div className="flex justify-between items-center gap-4 border-t border-border/10 pt-1">
+            <span className="text-muted-foreground uppercase font-medium">Mes pasado:</span>
+            <span className="text-muted-foreground/60 font-bold">{stats.lastMonthProspects}</span>
+          </div>
+        </div>
+      )
     },
     { 
       label: 'Ventas Mes', 
       value: stats.currentMonthSales.toString(), 
       icon: CheckCircle2, 
       color: 'text-green-500',
-      comparison: stats.lastMonthSales
+      comparison: stats.lastMonthSales,
+      tooltip: (
+        <div className="flex flex-col gap-1 text-[10px] leading-tight">
+          <div className="flex justify-between items-center gap-4">
+            <span className="text-muted-foreground uppercase font-medium">Cierres:</span>
+            <span className="text-green-500 font-bold">{stats.currentMonthOnlyCierre}</span>
+          </div>
+          <div className="flex justify-between items-center gap-4">
+            <span className="text-muted-foreground uppercase font-medium">Apartados:</span>
+            <span className="text-blue-500 font-bold">{stats.currentMonthApartados}</span>
+          </div>
+          <div className="flex justify-between items-center gap-4 border-t border-border/10 pt-1">
+            <span className="text-muted-foreground uppercase font-medium">Mes pasado:</span>
+            <span className="text-muted-foreground/60 font-bold">{stats.lastMonthSales}</span>
+          </div>
+        </div>
+      )
     },
     { 
       label: 'Comisiones Mes', 
@@ -412,7 +460,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                           <span className="text-[8px] font-bold flex items-center whitespace-nowrap text-muted-foreground/40">
                             {stat.isCurrency ? (
                                <>
-                                 {stats.currentMonthCommission > stats.lastMonthCommission ? <ArrowUpRight className="w-2.5 h-2.5 mr-0.5" /> : <ArrowDownRight className="w-2.5 h-2.5 mr-0.5" />}
+                                 {stats.currentMonthCommission >= stats.lastMonthCommission ? <ArrowUpRight className="w-2.5 h-2.5 mr-0.5" /> : <ArrowDownRight className="w-2.5 h-2.5 mr-0.5" />}
                                  {formatCurrency(stat.comparison)}
                                </>
                             ) : (
@@ -439,9 +487,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                       {cardContent}
                     </TooltipTrigger>
                     <TooltipContent side="bottom" sideOffset={1} className="bg-card border-border shadow-xl z-[100] p-3">
-                      <div className="font-bold uppercase tracking-widest text-primary">
-                        {stat.tooltip}
-                      </div>
+                      {stat.tooltip}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
