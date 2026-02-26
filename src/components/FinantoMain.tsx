@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -314,7 +313,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       color: 'text-yellow-500',
       comparison: stats.lastMonthCommission,
       isCurrency: true,
-      tooltip: `Dinero recibido: ${formatCurrency(stats.currentMonthPaidCommission)}`
+      tooltip: `Dinero recibido: ${formatCurrency(stats.currentMonthPaidCommission)}\nCobro este viernes: ${formatCurrency(stats.thisFridayCommission)}`
     },
   ];
 
@@ -420,7 +419,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                       {cardContent}
                     </TooltipTrigger>
                     <TooltipContent side="bottom" sideOffset={1} className="bg-card border-border shadow-xl z-[100]">
-                      <p className="text-xs font-bold uppercase tracking-widest text-primary">{stat.tooltip}</p>
+                      <div className="text-xs font-bold uppercase tracking-widest text-primary whitespace-pre-wrap">{stat.tooltip}</div>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>

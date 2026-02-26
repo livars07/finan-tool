@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -197,8 +196,11 @@ const DashboardContent = ({
                   </div>
                 </div>
               </TooltipTrigger>
-              <TooltipContent side="bottom" sideOffset={1}>
-                <p className="text-xs">Dinero recibido: {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(stats.currentMonthPaidCommission)}</p>
+              <TooltipContent side="bottom" sideOffset={1} className="bg-card border-border shadow-xl z-[100]">
+                <div className="flex flex-col gap-0.5 whitespace-nowrap">
+                  <p className="text-xs font-bold uppercase text-primary">Dinero recibido: {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(stats.currentMonthPaidCommission)}</p>
+                  <p className="text-xs font-bold uppercase text-primary">Cobro este viernes: {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(stats.thisFridayCommission)}</p>
+                </div>
               </TooltipContent>
             </Tooltip>
           </div>

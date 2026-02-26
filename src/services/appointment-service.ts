@@ -216,7 +216,6 @@ export const generateSeedData = (): Appointment[] => {
       date: pastDate.toISOString(),
       time: hours[i % hours.length],
       type: types[i % types.length],
-      product: products[i % products.length],
       status: status,
       isConfirmed: true,
       notes: isSale ? `Venta exitosa. Expediente completo enviado a notaría.` : `Seguimiento de ${products[i % products.length]}.`,
@@ -264,6 +263,20 @@ export const calculateStats = (appointments: Appointment[]) => {
     .filter(a => (a.status === 'Cierre' || a.status === 'Apartado') && isSameMonth(parseISO(a.date), lastMonth))
     .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
 
+  const todayStart = startOfDay(now);
+  const dayOfWeek = getDay(todayStart);
+  const daysToFriday = (5 - dayOfWeek + 7) % 7;
+  const targetFriday = addDays(todayStart, daysToFriday);
+
+  const thisFridayCommission = activeApps
+    .filter(a => {
+      if (a.status !== 'Cierre' && a.status !== 'Apartado') return false;
+      if (a.commissionStatus === 'Pagada') return false;
+      const payDate = startOfDay(getCommissionPaymentDate(a.date));
+      return payDate.getTime() === targetFriday.getTime();
+    })
+    .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
+
   const todayTotal = activeApps.filter(a => isToday(parseISO(a.date))).length;
   const todayConfirmed = activeApps.filter(a => isToday(parseISO(a.date)) && a.isConfirmed).length;
   const tomorrowTotal = activeApps.filter(a => {
@@ -294,6 +307,7 @@ export const calculateStats = (appointments: Appointment[]) => {
     currentMonthCommission,
     lastMonthCommission,
     currentMonthPaidCommission,
+    thisFridayCommission,
     conversionRate: parseFloat(conversionRate.toFixed(1)),
     lastMonthConversionRate: parseFloat(lastMonthConversionRate.toFixed(1)),
   };
