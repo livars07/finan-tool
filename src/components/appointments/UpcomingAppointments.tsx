@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -6,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { 
   Clock, Calendar, CheckCircle2, AlertCircle, 
   CheckCircle, Trophy, PartyPopper, Sparkles, Copy, 
-  ClipboardCheck, Phone, Box, ChevronRight, ShieldAlert, UserCog, Trash2
+  ClipboardCheck, Phone, Box, ChevronRight, ShieldAlert, UserCog, Trash2, RotateCcw
 } from "lucide-react";
 import { parseISO, isToday, addDays, isBefore } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -48,6 +49,7 @@ interface Props {
   onSelect: (app: Appointment) => void;
   onHighlight: (app: Appointment) => void;
   archiveAppointment: (id: string) => void;
+  unarchiveAppointment: (id: string) => void;
   activeId?: string | null;
   expanded?: boolean;
   theme?: string;
@@ -61,21 +63,30 @@ export default function UpcomingAppointments({
   onSelect, 
   onHighlight,
   archiveAppointment,
+  unarchiveAppointment,
   activeId,
   expanded = false,
   theme = 'corporativo'
 }: Props) {
-  const [confirmId, setConfirmId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const isActuallyToday = (dateStr: string) => isToday(parseISO(dateStr));
 
-  const handleArchive = (e: React.MouseEvent, app: Appointment) => {
+  const handleArchiveAction = (e: React.MouseEvent, app: Appointment) => {
     e.stopPropagation();
     archiveAppointment(app.id);
     toast({
       title: "Cita archivada",
-      description: `${app.name} se ha movido a la papelera.`,
+      description: `${app.name} se ha movido a archivadas.`,
+    });
+  };
+
+  const handleRestoreAction = (e: React.MouseEvent, app: Appointment) => {
+    e.stopPropagation();
+    unarchiveAppointment(app.id);
+    toast({
+      title: "Cita restaurada",
+      description: `${app.name} ha vuelto a activas.`,
     });
   };
 
@@ -114,25 +125,6 @@ export default function UpcomingAppointments({
     });
   };
 
-  const copyAllToday = () => {
-    const todayApps = appointments.filter(app => isActuallyToday(app.date));
-    if (todayApps.length === 0) return;
-
-    const reportText = todayApps.map(app => {
-      const timeFormatted = format12hTime(app.time);
-      const confirmedText = app.isConfirmed ? ' * (Confirmado)*' : '';
-      const motivoLine = app.type === '1ra consulta' ? '' : `\nMotivo: *${app.type}*`;
-      return `📌 *${app.name}*\nHora: *${timeFormatted}*${confirmedText}${motivoLine}\nProducto: *${app.product || 'N/A'}*\nNúmero: *${app.phone}*`;
-    }).join('\n\n---\n\n');
-
-    navigator.clipboard.writeText(reportText).then(() => {
-      toast({
-        title: "Citas de hoy copiadas",
-        description: `${todayApps.length} citas listas para WhatsApp.`,
-      });
-    });
-  };
-
   return (
     <div className="space-y-4 flex flex-col h-full">
       <div className={cn(
@@ -142,7 +134,7 @@ export default function UpcomingAppointments({
         {appointments.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-muted-foreground bg-muted/10 h-full">
             <Calendar className="w-16 h-16 mb-4 opacity-10" />
-            <p className="text-sm font-bold uppercase tracking-widest opacity-40">Sin citas programadas</p>
+            <p className="text-sm font-bold uppercase tracking-widest opacity-40">No hay citas en esta lista</p>
           </div>
         ) : (
           <ScrollArea className="flex-1 scrollbar-thin">
@@ -155,7 +147,7 @@ export default function UpcomingAppointments({
                   {expanded && <TableHead className="bg-card">Producto</TableHead>}
                   <TableHead className="bg-card">Fecha / Estado</TableHead>
                   <TableHead className="bg-card">Hora</TableHead>
-                  <TableHead className="bg-card w-12 text-center">Acción</TableHead>
+                  <TableHead className="bg-card w-32 text-center">Acción</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -175,7 +167,7 @@ export default function UpcomingAppointments({
                     >
                       <TableCell className="align-middle pl-4">
                         <div className="flex items-center gap-2">
-                          {appToday && <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shrink-0 shadow-[0_0_8px_hsl(var(--primary))]" title="Cita para hoy" />}
+                          {appToday && <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shrink-0" title="Cita para hoy" />}
                           <div className="font-bold text-sm leading-tight text-foreground">{app.name}</div>
                         </div>
                         {!expanded && (
@@ -210,9 +202,7 @@ export default function UpcomingAppointments({
                         </TableCell>
                       )}
                       <TableCell className="align-middle">
-                        <div className="flex flex-col justify-center">
-                          <span className={cn("text-[10px] font-bold uppercase mb-1.5", appToday ? "text-primary" : "text-muted-foreground")}>{formatDate(app.date)}</span>
-                        </div>
+                        <span className={cn("text-[10px] font-bold uppercase", appToday ? "text-primary" : "text-muted-foreground")}>{formatDate(app.date)}</span>
                       </TableCell>
                       <TableCell className="align-middle">
                         <div className="flex items-center gap-1.5 text-accent font-bold text-[10px] bg-accent/5 w-fit px-2 py-1 rounded-md border border-accent/20">
@@ -220,21 +210,29 @@ export default function UpcomingAppointments({
                         </div>
                       </TableCell>
                       <TableCell className="align-middle text-center" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={(e) => handleArchive(e, app)}
-                            type="button"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                          {expanded && (
-                             <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => onSelect(app)} type="button">
-                              <ChevronRight className="h-4 w-4" />
+                        <div className="flex items-center justify-center gap-2">
+                          {app.isArchived ? (
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-7 text-[9px] font-bold uppercase border-primary/40 text-primary hover:bg-primary/10"
+                              onClick={(e) => handleRestoreAction(e, app)}
+                            >
+                              <RotateCcw className="w-3 h-3 mr-1" /> Restaurar
+                            </Button>
+                          ) : (
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-7 text-[9px] font-bold uppercase border-destructive/40 text-destructive hover:bg-destructive/10"
+                              onClick={(e) => handleArchiveAction(e, app)}
+                            >
+                              <Archive className="w-3 h-3 mr-1" /> Archivar
                             </Button>
                           )}
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => onSelect(app)}>
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -246,11 +244,8 @@ export default function UpcomingAppointments({
         )}
       </div>
       <div className="flex flex-wrap justify-end gap-3 pt-2 shrink-0">
-        <Button variant="outline" size="sm" onClick={copyDailyReport} className="text-[10px] font-bold uppercase border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 h-9 gap-2 px-4" type="button">
+        <Button variant="outline" size="sm" onClick={copyDailyReport} className="text-[10px] font-bold uppercase border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 h-9 gap-2 px-4">
           <ClipboardCheck className="w-4 h-4" /> Reporte Diario
-        </Button>
-        <Button variant="outline" size="sm" onClick={copyAllToday} className="text-[10px] font-bold uppercase border-green-500/40 text-green-500 hover:bg-green-500/10 h-9 gap-2 px-4" type="button">
-          <Copy className="w-4 h-4" /> Citas Hoy
         </Button>
       </div>
     </div>

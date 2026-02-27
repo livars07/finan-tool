@@ -1,3 +1,4 @@
+
 "use client"
 
 import React from 'react';
@@ -13,7 +14,9 @@ import {
   ShieldAlert,
   UserCog,
   CheckCircle2,
-  Trash2
+  Trash2,
+  Archive,
+  RotateCcw
 } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -21,9 +24,9 @@ import { cn } from '@/lib/utils';
 import { useToast } from "@/hooks/use-toast";
 import {
   Tooltip,
-  TooltipContent,
   TooltipProvider,
   TooltipTrigger,
+  TooltipContent,
 } from "@/components/ui/tooltip";
 import { format, isToday, parseISO, isBefore } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -33,6 +36,7 @@ interface Props {
   onSelect: (app: Appointment) => void;
   onHighlight: (app: Appointment) => void;
   archiveAppointment: (id: string) => void;
+  unarchiveAppointment: (id: string) => void;
   formatDate: (date: string) => string;
   format12hTime: (time: string) => string;
   activeId?: string | null;
@@ -46,6 +50,7 @@ export default function PastAppointments({
   onSelect, 
   onHighlight,
   archiveAppointment,
+  unarchiveAppointment,
   formatDate, 
   format12hTime, 
   activeId, 
@@ -59,7 +64,7 @@ export default function PastAppointments({
     return (
       <div className="flex flex-col items-center justify-center py-20 text-muted-foreground bg-muted/10 h-full rounded-xl border border-dashed border-border/50">
         <MessageSquare className="w-16 h-16 mb-4 opacity-10" />
-        <p className="text-sm font-bold uppercase tracking-widest opacity-40">No hay registro de citas pasadas</p>
+        <p className="text-sm font-bold uppercase tracking-widest opacity-40">No hay registros en esta lista</p>
       </div>
     );
   }
@@ -77,12 +82,21 @@ export default function PastAppointments({
     }
   };
 
-  const handleArchive = (e: React.MouseEvent, app: Appointment) => {
+  const handleArchiveAction = (e: React.MouseEvent, app: Appointment) => {
     e.stopPropagation();
     archiveAppointment(app.id);
     toast({
       title: "Cita archivada",
-      description: `${app.name} se ha movido a la papelera.`,
+      description: `${app.name} se ha movido a archivadas.`,
+    });
+  };
+
+  const handleRestoreAction = (e: React.MouseEvent, app: Appointment) => {
+    e.stopPropagation();
+    unarchiveAppointment(app.id);
+    toast({
+      title: "Cita restaurada",
+      description: `${app.name} ha vuelto a activas.`,
     });
   };
 
@@ -93,18 +107,6 @@ export default function PastAppointments({
       toast({
         title: "Número copiado",
         description: `${app.name}: ${app.phone} listo para usar.`,
-      });
-    });
-  };
-
-  const copyProspectorPhone = (e: React.MouseEvent, app: Appointment) => {
-    e.stopPropagation();
-    if (!app.prospectorPhone) return;
-    onHighlight(app);
-    navigator.clipboard.writeText(app.prospectorPhone).then(() => {
-      toast({
-        title: "Prospectador copiado",
-        description: `${app.prospectorName}: ${app.prospectorPhone} listo.`,
       });
     });
   };
@@ -135,7 +137,7 @@ export default function PastAppointments({
                 <TableHead className="bg-card">Fecha / Hora</TableHead>
                 {expanded && <TableHead className="bg-card w-[300px]">Notas rápidas</TableHead>}
                 <TableHead className={cn("bg-card", !expanded ? "w-[160px]" : "w-[200px]")}>Resultado</TableHead>
-                <TableHead className="bg-card w-12"></TableHead>
+                <TableHead className="bg-card w-32 text-center"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -148,7 +150,6 @@ export default function PastAppointments({
                 
                 const paymentDate = getCommissionPaymentDate(app.date);
                 const isCommissionOverdue = isPending && isBefore(paymentDate, new Date());
-                const isCommissionUpcoming = isPending && !isCommissionOverdue;
                 
                 const commissionValue = (app.finalCreditAmount || 0) * 0.007 * ((app.commissionPercent || 0) / 100);
 
@@ -163,10 +164,7 @@ export default function PastAppointments({
                     )}
                   >
                     <TableCell className="align-middle pl-4">
-                      <div className="flex items-center gap-2">
-                        {appToday && <div className="w-2.5 h-2.5 rounded-full bg-primary shrink-0 animate-pulse shadow-[0_0_8px_hsl(var(--primary))]" title="Cita para hoy" />}
-                        <div className="font-bold text-sm text-foreground">{app.name}</div>
-                      </div>
+                      <div className="font-bold text-sm text-foreground">{app.name}</div>
                       {!expanded && (
                         <div className="text-[10px] text-muted-foreground inline-flex items-center gap-1 mt-0.5">
                           <Phone className="w-2.5 h-2.5 ml-4" /> 
@@ -215,12 +213,9 @@ export default function PastAppointments({
 
                     {expanded && (
                       <TableCell className="align-middle">
-                        <div className="flex items-start gap-2 max-w-[280px]">
-                          <FileText className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0 mt-0.5" />
-                          <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
-                            {app.notes || 'Sin anotaciones registradas.'}
-                          </p>
-                        </div>
+                        <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
+                          {app.notes || 'Sin anotaciones.'}
+                        </p>
                       </TableCell>
                     )}
 
@@ -234,51 +229,39 @@ export default function PastAppointments({
                         </div>
                         
                         {isCommissionPaid && (
-                          <TooltipProvider>
-                            <Tooltip delayDuration={0}>
-                              <TooltipTrigger asChild>
-                                <div className="p-1 bg-green-500/20 rounded-full border border-green-500/30 cursor-help">
-                                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent side="top" sideOffset={1} className="bg-card border-green-500/20 p-3 space-y-1 z-[100]">
-                                <div className="flex items-center gap-2 text-green-500 font-bold text-[10px] uppercase tracking-widest">
-                                  <CheckCircle2 className="w-3 h-3" /> Comisión Liquidada
-                                </div>
-                                <div className="text-[10px] font-bold text-foreground">
-                                  Monto Ganado: {formatCurrency(commissionValue)}
-                                </div>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                          <div className="p-1 bg-green-500/20 rounded-full border border-green-500/30">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                          </div>
                         )}
 
                         {isCommissionOverdue && (
-                          <div title="PAGO VENCIDO">
-                            <ShieldAlert className="w-3.5 h-3.5 text-destructive animate-pulse" />
-                          </div>
+                          <ShieldAlert className="w-3.5 h-3.5 text-destructive animate-pulse" />
                         )}
                       </div>
                     </TableCell>
 
                     <TableCell className="align-middle text-right" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={(e) => handleArchive(e, app)}
-                          type="button"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-primary"
-                          onClick={() => onSelect(app)}
-                          type="button"
-                        >
+                      <div className="flex items-center justify-end gap-2">
+                        {app.isArchived ? (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-7 text-[9px] font-bold uppercase border-primary/40 text-primary hover:bg-primary/10"
+                            onClick={(e) => handleRestoreAction(e, app)}
+                          >
+                            <RotateCcw className="w-3 h-3 mr-1" /> Restaurar
+                          </Button>
+                        ) : (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-7 text-[9px] font-bold uppercase border-destructive/40 text-destructive hover:bg-destructive/10"
+                            onClick={(e) => handleArchiveAction(e, app)}
+                          >
+                            <Archive className="w-3 h-3 mr-1" /> Archivar
+                          </Button>
+                        )}
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => onSelect(app)}>
                           <ChevronRight className="h-4 w-4" />
                         </Button>
                       </div>
@@ -297,8 +280,7 @@ export default function PastAppointments({
             variant="outline" 
             size="sm" 
             onClick={() => setVisibleCount(p => p + 25)}
-            className="text-xs font-bold uppercase tracking-widest border-dashed hover:bg-primary/10 backdrop-blur-md h-9 px-6"
-            type="button"
+            className="text-[10px] font-bold uppercase tracking-widest border-dashed hover:bg-primary/10 backdrop-blur-md h-9 px-6"
           >
             <ChevronDown className="mr-2 h-4 w-4" /> Cargar más historial
           </Button>

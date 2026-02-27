@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -18,10 +19,12 @@ import {
   TrendingUp,
   Coins,
   ArrowRight,
-  CheckCircle2
+  CheckCircle2,
+  Archive,
+  Inbox
 } from 'lucide-react';
 import { Appointment, AppointmentStatus } from '@/services/appointment-service';
-import { parseISO, format } from 'date-fns';
+import { parseISO, format, isAfter, isBefore, isToday, startOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import {
@@ -44,39 +47,82 @@ interface DashboardContentProps {
   expanded?: boolean;
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  filteredUpcoming: Appointment[];
-  filteredPast: Appointment[];
   appointments: Appointment[];
+  archiveAppointment: (id: string) => void;
+  unarchiveAppointment: (id: string) => void;
   formatFriendlyDate: (date: string) => string;
   format12hTime: (time: string) => string;
   handleSelect: (app: Appointment) => void;
   handleHighlight: (app: Appointment) => void;
-  archiveAppointment: (id: string) => void;
   activeId: string | null;
   visibleCountPast: number;
   setVisibleCountPast: (count: number | ((prev: number) => number)) => void;
   stats: any;
   theme?: string;
+  searchTerm: string;
 }
 
 const DashboardContent = ({ 
   expanded = false, 
   activeTab, 
   setActiveTab,
-  filteredUpcoming,
-  filteredPast,
   appointments,
+  archiveAppointment,
+  unarchiveAppointment,
   formatFriendlyDate,
   format12hTime,
   handleSelect,
   handleHighlight,
-  archiveAppointment,
   activeId,
   visibleCountPast,
   setVisibleCountPast,
   stats,
-  theme
+  theme,
+  searchTerm
 }: DashboardContentProps) => {
+  const [view, setView] = useState<"activas" | "archivadas">("activas");
+
+  const normalizeStr = (str: string) => {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  };
+
+  const today = startOfDay(new Date());
+
+  // Filtrado dinámico basado únicamente en el estado appointments y la vista seleccionada
+  const filteredList = appointments.filter(a => {
+    const matchesView = view === "activas" ? !a.isArchived : a.isArchived;
+    if (!matchesView) return false;
+
+    if (!searchTerm) return true;
+    const s = normalizeStr(searchTerm);
+    const appDate = parseISO(a.date);
+    const friendlyDate = normalizeStr(formatFriendlyDate(a.date));
+    const monthName = normalizeStr(format(appDate, 'MMMM', { locale: es }));
+    const dayName = normalizeStr(format(appDate, 'EEEE', { locale: es }));
+    
+    return normalizeStr(a.name).includes(s) || 
+           a.phone.includes(s) || 
+           (a.status && normalizeStr(a.status).includes(s)) ||
+           (a.product && normalizeStr(a.product).includes(s)) ||
+           friendlyDate.includes(s) ||
+           monthName.includes(s) ||
+           dayName.includes(s);
+  });
+
+  const filteredUpcoming = filteredList
+    .filter(a => {
+      const d = startOfDay(parseISO(a.date));
+      return (isToday(d) || isAfter(d, today)) && !a.status;
+    })
+    .sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime() || a.time.localeCompare(b.time));
+
+  const filteredPast = filteredList
+    .filter(a => {
+      const d = startOfDay(parseISO(a.date));
+      return isBefore(d, today) || !!a.status;
+    })
+    .sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime() || b.time.localeCompare(a.time));
+
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('es-MX', {
       style: 'currency',
@@ -87,25 +133,46 @@ const DashboardContent = ({
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
-      <div className={cn("flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 shrink-0", expanded && "bg-muted/10 p-6 rounded-2xl border border-border/30 backdrop-blur-md")}>
-        <TabsList className="grid w-full sm:w-80 grid-cols-2 h-10 p-1 bg-muted/40 border border-border/20 shadow-inner rounded-lg">
-          <TabsTrigger 
-            value="upcoming" 
-            className="h-full rounded-md text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
-          >
-            Próximas ({filteredUpcoming.length})
-          </TabsTrigger>
-          <TabsTrigger 
-            value="past" 
-            className="h-full rounded-md text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
-          >
-            Historial ({filteredPast.length})
-          </TabsTrigger>
-        </TabsList>
+      <div className={cn("flex flex-col gap-4 mb-6 shrink-0", expanded && "bg-muted/10 p-6 rounded-2xl border border-border/30 backdrop-blur-md")}>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <TabsList className="grid w-full sm:w-80 grid-cols-2 h-10 p-1 bg-muted/40 border border-border/20 shadow-inner rounded-lg">
+            <TabsTrigger 
+              value="upcoming" 
+              className="h-full rounded-md text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
+            >
+              Próximas ({filteredUpcoming.length})
+            </TabsTrigger>
+            <TabsTrigger 
+              value="past" 
+              className="h-full rounded-md text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
+            >
+              Historial ({filteredPast.length})
+            </TabsTrigger>
+          </TabsList>
+
+          <div className="flex items-center gap-2 bg-muted/30 p-1 rounded-lg border border-border/40">
+            <Button 
+              variant={view === "activas" ? "secondary" : "ghost"} 
+              size="sm" 
+              onClick={() => setView("activas")}
+              className="h-8 text-[10px] font-bold uppercase gap-2"
+            >
+              <Inbox className="w-3.5 h-3.5" /> Activas
+            </Button>
+            <Button 
+              variant={view === "archivadas" ? "secondary" : "ghost"} 
+              size="sm" 
+              onClick={() => setView("archivadas")}
+              className="h-8 text-[10px] font-bold uppercase gap-2"
+            >
+              <Archive className="w-3.5 h-3.5" /> Archivadas
+            </Button>
+          </div>
+        </div>
 
         {expanded && (
           <TooltipProvider delayDuration={0}>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-6 items-center flex-1 ml-0 sm:ml-8">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-6 items-center flex-1">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex flex-col items-center sm:items-start group cursor-help">
@@ -122,10 +189,6 @@ const DashboardContent = ({
                       <span className="text-muted-foreground uppercase font-medium">Mañana:</span>
                       <span className="text-primary font-bold">{stats.tomorrowTotal}</span>
                     </div>
-                    <div className="flex justify-between items-center gap-4">
-                      <span className="text-muted-foreground uppercase font-medium">Confirmadas:</span>
-                      <span className="text-green-500 font-bold">{stats.todayConfirmed}</span>
-                    </div>
                   </div>
                 </TooltipContent>
               </Tooltip>
@@ -133,7 +196,7 @@ const DashboardContent = ({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex flex-col items-center sm:items-start group cursor-help">
-                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-primary transition-colors">Cierres Mes</span>
+                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1">Cierres Mes</span>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
                         <div className="p-1.5 rounded-lg bg-green-500/10 text-green-600 border border-green-500/20"><CheckCircle2 className="w-3.5 h-3.5"/></div>
@@ -147,19 +210,15 @@ const DashboardContent = ({
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" sideOffset={1} className="bg-card border-border shadow-xl z-[100] p-3">
-                  <div className="flex flex-col gap-1 text-[10px] leading-tight">
-                    <div className="flex justify-between items-center gap-4">
-                      <span className="text-muted-foreground uppercase font-medium">Total formalizado:</span>
-                      <span className="text-green-500 font-bold">{stats.currentMonthOnlyCierre}</span>
-                    </div>
-                  </div>
+                   <span className="text-[9px] uppercase font-bold text-muted-foreground block mb-1">Cierres formalizados</span>
+                   <span className="text-xs font-bold text-green-500">{stats.currentMonthOnlyCierre}</span>
                 </TooltipContent>
               </Tooltip>
 
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex flex-col items-center sm:items-start group cursor-help">
-                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-blue-500 transition-colors">Apartados</span>
+                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1">Apartados</span>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
                         <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-500 border border-blue-500/20"><Coins className="w-3.5 h-3.5"/></div>
@@ -173,19 +232,15 @@ const DashboardContent = ({
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" sideOffset={1} className="bg-card border-border shadow-xl z-[100] p-3">
-                  <div className="flex flex-col gap-1 text-[10px] leading-tight">
-                    <div className="flex justify-between items-center gap-4">
-                      <span className="text-muted-foreground uppercase font-medium">En proceso:</span>
-                      <span className="text-blue-500 font-bold">{stats.currentMonthApartados}</span>
-                    </div>
-                  </div>
+                   <span className="text-[9px] uppercase font-bold text-muted-foreground block mb-1">En proceso</span>
+                   <span className="text-xs font-bold text-blue-500">{stats.currentMonthApartados}</span>
                 </TooltipContent>
               </Tooltip>
 
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex flex-col items-center sm:items-start group cursor-help">
-                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-green-500 transition-colors">Conversión Mes</span>
+                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1">Conversión</span>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
                         <div className="p-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20"><TrendingUp className="w-3.5 h-3.5"/></div>
@@ -199,25 +254,19 @@ const DashboardContent = ({
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" sideOffset={1} className="bg-card border-border shadow-xl z-[100] p-3">
-                  <div className="flex flex-col gap-1 text-[10px] leading-tight">
-                    <div className="flex justify-between items-center gap-4">
-                      <span className="text-muted-foreground uppercase font-medium">Efectividad:</span>
-                      <span className="text-primary font-bold">{stats.conversionRate}%</span>
-                    </div>
-                  </div>
+                   <span className="text-[9px] uppercase font-bold text-muted-foreground block mb-1">Efectividad mensual</span>
+                   <span className="text-xs font-bold text-primary">{stats.conversionRate}%</span>
                 </TooltipContent>
               </Tooltip>
 
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex flex-col items-center sm:items-start group cursor-help">
-                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1 group-hover:text-yellow-500 transition-colors">Ingresos Mes</span>
+                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1">Ingresos Mes</span>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
                         <div className="p-1.5 rounded-lg bg-yellow-500/10 text-yellow-600 border border-yellow-500/20"><Coins className="w-3.5 h-3.5"/></div>
-                        <span className="text-sm font-bold text-foreground">
-                          {formatCurrency(stats.currentMonthCommission)}
-                        </span>
+                        <span className="text-sm font-bold text-foreground">{formatCurrency(stats.currentMonthCommission)}</span>
                       </div>
                       <div className="flex items-center mt-1 text-[7px] font-bold text-muted-foreground/40 uppercase">
                         {stats.currentMonthCommission > stats.lastMonthCommission && <TrendingUp className="w-2 h-2 text-green-500 mr-0.5" />}
@@ -229,16 +278,8 @@ const DashboardContent = ({
                 <TooltipContent side="bottom" sideOffset={1} className="bg-card border-border shadow-xl z-[100] p-3">
                   <div className="flex flex-col gap-1 text-[10px] leading-tight">
                     <div className="flex justify-between items-center gap-4">
-                      <span className="text-muted-foreground uppercase font-medium">Dinero recibido:</span>
+                      <span className="text-muted-foreground uppercase font-medium">Recibido:</span>
                       <span className="text-primary font-bold">{formatCurrency(stats.currentMonthPaidCommission)}</span>
-                    </div>
-                    <div className="flex justify-between items-center gap-4">
-                      <span className="text-muted-foreground uppercase font-medium">Cobro este viernes:</span>
-                      <span className="text-yellow-500 font-bold">{formatCurrency(stats.thisFridayCommission)}</span>
-                    </div>
-                    <div className="flex justify-between items-center gap-4 border-t border-border/10 pt-1">
-                      <span className="text-muted-foreground uppercase font-medium">Pendiente:</span>
-                      <span className="text-destructive font-bold">{formatCurrency(stats.overdueCommission)}</span>
                     </div>
                   </div>
                 </TooltipContent>
@@ -258,6 +299,7 @@ const DashboardContent = ({
             onSelect={handleSelect}
             onHighlight={handleHighlight}
             archiveAppointment={archiveAppointment}
+            unarchiveAppointment={unarchiveAppointment}
             activeId={activeId}
             expanded={expanded}
             theme={theme}
@@ -271,6 +313,7 @@ const DashboardContent = ({
             onSelect={handleSelect}
             onHighlight={handleHighlight}
             archiveAppointment={archiveAppointment}
+            unarchiveAppointment={unarchiveAppointment}
             activeId={activeId}
             expanded={expanded}
             visibleCount={visibleCountPast}
@@ -290,6 +333,7 @@ interface AppointmentsDashboardProps {
   addAppointment: (app: any) => void;
   editAppointment: (id: string, data: Partial<Appointment>) => void;
   archiveAppointment: (id: string) => void;
+  unarchiveAppointment: (id: string) => void;
   formatFriendlyDate: (date: string) => string;
   format12hTime: (time: string) => string;
   initialExpanded?: boolean;
@@ -302,12 +346,10 @@ interface AppointmentsDashboardProps {
 
 export default function AppointmentsDashboard({
   appointments,
-  activeAppointments,
-  upcoming,
-  past,
   addAppointment,
   editAppointment,
   archiveAppointment,
+  unarchiveAppointment,
   formatFriendlyDate,
   format12hTime,
   initialExpanded = false,
@@ -329,54 +371,14 @@ export default function AppointmentsDashboard({
 
   useEffect(() => {
     if (isExpanded) {
-      const originalTitle = document.title;
-      document.title = "Gestión de Citas";
       window.history.pushState(null, '', '/gestor');
       return () => { 
-        document.title = originalTitle; 
         if (window.location.pathname === '/gestor') {
           window.history.pushState(null, '', '/');
         }
       };
     }
   }, [isExpanded]);
-
-  const normalizeStr = (str: string) => {
-    return str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .trim();
-  };
-
-  const filterAppointments = (list: Appointment[]) => {
-    if (!searchTerm) return list;
-    const s = normalizeStr(searchTerm);
-    
-    return list.filter(app => {
-      const appDate = parseISO(app.date);
-      const friendlyDate = normalizeStr(formatFriendlyDate(app.date));
-      const monthName = normalizeStr(format(appDate, 'MMMM', { locale: es }));
-      const dayName = normalizeStr(format(appDate, 'EEEE', { locale: es }));
-      
-      const basicMatch = 
-        normalizeStr(app.name).includes(s) || 
-        app.phone.includes(s) || 
-        (app.status && normalizeStr(app.status).includes(s)) ||
-        (app.product && normalizeStr(app.product).includes(s)) ||
-        (app.prospectorName && normalizeStr(app.prospectorName).includes(s));
-      
-      if (basicMatch) return true;
-      if (friendlyDate.includes(s)) return true;
-      if (monthName.includes(s)) return true;
-      if (dayName.includes(s)) return true;
-
-      return false;
-    });
-  };
-
-  const filteredUpcoming = useMemo(() => filterAppointments(upcoming), [upcoming, searchTerm]);
-  const filteredPast = useMemo(() => filterAppointments(past), [past, searchTerm]);
 
   const selectedApp = useMemo(() => {
     return appointments.find(app => app.id === selectedAppId) || null;
@@ -403,9 +405,7 @@ export default function AppointmentsDashboard({
                 <CalendarClock className="text-blue-600 w-6 h-6" />
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <CardTitle className="text-xl font-headline font-semibold">Gestión de citas</CardTitle>
-                </div>
+                <CardTitle className="text-xl font-headline font-semibold">Gestión de citas</CardTitle>
                 <CardDescription className="text-muted-foreground">Monitoreo de prospectos y cierres</CardDescription>
               </div>
             </div>
@@ -420,40 +420,33 @@ export default function AppointmentsDashboard({
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <TooltipProvider delayDuration={0}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => setIsExpanded(true)}
-                      className="h-9 w-9 rounded-lg text-muted-foreground/60 hover:text-blue-600 hover:bg-blue-600/10 transition-all border border-transparent hover:border-blue-600/20"
-                    >
-                      <Maximize2 className="w-4 h-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Expandir Dashboard</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setIsExpanded(true)}
+                className="h-9 w-9 rounded-lg text-muted-foreground/60 hover:text-blue-600 hover:bg-blue-600/10 transition-all border border-transparent hover:border-blue-600/20"
+              >
+                <Maximize2 className="w-4 h-4" />
+              </Button>
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
             <DashboardContent 
               activeTab={activeTab}
               setActiveTab={setActiveTab}
-              filteredUpcoming={filteredUpcoming}
-              filteredPast={filteredPast}
               appointments={appointments}
+              archiveAppointment={archiveAppointment}
+              unarchiveAppointment={unarchiveAppointment}
               formatFriendlyDate={formatFriendlyDate}
               format12hTime={format12hTime}
               handleSelect={handleSelect}
               handleHighlight={handleHighlight}
-              archiveAppointment={archiveAppointment}
               activeId={activeId}
               visibleCountPast={visibleCountPast}
               setVisibleCountPast={setVisibleCountPast}
               stats={stats}
               theme={theme}
+              searchTerm={searchTerm}
             />
           </CardContent>
         </Card>
@@ -485,7 +478,7 @@ export default function AppointmentsDashboard({
                 />
               </div>
               <DialogClose asChild>
-                <Button variant="ghost" size="icon" className="rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors h-10 w-10">
+                <Button variant="ghost" size="icon" className="rounded-full hover:bg-destructive/10 hover:text-destructive h-10 w-10">
                   <X className="w-5 h-5" />
                 </Button>
               </DialogClose>
@@ -496,19 +489,19 @@ export default function AppointmentsDashboard({
               expanded={true}
               activeTab={activeTab}
               setActiveTab={setActiveTab}
-              filteredUpcoming={filteredUpcoming}
-              filteredPast={filteredPast}
               appointments={appointments}
+              archiveAppointment={archiveAppointment}
+              unarchiveAppointment={unarchiveAppointment}
               formatFriendlyDate={formatFriendlyDate}
               format12hTime={format12hTime}
               handleSelect={handleSelect}
               handleHighlight={handleHighlight}
-              archiveAppointment={archiveAppointment}
               activeId={activeId}
               visibleCountPast={visibleCountPast}
               setVisibleCountPast={setVisibleCountPast}
               stats={stats}
               theme={theme}
+              searchTerm={searchTerm}
             />
           </div>
         </DialogContent>
