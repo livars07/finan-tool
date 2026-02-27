@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -7,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { 
   Clock, Calendar, CheckCircle2, AlertCircle, 
   CheckCircle, Trophy, PartyPopper, Sparkles, Copy, 
-  ClipboardCheck, Phone, Box, ChevronRight, ShieldAlert, UserCog, Trash2, RotateCcw
+  ClipboardCheck, Phone, Box, ChevronRight, ShieldAlert, UserCog, Trash2, RotateCcw, Archive
 } from "lucide-react";
 import { parseISO, isToday, addDays, isBefore } from 'date-fns';
 import { cn } from '@/lib/utils';
