@@ -14,7 +14,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Trash2, RotateCcw, Ghost, ChevronDown } from "lucide-react";
 import { Appointment } from '@/services/appointment-service';
 import { useToast } from "@/hooks/use-toast";
-import { cn } from '@/lib/utils';
 
 interface Props {
   open: boolean;
@@ -66,7 +65,7 @@ export default function TrashDialog({
             <DialogTitle>Papelera de Citas</DialogTitle>
           </div>
           <DialogDescription>
-            Citas eliminadas recientemente. Puedes restaurarlas o borrarlas permanentemente.
+            Citas archivadas recientemente. Puedes restaurarlas o borrarlas permanentemente.
           </DialogDescription>
         </DialogHeader>
 

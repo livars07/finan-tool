@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -7,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { 
   Clock, Calendar, CheckCircle2, AlertCircle, 
   CheckCircle, Trophy, PartyPopper, Sparkles, Copy, 
-  ClipboardCheck, Phone, Box, ChevronRight, ShieldAlert, UserCog
+  ClipboardCheck, Phone, Box, ChevronRight, ShieldAlert, UserCog, Trash2
 } from "lucide-react";
 import { parseISO, isToday, addDays, isBefore } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -48,8 +47,7 @@ interface Props {
   format12hTime: (time: string) => string;
   onSelect: (app: Appointment) => void;
   onHighlight: (app: Appointment) => void;
-  updateStatus: (id: string, status: AppointmentStatus, notes?: string) => void;
-  toggleConfirmation: (id: string) => void;
+  archiveAppointment: (id: string) => void;
   activeId?: string | null;
   expanded?: boolean;
   theme?: string;
@@ -62,73 +60,23 @@ export default function UpcomingAppointments({
   format12hTime, 
   onSelect, 
   onHighlight,
-  updateStatus, 
-  toggleConfirmation, 
+  archiveAppointment,
   activeId,
   expanded = false,
   theme = 'corporativo'
 }: Props) {
-  const [finId, setFinId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
-  const [status, setStatus] = useState<AppointmentStatus>('Asistencia');
-  const [finNotes, setFinNotes] = useState('');
-  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [lastFinishedApp, setLastFinishedApp] = useState<Appointment | null>(null);
-  
   const { toast } = useToast();
 
   const isActuallyToday = (dateStr: string) => isToday(parseISO(dateStr));
 
-  const handleConfirmAction = () => {
-    if (confirmId) {
-      const app = appointments.find(a => a.id === confirmId);
-      toggleConfirmation(confirmId);
-      setConfirmId(null);
-      toast({
-        title: "Asistencia confirmada",
-        description: `Se ha confirmado la asistencia de ${app?.name}.`,
-      });
-    }
-  };
-
-  const handleFinalize = () => {
-    if (!finId) return;
-    
-    const app = appointments.find(a => a.id === finId);
-    if (!app) return;
-
-    updateStatus(finId, status, finNotes);
-    
-    const updatedApp = { ...app, status, notes: finNotes };
-    setLastFinishedApp(updatedApp);
-    const isCierre = status === 'Cierre';
-    
-    setFinId(null);
-    setFinNotes('');
-
-    if (isCierre) {
-      setTimeout(() => {
-        const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3");
-        audio.volume = 0.4;
-        audio.play().catch(() => {});
-        setShowSuccessDialog(true);
-      }, 300);
-    } else {
-      setTimeout(() => {
-        onSelect(updatedApp);
-        toast({
-          title: "Consulta finalizada",
-          description: `${app.name} ha sido movido al historial con estatus: ${status}.`,
-        });
-      }, 300);
-    }
-  };
-
-  const handleSuccessClose = () => {
-    setShowSuccessDialog(false);
-    if (lastFinishedApp) {
-      setTimeout(() => onSelect(lastFinishedApp), 300);
-    }
+  const handleArchive = (e: React.MouseEvent, app: Appointment) => {
+    e.stopPropagation();
+    archiveAppointment(app.id);
+    toast({
+      title: "Cita archivada",
+      description: `${app.name} se ha movido a la papelera.`,
+    });
   };
 
   const copyPhone = (e: React.MouseEvent, app: Appointment) => {
@@ -142,23 +90,12 @@ export default function UpcomingAppointments({
     });
   };
 
-  const copyProspectorPhone = (e: React.MouseEvent, app: Appointment) => {
-    e.stopPropagation();
-    if (!app.prospectorPhone) return;
-    onHighlight(app);
-    navigator.clipboard.writeText(app.prospectorPhone).then(() => {
-      toast({
-        title: "Prospectador copiado",
-        description: `${app.prospectorName}: ${app.prospectorPhone} listo.`,
-      });
-    });
-  };
-
   const copyDailyReport = () => {
-    const todaySales = allAppointments.filter(a => isActuallyToday(a.date) && a.status === 'Cierre').length;
-    const todayTotal = allAppointments.filter(a => isActuallyToday(a.date)).length;
-    const todayConfirmed = allAppointments.filter(a => isActuallyToday(a.date) && a.isConfirmed).length;
+    const todaySales = allAppointments.filter(a => isActuallyToday(a.date) && a.status === 'Cierre' && !a.isArchived).length;
+    const todayTotal = allAppointments.filter(a => isActuallyToday(a.date) && !a.isArchived).length;
+    const todayConfirmed = allAppointments.filter(a => isActuallyToday(a.date) && a.isConfirmed && !a.isArchived).length;
     const tomorrowTotal = allAppointments.filter(a => {
+      if (a.isArchived) return false;
       const d = parseISO(a.date);
       const tomorrow = addDays(new Date(), 1);
       return d.getDate() === tomorrow.getDate() && d.getMonth() === tomorrow.getMonth() && d.getFullYear() === tomorrow.getFullYear();
@@ -196,8 +133,6 @@ export default function UpcomingAppointments({
     });
   };
 
-  const hasTodayApps = appointments.some(app => isActuallyToday(app.date));
-
   return (
     <div className="space-y-4 flex flex-col h-full">
       <div className={cn(
@@ -227,12 +162,6 @@ export default function UpcomingAppointments({
                 {appointments.map((app) => {
                   const appToday = isActuallyToday(app.date);
                   const isSelected = activeId === app.id;
-                  const isCierreStatus = app.status === 'Cierre' || app.status === 'Apartado';
-                  const isCommissionPending = isCierreStatus && app.commissionStatus !== 'Pagada';
-                  
-                  const paymentDate = getCommissionPaymentDate(app.date);
-                  const isCommissionOverdue = isCommissionPending && isBefore(paymentDate, new Date());
-                  const isCommissionUpcoming = isCommissionPending && !isCommissionOverdue;
                   
                   return (
                     <TableRow 
@@ -248,24 +177,6 @@ export default function UpcomingAppointments({
                         <div className="flex items-center gap-2">
                           {appToday && <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shrink-0 shadow-[0_0_8px_hsl(var(--primary))]" title="Cita para hoy" />}
                           <div className="font-bold text-sm leading-tight text-foreground">{app.name}</div>
-                          {app.prospectorName && (
-                            <TooltipProvider>
-                              <Tooltip delayDuration={0}>
-                                <TooltipTrigger asChild>
-                                  <div 
-                                    className="p-1 rounded-full bg-primary/10 text-primary cursor-pointer hover:bg-primary/20 transition-colors"
-                                    onClick={(e) => copyProspectorPhone(e, app)}
-                                  >
-                                    <UserCog className="h-3 w-3" />
-                                  </div>
-                                </TooltipTrigger>
-                                <TooltipContent side="top">
-                                  <p className="text-[10px] font-bold uppercase">Agendado por: {app.prospectorName}</p>
-                                  {app.prospectorPhone && <p className="text-[9px] text-muted-foreground">Click para copiar: {app.prospectorPhone}</p>}
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          )}
                         </div>
                         {!expanded && (
                           <div className="text-[10px] text-muted-foreground inline-flex items-center gap-1 mt-0.5">
@@ -301,29 +212,6 @@ export default function UpcomingAppointments({
                       <TableCell className="align-middle">
                         <div className="flex flex-col justify-center">
                           <span className={cn("text-[10px] font-bold uppercase mb-1.5", appToday ? "text-primary" : "text-muted-foreground")}>{formatDate(app.date)}</span>
-                          {appToday && (
-                            <div onClick={(e) => e.stopPropagation()} className="h-5 flex items-center">
-                              {app.isConfirmed ? (
-                                <div className="flex items-center gap-1 text-[9px] font-bold text-green-400 uppercase bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
-                                  <CheckCircle className="w-2.5 h-2.5" /> Confirmada
-                                </div>
-                              ) : (
-                                <Button variant="outline" size="sm" className="h-5 px-2 text-[8px] font-bold border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10" onClick={() => setConfirmId(app.id)} type="button">
-                                  <AlertCircle className="w-2.5 h-2.5 mr-1" /> Confirmar
-                                </Button>
-                              )}
-                            </div>
-                          )}
-                          {isCommissionOverdue && (
-                            <div className="flex items-center gap-1 mt-1 text-[8px] font-bold text-destructive animate-pulse">
-                              <ShieldAlert className="w-2.5 h-2.5" /> PAGO VENCIDO
-                            </div>
-                          )}
-                          {isCommissionUpcoming && (
-                            <div className="flex items-center gap-1 mt-1 text-[8px] font-bold text-yellow-500">
-                              <ShieldAlert className="w-2.5 h-2.5" /> PAGO PENDIENTE
-                            </div>
-                          )}
                         </div>
                       </TableCell>
                       <TableCell className="align-middle">
@@ -333,17 +221,15 @@ export default function UpcomingAppointments({
                       </TableCell>
                       <TableCell className="align-middle text-center" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-center gap-1">
-                          {appToday && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-primary hover:bg-primary/20"
-                              onClick={() => { setFinId(app.id); setFinNotes(app.notes || ''); setStatus('Asistencia'); }}
-                              type="button"
-                            >
-                              <CheckCircle2 className="h-5 h-5" />
-                            </Button>
-                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => handleArchive(e, app)}
+                            type="button"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                           {expanded && (
                              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => onSelect(app)} type="button">
                               <ChevronRight className="h-4 w-4" />
@@ -363,122 +249,10 @@ export default function UpcomingAppointments({
         <Button variant="outline" size="sm" onClick={copyDailyReport} className="text-[10px] font-bold uppercase border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 h-9 gap-2 px-4" type="button">
           <ClipboardCheck className="w-4 h-4" /> Reporte Diario
         </Button>
-        {hasTodayApps && (
-          <Button variant="outline" size="sm" onClick={copyAllToday} className="text-[10px] font-bold uppercase border-green-500/40 text-green-500 hover:bg-green-500/10 h-9 gap-2 px-4" type="button">
-            <Copy className="w-4 h-4" /> Citas Hoy
-          </Button>
-        )}
+        <Button variant="outline" size="sm" onClick={copyAllToday} className="text-[10px] font-bold uppercase border-green-500/40 text-green-500 hover:bg-green-500/10 h-9 gap-2 px-4" type="button">
+          <Copy className="w-4 h-4" /> Citas Hoy
+        </Button>
       </div>
-      <Dialog open={!!finId} onOpenChange={(open) => !open && setFinId(null)}>
-        <DialogContent className="sm:max-w-[450px] bg-card border-border shadow-2xl backdrop-blur-[12px] z-[80]">
-          <DialogHeader>
-            <DialogTitle className="text-foreground flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-primary" /> Finalizar Consulta</DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">Registra el resultado de la reunión con el prospecto.</DialogDescription>
-          </DialogHeader>
-          <div className="py-2 space-y-4">
-            <div className="space-y-1.5">
-              <Label className="text-[10px] font-bold uppercase text-muted-foreground">Estatus Final</Label>
-              <select value={status} onChange={(e) => setStatus(e.target.value as AppointmentStatus)} className={cn("flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm focus:ring-2 focus:ring-ring transition-colors", status === 'Cierre' && "border-green-500 text-green-600 bg-green-500/5 font-bold", status === 'Asistencia' && "border-blue-500 text-blue-600 bg-blue-500/5 font-bold")}>
-                <option value="Asistencia">Asistencia</option>
-                <option value="No asistencia">No asistencia</option>
-                <option value="Continuación en otra cita">Continuación en otra cita</option>
-                <option value="Reagendó">Reagendó</option>
-                <option value="Reembolso">Reembolso</option>
-                <option value="Cierre">✨ Cierre ✨</option>
-                <option value="Apartado">Apartado</option>
-              </select>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-[10px] font-bold uppercase text-muted-foreground">Acuerdos y Notas</Label>
-              <Textarea placeholder="Escribe montos, fechas o acuerdos aquí..." className="bg-muted/10 border-border/30 min-h-[120px] resize-none text-xs" value={finNotes} onChange={(e) => setFinNotes(e.target.value)} />
-            </div>
-          </div>
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setFinId(null)} className="h-9 text-xs" type="button">Volver</Button>
-            <Button onClick={handleFinalize} className={cn("h-9 text-xs font-bold shadow-lg", status === 'Cierre' ? "bg-green-600 hover:bg-green-700 text-white" : status === 'Asistencia' ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-primary text-primary-foreground")} type="button">
-              {status === 'Cierre' ? 'Confirmar Venta' : status === 'Asistencia' ? 'Confirmar Asistencia' : 'Cerrar Consulta'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent className={cn(
-          "sm:max-w-[550px] border shadow-2xl backdrop-blur-md overflow-hidden p-0 z-[90]",
-          (theme === 'corporativo' || theme === 'corporativo-v2') 
-            ? "bg-green-50 border-green-200 text-green-900" 
-            : "bg-green-950 border-green-500/50 text-white"
-        )}>
-          <div className="p-8 space-y-6">
-            <div className="flex flex-col items-center text-center space-y-4">
-              <div className={cn(
-                "p-5 rounded-full border relative z-10",
-                (theme === 'corporativo' || theme === 'corporativo-v2') 
-                  ? "bg-green-100 border-green-300" 
-                  : "bg-green-500/20 border-green-400/30"
-              )}>
-                <Trophy className={cn(
-                  "w-16 h-16",
-                  (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-green-700" : "text-green-400"
-                )} />
-              </div>
-              <DialogTitle className={cn(
-                "text-3xl font-headline font-bold flex items-center gap-3",
-                (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-black" : "text-white"
-              )}>
-                <PartyPopper className="text-yellow-500" /> ¡FELICIDADES! <PartyPopper className="text-yellow-500" />
-              </DialogTitle>
-              <DialogDescription className={cn(
-                "text-lg text-center mx-auto",
-                (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-green-800" : "text-green-100"
-              )}>
-                Has concretado el crédito de <strong className={(theme === 'corporativo' || theme === 'corporativo-v2') ? "text-black" : "text-white"}>{lastFinishedApp?.name}</strong> con éxito.
-              </DialogDescription>
-            </div>
-            <div className={cn(
-              "border p-6 rounded-2xl space-y-4",
-              (theme === 'corporativo' || theme === 'corporativo-v2') 
-                ? "bg-green-100/50 border-green-200" 
-                : "bg-green-500/10 border-green-500/20"
-            )}>
-              <h4 className={cn(
-                "text-xs font-bold uppercase tracking-widest flex items-center gap-2",
-                (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-green-800" : "text-green-400"
-              )}><Sparkles className="w-4 h-4" /> Recomendaciones de cierre</h4>
-              <p className={cn(
-                "text-sm leading-relaxed",
-                (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-green-900/80" : "text-green-50/80"
-              )}>Para garantizar la integridad administrativa del expediente, asegúrate de haber registrado:</p>
-              <ul className={cn(
-                "grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-bold",
-                (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-black" : "text-white"
-              )}>
-                <li className="flex items-center gap-2"><CheckCircle className={cn("w-3.5 h-3.5", (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-green-700" : "text-green-400")} /> Monto del Crédito Final</li>
-                <li className="flex items-center gap-2"><CheckCircle className={cn("w-3.5 h-3.5", (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-green-700" : "text-green-400")} /> Cálculo de Comisiones</li>
-                <li className="flex items-center gap-2"><CheckCircle className={cn("w-3.5 h-3.5", (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-green-700" : "text-green-400")} /> Fecha estimada de Firma</li>
-                <li className="flex items-center gap-2"><CheckCircle className={cn("w-3.5 h-3.5", (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-green-700" : "text-green-400")} /> Notas de acuerdos verbales</li>
-              </ul>
-            </div>
-          </div>
-          <DialogFooter className={cn(
-            "p-6 border-t sm:justify-center",
-            (theme === 'corporativo' || theme === 'corporativo-v2') ? "bg-green-100/50 border-green-200" : "bg-green-900/50 border-green-800/50"
-          )}>
-            <Button onClick={handleSuccessClose} className="bg-green-600 hover:bg-green-700 text-white font-bold px-12 h-14 rounded-2xl text-xl shadow-xl transition-all transform hover:scale-105" type="button">Continuar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      <AlertDialog open={!!confirmId} onOpenChange={(open) => !open && setConfirmId(null)}>
-        <AlertDialogContent className="bg-card border-border shadow-2xl backdrop-blur-md z-[85]">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-foreground">¿Confirmar asistencia?</AlertDialogTitle>
-            <AlertDialogDescription className="text-muted-foreground">Marcarás esta cita como confirmada para el día de hoy.</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel type="button">Volver</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmAction} className="bg-green-600 hover:bg-green-700 text-white font-bold" type="button">Sí, confirmar</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

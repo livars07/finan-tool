@@ -1,4 +1,3 @@
-
 "use client"
 
 import React from 'react';
@@ -13,7 +12,8 @@ import {
   ChevronRight,
   ShieldAlert,
   UserCog,
-  CheckCircle2
+  CheckCircle2,
+  Trash2
 } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -32,6 +32,7 @@ interface Props {
   appointments: Appointment[];
   onSelect: (app: Appointment) => void;
   onHighlight: (app: Appointment) => void;
+  archiveAppointment: (id: string) => void;
   formatDate: (date: string) => string;
   format12hTime: (time: string) => string;
   activeId?: string | null;
@@ -44,6 +45,7 @@ export default function PastAppointments({
   appointments, 
   onSelect, 
   onHighlight,
+  archiveAppointment,
   formatDate, 
   format12hTime, 
   activeId, 
@@ -73,6 +75,15 @@ export default function PastAppointments({
       case 'Continuación en otra cita': return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
       default: return 'text-muted-foreground bg-muted/10 border-border/20';
     }
+  };
+
+  const handleArchive = (e: React.MouseEvent, app: Appointment) => {
+    e.stopPropagation();
+    archiveAppointment(app.id);
+    toast({
+      title: "Cita archivada",
+      description: `${app.name} se ha movido a la papelera.`,
+    });
   };
 
   const copyPhone = (e: React.MouseEvent, app: Appointment) => {
@@ -124,7 +135,7 @@ export default function PastAppointments({
                 <TableHead className="bg-card">Fecha / Hora</TableHead>
                 {expanded && <TableHead className="bg-card w-[300px]">Notas rápidas</TableHead>}
                 <TableHead className={cn("bg-card", !expanded ? "w-[160px]" : "w-[200px]")}>Resultado</TableHead>
-                {expanded && <TableHead className="bg-card w-12"></TableHead>}
+                <TableHead className="bg-card w-12"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -146,7 +157,7 @@ export default function PastAppointments({
                     key={app.id} 
                     onClick={() => onSelect(app)}
                     className={cn(
-                      "hover:bg-primary/10 transition-colors cursor-pointer relative h-16",
+                      "hover:bg-primary/10 transition-colors cursor-pointer group relative h-16",
                       appToday && "bg-primary/10",
                       isSelected && "bg-primary/20 z-20"
                     )}
@@ -155,24 +166,6 @@ export default function PastAppointments({
                       <div className="flex items-center gap-2">
                         {appToday && <div className="w-2.5 h-2.5 rounded-full bg-primary shrink-0 animate-pulse shadow-[0_0_8px_hsl(var(--primary))]" title="Cita para hoy" />}
                         <div className="font-bold text-sm text-foreground">{app.name}</div>
-                        {app.prospectorName && (
-                          <TooltipProvider>
-                            <Tooltip delayDuration={0}>
-                              <TooltipTrigger asChild>
-                                <div 
-                                  className="p-1 rounded-full bg-primary/10 text-primary cursor-pointer hover:bg-primary/20 transition-colors"
-                                  onClick={(e) => copyProspectorPhone(e, app)}
-                                >
-                                  <UserCog className="h-3 w-3" />
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent side="top">
-                                <p className="text-[10px] font-bold uppercase">Agendado por: {app.prospectorName}</p>
-                                {app.prospectorPhone && <p className="text-[9px] text-muted-foreground">Click para copiar: {app.prospectorPhone}</p>}
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        )}
                       </div>
                       {!expanded && (
                         <div className="text-[10px] text-muted-foreground inline-flex items-center gap-1 mt-0.5">
@@ -255,14 +248,6 @@ export default function PastAppointments({
                                 <div className="text-[10px] font-bold text-foreground">
                                   Monto Ganado: {formatCurrency(commissionValue)}
                                 </div>
-                                <div className="text-[9px] text-muted-foreground">
-                                  Participación: <span className="text-foreground font-bold">{app.commissionPercent}%</span>
-                                </div>
-                                <div className="text-[9px] text-muted-foreground">
-                                  Pagada el: <span className="text-foreground font-bold">
-                                    {format(getCommissionPaymentDate(app.date), "d 'de' MMMM", { locale: es })}
-                                  </span>
-                                </div>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -273,17 +258,20 @@ export default function PastAppointments({
                             <ShieldAlert className="w-3.5 h-3.5 text-destructive animate-pulse" />
                           </div>
                         )}
-
-                        {isCommissionUpcoming && (
-                          <div title="Pago Pendiente (En Tiempo)">
-                            <ShieldAlert className="w-3.5 h-3.5 text-yellow-500" />
-                          </div>
-                        )}
                       </div>
                     </TableCell>
 
-                    {expanded && (
-                      <TableCell className="align-middle text-right" onClick={(e) => e.stopPropagation()}>
+                    <TableCell className="align-middle text-right" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => handleArchive(e, app)}
+                          type="button"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="icon"
@@ -293,8 +281,8 @@ export default function PastAppointments({
                         >
                           <ChevronRight className="h-4 w-4" />
                         </Button>
-                      </TableCell>
-                    )}
+                      </div>
+                    </TableCell>
                   </TableRow>
                 );
               })}

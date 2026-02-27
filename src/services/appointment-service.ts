@@ -42,6 +42,7 @@ export interface Appointment {
   status?: AppointmentStatus;
   notes?: string;
   isConfirmed?: boolean;
+  isArchived?: boolean;
   // Datos de comisión
   commissionPercent?: number;
   commissionStatus?: 'Pagada' | 'Pendiente';
@@ -105,38 +106,6 @@ export const formatPhoneNumber = (phone: string): string => {
 };
 
 /**
- * Crea una nueva cita y la guarda.
- */
-export const createAppointment = (data: Omit<Appointment, 'id'>): Appointment[] => {
-  const all = getFromDisk();
-  const newApp: Appointment = {
-    ...data,
-    id: uuidv4(),
-    phone: formatPhoneNumber(data.phone)
-  };
-  const updatedList = [newApp, ...all];
-  saveToDisk(updatedList);
-  return updatedList;
-};
-
-/**
- * Actualiza una cita existente por su ID.
- */
-export const updateAppointment = (id: string, partialData: Partial<Appointment>): Appointment[] => {
-  const all = getFromDisk();
-  const updatedList = all.map(app => {
-    if (app.id === id) {
-      const updated = { ...app, ...partialData };
-      if (partialData.phone) updated.phone = formatPhoneNumber(partialData.phone);
-      return updated;
-    }
-    return app;
-  });
-  saveToDisk(updatedList);
-  return updatedList;
-};
-
-/**
  * Genera datos de prueba realistas y variados (60 registros).
  */
 export const generateSeedData = (): Appointment[] => {
@@ -196,6 +165,7 @@ export const generateSeedData = (): Appointment[] => {
       type: types[i % types.length],
       product: products[i % products.length],
       isConfirmed: isTodayApp ? Math.random() > 0.4 : false,
+      isArchived: false,
       notes: i % 3 === 0 ? `Cliente muy interesado en ${products[i % products.length]}. Requiere crédito alto.` : '',
       prospectorName: i % 4 === 0 ? `Agente Externo ${i}` : undefined,
       prospectorPhone: i % 4 === 0 ? formatPhoneNumber(getPhone(i + 100)) : undefined
@@ -218,6 +188,7 @@ export const generateSeedData = (): Appointment[] => {
       type: types[i % types.length],
       status: status,
       isConfirmed: true,
+      isArchived: false,
       notes: isSale ? `Venta exitosa. Expediente completo enviado a notaría.` : `Seguimiento de ${products[i % products.length]}.`,
       commissionStatus: isSale ? (i % 2 === 0 ? 'Pagada' : 'Pendiente') : undefined,
       commissionPercent: isSale ? (i % 3 === 0 ? 50 : 100) : undefined,
@@ -235,7 +206,8 @@ export const generateSeedData = (): Appointment[] => {
  * Calcula las estadísticas globales enriquecidas.
  */
 export const calculateStats = (appointments: Appointment[]) => {
-  const activeApps = appointments;
+  // Solo tomar en cuenta las que NO están archivadas para el negocio
+  const activeApps = appointments.filter(a => !a.isArchived);
   const now = new Date();
   const todayStart = startOfDay(now);
   const lastMonth = subMonths(now, 1);

@@ -1,9 +1,9 @@
-
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import CreditCalculator from '@/components/calculator/CreditCalculator';
 import AppointmentsDashboard from '@/components/appointments/AppointmentsDashboard';
+import TrashDialog from '@/components/appointments/TrashDialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
   Wallet, CalendarDays, Users, CheckCircle2, ShieldCheck, RotateCcw,
@@ -11,7 +11,7 @@ import {
   ClipboardList, Copy, Crown, Snowflake, MessageSquare, 
   CalendarClock, HandCoins, CheckCircle, Search, BadgeAlert, 
   MoreHorizontal, ArrowUpRight, ArrowDownRight, Coins, Star, Trophy, PartyPopper,
-  TrendingUp, TrendingDown
+  TrendingUp, Trash2
 } from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
 import { Button } from '@/components/ui/button';
@@ -80,6 +80,7 @@ export interface FinantoMainProps {
 export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [showTrash, setShowTrash] = useState(false);
   const [showHelp, setShowHelp] = useState(initialSection === 'guia');
   const [isSimulatorExpanded, setIsSimulatorExpanded] = useState(initialSection === 'simulador');
   const [isGestorExpanded, setIsGestorExpanded] = useState(initialSection === 'gestor');
@@ -87,8 +88,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const [theme, setTheme] = useState<Theme>('corporativo');
   const [api, setApi] = useState<CarouselApi>();
   const [timerKey, setTimerKey] = useState(0);
-  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [lastFinishedApp, setLastFinishedApp] = useState<Service.Appointment | null>(null);
   
   const [pendingCommissionApp, setPendingCommissionApp] = useState<Service.Appointment | null>(null);
   const shownCommissionIds = useRef<Set<string>>(new Set());
@@ -98,8 +97,8 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
 
   const appointmentState = useAppointments();
   const { 
-    appointments, stats, isLoaded, resetData, clearAll, 
-    editAppointment
+    appointments, activeAppointments, stats, isLoaded, resetData, clearAll, 
+    editAppointment, archiveAppointment, unarchiveAppointment, deletePermanent
   } = appointmentState;
   
   const onSelectAppId = (id: string | null) => setSelectedAppId(id);
@@ -188,7 +187,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
     if (!isLoaded) return;
 
     const performCommissionSearch = () => {
-      const currentApps = appointmentsRef.current;
+      const currentApps = appointmentsRef.current.filter(a => !a.isArchived);
       const today = new Date();
 
       const overdueCommissions = currentApps.filter(app => {
@@ -533,14 +532,15 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
               onSelectAppId={onSelectAppId}
               theme={theme}
               appointments={appointmentState.appointments} 
+              activeAppointments={appointmentState.activeAppointments}
               upcoming={appointmentState.upcoming} 
               past={appointmentState.past} 
               addAppointment={appointmentState.addAppointment} 
-              updateStatus={appointmentState.updateStatus} 
               editAppointment={appointmentState.editAppointment} 
-              toggleConfirmation={appointmentState.toggleConfirmation} 
+              archiveAppointment={appointmentState.archiveAppointment}
               formatFriendlyDate={appointmentState.formatFriendlyDate} 
               format12hTime={appointmentState.format12hTime} 
+              stats={appointmentState.stats}
             />
           </section>
         </div>
@@ -552,7 +552,15 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
             <span className="font-bold text-foreground">Finanto v1.1</span>
             <span>© 2026 - Sistema de Gestión Inmobiliaria</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowTrash(true)} 
+              className="text-muted-foreground hover:text-destructive gap-2 h-8 px-3"
+            >
+              <Trash2 className="w-4 h-4" /> Papelera ({appointments.filter(a => a.isArchived).length})
+            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground">
@@ -603,6 +611,16 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <TrashDialog 
+        open={showTrash} 
+        onOpenChange={setShowTrash}
+        archivedAppointments={appointments.filter(a => a.isArchived)}
+        onRestore={unarchiveAppointment}
+        onDelete={deletePermanent}
+        formatDate={appointmentState.formatFriendlyDate}
+        format12hTime={appointmentState.format12hTime}
+      />
 
       <Dialog open={showHelp} onOpenChange={setShowHelp}>
         <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 overflow-hidden bg-card shadow-2xl z-[70]">
@@ -731,49 +749,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
             <Button onClick={handleConfirmCommissionPayment} className="w-full sm:flex-1 h-11 bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg gap-2" type="button">
               <CheckCircle className="w-4 h-4" /> Sí, ya se pagó
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent className={cn(
-          "sm:max-w-[550px] border shadow-2xl backdrop-blur-md overflow-hidden p-0 z-[90]",
-          (theme === 'corporativo' || theme === 'corporativo-v2') 
-            ? "bg-green-50 border-green-200 text-green-900" 
-            : "bg-green-950 border-green-500/50 text-white"
-        )}>
-          <div className="p-8 space-y-6">
-            <div className="flex flex-col items-center text-center space-y-4">
-              <div className={cn(
-                "p-5 rounded-full border relative z-10",
-                (theme === 'corporativo' || theme === 'corporativo-v2') 
-                  ? "bg-green-100 border-green-300" 
-                  : "bg-green-500/20 border-green-400/30"
-              )}>
-                <Trophy className={cn(
-                  "w-16 h-16",
-                  (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-green-700" : "text-green-400"
-                )} />
-              </div>
-              <DialogTitle className={cn(
-                "text-3xl font-headline font-bold flex items-center gap-3",
-                (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-black" : "text-white"
-              )}>
-                <PartyPopper className="text-yellow-500" /> ¡FELICIDADES! <PartyPopper className="text-yellow-500" />
-              </DialogTitle>
-              <DialogDescription className={cn(
-                "text-lg text-center mx-auto",
-                (theme === 'corporativo' || theme === 'corporativo-v2') ? "text-green-800" : "text-green-100"
-              )}>
-                Has concretado el crédito de <strong className={(theme === 'corporativo' || theme === 'corporativo-v2') ? "text-black" : "text-white"}>{lastFinishedApp?.name}</strong> con éxito.
-              </DialogDescription>
-            </div>
-          </div>
-          <DialogFooter className={cn(
-            "p-6 border-t sm:justify-center",
-            (theme === 'corporativo' || theme === 'corporativo-v2') ? "bg-green-100/50 border-green-200" : "bg-green-900/50 border-green-800/50"
-          )}>
-            <Button onClick={() => setShowSuccessDialog(false)} className="bg-green-600 hover:bg-green-700 text-white font-bold px-12 h-14 rounded-2xl text-xl shadow-xl transition-all transform hover:scale-105" type="button">Continuar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

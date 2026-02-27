@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -40,7 +39,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from '@/lib/utils';
-import * as Service from '@/services/appointment-service';
 
 interface DashboardContentProps {
   expanded?: boolean;
@@ -53,8 +51,7 @@ interface DashboardContentProps {
   format12hTime: (time: string) => string;
   handleSelect: (app: Appointment) => void;
   handleHighlight: (app: Appointment) => void;
-  updateStatus: (id: string, status: AppointmentStatus, notes?: string) => void;
-  toggleConfirmation: (id: string) => void;
+  archiveAppointment: (id: string) => void;
   activeId: string | null;
   visibleCountPast: number;
   setVisibleCountPast: (count: number | ((prev: number) => number)) => void;
@@ -73,8 +70,7 @@ const DashboardContent = ({
   format12hTime,
   handleSelect,
   handleHighlight,
-  updateStatus,
-  toggleConfirmation,
+  archiveAppointment,
   activeId,
   visibleCountPast,
   setVisibleCountPast,
@@ -261,8 +257,7 @@ const DashboardContent = ({
             format12hTime={format12hTime}
             onSelect={handleSelect}
             onHighlight={handleHighlight}
-            updateStatus={updateStatus}
-            toggleConfirmation={toggleConfirmation}
+            archiveAppointment={archiveAppointment}
             activeId={activeId}
             expanded={expanded}
             theme={theme}
@@ -275,6 +270,7 @@ const DashboardContent = ({
             format12hTime={format12hTime}
             onSelect={handleSelect}
             onHighlight={handleHighlight}
+            archiveAppointment={archiveAppointment}
             activeId={activeId}
             expanded={expanded}
             visibleCount={visibleCountPast}
@@ -288,35 +284,37 @@ const DashboardContent = ({
 
 interface AppointmentsDashboardProps {
   appointments: Appointment[];
+  activeAppointments: Appointment[];
   upcoming: Appointment[];
   past: Appointment[];
   addAppointment: (app: any) => void;
-  updateStatus: (id: string, status: AppointmentStatus, notes?: string) => void;
   editAppointment: (id: string, data: Partial<Appointment>) => void;
-  toggleConfirmation: (id: string) => void;
+  archiveAppointment: (id: string) => void;
   formatFriendlyDate: (date: string) => string;
   format12hTime: (time: string) => string;
   initialExpanded?: boolean;
   onExpandedChange?: (expanded: boolean) => void;
   selectedAppId: string | null;
   onSelectAppId: (id: string | null) => void;
+  stats: any;
   theme?: string;
 }
 
 export default function AppointmentsDashboard({
   appointments,
+  activeAppointments,
   upcoming,
   past,
   addAppointment,
-  updateStatus,
   editAppointment,
-  toggleConfirmation,
+  archiveAppointment,
   formatFriendlyDate,
   format12hTime,
   initialExpanded = false,
   onExpandedChange,
   selectedAppId,
   onSelectAppId,
+  stats,
   theme
 }: AppointmentsDashboardProps) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -324,8 +322,6 @@ export default function AppointmentsDashboard({
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const [activeTab, setActiveTab] = useState('upcoming');
   const [visibleCountPast, setVisibleCountPast] = useState(25);
-
-  const stats = useMemo(() => Service.calculateStats(appointments), [appointments]);
 
   useEffect(() => {
     onExpandedChange?.(isExpanded);
@@ -452,8 +448,7 @@ export default function AppointmentsDashboard({
               format12hTime={format12hTime}
               handleSelect={handleSelect}
               handleHighlight={handleHighlight}
-              updateStatus={updateStatus}
-              toggleConfirmation={toggleConfirmation}
+              archiveAppointment={archiveAppointment}
               activeId={activeId}
               visibleCountPast={visibleCountPast}
               setVisibleCountPast={setVisibleCountPast}
@@ -508,8 +503,7 @@ export default function AppointmentsDashboard({
               format12hTime={format12hTime}
               handleSelect={handleSelect}
               handleHighlight={handleHighlight}
-              updateStatus={updateStatus}
-              toggleConfirmation={toggleConfirmation}
+              archiveAppointment={archiveAppointment}
               activeId={activeId}
               visibleCountPast={visibleCountPast}
               setVisibleCountPast={setVisibleCountPast}

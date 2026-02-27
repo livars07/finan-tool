@@ -3,20 +3,24 @@
 import { useState, useEffect, useMemo } from 'react';
 import { 
   isToday, isAfter, isBefore, startOfDay, parseISO, 
-  format, differenceInDays, subMonths
+  format, differenceInDays
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import * as Service from '@/services/appointment-service';
 import { Appointment, AppointmentStatus } from '@/services/appointment-service';
+import { v4 as uuidv4 } from 'uuid';
+
+const KEY = Service.STORAGE_KEY;
 
 export function useAppointments() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Carga inicial única
   useEffect(() => {
-    const saved = Service.getFromDisk();
-    if (saved.length > 0) {
-      setAppointments(saved);
+    const stored = localStorage.getItem(KEY);
+    if (stored) {
+      setAppointments(JSON.parse(stored));
     } else {
       const seed = Service.generateSeedData();
       setAppointments(seed);
@@ -25,45 +29,79 @@ export function useAppointments() {
   }, []);
 
   const addAppointment = (data: Omit<Appointment, 'id'>) => {
-    const updated = Service.createAppointment(data);
-    setAppointments(updated);
-  };
-
-  const updateStatus = (id: string, status: AppointmentStatus, notes?: string) => {
-    const app = appointments.find(a => a.id === id);
-    const shouldAutoConfirm = app && !app.isConfirmed && status !== 'No asistencia' && status !== 'Reagendó';
-    
-    const updated = Service.updateAppointment(id, { 
-      status, 
-      notes,
-      ...(shouldAutoConfirm ? { isConfirmed: true } : {})
+    setAppointments(prev => {
+      const newApp: Appointment = {
+        ...data,
+        id: uuidv4(),
+        phone: Service.formatPhoneNumber(data.phone),
+        isArchived: false
+      };
+      const updated = [newApp, ...prev];
+      localStorage.setItem(KEY, JSON.stringify(updated));
+      return updated;
     });
-    setAppointments(updated);
   };
 
-  const editAppointment = (id: string, data: Partial<Appointment>) => {
-    const updated = Service.updateAppointment(id, data);
-    setAppointments(updated);
+  const editAppointment = (id: string, partial: Partial<Appointment>) => {
+    setAppointments(prev => {
+      const updated = prev.map(a => {
+        if (a.id === id) {
+          const updatedApp = { ...a, ...partial };
+          if (partial.phone) updatedApp.phone = Service.formatPhoneNumber(partial.phone);
+          return updatedApp;
+        }
+        return a;
+      });
+      localStorage.setItem(KEY, JSON.stringify(updated));
+      return updated;
+    });
   };
 
-  const toggleConfirmation = (id: string) => {
-    const updated = Service.updateAppointment(id, { isConfirmed: true });
-    setAppointments(updated);
+  const archiveAppointment = (id: string) => {
+    setAppointments(prev => {
+      const updated = prev.map(a =>
+        a.id === id ? { ...a, isArchived: true } : a
+      );
+      localStorage.setItem(KEY, JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const unarchiveAppointment = (id: string) => {
+    setAppointments(prev => {
+      const updated = prev.map(a =>
+        a.id === id ? { ...a, isArchived: false } : a
+      );
+      localStorage.setItem(KEY, JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const deletePermanent = (id: string) => {
+    setAppointments(prev => {
+      const updated = prev.filter(a => a.id !== id);
+      localStorage.setItem(KEY, JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const resetData = () => {
     const seed = Service.generateSeedData();
     setAppointments(seed);
+    localStorage.setItem(KEY, JSON.stringify(seed));
   };
 
   const clearAll = () => {
-    Service.saveToDisk([]);
     setAppointments([]);
+    localStorage.setItem(KEY, JSON.stringify([]));
   };
+
+  // Filtrado de activas
+  const activeAppointments = useMemo(() => appointments.filter(a => !a.isArchived), [appointments]);
 
   const upcoming = useMemo(() => {
     const today = startOfDay(new Date());
-    return appointments
+    return activeAppointments
       .filter(a => {
         const d = startOfDay(parseISO(a.date));
         return (isToday(d) || isAfter(d, today)) && !a.status;
@@ -74,11 +112,11 @@ export function useAppointments() {
         if (dateA !== dateB) return dateA - dateB;
         return a.time.localeCompare(b.time);
       });
-  }, [appointments]);
+  }, [activeAppointments]);
 
   const past = useMemo(() => {
     const today = startOfDay(new Date());
-    return appointments
+    return activeAppointments
       .filter(a => {
         const d = startOfDay(parseISO(a.date));
         return isBefore(d, today) || !!a.status;
@@ -89,7 +127,7 @@ export function useAppointments() {
         if (dateA !== dateB) return dateB - dateA;
         return b.time.localeCompare(a.time);
       });
-  }, [appointments]);
+  }, [activeAppointments]);
 
   const formatFriendlyDate = (dateStr: string) => {
     const d = parseISO(dateStr);
@@ -121,8 +159,9 @@ export function useAppointments() {
   const stats = useMemo(() => Service.calculateStats(appointments), [appointments]);
 
   return {
-    appointments, upcoming, past, addAppointment, updateStatus, editAppointment,
-    toggleConfirmation, resetData, clearAll, formatFriendlyDate, format12hTime,
+    appointments, upcoming, past, activeAppointments, 
+    addAppointment, editAppointment, archiveAppointment, unarchiveAppointment, deletePermanent,
+    resetData, clearAll, formatFriendlyDate, format12hTime,
     stats, isLoaded
   };
 }
