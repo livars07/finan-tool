@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -18,6 +17,7 @@ import {
   Receipt, Landmark, BarChart3, PartyPopper as PartyIcon, ArrowRight, ListTodo
 } from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
+import { useDirectory } from '@/hooks/use-directory';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -114,10 +114,14 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const pendingAppRef = useRef<Service.Appointment | null>(null);
 
   const appointmentState = useAppointments();
+  const directoryState = useDirectory();
+
   const { 
     appointments, activeAppointments, stats, isLoaded, resetData, clearAll, 
     addAppointment, editAppointment, archiveAppointment, unarchiveAppointment, deletePermanent
   } = appointmentState;
+
+  const { resetDirectory, clearDirectory } = directoryState;
   
   const onSelectAppId = (id: string | null) => setSelectedAppId(id);
   
@@ -331,6 +335,20 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
 
     setConvertData(null);
     toast({ title: "Cita Registrada", description: `Se ha agendado la cita para ${convertData.name || convertData.phone}.` });
+  };
+
+  const handleGlobalReset = () => {
+    resetData(); // Reset appointments
+    resetDirectory(); // Reset directory
+    setShowResetConfirm(false);
+    toast({ title: "Datos restaurados", description: "Agenda y Directorio han vuelto a su estado inicial." });
+  };
+
+  const handleGlobalClear = () => {
+    clearAll(); // Clear appointments
+    clearDirectory(); // Clear directory
+    setShowClearConfirm(false);
+    toast({ title: "Base de datos limpia", description: "Toda la información ha sido eliminada permanentemente.", variant: "destructive" });
   };
 
   if (!isLoaded) return null;
@@ -667,11 +685,11 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
         <AlertDialogContent className="z-[85]">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Confirmar reinicio?</AlertDialogTitle>
-            <AlertDialogDescription>Se borrará tu información actual para restaurar los datos de prueba iniciales.</AlertDialogDescription>
+            <AlertDialogDescription>Se borrará tu información actual para restaurar los datos de prueba iniciales tanto en la Agenda como en el Directorio.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setShowResetConfirm(false)} type="button">Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { resetData(); setShowResetConfirm(false); toast({ title: "Datos restaurados" }); }} type="button">Sí, reiniciar</AlertDialogAction>
+            <AlertDialogAction onClick={handleGlobalReset} type="button">Sí, reiniciar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -680,11 +698,11 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
         <AlertDialogContent className="z-[85]">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar todo?</AlertDialogTitle>
-            <AlertDialogDescription>Esta acción borrará todas tus citas permanentemente. No se puede deshacer.</AlertDialogDescription>
+            <AlertDialogDescription>Esta acción borrará todas tus citas y prospectos permanentemente. No se puede deshacer.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setShowClearConfirm(false)} type="button">Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { clearAll(); setShowClearConfirm(false); toast({ title: "Base de datos limpia", variant: "destructive" }); }} className="bg-destructive hover:bg-destructive/90 text-white" type="button">
+            <AlertDialogAction onClick={handleGlobalClear} className="bg-destructive hover:bg-destructive/90 text-white" type="button">
               Eliminar Permanentemente
             </AlertDialogAction>
           </AlertDialogFooter>

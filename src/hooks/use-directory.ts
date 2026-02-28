@@ -61,6 +61,12 @@ export function useDirectory() {
     Service.saveDirectoryToDisk([]);
   };
 
+  const resetDirectory = () => {
+    const seeds = Service.generateDirectorySeeds();
+    setEntries(seeds);
+    localStorage.setItem('FINANTO_DIRECTORY_SEEDED', 'true');
+  };
+
   return {
     entries,
     addEntry,
@@ -68,6 +74,7 @@ export function useDirectory() {
     toggleMessageSent,
     removeEntry,
     clearDirectory,
+    resetDirectory,
     isLoaded
   };
 }
