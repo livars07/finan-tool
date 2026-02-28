@@ -275,9 +275,8 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
       `• Plazo: ${currentTerm} meses`,
       `• Mensualidad: ${formatCurrency(totalMonthlyLoad)}`,
       `--------------------------`,
-      `💰 *INVERSIÓN INICIAL*`,
-      `• Total a Pagar: ${formatCurrency(totalInitialInvestment)}`,
-      `  (Incluye Enganche, Escrituración y Avalúo)`,
+      `💰 *PAGO INICIAL*`,
+      `• Enganche: ${formatCurrency(totalDownPayment)}`,
     ];
 
     let notes = [];

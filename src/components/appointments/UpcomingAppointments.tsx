@@ -7,7 +7,7 @@ import {
   Clock, Calendar, CheckCircle2, AlertCircle, 
   CheckCircle, ClipboardCheck, Phone, Box, ChevronRight, 
   Trash2, RotateCcw, Archive, CheckCircle as CheckIcon,
-  Save, MessageSquare, Coins, Percent, Info
+  Save, MessageSquare, Coins, Percent, Info, UserCog
 } from "lucide-react";
 import { parseISO, isToday, addDays } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -263,7 +263,29 @@ export default function UpcomingAppointments({
                       )}
                     >
                       <TableCell className="align-middle pl-4">
-                        <div className="font-bold text-sm leading-tight text-foreground">{app.name}</div>
+                        <div className="flex items-center gap-2">
+                          <div className="font-bold text-sm leading-tight text-foreground">{app.name}</div>
+                          {app.prospectorName && (
+                            <TooltipProvider delayDuration={0}>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div className="p-1 rounded-md bg-blue-500/10 hover:bg-blue-500/20 transition-colors cursor-help">
+                                    <UserCog className="w-3.5 h-3.5 text-blue-500" />
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent className="z-[170] shadow-xl border-border bg-card p-3">
+                                  <div className="space-y-1">
+                                    <p className="text-[9px] font-bold uppercase text-muted-foreground tracking-widest">Prospectado por:</p>
+                                    <p className="text-xs font-black text-blue-600">{app.prospectorName}</p>
+                                    {app.prospectorPhone && (
+                                      <p className="text-[10px] font-mono text-muted-foreground font-semibold">{app.prospectorPhone}</p>
+                                    )}
+                                  </div>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
+                        </div>
                         {!expanded && (
                           <div className="text-[10px] text-muted-foreground inline-flex items-center gap-1 mt-0.5">
                             <Phone className="w-2.5 h-2.5 ml-4" /> 
@@ -434,20 +456,19 @@ export default function UpcomingAppointments({
           <div className="space-y-6 pt-4">
             <div className="space-y-2">
               <Label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest block text-center">Resultado de la cita</Label>
-              <Select value={finalStatus} onValueChange={(v) => setFinalStatus(v as AppointmentStatus)}>
-                <SelectTrigger className="h-11 bg-muted/20 border-border/40 focus:ring-green-500">
-                  <SelectValue placeholder="Selecciona el resultado..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Asistencia">👤 Asistencia (Visto)</SelectItem>
-                  <SelectItem value="Cierre">💰 CIERRE (VENTA) ✨</SelectItem>
-                  <SelectItem value="Apartado">📑 Apartado (Reserva)</SelectItem>
-                  <SelectItem value="No asistencia">❌ No asistencia</SelectItem>
-                  <SelectItem value="Reagendó">📅 Reagendó</SelectItem>
-                  <SelectItem value="Continuación en otra cita">🔄 Continuación</SelectItem>
-                  <SelectItem value="Reembolso">💸 Reembolso</SelectItem>
-                </SelectContent>
-              </Select>
+              <select 
+                value={finalStatus} 
+                onChange={(e) => setFinalStatus(e.target.value as AppointmentStatus)}
+                className="w-full h-11 px-3 rounded-md bg-muted/20 border border-border/40 focus:ring-green-500 text-sm"
+              >
+                <option value="Asistencia">👤 Asistencia (Visto)</option>
+                <option value="Cierre">💰 CIERRE (VENTA) ✨</option>
+                <option value="Apartado">📑 Apartado (Reserva)</option>
+                <option value="No asistencia">❌ No asistencia</option>
+                <option value="Reagendó">📅 Reagendó</option>
+                <option value="Continuación en otra cita">🔄 Continuación</option>
+                <option value="Reembolso">💸 Reembolso</option>
+              </select>
             </div>
 
             {finalStatus === 'Cierre' && (
