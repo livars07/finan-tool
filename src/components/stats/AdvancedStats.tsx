@@ -82,14 +82,42 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
 
   const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444'];
 
-  // Cálculo de productividad basado en conversión y confirmación de hoy
   const productivityScore = Math.min(100, (stats.conversionRate * 3) + (stats.todayConfirmed / (stats.todayCount || 1) * 20));
 
   const getAdvice = () => {
-    if (stats.conversionRate > 20) return "Tu tasa de cierre es élite. Mantén este ritmo y enfócate en prospectos de alto valor.";
-    if (stats.conversionRate < 5) return "Tu conversión es baja. Revisa tu script de 1ra consulta para calificar mejor a los interesados.";
-    if (stats.pendingCount > 10) return "Tienes muchos prospectos sin estatus definido. Haz seguimiento hoy para que no se enfríen.";
-    return "Tu rendimiento es estable. La constancia en el registro de notas será tu mejor aliado para el cierre de mes.";
+    // 1. Sugerencia de Conversión Élite
+    if (stats.conversionRate > 20) {
+      return "Tu tasa de cierre es excepcional. Es el momento de ser más selectivo: enfócate en captar prospectos de perfil más alto para maximizar tu retorno por cada hora invertida.";
+    }
+    
+    // 2. Sugerencia de Ajuste de Calificación
+    if (stats.conversionRate < 8) {
+      return "La conversión está por debajo del promedio. Revisa urgentemente la calificación de prospectos en la primera llamada; necesitas filtrar mejor antes de agendar citas presenciales.";
+    }
+    
+    // 3. Sugerencia de Seguimiento Crítico
+    if (stats.pendingCount > 12) {
+      return "Acumulación crítica de prospectos sin estatus. Realiza una jornada intensiva de seguimiento hoy mismo para evitar que estos cierres se enfríen definitivamente.";
+    }
+    
+    // 4. Sugerencia de Disciplina Operativa (Confirmación)
+    if (stats.todayCount > 0 && (stats.todayConfirmed / stats.todayCount) < 0.6) {
+      return "Baja tasa de asistencia hoy. Implementa recordatorios por WhatsApp personalizados al menos 2 horas antes de cada cita para asegurar la puntualidad y el compromiso del cliente.";
+    }
+    
+    // 5. Sugerencia de Dominio de Nicho
+    const topProduct = stats.charts.productDistribution[0];
+    if (topProduct && topProduct.count > (stats.currentMonthProspects * 0.6)) {
+      return `El producto ${topProduct.product} domina el 60% de tu cartera. Considera diversificar tus fuentes de captación para reducir la vulnerabilidad ante cambios en este nicho específico.`;
+    }
+
+    // 6. Sugerencia de Escalabilidad Financiera
+    if (stats.currentMonthCommission > 15000) {
+      return "Resultados financieros sobresalientes. Te sugerimos reinvertir un porcentaje de estas ganancias en pauta digital para escalar tu volumen de prospectos calificados el próximo mes.";
+    }
+
+    // 7. Sugerencia de Consistencia Operativa (Default)
+    return "Tu ritmo operativo es estable y saludable. Mantén el hábito estricto de registrar cada acuerdo en el área de notas para asegurar una transición impecable hacia el cierre final.";
   };
 
   const StatsContent = ({ expanded = false }) => (
@@ -272,8 +300,8 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
             <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-accent/80">Sugerencia Estratégica</CardTitle>
           </CardHeader>
           <CardContent className="p-4 pt-2 relative z-10">
-            <p className="text-xs text-foreground/80 leading-relaxed font-semibold italic">
-              "{getAdvice()}"
+            <p className="text-xs text-foreground/90 leading-relaxed font-semibold">
+              {getAdvice()}
             </p>
           </CardContent>
         </Card>
@@ -379,4 +407,3 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
     </>
   );
 }
-
