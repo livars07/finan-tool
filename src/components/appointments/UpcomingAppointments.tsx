@@ -71,6 +71,7 @@ export default function UpcomingAppointments({
   theme = 'corporativo'
 }: Props) {
   const [archiveConfirmId, setArchiveConfirmId] = useState<string | null>(null);
+  const [confirmingApp, setConfirmingApp] = useState<Appointment | null>(null);
   const { toast } = useToast();
 
   const isActuallyToday = (dateStr: string) => isToday(parseISO(dateStr));
@@ -96,16 +97,30 @@ export default function UpcomingAppointments({
     });
   };
 
+  const processConfirmation = () => {
+    if (confirmingApp) {
+      editAppointment(confirmingApp.id, { isConfirmed: true });
+      toast({
+        title: "Asistencia Confirmada",
+        description: `${confirmingApp.name} ha validado su asistencia para hoy.`,
+      });
+      setConfirmingApp(null);
+    }
+  };
+
   const handleToggleConfirmation = (e: React.MouseEvent, app: Appointment) => {
     e.stopPropagation();
-    const newStatus = !app.isConfirmed;
-    editAppointment(app.id, { isConfirmed: newStatus });
-    toast({
-      title: newStatus ? "Cita Confirmada" : "Confirmación Removida",
-      description: newStatus 
-        ? `${app.name} ha confirmado su asistencia para hoy.` 
-        : `Se ha quitado la marca de confirmación para ${app.name}.`,
-    });
+    if (app.isConfirmed) {
+      // Si ya está confirmado, permitir quitarlo sin popup o con un toggle simple
+      editAppointment(app.id, { isConfirmed: false });
+      toast({
+        title: "Confirmación Removida",
+        description: `Se ha quitado la marca de asistencia para ${app.name}.`,
+      });
+    } else {
+      // Si no está confirmado, pedir confirmación
+      setConfirmingApp(app);
+    }
   };
 
   const copyPhone = (e: React.MouseEvent, app: Appointment) => {
@@ -163,7 +178,7 @@ export default function UpcomingAppointments({
                   {expanded && <TableHead className="bg-card w-[140px]">Contacto</TableHead>}
                   <TableHead className="bg-card">Motivo</TableHead>
                   {expanded && <TableHead className="bg-card">Producto</TableHead>}
-                  <TableHead className="bg-card">Fecha / Estado</TableHead>
+                  <TableHead className="bg-card">Fecha</TableHead>
                   <TableHead className="bg-card">Hora</TableHead>
                   <TableHead className="bg-card w-24 text-center">Acción</TableHead>
                 </TableRow>
@@ -184,23 +199,7 @@ export default function UpcomingAppointments({
                       )}
                     >
                       <TableCell className="align-middle pl-4">
-                        <div className="flex items-center gap-2">
-                          {appToday && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className={cn(
-                                "w-6 h-6 rounded-full shrink-0 transition-all",
-                                app.isConfirmed ? "bg-green-500 text-white hover:bg-green-600" : "bg-primary/20 text-primary animate-pulse hover:bg-primary/30"
-                              )}
-                              onClick={(e) => handleToggleConfirmation(e, app)}
-                              title={app.isConfirmed ? "Confirmado" : "Click para confirmar asistencia"}
-                            >
-                              <CheckCircle className="w-4 h-4" />
-                            </Button>
-                          )}
-                          <div className="font-bold text-sm leading-tight text-foreground">{app.name}</div>
-                        </div>
+                        <div className="font-bold text-sm leading-tight text-foreground">{app.name}</div>
                         {!expanded && (
                           <div className="text-[10px] text-muted-foreground inline-flex items-center gap-1 mt-0.5">
                             <Phone className="w-2.5 h-2.5 ml-4" /> 
@@ -233,7 +232,32 @@ export default function UpcomingAppointments({
                         </TableCell>
                       )}
                       <TableCell className="align-middle">
-                        <span className={cn("text-[10px] font-bold uppercase", appToday ? "text-primary" : "text-muted-foreground")}>{formatDate(app.date)}</span>
+                        <div className="flex flex-col gap-1.5">
+                          <span className={cn("text-[10px] font-bold uppercase", appToday ? "text-primary" : "text-muted-foreground")}>{formatDate(app.date)}</span>
+                          {appToday && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => handleToggleConfirmation(e, app)}
+                              className={cn(
+                                "h-6 px-2 text-[9px] font-bold uppercase border transition-all",
+                                app.isConfirmed 
+                                  ? "bg-green-500/10 text-green-600 border-green-500/20 hover:bg-green-500/20" 
+                                  : "bg-orange-500/10 text-orange-600 border-orange-500/20 hover:bg-orange-500/20 animate-pulse"
+                              )}
+                            >
+                              {app.isConfirmed ? (
+                                <>
+                                  <CheckCircle className="w-3 h-3 mr-1" /> Confirmado
+                                </>
+                              ) : (
+                                <>
+                                  <AlertCircle className="w-3 h-3 mr-1" /> Confirmar
+                                </>
+                              )}
+                            </Button>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="align-middle">
                         <div className="flex items-center gap-1.5 text-accent font-bold text-[10px] bg-accent/5 w-fit px-2 py-1 rounded-md border border-accent/20">
@@ -294,6 +318,28 @@ export default function UpcomingAppointments({
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmArchive} className="bg-destructive hover:bg-destructive/90 text-white">
               Sí, archivar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!confirmingApp} onOpenChange={(o) => !o && setConfirmingApp(null)}>
+        <AlertDialogContent className="border-orange-200">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-orange-100 rounded-full">
+                <AlertCircle className="w-6 h-6 text-orange-600" />
+              </div>
+              <AlertDialogTitle className="text-orange-950">Confirmar Asistencia</AlertDialogTitle>
+            </div>
+            <AlertDialogDescription className="text-orange-900/70">
+              ¿Confirmas que el cliente <strong>{confirmingApp?.name}</strong> asistirá a su cita el día de hoy? Esta acción se reflejará en tus estadísticas de cierre.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-orange-200 text-orange-700 hover:bg-orange-50">Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={processConfirmation} className="bg-orange-600 hover:bg-orange-700 text-white">
+              Sí, confirmar asistencia
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
