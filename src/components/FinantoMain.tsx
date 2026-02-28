@@ -281,7 +281,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       style: 'currency',
       currency: 'MXN',
       maximumFractionDigits: 0
-    }).format(val);
+    }).format(Math.round(val));
   };
 
   const statsCards = [
@@ -778,8 +778,8 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                 <div className="flex justify-between items-center">
                   <span className="text-[10px] font-bold uppercase text-blue-800 tracking-widest">Ganancia Estimada</span>
                   <span className="text-sm font-bold text-blue-700">
-                    {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(
-                      (pendingCommissionApp.finalCreditAmount || 0) * 0.007 * ((pendingCommissionApp.commissionPercent || 0) / 100)
+                    {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(
+                      Math.round((pendingCommissionApp.finalCreditAmount || 0) * 0.007 * ((pendingCommissionApp.commissionPercent || 0) / 100))
                     )}
                   </span>
                 </div>

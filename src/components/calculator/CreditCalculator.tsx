@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -79,7 +78,7 @@ const CalculatorInputs = ({
           )}>$</span>
           <Input
             id={isModal ? "totalPriceModal" : "totalPrice"}
-            placeholder="0.00"
+            placeholder="0"
             className={isModal ? "pl-9 font-bold text-2xl bg-primary/5 border-primary/30 focus-visible:ring-primary h-14" : "pl-7 font-semibold text-lg bg-primary/5 border-primary/30 focus-visible:ring-primary"}
             type="text"
             value={formatWithCommas(totalPrice)}
@@ -101,7 +100,7 @@ const CalculatorInputs = ({
           )}>$</span>
           <Input
             id={isModal ? "monthlyPaymentModal" : "monthlyPayment"}
-            placeholder="0.00"
+            placeholder="0"
             className={isModal ? "pl-9 border-accent/30 focus-visible:ring-accent font-bold text-2xl text-accent bg-accent/5 h-14" : "pl-7 border-accent/30 focus-visible:ring-accent font-bold text-lg text-accent bg-accent/5"}
             type="text"
             value={formatWithCommas(monthlyPayment)}
@@ -152,7 +151,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
   }, [isExpanded]);
 
   const parseNumber = (val: string) => {
-    return parseFloat(val.replace(/,/g, '')) || 0;
+    return Math.round(parseFloat(val.replace(/,/g, ''))) || 0;
   };
 
   const formatWithCommas = (val: string) => {
@@ -160,15 +159,15 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
     if (!num || isNaN(Number(num))) return '';
     const parts = num.split('.');
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    return parts.join('.');
+    return parts[0]; // Descartamos decimales
   };
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('es-MX', {
       style: 'currency',
       currency: 'MXN',
-      minimumFractionDigits: 2,
-    }).format(val);
+      maximumFractionDigits: 0,
+    }).format(Math.round(val));
   };
 
   const handleTotalPriceChange = (val: string) => {
@@ -180,7 +179,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
       const netP = Math.max(0, p - ed);
       const c = netP * effectiveFactor;
       const totalMonthly = c + parseNumber(extraMonthlyContribution);
-      setMonthlyPayment(totalMonthly.toFixed(2));
+      setMonthlyPayment(Math.round(totalMonthly).toString());
     }
   };
 
@@ -193,7 +192,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
       const baseC = Math.max(0, totalC - extraC);
       const netP = baseC / effectiveFactor;
       const p = netP + parseNumber(extraDownPayment);
-      setTotalPrice(p.toFixed(2));
+      setTotalPrice(Math.round(p).toString());
     }
   };
 
@@ -205,7 +204,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
     const netP = Math.max(0, p - ed);
     const c = netP * effectiveFactor;
     const totalMonthly = c + parseNumber(extraMonthlyContribution);
-    setMonthlyPayment(totalMonthly.toFixed(2));
+    setMonthlyPayment(Math.round(totalMonthly).toString());
   };
 
   const handleExtraMonthlyChange = (val: string) => {
@@ -216,7 +215,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
     const netP = Math.max(0, p - ed);
     const baseC = netP * effectiveFactor;
     const totalMonthly = baseC + (parseFloat(cleanVal) || 0);
-    setMonthlyPayment(totalMonthly.toFixed(2));
+    setMonthlyPayment(Math.round(totalMonthly).toString());
   };
 
   useEffect(() => {
@@ -226,7 +225,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
     if (netP > 0) {
       const baseC = netP * effectiveFactor;
       const totalMonthly = baseC + parseNumber(extraMonthlyContribution);
-      setMonthlyPayment(totalMonthly.toFixed(2));
+      setMonthlyPayment(Math.round(totalMonthly).toString());
     }
   }, [customTerm, effectiveFactor, totalPrice, extraDownPayment, extraMonthlyContribution]);
 

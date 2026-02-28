@@ -206,12 +206,12 @@ export const generateSeedData = (): Appointment[] => {
  * Calcula las estadísticas globales enriquecidas.
  */
 export const calculateStats = (appointments: Appointment[]) => {
-  // Solo tomar en cuenta las que NO están archivadas para el negocio
   const activeApps = appointments.filter(a => !a.isArchived);
   const now = new Date();
   const todayStart = startOfDay(now);
   const lastMonth = subMonths(now, 1);
 
+  // Prospectos y Ventas se basan en la fecha de la cita/venta
   const currentMonthProspects = activeApps.filter(a => isSameMonth(parseISO(a.date), now)).length;
   const lastMonthProspects = activeApps.filter(a => isSameMonth(parseISO(a.date), lastMonth)).length;
 
@@ -224,18 +224,34 @@ export const calculateStats = (appointments: Appointment[]) => {
   const currentMonthApartados = activeApps.filter(a => a.status === 'Apartado' && isSameMonth(parseISO(a.date), now)).length;
   const lastMonthApartados = activeApps.filter(a => a.status === 'Apartado' && isSameMonth(parseISO(a.date), lastMonth)).length;
 
+  // COMISIONES: Se basan en la FECHA DE PAGO para reflejar flujo de caja real
+  // Incluimos cierres del mes pasado cuya fecha de pago cae en este mes
   const currentMonthCommission = activeApps
-    .filter(a => (a.status === 'Cierre' || a.status === 'Apartado') && isSameMonth(parseISO(a.date), now))
+    .filter(a => {
+      if (a.status !== 'Cierre' && a.status !== 'Apartado') return false;
+      const payDate = getCommissionPaymentDate(a.date);
+      return isSameMonth(payDate, now);
+    })
     .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
 
   const currentMonthPaidCommission = activeApps
-    .filter(a => (a.status === 'Cierre' || a.status === 'Apartado') && a.commissionStatus === 'Pagada' && isSameMonth(parseISO(a.date), now))
+    .filter(a => {
+      if (a.status !== 'Cierre' && a.status !== 'Apartado') return false;
+      if (a.commissionStatus !== 'Pagada') return false;
+      const payDate = getCommissionPaymentDate(a.date);
+      return isSameMonth(payDate, now);
+    })
     .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
 
   const lastMonthCommission = activeApps
-    .filter(a => (a.status === 'Cierre' || a.status === 'Apartado') && isSameMonth(parseISO(a.date), lastMonth))
+    .filter(a => {
+      if (a.status !== 'Cierre' && a.status !== 'Apartado') return false;
+      const payDate = getCommissionPaymentDate(a.date);
+      return isSameMonth(payDate, lastMonth);
+    })
     .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
 
+  // Proyecciones semanales
   const dayOfWeek = getDay(todayStart);
   const daysToFriday = (5 - dayOfWeek + 7) % 7;
   const targetFriday = addDays(todayStart, daysToFriday);
