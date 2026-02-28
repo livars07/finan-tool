@@ -15,7 +15,10 @@ import {
   CheckCircle2,
   Trash2,
   Archive,
-  RotateCcw
+  RotateCcw,
+  Coins,
+  Calendar,
+  Percent
 } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -128,6 +131,7 @@ export default function PastAppointments({
     return new Intl.NumberFormat('es-MX', {
       style: 'currency',
       currency: 'MXN',
+      maximumFractionDigits: 0
     }).format(val);
   };
 
@@ -163,6 +167,10 @@ export default function PastAppointments({
                 
                 const paymentDate = getCommissionPaymentDate(app.date);
                 const isCommissionOverdue = isPending && isBefore(paymentDate, new Date());
+
+                const commissionValue = isCierre 
+                  ? (app.finalCreditAmount || 0) * 0.007 * ((app.commissionPercent || 0) / 100) 
+                  : 0;
                 
                 return (
                   <TableRow 
@@ -231,24 +239,70 @@ export default function PastAppointments({
                     )}
 
                     <TableCell className="align-middle">
-                      <div className="flex items-center gap-2">
-                        <div className={cn(
-                          "text-[9px] uppercase font-bold px-2 py-1 rounded-full border w-fit text-center min-w-[80px]",
-                          getStatusColor(app.status)
-                        )}>
-                          {app.status || 'N/A'}
-                        </div>
-                        
-                        {isCommissionPaid && (
-                          <div className="p-1 bg-green-500/20 rounded-full border border-green-500/30">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                          </div>
-                        )}
+                      <TooltipProvider delayDuration={0}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex items-center gap-2 cursor-help">
+                              <div className={cn(
+                                "text-[9px] uppercase font-bold px-2 py-1 rounded-full border w-fit text-center min-w-[80px]",
+                                getStatusColor(app.status)
+                              )}>
+                                {app.status || 'N/A'}
+                              </div>
+                              
+                              {isCommissionPaid && (
+                                <div className="p-1 bg-green-500/20 rounded-full border border-green-500/30">
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                                </div>
+                              )}
 
-                        {isCommissionOverdue && (
-                          <ShieldAlert className="w-3.5 h-3.5 text-destructive animate-pulse" />
-                        )}
-                      </div>
+                              {isCommissionOverdue && (
+                                <ShieldAlert className="w-3.5 h-3.5 text-destructive animate-pulse" />
+                              )}
+                            </div>
+                          </TooltipTrigger>
+                          {isCierre && (
+                            <TooltipContent side="top" className="bg-card border-border shadow-2xl p-3 min-w-[180px] z-[100]">
+                              <div className="space-y-2">
+                                <div className="flex items-center justify-between border-b border-border/10 pb-1">
+                                  <span className="text-[8px] uppercase font-bold text-muted-foreground tracking-widest">Detalle Financiero</span>
+                                  <span className={cn(
+                                    "text-[8px] font-bold px-1.5 py-0.5 rounded-full border",
+                                    isCommissionPaid ? "bg-green-500/10 text-green-500 border-green-500/20" : "bg-yellow-500/10 text-yellow-600 border-yellow-500/20"
+                                  )}>
+                                    {app.commissionStatus || 'Pendiente'}
+                                  </span>
+                                </div>
+                                <div className="space-y-1">
+                                  <div className="flex items-center justify-between gap-4">
+                                    <div className="flex items-center gap-1.5">
+                                      <Coins className="w-3 h-3 text-accent" />
+                                      <span className="text-[9px] text-muted-foreground font-medium uppercase">Monto Ganado:</span>
+                                    </div>
+                                    <span className="text-xs font-bold text-accent">{formatCurrency(commissionValue)}</span>
+                                  </div>
+                                  <div className="flex items-center justify-between gap-4">
+                                    <div className="flex items-center gap-1.5">
+                                      <Percent className="w-3 h-3 text-primary" />
+                                      <span className="text-[9px] text-muted-foreground font-medium uppercase">Participación:</span>
+                                    </div>
+                                    <span className="text-[10px] font-bold">{app.commissionPercent}%</span>
+                                  </div>
+                                  <div className="flex items-center justify-between gap-4 pt-1 border-t border-border/10">
+                                    <div className="flex items-center gap-1.5">
+                                      <Calendar className="w-3 h-3 text-muted-foreground" />
+                                      <span className="text-[9px] text-muted-foreground font-medium uppercase">Fecha Pago:</span>
+                                    </div>
+                                    <span className="text-[10px] font-bold text-primary">
+                                      {format(paymentDate, "d 'de' MMM", { locale: es })}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
+                      </TooltipProvider>
                     </TableCell>
 
                     <TableCell className="align-middle text-right" onClick={(e) => e.stopPropagation()}>
