@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -19,7 +18,12 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Appointment, AppointmentStatus, AppointmentType, AppointmentProduct, getCommissionPaymentDate } from '@/services/appointment-service';
-import { User, Phone, Clock, Edit2, Save, Copy, ClipboardList, CheckCircle2, Box, CalendarPlus, Receipt, Coins, CalendarDays, UserCog, ChevronDown, History as HistoryIcon, Info } from 'lucide-react';
+import { 
+  User, Phone, Clock, Edit2, Save, Copy, ClipboardList, 
+  CheckCircle2, Box, CalendarPlus, Receipt, Coins, 
+  CalendarDays, UserCog, ChevronDown, History as HistoryIcon, 
+  Info, Trash2, Archive 
+} from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { parseISO, format, isToday, isTomorrow, isYesterday, differenceInCalendarDays, startOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -30,6 +34,16 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 interface Props {
   appointment: Appointment | null;
@@ -37,6 +51,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   onEdit: (id: string, data: Partial<Appointment>) => void;
   onAdd: (app: Omit<Appointment, 'id'>) => void;
+  archiveAppointment: (id: string) => void;
   formatFriendlyDate: (date: string) => string;
   format12hTime: (time: string) => string;
 }
@@ -47,11 +62,13 @@ export default function AppointmentDetailsDialog({
   onOpenChange, 
   onEdit,
   onAdd,
+  archiveAppointment,
   format12hTime
 }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [isRescheduling, setIsRescheduling] = useState(false);
   const [showEditProspector, setShowEditProspector] = useState(false);
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
   const [editData, setEditData] = useState<Partial<Appointment>>({});
   
   const [newName, setNewName] = useState('');
@@ -89,6 +106,16 @@ export default function AppointmentDetailsDialog({
     onEdit(appointment.id, editData);
     setIsEditing(false);
     toast({ title: "Guardado", description: "La información ha sido actualizada." });
+  };
+
+  const handleArchive = () => {
+    archiveAppointment(appointment.id);
+    setShowArchiveConfirm(false);
+    onOpenChange(false);
+    toast({ 
+      title: "Cita archivada", 
+      description: `${appointment.name} se ha movido a la papelera.` 
+    });
   };
 
   const handleConfirmSecond = () => {
@@ -168,6 +195,7 @@ Número: *${appointment.phone}*`;
     return new Intl.NumberFormat('es-MX', {
       style: 'currency',
       currency: 'MXN',
+      maximumFractionDigits: 0
     }).format(val);
   };
 
@@ -248,15 +276,25 @@ Número: *${appointment.phone}*`;
 
             <div className="flex items-center gap-2">
               {!isEditing && (
-                <Button 
-                  onClick={copyToWhatsAppFormat}
-                  variant="outline" 
-                  size="sm"
-                  className="h-7 px-2 text-[9px] border-primary/40 text-primary hover:bg-primary/5 font-bold uppercase backdrop-blur-md"
-                >
-                  <Copy className="w-3 h-3 mr-1" />
-                  Copiar datos
-                </Button>
+                <>
+                  <Button 
+                    onClick={copyToWhatsAppFormat}
+                    variant="outline" 
+                    size="sm"
+                    className="h-7 px-2 text-[9px] border-primary/40 text-primary hover:bg-primary/5 font-bold uppercase backdrop-blur-md"
+                  >
+                    <Copy className="w-3 h-3 mr-1" />
+                    Copiar datos
+                  </Button>
+                  <Button 
+                    onClick={() => setShowArchiveConfirm(true)}
+                    variant="ghost" 
+                    size="icon"
+                    className="h-7 w-7 text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </>
               )}
               <DialogClose className="h-7 w-7 flex items-center justify-center rounded-full bg-destructive/10 text-destructive hover:bg-destructive transition-colors group backdrop-blur-md border border-destructive/20">
                 <span className="text-[10px] font-bold group-hover:text-white">✕</span>
@@ -626,6 +664,23 @@ Número: *${appointment.phone}*`;
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showArchiveConfirm} onOpenChange={setShowArchiveConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Archivar registro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              El registro se moverá a la papelera. Podrás recuperarlo en cualquier momento desde la vista de "Archivadas".
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleArchive} className="bg-destructive hover:bg-destructive/90 text-white">
+              Sí, archivar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Dialog open={isRescheduling} onOpenChange={setIsRescheduling}>
         <DialogContent 

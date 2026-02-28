@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -6,10 +5,11 @@ import { Appointment, AppointmentStatus, getCommissionPaymentDate } from '@/serv
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { 
   Clock, Calendar, CheckCircle2, AlertCircle, 
-  CheckCircle, Trophy, PartyPopper, Sparkles, Copy, 
-  ClipboardCheck, Phone, Box, ChevronRight, ShieldAlert, UserCog, Trash2, RotateCcw, Archive
+  CheckCircle, ClipboardCheck, Phone, Box, ChevronRight, 
+  Trash2, RotateCcw, Archive, CheckCircle as CheckIcon,
+  Save, MessageSquare
 } from "lucide-react";
-import { parseISO, isToday, addDays, isBefore } from 'date-fns';
+import { parseISO, isToday, addDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -34,11 +34,12 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import {
-  Tooltip,
-  TooltipProvider,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
 interface Props {
@@ -72,6 +73,12 @@ export default function UpcomingAppointments({
 }: Props) {
   const [archiveConfirmId, setArchiveConfirmId] = useState<string | null>(null);
   const [confirmingApp, setConfirmingApp] = useState<Appointment | null>(null);
+  const [finalizingApp, setFinalizingApp] = useState<Appointment | null>(null);
+  
+  // States for Finalize Assistant
+  const [finalStatus, setFinalStatus] = useState<AppointmentStatus>('Asistencia');
+  const [finalNotes, setFinalNotes] = useState('');
+
   const { toast } = useToast();
 
   const isActuallyToday = (dateStr: string) => isToday(parseISO(dateStr));
@@ -111,15 +118,34 @@ export default function UpcomingAppointments({
   const handleToggleConfirmation = (e: React.MouseEvent, app: Appointment) => {
     e.stopPropagation();
     if (app.isConfirmed) {
-      // Si ya está confirmado, permitir quitarlo sin popup o con un toggle simple
       editAppointment(app.id, { isConfirmed: false });
       toast({
         title: "Confirmación Removida",
         description: `Se ha quitado la marca de asistencia para ${app.name}.`,
       });
     } else {
-      // Si no está confirmado, pedir confirmación
       setConfirmingApp(app);
+    }
+  };
+
+  const handleOpenFinalize = (e: React.MouseEvent, app: Appointment) => {
+    e.stopPropagation();
+    setFinalizingApp(app);
+    setFinalStatus('Asistencia');
+    setFinalNotes(app.notes || '');
+  };
+
+  const handleSaveFinalization = () => {
+    if (finalizingApp) {
+      editAppointment(finalizingApp.id, { 
+        status: finalStatus, 
+        notes: finalNotes 
+      });
+      toast({
+        title: "Consulta Finalizada",
+        description: `Se ha registrado el resultado "${finalStatus}" para ${finalizingApp.name}.`,
+      });
+      setFinalizingApp(null);
     }
   };
 
@@ -266,16 +292,24 @@ export default function UpcomingAppointments({
                       </TableCell>
                       <TableCell className="align-middle text-center" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-center gap-1">
-                          {app.isArchived ? (
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="h-8 w-8 text-muted-foreground/40 hover:text-primary hover:bg-primary/10 transition-colors"
-                              onClick={(e) => handleRestoreAction(e, app)}
-                              title="Restaurar"
-                            >
-                              <RotateCcw className="w-4 h-4" />
-                            </Button>
+                          {appToday ? (
+                            <TooltipProvider delayDuration={0}>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="h-8 w-8 text-muted-foreground/40 hover:text-green-500 hover:bg-green-500/10 transition-colors"
+                                    onClick={(e) => handleOpenFinalize(e, app)}
+                                  >
+                                    <CheckIcon className="w-4 h-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent className="bg-card border-border shadow-xl z-[100] text-[10px] font-bold">
+                                  FINALIZAR CONSULTA
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           ) : (
                             <Button 
                               variant="ghost" 
@@ -344,6 +378,69 @@ export default function UpcomingAppointments({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Finalize Assistant Dialog */}
+      <Dialog open={!!finalizingApp} onOpenChange={(o) => !o && setFinalizingApp(null)}>
+        <DialogContent className="sm:max-w-[450px] border-green-200 bg-card shadow-2xl z-[80]">
+          <DialogHeader className="bg-green-500/5 p-4 -m-6 mb-4 border-b border-green-500/20">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-500/20 rounded-xl">
+                <CheckIcon className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <DialogTitle className="text-green-950">Finalizar Consulta</DialogTitle>
+                <DialogDescription className="text-green-800/60">Registrando resultado para {finalizingApp?.name}</DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          
+          <div className="space-y-6 pt-4">
+            <div className="space-y-2">
+              <Label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Resultado de la cita</Label>
+              <Select value={finalStatus} onValueChange={(v) => setFinalStatus(v as AppointmentStatus)}>
+                <SelectTrigger className="h-11 bg-muted/20 border-border/40 focus:ring-green-500">
+                  <SelectValue placeholder="Selecciona el resultado..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Asistencia">Asistencia (Visto)</SelectItem>
+                  <SelectItem value="Cierre">Cierre (Venta)</SelectItem>
+                  <SelectItem value="Apartado">Apartado (Reserva)</SelectItem>
+                  <SelectItem value="No asistencia">No asistencia</SelectItem>
+                  <SelectItem value="Reagendó">Reagendó</SelectItem>
+                  <SelectItem value="Continuación en otra cita">Continuación en otra cita</SelectItem>
+                  <SelectItem value="Reembolso">Reembolso</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2 text-[10px] font-bold uppercase text-muted-foreground tracking-widest">
+                <MessageSquare className="w-3.5 h-3.5" /> Notas del resultado
+              </Label>
+              <Textarea 
+                placeholder="Escribe aquí los acuerdos, dudas o detalles del cierre..."
+                className="bg-muted/10 border-border/40 min-h-[150px] resize-none text-sm"
+                value={finalNotes}
+                onChange={(e) => setFinalNotes(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 mt-4">
+            <Button variant="ghost" onClick={() => setFinalizingApp(null)} className="h-11 px-6 font-bold uppercase text-xs">Cancelar</Button>
+            <Button onClick={handleSaveFinalization} className="bg-green-600 hover:bg-green-700 text-white h-11 flex-1 font-bold shadow-lg gap-2">
+              <Save className="w-4 h-4" /> Guardar Resultado
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
