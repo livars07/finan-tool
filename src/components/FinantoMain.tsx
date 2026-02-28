@@ -444,6 +444,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       <main className="flex-1 container mx-auto px-4 py-6 md:py-12">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           {statsCards.map((stat, i) => {
+            const isTargetCommission = stat.label === 'Comisiones Mes' && stats.currentMonthCommission > 5000;
             const cardContent = (
               <Card 
                 key={i}
@@ -455,7 +456,12 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   <div className="flex-1 overflow-hidden">
                     <p className="text-[10px] uppercase font-bold text-muted-foreground truncate">{stat.label}</p>
                     <div className="flex items-baseline gap-2">
-                      <p className="text-lg font-bold truncate">{stat.value}</p>
+                      <p className={cn(
+                        "text-lg font-bold truncate",
+                        isTargetCommission && "bg-gradient-to-r from-[#00F5FF] via-[#7B61FF] to-[#FF00D6] bg-clip-text text-transparent"
+                      )}>
+                        {stat.value}
+                      </p>
                       {stat.comparison !== undefined && (
                         <div className="flex flex-col">
                           <span className="text-[8px] font-bold flex items-center whitespace-nowrap text-muted-foreground/40">

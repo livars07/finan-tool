@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -267,7 +266,12 @@ const DashboardContent = ({
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
                         <div className="p-1.5 rounded-lg bg-yellow-500/10 text-yellow-600 border border-yellow-500/20"><Coins className="w-3.5 h-3.5"/></div>
-                        <span className="text-sm font-bold text-foreground">{formatCurrency(stats.currentMonthCommission)}</span>
+                        <span className={cn(
+                          "text-sm font-bold text-foreground",
+                          stats.currentMonthCommission > 5000 && "bg-gradient-to-r from-[#00F5FF] via-[#7B61FF] to-[#FF00D6] bg-clip-text text-transparent"
+                        )}>
+                          {formatCurrency(stats.currentMonthCommission)}
+                        </span>
                       </div>
                       <div className="flex items-center mt-1 text-[7px] font-bold text-muted-foreground/40 uppercase">
                         {stats.currentMonthCommission > stats.lastMonthCommission && <TrendingUp className="w-2 h-2 text-green-500 mr-0.5" />}
