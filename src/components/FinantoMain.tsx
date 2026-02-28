@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import CreditCalculator from '@/components/calculator/CreditCalculator';
 import AppointmentsDashboard from '@/components/appointments/AppointmentsDashboard';
+import AdvancedStats from '@/components/stats/AdvancedStats';
 import TrashDialog from '@/components/appointments/TrashDialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
@@ -12,7 +13,7 @@ import {
   CalendarClock, HandCoins, CheckCircle, Search, BadgeAlert, 
   MoreHorizontal, ArrowUpRight, ArrowDownRight, Coins, Star, Trophy, PartyPopper,
   TrendingUp, Trash2, Target, History as HistoryIcon, User, CalendarPlus,
-  Receipt, Landmark
+  Receipt, Landmark, BarChart3
 } from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
 import { Button } from '@/components/ui/button';
@@ -75,7 +76,7 @@ const APP_TIPS = [
 ];
 
 export interface FinantoMainProps {
-  initialSection?: 'guia' | 'simulador' | 'gestor';
+  initialSection?: 'guia' | 'simulador' | 'gestor' | 'stats';
 }
 
 export default function FinantoMain({ initialSection }: FinantoMainProps) {
@@ -85,6 +86,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const [showHelp, setShowHelp] = useState(initialSection === 'guia');
   const [isSimulatorExpanded, setIsSimulatorExpanded] = useState(initialSection === 'simulador');
   const [isGestorExpanded, setIsGestorExpanded] = useState(initialSection === 'gestor');
+  const [isStatsExpanded, setIsStatsExpanded] = useState(initialSection === 'stats');
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
   const [theme, setTheme] = useState<Theme>('corporativo');
   const [api, setApi] = useState<CarouselApi>();
@@ -141,10 +143,12 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       document.title = "Simulador - Finanto";
     } else if (isGestorExpanded) {
       document.title = "Gestor - Finanto";
+    } else if (isStatsExpanded) {
+      document.title = "Estadísticas - Finanto";
     } else {
       document.title = "Finanto - Gestión Inmobiliaria";
     }
-  }, [showHelp, isSimulatorExpanded, isGestorExpanded]);
+  }, [showHelp, isSimulatorExpanded, isGestorExpanded, isStatsExpanded]);
 
   useEffect(() => {
     if (!api) return;
@@ -531,6 +535,11 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                 </div>
               </Carousel>
             </div>
+            <AdvancedStats 
+              stats={stats} 
+              initialExpanded={initialSection === 'stats'}
+              onExpandedChange={setIsStatsExpanded}
+            />
           </section>
           <section className="xl:col-span-7 pb-10">
             <AppointmentsDashboard 

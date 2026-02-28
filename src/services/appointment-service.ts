@@ -15,8 +15,12 @@ import {
   isSameMonth, 
   subDays, 
   addDays, 
-  getDay
+  getDay,
+  format,
+  eachDayOfInterval,
+  isSameDay
 } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 export type AppointmentStatus = 
   | 'Asistencia' 
@@ -187,6 +191,7 @@ export const generateSeedData = (): Appointment[] => {
       time: hours[i % hours.length],
       type: types[i % types.length],
       status: status,
+      product: products[i % products.length],
       isConfirmed: true,
       isArchived: false,
       notes: isSale ? `Venta exitosa. Expediente completo enviado a notaría.` : `Seguimiento de ${products[i % products.length]}.`,
@@ -224,8 +229,7 @@ export const calculateStats = (appointments: Appointment[]) => {
   const currentMonthApartados = activeApps.filter(a => a.status === 'Apartado' && isSameMonth(parseISO(a.date), now)).length;
   const lastMonthApartados = activeApps.filter(a => a.status === 'Apartado' && isSameMonth(parseISO(a.date), lastMonth)).length;
 
-  // COMISIONES: Se basan en la FECHA DE PAGO para reflejar flujo de caja real
-  // Incluimos cierres del mes pasado cuya fecha de pago cae en este mes
+  // COMISIONES
   const currentMonthCommission = activeApps
     .filter(a => {
       if (a.status !== 'Cierre' && a.status !== 'Apartado') return false;
@@ -285,6 +289,34 @@ export const calculateStats = (appointments: Appointment[]) => {
   const conversionRate = currentMonthProspects > 0 ? (currentMonthSales / currentMonthProspects) * 100 : 0;
   const lastMonthConversionRate = lastMonthProspects > 0 ? (lastMonthSales / lastMonthProspects) * 100 : 0;
 
+  // DATA PARA GRÁFICAS
+  // 1. Actividad últimos 7 días
+  const last7Days = eachDayOfInterval({
+    start: subDays(now, 6),
+    end: now
+  });
+
+  const dailyActivity = last7Days.map(day => {
+    const dayStr = format(day, 'eee', { locale: es });
+    const prospects = activeApps.filter(a => isSameDay(parseISO(a.date), day)).length;
+    const sales = activeApps.filter(a => isSameDay(parseISO(a.date), day) && (a.status === 'Cierre' || a.status === 'Apartado')).length;
+    return { day: dayStr, prospects, sales };
+  });
+
+  // 2. Distribución por producto (Mes actual)
+  const productDistribution = activeApps
+    .filter(a => isSameMonth(parseISO(a.date), now))
+    .reduce((acc: any[], app) => {
+      const prod = app.product || 'Casa';
+      const existing = acc.find(item => item.product === prod);
+      if (existing) {
+        existing.count += 1;
+      } else {
+        acc.push({ product: prod, count: 1 });
+      }
+      return acc;
+    }, []);
+
   return {
     todayCount: todayTotal,
     todayConfirmed,
@@ -308,5 +340,9 @@ export const calculateStats = (appointments: Appointment[]) => {
     overdueCommission,
     conversionRate: parseFloat(conversionRate.toFixed(1)),
     lastMonthConversionRate: parseFloat(lastMonthConversionRate.toFixed(1)),
+    charts: {
+      dailyActivity,
+      productDistribution
+    }
   };
 };
