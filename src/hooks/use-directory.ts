@@ -1,0 +1,56 @@
+"use client"
+
+import { useState, useEffect } from 'react';
+import * as Service from '@/services/directory-service';
+import { v4 as uuidv4 } from 'uuid';
+
+export function useDirectory() {
+  const [entries, setEntries] = useState<Service.DirectoryEntry[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    setEntries(Service.getDirectoryFromDisk());
+    setIsLoaded(true);
+  }, []);
+
+  const addEntry = (phone: string, name?: string) => {
+    const newEntry: Service.DirectoryEntry = {
+      id: uuidv4(),
+      phone,
+      name,
+      createdAt: new Date().toISOString(),
+      isProcessed: false
+    };
+    const updated = [newEntry, ...entries];
+    setEntries(updated);
+    Service.saveDirectoryToDisk(updated);
+  };
+
+  const toggleProcessed = (id: string) => {
+    const updated = entries.map(e => 
+      e.id === id ? { ...e, isProcessed: !e.isProcessed } : e
+    );
+    setEntries(updated);
+    Service.saveDirectoryToDisk(updated);
+  };
+
+  const removeEntry = (id: string) => {
+    const updated = entries.filter(e => e.id !== id);
+    setEntries(updated);
+    Service.saveDirectoryToDisk(updated);
+  };
+
+  const clearDirectory = () => {
+    setEntries([]);
+    Service.saveDirectoryToDisk([]);
+  };
+
+  return {
+    entries,
+    addEntry,
+    toggleProcessed,
+    removeEntry,
+    clearDirectory,
+    isLoaded
+  };
+}

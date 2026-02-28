@@ -1,10 +1,10 @@
-
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import CreditCalculator from '@/components/calculator/CreditCalculator';
 import AppointmentsDashboard from '@/components/appointments/AppointmentsDashboard';
 import AdvancedStats from '@/components/stats/AdvancedStats';
+import NumberDirectory from '@/components/directory/NumberDirectory';
 import TrashDialog from '@/components/appointments/TrashDialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
@@ -14,7 +14,7 @@ import {
   CalendarClock, HandCoins, CheckCircle, Search, BadgeAlert, 
   MoreHorizontal, ArrowUpRight, ArrowDownRight, Coins, Star, Trophy, PartyPopper,
   TrendingUp, Trash2, Target, History as HistoryIcon, User, CalendarPlus,
-  Receipt, Landmark, BarChart3, PartyPopper as PartyIcon, ArrowRight
+  Receipt, Landmark, BarChart3, PartyPopper as PartyIcon, ArrowRight, ListTodo
 } from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
 import { Button } from '@/components/ui/button';
@@ -63,6 +63,9 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import * as Service from '@/services/appointment-service';
 import { isBefore } from 'date-fns';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 type Theme = 'corporativo' | 'tranquilo' | 'moderno' | 'discreto' | 'olivares' | 'gelido' | 'corporativo-v2';
 
@@ -77,7 +80,7 @@ const APP_TIPS = [
 ];
 
 export interface FinantoMainProps {
-  initialSection?: 'guia' | 'simulador' | 'gestor' | 'stats';
+  initialSection?: 'guia' | 'simulador' | 'gestor' | 'stats' | 'directorio';
 }
 
 export default function FinantoMain({ initialSection }: FinantoMainProps) {
@@ -88,6 +91,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const [isSimulatorExpanded, setIsSimulatorExpanded] = useState(initialSection === 'simulador');
   const [isGestorExpanded, setIsGestorExpanded] = useState(initialSection === 'gestor');
   const [isStatsExpanded, setIsStatsExpanded] = useState(initialSection === 'stats');
+  const [isDirectoryExpanded, setIsDirectoryExpanded] = useState(initialSection === 'directorio');
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
   const [theme, setTheme] = useState<Theme>('corporativo');
   const [api, setApi] = useState<CarouselApi>();
@@ -95,6 +99,13 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   
   const [pendingCommissionApp, setPendingCommissionApp] = useState<Service.Appointment | null>(null);
   const [celebrationApp, setCelebrationApp] = useState<Service.Appointment | null>(null);
+
+  // Conversion from Directory state
+  const [convertData, setConvertData] = useState<{ phone: string; name?: string } | null>(null);
+  const [convertDate, setConvertDate] = useState('');
+  const [convertTime, setConvertTime] = useState('');
+  const [convertProduct, setConvertProduct] = useState<Service.AppointmentProduct>('Casa');
+  const [convertType, setConvertType] = useState<Service.AppointmentType>('1ra consulta');
   
   const shownCommissionIds = useRef<Set<string>>(new Set());
   const overdueQueue = useRef<Service.Appointment[]>([]);
@@ -104,7 +115,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const appointmentState = useAppointments();
   const { 
     appointments, activeAppointments, stats, isLoaded, resetData, clearAll, 
-    editAppointment, archiveAppointment, unarchiveAppointment, deletePermanent
+    addAppointment, editAppointment, archiveAppointment, unarchiveAppointment, deletePermanent
   } = appointmentState;
   
   const onSelectAppId = (id: string | null) => setSelectedAppId(id);
@@ -114,13 +125,11 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const statsRef = useRef(stats);
   const appointmentsRef = useRef(appointments);
 
-  // Monitor for closures to show celebration
   const prevAppointmentsRef = useRef<Service.Appointment[]>([]);
 
   useEffect(() => {
     if (!isLoaded) return;
 
-    // Detect if an appointment just transitioned to 'Cierre'
     const justClosed = appointments.find(current => {
       const prev = prevAppointmentsRef.current.find(p => p.id === current.id);
       return current.status === 'Cierre' && (!prev || prev.status !== 'Cierre');
@@ -167,10 +176,12 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       document.title = "Gestor - Finanto";
     } else if (isStatsExpanded) {
       document.title = "Estadísticas - Finanto";
+    } else if (isDirectoryExpanded) {
+      document.title = "Directorio - Finanto";
     } else {
       document.title = "Finanto - Gestión Inmobiliaria";
     }
-  }, [showHelp, isSimulatorExpanded, isGestorExpanded, isStatsExpanded]);
+  }, [showHelp, isSimulatorExpanded, isGestorExpanded, isStatsExpanded, isDirectoryExpanded]);
 
   useEffect(() => {
     if (!api) return;
@@ -298,6 +309,36 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       setPendingCommissionApp(null);
       lastClosedTimeRef.current = Date.now();
     }
+  };
+
+  const handleConvertToAppointment = (phone: string, name?: string) => {
+    setConvertData({ phone, name });
+    setConvertDate('');
+    setConvertTime('');
+    setConvertProduct('Casa');
+    setConvertType('1ra consulta');
+  };
+
+  const handleConfirmConvert = () => {
+    if (!convertData || !convertDate || !convertTime) {
+      toast({ title: "Error", description: "Fecha y hora son obligatorias.", variant: "destructive" });
+      return;
+    }
+
+    const isoDate = new Date(convertDate + 'T12:00:00Z').toISOString();
+    addAppointment({
+      name: convertData.name || 'Prospecto Marketplace',
+      phone: convertData.phone,
+      date: isoDate,
+      time: convertTime,
+      product: convertProduct,
+      type: convertType,
+      isArchived: false,
+      isConfirmed: false
+    });
+
+    setConvertData(null);
+    toast({ title: "Cita Registrada", description: `Se ha agendado la cita para ${convertData.name || convertData.phone}.` });
   };
 
   if (!isLoaded) return null;
@@ -563,7 +604,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
               onExpandedChange={setIsStatsExpanded}
             />
           </section>
-          <section className="xl:col-span-7 pb-10">
+          <section className="xl:col-span-7 pb-10 space-y-6">
             <AppointmentsDashboard 
               initialExpanded={initialSection === 'gestor'}
               onExpandedChange={setIsGestorExpanded}
@@ -581,6 +622,11 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
               formatFriendlyDate={appointmentState.formatFriendlyDate} 
               format12hTime={appointmentState.format12hTime} 
               stats={appointmentState.stats}
+            />
+            <NumberDirectory 
+              initialExpanded={initialSection === 'directorio'}
+              onExpandedChange={setIsDirectoryExpanded}
+              onConvertToAppointment={handleConvertToAppointment}
             />
           </section>
         </div>
@@ -876,6 +922,85 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
               <PartyIcon className="w-5 h-5" /> ¡A POR EL SIGUIENTE CIERRE!
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Directory Conversion Dialog */}
+      <Dialog open={!!convertData} onOpenChange={(o) => !o && setConvertData(null)}>
+        <DialogContent className="sm:max-w-[450px] bg-card border-border shadow-2xl z-[80]">
+          <DialogHeader className="bg-accent/5 p-4 -m-6 mb-4 border-b border-accent/20">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-accent/20 rounded-xl">
+                <CalendarPlus className="w-6 h-6 text-accent" />
+              </div>
+              <div>
+                <DialogTitle className="text-foreground">Convertir en Cita</DialogTitle>
+                <DialogDescription className="text-muted-foreground text-xs">Agendando prospecto de Marketplace</DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          
+          <div className="space-y-4 pt-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Nombre</Label>
+                <Input value={convertData?.name || ''} readOnly className="h-9 bg-muted/20" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Teléfono</Label>
+                <Input value={convertData?.phone || ''} readOnly className="h-9 bg-muted/20" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Fecha</Label>
+                <Input type="date" value={convertDate} onChange={e => setConvertDate(e.target.value)} className="h-9" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Hora</Label>
+                <Input type="time" value={convertTime} onChange={e => setConvertTime(e.target.value)} className="h-9" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Producto</Label>
+                <Select value={convertProduct} onValueChange={(v) => setConvertProduct(v as Service.AppointmentProduct)}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Casa">Casa</SelectItem>
+                    <SelectItem value="Departamento">Departamento</SelectItem>
+                    <SelectItem value="Terreno">Terreno</SelectItem>
+                    <SelectItem value="Transporte">Transporte</SelectItem>
+                    <SelectItem value="Préstamo">Préstamo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Motivo</Label>
+                <Select value={convertType} onValueChange={(v) => setConvertType(v as Service.AppointmentType)}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1ra consulta">1ra consulta</SelectItem>
+                    <SelectItem value="2da consulta">2da consulta</SelectItem>
+                    <SelectItem value="Seguimiento">Seguimiento</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 mt-4">
+            <Button variant="outline" onClick={() => setConvertData(null)} className="h-10 text-xs font-bold uppercase">Cancelar</Button>
+            <Button onClick={handleConfirmConvert} className="bg-accent hover:bg-accent/90 text-accent-foreground h-10 flex-1 font-bold shadow-lg">
+              Confirmar Cita
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
