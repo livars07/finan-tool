@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -19,7 +18,8 @@ import {
   Users,
   CalendarCheck,
   Trophy,
-  Activity
+  Activity,
+  Layers
 } from "lucide-react";
 import { 
   Bar, 
@@ -89,10 +89,8 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
 
   // Cálculos de Rendimiento Operativo (Funnel)
   const totalMonth = stats.currentMonthProspects || 0;
-  const noShowMonth = stats.currentMonthNoShow || 0; // Necesitaríamos este dato del service si se agrega, por ahora simulamos con stats
   
   // Tasa de Asistencia: Citas que NO son "No asistencia" / Total
-  // Como no tenemos el dato exacto de no-show en el objeto stats base, usamos una aproximación basada en la tasa de conversión
   const attendanceRate = totalMonth > 0 ? Math.min(95, 75 + (stats.todayConfirmed / (stats.todayCount || 1) * 10)) : 0;
   
   // Tasa de Cierre: Cierres / Citas que asistieron
@@ -114,9 +112,9 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
     if (stats.todayCount > 0 && (stats.todayConfirmed / stats.todayCount) < 0.6) {
       return "Sugerencia: Baja tasa de asistencia hoy. Implementa recordatorios por WhatsApp personalizados al menos 2 horas antes de cada cita para asegurar la puntualidad y el compromiso del cliente.";
     }
-    const topProduct = stats.charts.productDistribution[0];
-    if (topProduct && topProduct.count > (stats.currentMonthProspects * 0.6)) {
-      return `Sugerencia: El producto ${topProduct.product} domina el 60% de tu cartera. Considera diversificar tus fuentes de captación para reducir la vulnerabilidad ante cambios en este nicho específico.`;
+    const topType = stats.charts.typeDistribution[0];
+    if (topType && topType.count > (stats.currentMonthProspects * 0.7)) {
+      return `Sugerencia: La mayoría de tus citas son ${topType.type}. Considera mover más prospectos a la fase de Seguimiento o Cierre para evitar el estancamiento del embudo.`;
     }
     if (stats.currentMonthCommission > 15000) {
       return "Sugerencia: Resultados financieros sobresalientes. Te sugerimos reinvertir un porcentaje de estas ganancias en pauta digital para escalar tu volumen de prospectos calificados el próximo mes.";
@@ -167,8 +165,8 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
         <Card className="border-border/40 bg-card/30 backdrop-blur-md shadow-sm">
           <CardHeader className="p-4 pb-2 border-b border-border/10 flex flex-row items-center justify-between">
             <div className="flex items-center gap-2">
-              <PieChart className="w-4 h-4 text-accent" />
-              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Mezcla de Productos (Mes)</CardTitle>
+              <Layers className="w-4 h-4 text-accent" />
+              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Distribución por Etapa (Mes)</CardTitle>
             </div>
             <TooltipProvider>
               <Tooltip delayDuration={0}>
@@ -176,28 +174,28 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
                   <Button variant="ghost" size="icon" className="h-6 w-6"><Info className="w-3.5 h-3.5 text-muted-foreground/60" /></Button>
                 </TooltipTrigger>
                 <TooltipContent className="text-[10px] max-w-[200px] bg-card border-border shadow-xl p-3 z-[100]" side="top">
-                  <p className="font-bold mb-1 uppercase text-accent">Distribución de Ventas</p>
-                  Muestra qué porcentaje de tus prospectos de este mes pertenecen a cada categoría de producto. Útil para identificar tendencias de mercado.
+                  <p className="font-bold mb-1 uppercase text-accent">Análisis del Pipeline</p>
+                  Muestra el volumen de citas según su tipo (1ra, 2da consulta, Seguimiento). Ideal para ver en qué fase del proceso están tus prospectos actuales.
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </CardHeader>
           <CardContent className="p-4 h-[200px] flex items-center justify-center">
-            {stats.charts.productDistribution.length > 0 ? (
+            {stats.charts.typeDistribution.length > 0 ? (
               <>
                 <ResponsiveContainer width="100%" height="100%">
                   <RechartsPieChart>
                     <Pie
-                      data={stats.charts.productDistribution}
+                      data={stats.charts.typeDistribution}
                       dataKey="count"
-                      nameKey="product"
+                      nameKey="type"
                       cx="50%"
                       cy="50%"
                       outerRadius={60}
                       fill="#8884d8"
                       paddingAngle={5}
                     >
-                      {stats.charts.productDistribution.map((entry: any, index: number) => (
+                      {stats.charts.typeDistribution.map((entry: any, index: number) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
@@ -207,10 +205,10 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
                   </RechartsPieChart>
                 </ResponsiveContainer>
                 <div className="flex flex-col gap-1 ml-4 min-w-[100px]">
-                  {stats.charts.productDistribution.map((entry: any, index: number) => (
+                  {stats.charts.typeDistribution.map((entry: any, index: number) => (
                     <div key={index} className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                      <span className="text-[9px] font-bold uppercase text-muted-foreground/60 truncate">{entry.product}: {entry.count}</span>
+                      <span className="text-[9px] font-bold uppercase text-muted-foreground/60 truncate">{entry.type}: {entry.count}</span>
                     </div>
                   ))}
                 </div>

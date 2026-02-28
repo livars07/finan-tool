@@ -11,6 +11,7 @@ export interface DirectoryEntry {
   name?: string;
   createdAt: string;
   isProcessed: boolean;
+  messageSent?: boolean;
 }
 
 export const DIRECTORY_STORAGE_KEY = 'FINANTO_DIRECTORY_V1';

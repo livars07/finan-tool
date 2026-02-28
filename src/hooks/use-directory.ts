@@ -19,7 +19,8 @@ export function useDirectory() {
       phone,
       name,
       createdAt: new Date().toISOString(),
-      isProcessed: false
+      isProcessed: false,
+      messageSent: false
     };
     const updated = [newEntry, ...entries];
     setEntries(updated);
@@ -29,6 +30,14 @@ export function useDirectory() {
   const toggleProcessed = (id: string) => {
     const updated = entries.map(e => 
       e.id === id ? { ...e, isProcessed: !e.isProcessed } : e
+    );
+    setEntries(updated);
+    Service.saveDirectoryToDisk(updated);
+  };
+
+  const toggleMessageSent = (id: string) => {
+    const updated = entries.map(e => 
+      e.id === id ? { ...e, messageSent: !e.messageSent } : e
     );
     setEntries(updated);
     Service.saveDirectoryToDisk(updated);
@@ -49,6 +58,7 @@ export function useDirectory() {
     entries,
     addEntry,
     toggleProcessed,
+    toggleMessageSent,
     removeEntry,
     clearDirectory,
     isLoaded

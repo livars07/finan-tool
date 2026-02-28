@@ -303,16 +303,16 @@ export const calculateStats = (appointments: Appointment[]) => {
     return { day: dayStr, prospects, sales };
   });
 
-  // 2. Distribución por producto (Mes actual)
-  const productDistribution = activeApps
+  // 2. Distribución por Etapa (Tipos de Cita - Mes actual)
+  const typeDistribution = activeApps
     .filter(a => isSameMonth(parseISO(a.date), now))
     .reduce((acc: any[], app) => {
-      const prod = app.product || 'Casa';
-      const existing = acc.find(item => item.product === prod);
+      const type = app.type || '1ra consulta';
+      const existing = acc.find(item => item.type === type);
       if (existing) {
         existing.count += 1;
       } else {
-        acc.push({ product: prod, count: 1 });
+        acc.push({ type: type, count: 1 });
       }
       return acc;
     }, []);
@@ -342,7 +342,7 @@ export const calculateStats = (appointments: Appointment[]) => {
     lastMonthConversionRate: parseFloat(lastMonthConversionRate.toFixed(1)),
     charts: {
       dailyActivity,
-      productDistribution
+      typeDistribution
     }
   };
 };
