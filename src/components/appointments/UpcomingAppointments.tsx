@@ -87,11 +87,24 @@ export default function UpcomingAppointments({
   const [finalStatus, setFinalStatus] = useState<AppointmentStatus>('Asistencia');
   const [finalNotes, setFinalNotes] = useState('');
   const [finalCreditAmount, setFinalCreditAmount] = useState<number>(0);
+  const [creditInput, setCreditInput] = useState('');
   const [finalCommissionPercent, setFinalCommissionPercent] = useState<number>(100);
 
   const { toast } = useToast();
 
   const isActuallyToday = (dateStr: string) => isToday(parseISO(dateStr));
+
+  const formatWithCommas = (val: string) => {
+    const num = val.replace(/[^0-9]/g, '');
+    if (!num) return '';
+    return num.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
+  const handleCreditChange = (val: string) => {
+    const formatted = formatWithCommas(val);
+    setCreditInput(formatted);
+    setFinalCreditAmount(parseInt(formatted.replace(/,/g, '')) || 0);
+  };
 
   const handleConfirmArchive = () => {
     if (archiveConfirmId) {
@@ -134,7 +147,9 @@ export default function UpcomingAppointments({
     setFinalizingApp(app);
     setFinalStatus('Asistencia');
     setFinalNotes(app.notes || '');
-    setFinalCreditAmount(app.finalCreditAmount || 0);
+    const amount = app.finalCreditAmount || 0;
+    setFinalCreditAmount(amount);
+    setCreditInput(amount > 0 ? amount.toLocaleString('en-US') : '');
     setFinalCommissionPercent(app.commissionPercent || 100);
   };
 
@@ -345,7 +360,7 @@ export default function UpcomingAppointments({
                             </Button>
                           )}
                           <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground/40 hover:text-primary transition-colors" onClick={() => onSelect(app)}>
-                            <ChevronRight className="h-4 h-4" />
+                            <ChevronRight className="h-4 w-4" />
                           </Button>
                         </div>
                       </TableCell>
@@ -418,7 +433,7 @@ export default function UpcomingAppointments({
           
           <div className="space-y-6 pt-4">
             <div className="space-y-2">
-              <Label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Resultado de la cita</Label>
+              <Label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest block text-center">Resultado de la cita</Label>
               <Select value={finalStatus} onValueChange={(v) => setFinalStatus(v as AppointmentStatus)}>
                 <SelectTrigger className="h-11 bg-muted/20 border-border/40 focus:ring-green-500">
                   <SelectValue placeholder="Selecciona el resultado..." />
@@ -436,53 +451,56 @@ export default function UpcomingAppointments({
             </div>
 
             {finalStatus === 'Cierre' && (
-              <div className="p-4 bg-green-500/5 border-2 border-green-500/20 rounded-xl space-y-4 animate-in slide-in-from-top-2 duration-300">
-                <div className="flex items-center gap-2 border-b border-green-500/10 pb-2">
+              <div className="p-6 bg-green-500/5 border-2 border-green-500/20 rounded-xl space-y-6 animate-in slide-in-from-top-2 duration-300">
+                <div className="flex items-center justify-center gap-2 border-b border-green-500/10 pb-3">
                   <Coins className="w-4 h-4 text-green-600" />
                   <span className="text-[10px] font-bold uppercase tracking-widest text-green-700">Configuración Financiera</span>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <Label className="text-[9px] font-bold uppercase text-muted-foreground flex items-center gap-1">
-                      Monto de Crédito
+                <div className="grid grid-cols-1 gap-6">
+                  <div className="space-y-2 text-center">
+                    <Label className="text-[10px] font-bold uppercase text-muted-foreground block">
+                      Monto de Crédito Final
                     </Label>
-                    <div className="relative">
-                      <span className="absolute left-2.5 top-2 text-[10px] font-bold text-muted-foreground">$</span>
+                    <div className="relative max-w-[240px] mx-auto">
+                      <span className="absolute left-4 top-2.5 text-xs font-bold text-green-600">$</span>
                       <Input 
-                        type="number"
-                        value={finalCreditAmount || ''} 
-                        onChange={e => setFinalCreditAmount(parseFloat(e.target.value) || 0)}
-                        className="h-8 pl-5 bg-background border-green-500/20 text-xs font-bold"
+                        type="text"
+                        value={creditInput} 
+                        onChange={e => handleCreditChange(e.target.value)}
+                        className="h-10 pl-8 pr-4 bg-background border-green-500/30 text-sm font-black text-center focus:ring-green-500"
+                        placeholder="0"
                       />
                     </div>
                   </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-[9px] font-bold uppercase text-muted-foreground">Participación %</Label>
-                    <div className="relative">
+
+                  <div className="space-y-2 text-center border-t border-green-500/10 pt-4">
+                    <Label className="text-[10px] font-bold uppercase text-muted-foreground block">Participación en Comisión</Label>
+                    <div className="relative max-w-[120px] mx-auto">
                       <Input 
                         type="number"
                         max={100}
                         value={finalCommissionPercent || ''} 
                         onChange={e => setFinalCommissionPercent(parseFloat(e.target.value) || 0)}
-                        className="h-8 pr-6 bg-background border-green-500/20 text-xs font-bold"
+                        className="h-10 pr-8 bg-background border-green-500/30 text-sm font-black text-center focus:ring-green-500"
+                        placeholder="100"
                       />
-                      <span className="absolute right-2 top-2 text-[10px] font-bold text-green-600">%</span>
+                      <span className="absolute right-4 top-2.5 text-xs font-bold text-green-600">%</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-2 flex items-center justify-between">
-                  <div className="flex items-center gap-1">
-                    <span className="text-[10px] font-bold uppercase text-muted-foreground">Comisión Proyectada:</span>
+                <div className="pt-4 border-t border-green-500/20 flex flex-col items-center gap-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-bold uppercase text-muted-foreground">Comisión Proyectada (Neto):</span>
                     <TooltipProvider>
                       <Tooltip>
-                        <TooltipTrigger asChild><Info className="w-3 h-3 text-muted-foreground/40 cursor-help" /></TooltipTrigger>
-                        <TooltipContent className="text-[10px] z-[170]">Incluye retención del 9% de impuesto.</TooltipContent>
+                        <TooltipTrigger asChild><Info className="w-3.5 h-3.5 text-muted-foreground/40 cursor-help" /></TooltipTrigger>
+                        <TooltipContent className="text-[10px] z-[170]">Incluye retención del 9% de impuesto sobre el 0.7% del crédito.</TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                   </div>
-                  <span className="text-sm font-bold text-green-600">{formatCurrency(calculatedCommission)}</span>
+                  <span className="text-2xl font-black text-green-600 tracking-tight">{formatCurrency(calculatedCommission)}</span>
                 </div>
               </div>
             )}
