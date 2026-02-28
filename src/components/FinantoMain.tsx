@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -302,8 +303,9 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
 
   const handleCelebration = (app: Service.Appointment) => {
     setCelebrationApp(app);
-    const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3");
-    audio.volume = 0.5;
+    // Sonido más formal y corto para cierres corporativos
+    const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3");
+    audio.volume = 0.6;
     audio.play().catch(() => {});
   };
 

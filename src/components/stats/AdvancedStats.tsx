@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -91,6 +92,9 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
   const avgCommission = stats.currentMonthSales > 0 ? stats.currentMonthCommission / stats.currentMonthSales : 0;
   const monthlyGrowth = stats.lastMonthProspects > 0 ? ((stats.currentMonthProspects - stats.lastMonthProspects) / stats.lastMonthProspects) * 100 : 0;
   const taxImpact = stats.currentMonthCommission / 0.91 * 0.09;
+
+  // Cierre mensual fijo en 5
+  const MONTHLY_GOAL = 5;
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('es-MX', {
@@ -317,7 +321,12 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
                   </div>
                   <div>
                     <p className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest">Ingresos Totales (Neto)</p>
-                    <p className="text-xl font-black truncate">{formatCurrency(stats.currentMonthCommission)}</p>
+                    <p className={cn(
+                      "text-xl font-black truncate",
+                      stats.currentMonthCommission > 5000 && "bg-gradient-to-r from-[#00F5FF] via-[#7B61FF] to-[#FF00D6] bg-clip-text text-transparent"
+                    )}>
+                      {formatCurrency(stats.currentMonthCommission)}
+                    </p>
                   </div>
                   <div className="grid grid-cols-1 gap-1 pt-2 border-t border-border/10">
                     <div className="flex justify-between">
@@ -402,10 +411,10 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
                     <div>
                       <p className="text-[9px] uppercase font-bold text-muted-foreground">Meta de Cierre Mensual</p>
                       <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-black">{stats.currentMonthSales} / {Math.max(stats.lastMonthSales + 2, 10)}</span>
-                        <span className="text-xs font-bold text-primary">+{Math.round((stats.currentMonthSales / (stats.lastMonthSales + 2 || 10)) * 100)}%</span>
+                        <span className="text-2xl font-black">{stats.currentMonthSales} / {MONTHLY_GOAL}</span>
+                        <span className="text-xs font-bold text-primary">+{Math.round((stats.currentMonthSales / MONTHLY_GOAL) * 100)}%</span>
                       </div>
-                      <Progress value={(stats.currentMonthSales / (stats.lastMonthSales + 2 || 10)) * 100} className="h-1.5 mt-2" />
+                      <Progress value={(stats.currentMonthSales / MONTHLY_GOAL) * 100} className="h-1.5 mt-2" />
                     </div>
                   </Card>
                 </div>
