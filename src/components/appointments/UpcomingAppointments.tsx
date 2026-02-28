@@ -7,12 +7,13 @@ import {
   Clock, Calendar, CheckCircle2, AlertCircle, 
   CheckCircle, ClipboardCheck, Phone, Box, ChevronRight, 
   Trash2, RotateCcw, Archive, CheckCircle as CheckIcon,
-  Save, MessageSquare
+  Save, MessageSquare, Coins, Percent, Info
 } from "lucide-react";
 import { parseISO, isToday, addDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -85,6 +86,8 @@ export default function UpcomingAppointments({
   
   const [finalStatus, setFinalStatus] = useState<AppointmentStatus>('Asistencia');
   const [finalNotes, setFinalNotes] = useState('');
+  const [finalCreditAmount, setFinalCreditAmount] = useState<number>(0);
+  const [finalCommissionPercent, setFinalCommissionPercent] = useState<number>(100);
 
   const { toast } = useToast();
 
@@ -131,29 +134,47 @@ export default function UpcomingAppointments({
     setFinalizingApp(app);
     setFinalStatus('Asistencia');
     setFinalNotes(app.notes || '');
+    setFinalCreditAmount(app.finalCreditAmount || 0);
+    setFinalCommissionPercent(app.commissionPercent || 100);
   };
 
   const handleSaveFinalization = () => {
     if (finalizingApp) {
+      const isCierre = finalStatus === 'Cierre';
+      
       editAppointment(finalizingApp.id, { 
         status: finalStatus, 
-        notes: finalNotes 
+        notes: finalNotes,
+        finalCreditAmount: isCierre ? finalCreditAmount : undefined,
+        commissionPercent: isCierre ? finalCommissionPercent : undefined,
+        commissionStatus: isCierre ? 'Pendiente' : undefined
       });
+
       toast({
-        title: "Consulta Finalizada",
+        title: isCierre ? "¡Venta Cerrada!" : "Consulta Finalizada",
         description: `Se ha registrado el resultado "${finalStatus}" para ${finalizingApp.name}.`,
       });
       
       const appRef = finalizingApp;
       setFinalizingApp(null);
 
-      if (finalStatus === 'Cierre' && onCelebrate) {
+      if (isCierre && onCelebrate) {
         onCelebrate(appRef);
       } else {
         onSelect(appRef);
       }
     }
   };
+
+  const formatCurrency = (val: number) => {
+    return new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency: 'MXN',
+      maximumFractionDigits: 0
+    }).format(Math.round(val));
+  };
+
+  const calculatedCommission = (finalCreditAmount * 0.007 * (finalCommissionPercent / 100)) * 0.91;
 
   const copyPhone = (e: React.MouseEvent, app: Appointment) => {
     e.stopPropagation();
@@ -343,7 +364,7 @@ export default function UpcomingAppointments({
       </div>
 
       <AlertDialog open={!!archiveConfirmId} onOpenChange={(o) => !o && setArchiveConfirmId(null)}>
-        <AlertDialogContent className="z-[100]">
+        <AlertDialogContent className="z-[160]">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Archivar cita?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -360,7 +381,7 @@ export default function UpcomingAppointments({
       </AlertDialog>
 
       <AlertDialog open={!!confirmingApp} onOpenChange={(o) => !o && setConfirmingApp(null)}>
-        <AlertDialogContent className="z-[100] border-border">
+        <AlertDialogContent className="z-[160] border-border">
           <AlertDialogHeader>
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-primary/10 rounded-full">
@@ -382,8 +403,8 @@ export default function UpcomingAppointments({
       </AlertDialog>
 
       <Dialog open={!!finalizingApp} onOpenChange={(o) => !o && setFinalizingApp(null)}>
-        <DialogContent className="sm:max-w-[450px] border-green-200 bg-card shadow-2xl z-[100]">
-          <DialogHeader className="bg-green-500/5 p-4 -m-6 mb-4 border-b border-green-500/20">
+        <DialogContent className="sm:max-w-[500px] border-green-200 bg-card shadow-2xl z-[160] max-h-[90vh] overflow-y-auto scrollbar-thin">
+          <DialogHeader className="bg-green-500/5 p-4 -m-6 mb-4 border-b border-green-500/20 shrink-0">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-green-500/20 rounded-xl">
                 <CheckIcon className="w-6 h-6 text-green-600" />
@@ -414,20 +435,72 @@ export default function UpcomingAppointments({
               </Select>
             </div>
 
+            {finalStatus === 'Cierre' && (
+              <div className="p-4 bg-green-500/5 border-2 border-green-500/20 rounded-xl space-y-4 animate-in slide-in-from-top-2 duration-300">
+                <div className="flex items-center gap-2 border-b border-green-500/10 pb-2">
+                  <Coins className="w-4 h-4 text-green-600" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-green-700">Configuración Financiera</span>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] font-bold uppercase text-muted-foreground flex items-center gap-1">
+                      Monto de Crédito
+                    </Label>
+                    <div className="relative">
+                      <span className="absolute left-2.5 top-2 text-[10px] font-bold text-muted-foreground">$</span>
+                      <Input 
+                        type="number"
+                        value={finalCreditAmount || ''} 
+                        onChange={e => setFinalCreditAmount(parseFloat(e.target.value) || 0)}
+                        className="h-8 pl-5 bg-background border-green-500/20 text-xs font-bold"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] font-bold uppercase text-muted-foreground">Participación %</Label>
+                    <div className="relative">
+                      <Input 
+                        type="number"
+                        max={100}
+                        value={finalCommissionPercent || ''} 
+                        onChange={e => setFinalCommissionPercent(parseFloat(e.target.value) || 0)}
+                        className="h-8 pr-6 bg-background border-green-500/20 text-xs font-bold"
+                      />
+                      <span className="absolute right-2 top-2 text-[10px] font-bold text-green-600">%</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2 flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <span className="text-[10px] font-bold uppercase text-muted-foreground">Comisión Proyectada:</span>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild><Info className="w-3 h-3 text-muted-foreground/40 cursor-help" /></TooltipTrigger>
+                        <TooltipContent className="text-[10px] z-[170]">Incluye retención del 9% de impuesto.</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <span className="text-sm font-bold text-green-600">{formatCurrency(calculatedCommission)}</span>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label className="flex items-center gap-2 text-[10px] font-bold uppercase text-muted-foreground tracking-widest">
                 <MessageSquare className="w-3.5 h-3.5" /> Notas del resultado
               </Label>
               <Textarea 
                 placeholder="Escribe aquí los acuerdos, dudas o detalles del cierre..."
-                className="bg-muted/10 border-border/40 min-h-[150px] resize-none text-sm"
+                className="bg-muted/10 border-border/40 min-h-[120px] resize-none text-sm"
                 value={finalNotes}
                 onChange={(e) => setFinalNotes(e.target.value)}
               />
             </div>
           </div>
 
-          <DialogFooter className="gap-2 mt-4">
+          <DialogFooter className="gap-2 mt-4 shrink-0">
             <Button variant="ghost" onClick={() => setFinalizingApp(null)} className="h-11 px-6 font-bold uppercase text-xs">Cancelar</Button>
             <Button onClick={handleSaveFinalization} className="bg-green-600 hover:bg-green-700 text-white h-11 flex-1 font-bold shadow-lg gap-2">
               <Save className="w-4 h-4" /> Guardar Resultado
