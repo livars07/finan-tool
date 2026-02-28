@@ -48,6 +48,7 @@ interface DashboardContentProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   appointments: Appointment[];
+  editAppointment: (id: string, data: Partial<Appointment>) => void;
   archiveAppointment: (id: string) => void;
   unarchiveAppointment: (id: string) => void;
   formatFriendlyDate: (date: string) => string;
@@ -67,6 +68,7 @@ const DashboardContent = ({
   activeTab, 
   setActiveTab,
   appointments,
+  editAppointment,
   archiveAppointment,
   unarchiveAppointment,
   formatFriendlyDate,
@@ -88,7 +90,6 @@ const DashboardContent = ({
 
   const today = startOfDay(new Date());
 
-  // Filtrado dinámico basado únicamente en el estado appointments y la vista seleccionada
   const filteredList = appointments.filter(a => {
     const matchesView = view === "activas" ? !a.isArchived : a.isArchived;
     if (!matchesView) return false;
@@ -298,6 +299,7 @@ const DashboardContent = ({
             format12hTime={format12hTime}
             onSelect={handleSelect}
             onHighlight={handleHighlight}
+            editAppointment={editAppointment}
             archiveAppointment={archiveAppointment}
             unarchiveAppointment={unarchiveAppointment}
             activeId={activeId}
@@ -435,6 +437,7 @@ export default function AppointmentsDashboard({
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               appointments={appointments}
+              editAppointment={editAppointment}
               archiveAppointment={archiveAppointment}
               unarchiveAppointment={unarchiveAppointment}
               formatFriendlyDate={formatFriendlyDate}
@@ -454,7 +457,7 @@ export default function AppointmentsDashboard({
 
       <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
         <DialogContent 
-          data-appointments-dialog="true"
+          data-calculator-dialog="true"
           className="max-w-none w-screen h-screen m-0 rounded-none bg-background border-none shadow-none p-0 flex flex-col overflow-hidden z-[60]"
         >
           <DialogHeader className="px-6 py-4 border-b border-border/40 flex flex-row items-center justify-between bg-card/10 shrink-0">
@@ -490,6 +493,7 @@ export default function AppointmentsDashboard({
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               appointments={appointments}
+              editAppointment={editAppointment}
               archiveAppointment={archiveAppointment}
               unarchiveAppointment={unarchiveAppointment}
               formatFriendlyDate={formatFriendlyDate}

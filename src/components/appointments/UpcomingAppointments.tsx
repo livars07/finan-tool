@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -47,6 +48,7 @@ interface Props {
   format12hTime: (time: string) => string;
   onSelect: (app: Appointment) => void;
   onHighlight: (app: Appointment) => void;
+  editAppointment: (id: string, data: Partial<Appointment>) => void;
   archiveAppointment: (id: string) => void;
   unarchiveAppointment: (id: string) => void;
   activeId?: string | null;
@@ -61,6 +63,7 @@ export default function UpcomingAppointments({
   format12hTime, 
   onSelect, 
   onHighlight,
+  editAppointment,
   archiveAppointment,
   unarchiveAppointment,
   activeId,
@@ -90,6 +93,18 @@ export default function UpcomingAppointments({
     toast({
       title: "Cita restaurada",
       description: `${app.name} ha vuelto a activas.`,
+    });
+  };
+
+  const handleToggleConfirmation = (e: React.MouseEvent, app: Appointment) => {
+    e.stopPropagation();
+    const newStatus = !app.isConfirmed;
+    editAppointment(app.id, { isConfirmed: newStatus });
+    toast({
+      title: newStatus ? "Cita Confirmada" : "Confirmación Removida",
+      description: newStatus 
+        ? `${app.name} ha confirmado su asistencia para hoy.` 
+        : `Se ha quitado la marca de confirmación para ${app.name}.`,
     });
   };
 
@@ -170,7 +185,20 @@ export default function UpcomingAppointments({
                     >
                       <TableCell className="align-middle pl-4">
                         <div className="flex items-center gap-2">
-                          {appToday && <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shrink-0" title="Cita para hoy" />}
+                          {appToday && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className={cn(
+                                "w-6 h-6 rounded-full shrink-0 transition-all",
+                                app.isConfirmed ? "bg-green-500 text-white hover:bg-green-600" : "bg-primary/20 text-primary animate-pulse hover:bg-primary/30"
+                              )}
+                              onClick={(e) => handleToggleConfirmation(e, app)}
+                              title={app.isConfirmed ? "Confirmado" : "Click para confirmar asistencia"}
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                            </Button>
+                          )}
                           <div className="font-bold text-sm leading-tight text-foreground">{app.name}</div>
                         </div>
                         {!expanded && (
