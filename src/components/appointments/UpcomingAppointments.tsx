@@ -67,17 +67,21 @@ export default function UpcomingAppointments({
   expanded = false,
   theme = 'corporativo'
 }: Props) {
+  const [archiveConfirmId, setArchiveConfirmId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const isActuallyToday = (dateStr: string) => isToday(parseISO(dateStr));
 
-  const handleArchiveAction = (e: React.MouseEvent, app: Appointment) => {
-    e.stopPropagation();
-    archiveAppointment(app.id);
-    toast({
-      title: "Cita archivada",
-      description: `${app.name} se ha movido a archivadas.`,
-    });
+  const handleConfirmArchive = () => {
+    if (archiveConfirmId) {
+      const app = appointments.find(a => a.id === archiveConfirmId);
+      archiveAppointment(archiveConfirmId);
+      toast({
+        title: "Cita archivada",
+        description: `${app?.name} se ha movido a archivadas.`,
+      });
+      setArchiveConfirmId(null);
+    }
   };
 
   const handleRestoreAction = (e: React.MouseEvent, app: Appointment) => {
@@ -146,7 +150,7 @@ export default function UpcomingAppointments({
                   {expanded && <TableHead className="bg-card">Producto</TableHead>}
                   <TableHead className="bg-card">Fecha / Estado</TableHead>
                   <TableHead className="bg-card">Hora</TableHead>
-                  <TableHead className="bg-card w-32 text-center">Acción</TableHead>
+                  <TableHead className="bg-card w-24 text-center">Acción</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -209,28 +213,30 @@ export default function UpcomingAppointments({
                         </div>
                       </TableCell>
                       <TableCell className="align-middle text-center" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-center gap-1">
                           {app.isArchived ? (
                             <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="h-7 text-[9px] font-bold uppercase border-primary/40 text-primary hover:bg-primary/10"
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-muted-foreground/40 hover:text-primary hover:bg-primary/10 transition-colors"
                               onClick={(e) => handleRestoreAction(e, app)}
+                              title="Restaurar"
                             >
-                              <RotateCcw className="w-3 h-3 mr-1" /> Restaurar
+                              <RotateCcw className="w-4 h-4" />
                             </Button>
                           ) : (
                             <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="h-7 text-[9px] font-bold uppercase border-destructive/40 text-destructive hover:bg-destructive/10"
-                              onClick={(e) => handleArchiveAction(e, app)}
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-colors"
+                              onClick={(e) => { e.stopPropagation(); setArchiveConfirmId(app.id); }}
+                              title="Archivar"
                             >
-                              <Archive className="w-3 h-3 mr-1" /> Archivar
+                              <Archive className="w-4 h-4" />
                             </Button>
                           )}
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => onSelect(app)}>
-                            <ChevronRight className="h-4 w-4" />
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground/40 hover:text-primary transition-colors" onClick={() => onSelect(app)}>
+                            <ChevronRight className="h-4 h-4" />
                           </Button>
                         </div>
                       </TableCell>
@@ -247,6 +253,23 @@ export default function UpcomingAppointments({
           <ClipboardCheck className="w-4 h-4" /> Reporte Diario
         </Button>
       </div>
+
+      <AlertDialog open={!!archiveConfirmId} onOpenChange={(o) => !o && setArchiveConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Archivar cita?</AlertDialogTitle>
+            <AlertDialogDescription>
+              La cita se moverá a la papelera. Podrás restaurarla en cualquier momento desde el selector de vista "Archivadas".
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmArchive} className="bg-destructive hover:bg-destructive/90 text-white">
+              Sí, archivar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
