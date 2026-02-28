@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -89,10 +88,9 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
   const closingRate = attendanceRate > 0 ? (stats.conversionRate / (attendanceRate / 100)) : 0;
   const productivityScore = Math.min(100, (stats.conversionRate * 3) + (attendanceRate * 0.4));
 
-  // Datos Derivados
   const avgCommission = stats.currentMonthSales > 0 ? stats.currentMonthCommission / stats.currentMonthSales : 0;
   const monthlyGrowth = stats.lastMonthProspects > 0 ? ((stats.currentMonthProspects - stats.lastMonthProspects) / stats.lastMonthProspects) * 100 : 0;
-  const taxImpact = stats.currentMonthCommission / 0.91 * 0.09; // Estimación del 9% retenido
+  const taxImpact = stats.currentMonthCommission / 0.91 * 0.09;
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('es-MX', {
@@ -170,7 +168,7 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-1.5">
                 <span className="text-[9px] uppercase font-bold text-muted-foreground">1. Tasa de Asistencia</span>
-                <TooltipProvider><Tooltip><TooltipTrigger><Info className="w-2.5 h-2.5 opacity-40"/></TooltipTrigger><TooltipContent className="text-[10px] z-[110]">Porcentaje de citas que confirmaron asistencia hoy.</TooltipContent></Tooltip></TooltipProvider>
+                <TooltipProvider><Tooltip><TooltipTrigger asChild><Info className="w-2.5 h-2.5 opacity-40 cursor-help"/></TooltipTrigger><TooltipContent className="text-[10px] z-[110]">Porcentaje de citas que confirmaron asistencia hoy.</TooltipContent></Tooltip></TooltipProvider>
               </div>
               <span className="text-xs font-bold text-blue-500">{Math.round(attendanceRate)}%</span>
             </div>
@@ -181,7 +179,7 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-1.5">
                 <span className="text-[9px] uppercase font-bold text-muted-foreground">2. Efectividad de Cierre</span>
-                <TooltipProvider><Tooltip><TooltipTrigger><Info className="w-2.5 h-2.5 opacity-40"/></TooltipTrigger><TooltipContent className="text-[10px] z-[110]">Ventas logradas divididas entre prospectos atendidos.</TooltipContent></Tooltip></TooltipProvider>
+                <TooltipProvider><Tooltip><TooltipTrigger asChild><Info className="w-2.5 h-2.5 opacity-40 cursor-help"/></TooltipTrigger><TooltipContent className="text-[10px] z-[110]">Ventas logradas divididas entre prospectos atendidos.</TooltipContent></Tooltip></TooltipProvider>
               </div>
               <span className="text-xs font-bold text-green-500">{Math.round(closingRate)}%</span>
             </div>
@@ -218,7 +216,7 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
       <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
         <DialogContent 
           data-calculator-dialog="true"
-          className="max-w-none w-screen h-screen m-0 rounded-none bg-background border-none shadow-none p-0 flex flex-col overflow-hidden z-[60]"
+          className="max-w-none w-screen h-screen m-0 rounded-none bg-background border-none shadow-none p-0 flex flex-col overflow-hidden"
         >
           <DialogHeader className="px-6 py-4 border-b border-border/40 flex flex-row items-center justify-between bg-card/10 shrink-0">
             <div className="flex items-center gap-3">
@@ -239,8 +237,6 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
 
           <div className="flex-1 overflow-y-auto p-8 scrollbar-thin bg-muted/5">
             <div className="max-w-[1400px] mx-auto space-y-8">
-              
-              {/* SECCIÓN 1: LOS 5 GRANDES (EXTENDIDOS) */}
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <Card className="bg-card/40 border-primary/20 p-4 space-y-3">
                   <div className="flex justify-between items-start">
@@ -336,10 +332,7 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
                 </Card>
               </div>
 
-              {/* SECCIÓN 2: INSIGHTS DERIVADOS Y GRÁFICAS */}
               <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-                
-                {/* Lado Izquierdo: Gráficas Comparativas */}
                 <div className="xl:col-span-8 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <WeeklyChart data={stats.charts.dailyActivity} title="Flujo Semana Actual" icon={CalendarDays} />
@@ -384,7 +377,6 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
                   </Card>
                 </div>
 
-                {/* Lado Derecho: Rendimiento y Sugerencias */}
                 <div className="xl:col-span-4 space-y-6">
                   <PerformanceSection />
                   
@@ -417,7 +409,6 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
                     </div>
                   </Card>
                 </div>
-
               </div>
             </div>
           </div>

@@ -182,7 +182,6 @@ Hora: ${timeBold}${confirmedBold}`;
   };
 
   const showCommissionPanel = appointment.status === 'Cierre' || appointment.status === 'Apartado';
-  // Cálculo con retención del 9% de impuesto
   const commissionValue = ((editData.finalCreditAmount || 0) * 0.007 * ((editData.commissionPercent || 0) / 100)) * 0.91;
 
   const calculatePaymentDateText = (dateStr: string) => {
@@ -266,7 +265,7 @@ Hora: ${timeBold}${confirmedBold}`;
       }
     }}>
       <DialogContent 
-        className="sm:max-w-[550px] bg-card border-border p-0 shadow-xl backdrop-blur-md z-[70] overflow-hidden flex flex-col max-h-[95vh]"
+        className="sm:max-w-[550px] bg-card border-border p-0 shadow-xl backdrop-blur-md overflow-hidden flex flex-col max-h-[95vh]"
       >
         <DialogHeader className="px-6 py-3 border-b border-border/40 flex flex-row items-center justify-between bg-card/10 shrink-0">
           <DialogTitle className="text-lg font-headline font-bold text-foreground">
@@ -674,9 +673,8 @@ Hora: ${timeBold}${confirmedBold}`;
           </div>
         </DialogFooter>
 
-        {/* Nested Dialogs for correct stacking and dismissing logic */}
         <AlertDialog open={showArchiveConfirm} onOpenChange={setShowArchiveConfirm}>
-          <AlertDialogContent className="z-[160]">
+          <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>¿Archivar registro?</AlertDialogTitle>
               <AlertDialogDescription>
@@ -694,7 +692,7 @@ Hora: ${timeBold}${confirmedBold}`;
 
         <Dialog open={isRescheduling} onOpenChange={setIsRescheduling}>
           <DialogContent 
-            className="sm:max-w-[450px] bg-card border-border shadow-2xl backdrop-blur-md z-[160]"
+            className="sm:max-w-[450px] bg-card border-border shadow-2xl backdrop-blur-md"
           >
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">

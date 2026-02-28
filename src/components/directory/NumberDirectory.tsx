@@ -298,7 +298,7 @@ export default function NumberDirectory({
       <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
         <DialogContent 
           data-calculator-dialog="true"
-          className="max-w-none w-screen h-screen m-0 rounded-none bg-background border-none shadow-none p-0 flex flex-col overflow-hidden z-[60]"
+          className="max-w-none w-screen h-screen m-0 rounded-none bg-background border-none shadow-none p-0 flex flex-col overflow-hidden"
         >
           <DialogHeader className="px-6 py-4 border-b border-border/40 flex flex-row items-center justify-between bg-card/10 shrink-0">
             <div className="flex items-center gap-3">

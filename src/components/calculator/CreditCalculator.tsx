@@ -159,7 +159,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
     if (!num || isNaN(Number(num))) return '';
     const parts = num.split('.');
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    return parts[0]; // Descartamos decimales
+    return parts[0];
   };
 
   const formatCurrency = (val: number) => {
@@ -399,9 +399,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
       <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
         <DialogContent 
           data-calculator-dialog="true"
-          onOpenAutoFocus={(e) => e.preventDefault()}
-          onCloseAutoFocus={(e) => e.preventDefault()}
-          className="max-w-none w-screen h-screen m-0 rounded-none bg-background border-none shadow-none p-0 flex flex-col overflow-hidden z-[60]"
+          className="max-w-none w-screen h-screen m-0 rounded-none bg-background border-none shadow-none p-0 flex flex-col overflow-hidden"
         >
           <DialogHeader className="px-6 py-4 border-b border-border/40 flex flex-row items-center justify-between bg-card/10 shrink-0">
             <div className="flex items-center gap-3">
@@ -439,7 +437,7 @@ export default function CreditCalculator({ initialExpanded = false, onExpandedCh
                   <div className="p-4 border-b border-border/40 bg-muted/20 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Settings2 className="w-4 h-4 text-primary" />
-                      <h3 className="text-xs font-bold uppercase tracking-wider">Ajustes de Escenario (Personalización)</h3>
+                      <h3 className="text-xs font-bold uppercase tracking-wider">Ajustes de Escenario</h3>
                     </div>
                     <span className="text-[10px] text-muted-foreground uppercase font-bold italic opacity-60">Impacto en el financiamiento</span>
                   </div>

@@ -681,8 +681,8 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
         </div>
       </footer>
 
-      <AlertDialog open={showResetConfirm} onOpenChange={showResetConfirm ? () => setShowResetConfirm(false) : undefined}>
-        <AlertDialogContent className="z-[85]">
+      <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Confirmar reinicio?</AlertDialogTitle>
             <AlertDialogDescription>Se borrará tu información actual para restaurar los datos de prueba iniciales tanto en la Agenda como en el Directorio.</AlertDialogDescription>
@@ -694,8 +694,8 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={showClearConfirm} onOpenChange={showClearConfirm ? () => setShowClearConfirm(false) : undefined}>
-        <AlertDialogContent className="z-[85]">
+      <AlertDialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar todo?</AlertDialogTitle>
             <AlertDialogDescription>Esta acción borrará todas tus citas y prospectos permanentemente. No se puede deshacer.</AlertDialogDescription>
@@ -720,7 +720,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       />
 
       <Dialog open={showHelp} onOpenChange={setShowHelp}>
-        <DialogContent className="sm:max-w-[750px] h-[85vh] flex flex-col p-0 overflow-hidden bg-card shadow-2xl z-[70]">
+        <DialogContent className="sm:max-w-[750px] h-[85vh] flex flex-col p-0 overflow-hidden bg-card shadow-2xl">
           <DialogHeader className="p-6 border-b bg-primary/5 shrink-0">
             <div className="flex items-center gap-3">
               <div className="p-3 border border-primary/30 rounded-xl bg-primary/10">
@@ -734,7 +734,6 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
           </DialogHeader>
           <ScrollArea className="flex-1">
             <div className="p-6 space-y-12 pb-20">
-              {/* CALCULADORA Y SIMULADOR */}
               <section className="space-y-4">
                 <div className="flex items-center gap-2 text-primary">
                   <Calculator className="w-5 h-5" />
@@ -751,12 +750,11 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                         <li><strong>Gastos Operativos:</strong> Proyecta automáticamente escrituración (5%) y avalúos.</li>
                       </ul>
                     </li>
-                    <li><strong>Cotizaciones:</strong> Usa el botón <strong>"Copiar Resumen"</strong> para generar una ficha técnica súper simple, impecable y lista para enviar por WhatsApp. Se recomienda pegarla también en las notas de la cita para tener el respaldo del cálculo.</li>
+                    <li><strong>Cotizaciones:</strong> Usa el botón <strong>"Copiar Resumen"</strong> para generar una ficha técnica súper simple, impecable y lista para enviar por WhatsApp.</li>
                   </ul>
                 </div>
               </section>
 
-              {/* AGENDA */}
               <section className="space-y-4">
                 <div className="flex items-center gap-2 text-blue-500">
                   <CalendarClock className="w-5 h-5" />
@@ -768,15 +766,14 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                     <li><strong>Pestaña Próximas:</strong> Tu centro de operaciones. Aquí verás tus citas de hoy y futuros días.
                       <ul className="pl-4 mt-1 list-circle space-y-1">
                         <li><strong>Confirmación:</strong> Usa el indicador de hoy para validar la asistencia del cliente.</li>
-                        <li><strong>Reporte Diario:</strong> Un solo clic para copiar tus métricas de éxito del día y enviarlas a tu grupo de equipo.</li>
+                        <li><strong>Reporte Diario:</strong> Un solo clic para copiar tus métricas de éxito del día.</li>
                       </ul>
                     </li>
-                    <li><strong>Pestaña Historial:</strong> Tu CRM histórico. Consulta todos los resultados anteriores, cierres logrados y motivos de no asistencia para campañas de re-contacto.</li>
+                    <li><strong>Pestaña Historial:</strong> Tu CRM histórico. Consulta todos los resultados anteriores y cierres logrados.</li>
                   </ul>
                 </div>
               </section>
 
-              {/* DETALLES Y FEATURES */}
               <section className="space-y-4">
                 <div className="flex items-center gap-2 text-accent">
                   <User className="w-5 h-5" />
@@ -785,14 +782,13 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                 <div className="pl-7 space-y-3 text-sm text-muted-foreground border-l-4 border-accent/40 bg-accent/5 p-4 rounded-r-xl">
                   <p>Cada registro es un expediente completo con herramientas de copiado rápido:</p>
                   <ul className="list-disc pl-4 space-y-2">
-                    <li><strong>Copiado Inteligente:</strong> Botones rápidos para copiar el número del cliente o la ficha completa de la cita formateada para WhatsApp.</li>
-                    <li><strong>Re-agendado:</strong> ¿El cliente no asistió o necesita otra cita? Usa el botón "Agendar 2da cita" para crear un nuevo registro vinculando las notas anteriores automáticamente.</li>
-                    <li><strong>Prospectadores Externos:</strong> Registra si la cita viene de un ejecutivo externo. Incluye su nombre y teléfono con opción de copiado rápido para coordinar pagos.</li>
+                    <li><strong>Copiado Inteligente:</strong> Botones rápidos para copiar el número del cliente o la ficha completa.</li>
+                    <li><strong>Re-agendado:</strong> ¿El cliente no asistió o necesita otra cita? Usa el botón "Agendar 2da cita".</li>
+                    <li><strong>Prospectadores Externos:</strong> Registra si la cita viene de un ejecutivo externo.</li>
                   </ul>
                 </div>
               </section>
 
-              {/* COMISIONES */}
               <section className="space-y-4">
                 <div className="flex items-center gap-2 text-green-500">
                   <Coins className="w-5 h-5" />
@@ -802,18 +798,12 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   <p>Control financiero total de tus ventas:</p>
                   <ul className="list-disc pl-4 space-y-2">
                     <li><strong>Apartado vs Cierre:</strong> Marca como "Apartado" mientras se formaliza y "Cierre" al finalizar.</li>
-                    <li><strong>Regla de Pago:</strong> Finanto calcula automáticamente tu fecha de pago:
-                      <ul className="pl-4 mt-1 list-circle space-y-1">
-                        <li>Ventas Dom-Mar → Cobras el viernes de la siguiente semana.</li>
-                        <li>Ventas Mié-Sáb → Cobras el viernes de la subsiguiente semana.</li>
-                      </ul>
-                    </li>
-                    <li><strong>Verificación de Pago:</strong> El sistema te alertará automáticamente cuando una comisión esté vencida para que la concilies mediante el popup de verificación azul.</li>
+                    <li><strong>Regla de Pago:</strong> Finanto calcula automáticamente tu fecha de pago.</li>
+                    <li><strong>Verificación de Pago:</strong> El sistema te alertará automáticamente cuando una comisión esté vencida.</li>
                   </ul>
                 </div>
               </section>
 
-              {/* STATS */}
               <section className="space-y-4">
                 <div className="flex items-center gap-2 text-primary">
                   <Target className="w-5 h-5" />
@@ -822,8 +812,8 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                 <div className="pl-7 space-y-3 text-sm text-muted-foreground border-l-4 border-primary/40 bg-primary/5 p-4 rounded-r-xl">
                   <p>Indicadores superiores para medir tu éxito en tiempo real:</p>
                   <ul className="list-disc pl-4 space-y-2">
-                    <li><strong>Tooltips Inteligentes:</strong> Pasa el mouse sobre cualquier estadística para ver desgloses avanzados (ej. Proyección de cobro de este viernes, comparación con el mes anterior, tasa de conversión).</li>
-                    <li><strong>Indicadores de Tendencia:</strong> Visualiza iconos <TrendingUp className="inline w-3 h-3 text-green-500" /> que te indican si estás superando tus números del mes pasado.</li>
+                    <li><strong>Tooltips Inteligentes:</strong> Pasa el mouse sobre cualquier estadística para ver desgloses avanzados.</li>
+                    <li><strong>Indicadores de Tendencia:</strong> Visualiza iconos <TrendingUp className="inline w-3 h-3 text-green-500" /> que te indican si estás superando tus números.</li>
                   </ul>
                 </div>
               </section>
@@ -838,7 +828,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       </Dialog>
 
       <Dialog open={!!pendingCommissionApp} onOpenChange={(open) => { if (!open) { setPendingCommissionApp(null); lastClosedTimeRef.current = Date.now(); } }}>
-        <DialogContent className="sm:max-w-[450px] border-none bg-gradient-to-br from-blue-700 to-indigo-900 shadow-2xl z-[80] text-white p-0 overflow-hidden">
+        <DialogContent className="sm:max-w-[450px] border-none bg-gradient-to-br from-blue-700 to-indigo-900 shadow-2xl text-white p-0 overflow-hidden">
           <div className="p-6 space-y-6">
             <div className="flex items-center justify-between">
               <div className="bg-white/10 p-3 rounded-full w-fit">
@@ -892,11 +882,10 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
         if (!o) {
           const app = celebrationApp;
           setCelebrationApp(null);
-          // Al cerrar celebración, abrimos el expediente
           if (app) onSelectAppId(app.id);
         }
       }}>
-        <DialogContent className="sm:max-w-[480px] border-none bg-gradient-to-br from-green-600 to-emerald-800 shadow-2xl z-[90] text-white p-0 overflow-hidden">
+        <DialogContent className="sm:max-w-[480px] border-none bg-gradient-to-br from-green-600 to-emerald-800 shadow-2xl text-white p-0 overflow-hidden">
           <div className="relative p-8 space-y-6">
             <div className="absolute top-0 right-0 p-4 opacity-10">
               <PartyIcon className="w-32 h-32 rotate-12" />
@@ -947,9 +936,8 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Directory Conversion Dialog */}
       <Dialog open={!!convertData} onOpenChange={(o) => !o && setConvertData(null)}>
-        <DialogContent className="sm:max-w-[450px] bg-card border-border shadow-2xl z-[80]">
+        <DialogContent className="sm:max-w-[450px] bg-card border-border shadow-2xl">
           <DialogHeader className="bg-accent/5 p-4 -m-6 mb-4 border-b border-accent/20">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-accent/20 rounded-xl">
