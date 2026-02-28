@@ -175,11 +175,10 @@ export default function AppointmentDetailsDialog({
     const text = `Cita: ${dateBold}
 Nombre: *${appointment.name}*
 ${motivoLine}Producto: *${appointment.product || 'N/A'}*
-Hora: ${timeBold}${confirmedBold}
-Número: *${appointment.phone}*`;
+Hora: ${timeBold}${confirmedBold}`;
 
     navigator.clipboard.writeText(text).then(() => {
-      toast({ title: "Copiado", description: "Datos listos para WhatsApp." });
+      toast({ title: "Copiado", description: "Datos de la cita listos para enviar." });
     });
   };
 

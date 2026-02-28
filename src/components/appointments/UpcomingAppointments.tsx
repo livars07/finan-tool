@@ -178,9 +178,7 @@ export default function UpcomingAppointments({
   };
 
   const copyDailyReport = () => {
-    const todaySales = allAppointments.filter(a => isActuallyToday(a.date) && a.status === 'Cierre' && !a.isArchived).length;
     const todayTotal = allAppointments.filter(a => isActuallyToday(a.date) && !a.isArchived).length;
-    const todayConfirmed = allAppointments.filter(a => isActuallyToday(a.date) && a.isConfirmed && !a.isArchived).length;
     const tomorrowTotal = allAppointments.filter(a => {
       if (a.isArchived) return false;
       const d = parseISO(a.date);
@@ -188,15 +186,13 @@ export default function UpcomingAppointments({
       return d.getDate() === tomorrow.getDate() && d.getMonth() === tomorrow.getMonth() && d.getFullYear() === tomorrow.getFullYear();
     }).length;
 
-    const reportText = `✅ Ventas: *${todaySales}*
-✅ Citas para hoy: *${todayTotal}*
-✅ Citas confirmadas: *${todayConfirmed}*
-✅ Citas para el día siguiente: *${tomorrowTotal}*`;
+    const reportText = `✅ Citas para hoy: *${todayTotal}*
+✅ Citas para mañana: *${tomorrowTotal}*`;
 
     navigator.clipboard.writeText(reportText).then(() => {
       toast({
         title: "Reporte diario copiado",
-        description: "Estadísticas del día listas para enviar.",
+        description: "Agenda de hoy y mañana lista para enviar.",
       });
     });
   };
