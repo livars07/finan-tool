@@ -403,13 +403,13 @@ Número: *${appointment.phone}*`;
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Asistencia">Asistencia</SelectItem>
-                        <SelectItem value="No asistencia">No asistencia</SelectItem>
-                        <SelectItem value="Continuación en otra cita">Continuación en otra cita</SelectItem>
-                        <SelectItem value="Reagendó">Reagendó</SelectItem>
-                        <SelectItem value="Reembolso">Reembolso</SelectItem>
-                        <SelectItem value="Cierre">Cierre</SelectItem>
-                        <SelectItem value="Apartado">Apartado</SelectItem>
+                        <SelectItem value="Asistencia">👤 Asistencia</SelectItem>
+                        <SelectItem value="Cierre">💰 CIERRE (VENTA) ✨</SelectItem>
+                        <SelectItem value="Apartado">📑 Apartado</SelectItem>
+                        <SelectItem value="No asistencia">❌ No asistencia</SelectItem>
+                        <SelectItem value="Reagendó">📅 Reagendó</SelectItem>
+                        <SelectItem value="Continuación en otra cita">🔄 Continuación</SelectItem>
+                        <SelectItem value="Reembolso">💸 Reembolso</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

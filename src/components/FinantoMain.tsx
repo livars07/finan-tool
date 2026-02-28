@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -125,24 +126,8 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
   const statsRef = useRef(stats);
   const appointmentsRef = useRef(appointments);
 
-  const prevAppointmentsRef = useRef<Service.Appointment[]>([]);
-
   useEffect(() => {
     if (!isLoaded) return;
-
-    const justClosed = appointments.find(current => {
-      const prev = prevAppointmentsRef.current.find(p => p.id === current.id);
-      return current.status === 'Cierre' && (!prev || prev.status !== 'Cierre');
-    });
-
-    if (justClosed) {
-      setCelebrationApp(justClosed);
-      const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3");
-      audio.volume = 0.5;
-      audio.play().catch(() => {});
-    }
-
-    prevAppointmentsRef.current = appointments;
     statsRef.current = stats;
     appointmentsRef.current = appointments;
   }, [stats, appointments, isLoaded]);
@@ -309,6 +294,13 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       setPendingCommissionApp(null);
       lastClosedTimeRef.current = Date.now();
     }
+  };
+
+  const handleCelebration = (app: Service.Appointment) => {
+    setCelebrationApp(app);
+    const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3");
+    audio.volume = 0.5;
+    audio.play().catch(() => {});
   };
 
   const handleConvertToAppointment = (phone: string, name?: string) => {
@@ -622,6 +614,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
               formatFriendlyDate={appointmentState.formatFriendlyDate} 
               format12hTime={appointmentState.format12hTime} 
               stats={appointmentState.stats}
+              onCelebrate={handleCelebration}
             />
             <NumberDirectory 
               initialExpanded={initialSection === 'directorio'}
@@ -793,8 +786,8 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                     <li><strong>Apartado vs Cierre:</strong> Marca como "Apartado" mientras se formaliza y "Cierre" al finalizar.</li>
                     <li><strong>Regla de Pago:</strong> Finanto calcula automáticamente tu fecha de pago:
                       <ul className="pl-4 mt-1 list-circle space-y-1">
-                        <li>Ventas Dom-Mar {"→"} Cobras el viernes de la siguiente semana.</li>
-                        <li>Ventas Mié-Sáb {"→"} Cobras el viernes de la subsiguiente semana.</li>
+                        <li>Ventas Dom-Mar → Cobras el viernes de la siguiente semana.</li>
+                        <li>Ventas Mié-Sáb → Cobras el viernes de la subsiguiente semana.</li>
                       </ul>
                     </li>
                     <li><strong>Verificación de Pago:</strong> El sistema te alertará automáticamente cuando una comisión esté vencida para que la concilies mediante el popup de verificación azul.</li>
@@ -877,7 +870,14 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!celebrationApp} onOpenChange={(o) => !o && setCelebrationApp(null)}>
+      <Dialog open={!!celebrationApp} onOpenChange={(o) => {
+        if (!o) {
+          const app = celebrationApp;
+          setCelebrationApp(null);
+          // Al cerrar celebración, abrimos el expediente
+          if (app) onSelectAppId(app.id);
+        }
+      }}>
         <DialogContent className="sm:max-w-[480px] border-none bg-gradient-to-br from-green-600 to-emerald-800 shadow-2xl z-[90] text-white p-0 overflow-hidden">
           <div className="relative p-8 space-y-6">
             <div className="absolute top-0 right-0 p-4 opacity-10">
@@ -918,7 +918,11 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
               </div>
             </div>
 
-            <Button onClick={() => setCelebrationApp(null)} className="w-full h-14 bg-white text-green-700 hover:bg-green-50 font-black text-lg rounded-2xl shadow-2xl gap-2 relative z-10" type="button">
+            <Button onClick={() => {
+              const app = celebrationApp;
+              setCelebrationApp(null);
+              if (app) onSelectAppId(app.id);
+            }} className="w-full h-14 bg-white text-green-700 hover:bg-green-50 font-black text-lg rounded-2xl shadow-2xl gap-2 relative z-10" type="button">
               <PartyIcon className="w-5 h-5" /> ¡A POR EL SIGUIENTE CIERRE!
             </Button>
           </div>

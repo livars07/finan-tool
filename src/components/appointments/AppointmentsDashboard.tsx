@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -60,6 +61,7 @@ interface DashboardContentProps {
   stats: any;
   theme?: string;
   searchTerm: string;
+  onCelebrate?: (app: Appointment) => void;
 }
 
 const DashboardContent = ({ 
@@ -79,7 +81,8 @@ const DashboardContent = ({
   setVisibleCountPast,
   stats,
   theme,
-  searchTerm
+  searchTerm,
+  onCelebrate
 }: DashboardContentProps) => {
   const [view, setView] = useState<"activas" | "archivadas">("activas");
 
@@ -309,6 +312,7 @@ const DashboardContent = ({
             activeId={activeId}
             expanded={expanded}
             theme={theme}
+            onCelebrate={onCelebrate}
           />
         </TabsContent>
         <TabsContent value="past" className="mt-0 h-full">
@@ -348,6 +352,7 @@ interface AppointmentsDashboardProps {
   onSelectAppId: (id: string | null) => void;
   stats: any;
   theme?: string;
+  onCelebrate?: (app: Appointment) => void;
 }
 
 export default function AppointmentsDashboard({
@@ -363,7 +368,8 @@ export default function AppointmentsDashboard({
   selectedAppId,
   onSelectAppId,
   stats,
-  theme
+  theme,
+  onCelebrate
 }: AppointmentsDashboardProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -454,6 +460,7 @@ export default function AppointmentsDashboard({
               stats={stats}
               theme={theme}
               searchTerm={searchTerm}
+              onCelebrate={onCelebrate}
             />
           </CardContent>
         </Card>
@@ -510,6 +517,7 @@ export default function AppointmentsDashboard({
               stats={stats}
               theme={theme}
               searchTerm={searchTerm}
+              onCelebrate={onCelebrate}
             />
           </div>
         </DialogContent>
@@ -523,6 +531,7 @@ export default function AppointmentsDashboard({
         onAdd={addAppointment}
         formatFriendlyDate={formatFriendlyDate}
         format12hTime={format12hTime}
+        archiveAppointment={archiveAppointment}
       />
     </div>
   );

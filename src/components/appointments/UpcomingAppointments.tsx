@@ -42,6 +42,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Props {
   appointments: Appointment[];
@@ -56,6 +62,7 @@ interface Props {
   activeId?: string | null;
   expanded?: boolean;
   theme?: string;
+  onCelebrate?: (app: Appointment) => void;
 }
 
 export default function UpcomingAppointments({ 
@@ -70,7 +77,8 @@ export default function UpcomingAppointments({
   unarchiveAppointment,
   activeId,
   expanded = false,
-  theme = 'corporativo'
+  theme = 'corporativo',
+  onCelebrate
 }: Props) {
   const [archiveConfirmId, setArchiveConfirmId] = useState<string | null>(null);
   const [confirmingApp, setConfirmingApp] = useState<Appointment | null>(null);
@@ -147,9 +155,14 @@ export default function UpcomingAppointments({
         description: `Se ha registrado el resultado "${finalStatus}" para ${finalizingApp.name}.`,
       });
       
-      // Abrimos los detalles de la cita independientemente del resultado
-      onSelect(finalizingApp);
+      const appRef = finalizingApp;
       setFinalizingApp(null);
+
+      if (finalStatus === 'Cierre' && onCelebrate) {
+        onCelebrate(appRef);
+      } else {
+        onSelect(appRef);
+      }
     }
   };
 
@@ -406,13 +419,13 @@ export default function UpcomingAppointments({
                   <SelectValue placeholder="Selecciona el resultado..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Asistencia">Asistencia (Visto)</SelectItem>
-                  <SelectItem value="Cierre">Cierre (Venta)</SelectItem>
-                  <SelectItem value="Apartado">Apartado (Reserva)</SelectItem>
-                  <SelectItem value="No asistencia">No asistencia</SelectItem>
-                  <SelectItem value="Reagendó">Reagendó</SelectItem>
-                  <SelectItem value="Continuación en otra cita">Continuación en otra cita</SelectItem>
-                  <SelectItem value="Reembolso">Reembolso</SelectItem>
+                  <SelectItem value="Asistencia">👤 Asistencia (Visto)</SelectItem>
+                  <SelectItem value="Cierre">💰 CIERRE (VENTA) ✨</SelectItem>
+                  <SelectItem value="Apartado">📑 Apartado (Reserva)</SelectItem>
+                  <SelectItem value="No asistencia">❌ No asistencia</SelectItem>
+                  <SelectItem value="Reagendó">📅 Reagendó</SelectItem>
+                  <SelectItem value="Continuación en otra cita">🔄 Continuación</SelectItem>
+                  <SelectItem value="Reembolso">💸 Reembolso</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -441,10 +454,3 @@ export default function UpcomingAppointments({
     </div>
   );
 }
-
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
