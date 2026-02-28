@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -666,7 +667,7 @@ Número: *${appointment.phone}*`;
       </Dialog>
 
       <AlertDialog open={showArchiveConfirm} onOpenChange={setShowArchiveConfirm}>
-        <AlertDialogContent>
+        <AlertDialogContent className="z-[85]">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Archivar registro?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -756,7 +757,7 @@ Número: *${appointment.phone}*`;
               <Textarea 
                 value={newNotes} 
                 onChange={e => setNewNotes(e.target.value)} 
-                className="bg-muted/10 border-border/30 h-24 resize-none text-xs" 
+                className="bg-muted/10 border-border/40 h-24 resize-none text-xs" 
                 placeholder="Escribe acuerdos previos o temas a tratar..."
               />
             </div>
