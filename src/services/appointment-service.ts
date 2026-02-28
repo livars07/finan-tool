@@ -119,44 +119,36 @@ export const generateSeedData = (): Appointment[] => {
     'Juan', 'María', 'Carlos', 'Ana', 'Luis', 'Elena', 'Roberto', 'Sofía', 'Diego', 'Lucía', 
     'Fernando', 'Gabriela', 'Ricardo', 'Patricia', 'Héctor', 'Isabel', 'Jorge', 'Mónica', 'Andrés', 'Carmen',
     'Alejandro', 'Daniela', 'Raúl', 'Verónica', 'Víctor', 'Adriana', 'Oscar', 'Paola', 'Miguel', 'Rosa',
-    'Francisco', 'Lorena', 'Eduardo', 'Ximena', 'Ramiro', 'Natalia', 'Esteban', 'Silvia', 'Javier', 'Beatriz',
-    'Manuel', 'Julia', 'Alberto', 'Teresa', 'Felipe', 'Inés', 'Enrique', 'Clara', 'Mario', 'Andrea',
-    'Raquel', 'Samuel', 'Paula', 'Arturo', 'Elisa', 'Ignacio', 'Lidia', 'Ramón', 'Gloria', 'Hugo'
+    'Francisco', 'Lorena', 'Eduardo', 'Ximena', 'Ramiro', 'Natalia', 'Esteban', 'Silvia', 'Javier', 'Beatriz'
   ];
   
   const lastNames = [
     'Pérez', 'García', 'López', 'Martínez', 'Rodríguez', 'Gómez', 'Díaz', 'Ruiz', 'Torres', 'Morales', 
-    'Vázquez', 'Jiménez', 'Castro', 'Ortiz', 'Álvarez', 'Flores', 'Ramos', 'Gutiérrez', 'Reyes', 'Blanco',
-    'Sánchez', 'Ramírez', 'Hernández', 'Navarro', 'Delgado', 'Cano', 'Mendoza', 'Marín', 'Medina', 'Vega',
-    'Moreno', 'Solís', 'Vargas', 'Herrera', 'Cortes', 'Mora', 'Ríos', 'Aguilar', 'Pascual', 'Rojo',
-    'Galán', 'Garzón', 'Suárez', 'Ibarra', 'Valdez', 'Peralta', 'Gallegos', 'Montero', 'Hidalgo', 'Ortega',
-    'Rivas', 'Soto', 'Mejía', 'Guerra', 'Bermúdez', 'Acosta', 'Salazar', 'Figueroa', 'Villalobos', 'Arias'
+    'Vázquez', 'Jiménez', 'Castro', 'Ortiz', 'Álvarez', 'Flores', 'Ramos', 'Gutiérrez', 'Reyes', 'Blanco'
   ];
 
-  const types: AppointmentType[] = ['1ra consulta', '2da consulta', 'Cierre', 'Seguimiento'];
   const products: AppointmentProduct[] = ['Casa', 'Departamento', 'Terreno', 'Transporte', 'Préstamo'];
-  const statuses: AppointmentStatus[] = ['Asistencia', 'No asistencia', 'Continuación en otra cita', 'Reagendó', 'Reembolso', 'Cierre', 'Apartado'];
-  const hours = ['09:00', '10:00', '11:30', '13:00', '14:30', '16:00', '17:30', '19:00'];
+  const hours = ['09:00', '10:30', '12:00', '13:30', '15:00', '16:30', '18:00'];
 
   const now = new Date();
 
   const getName = (index: number) => {
     const fname = firstNames[index % firstNames.length];
-    const lname = lastNames[(index + 5) % lastNames.length];
+    const lname = lastNames[(index + 3) % lastNames.length];
     return `${fname} ${lname}`;
   };
 
   const getPhone = (index: number) => {
-    const base = 6640000000 + (index * 12345) % 9999999;
-    return base.toString().substring(0, 10);
+    const base = 6641000000 + (index * 54321) % 8999999;
+    return base.toString();
   };
 
-  // 30 Citas Próximas
-  for (let i = 0; i < 30; i++) {
+  // 25 Citas Próximas (Hoy y Futuro)
+  for (let i = 0; i < 25; i++) {
     let appDate;
-    if (i < 6) appDate = now; 
-    else if (i < 12) appDate = addDays(now, 1);
-    else appDate = addDays(now, (i % 7) + 2);
+    if (i < 5) appDate = now; 
+    else if (i < 10) appDate = addDays(now, 1);
+    else appDate = addDays(now, (i % 10) + 2);
     
     const isTodayApp = isToday(appDate);
     
@@ -166,21 +158,26 @@ export const generateSeedData = (): Appointment[] => {
       phone: formatPhoneNumber(getPhone(i)),
       date: appDate.toISOString(),
       time: hours[i % hours.length],
-      type: types[i % types.length],
+      type: i % 3 === 0 ? '2da consulta' : '1ra consulta',
       product: products[i % products.length],
-      isConfirmed: isTodayApp ? Math.random() > 0.4 : false,
+      isConfirmed: isTodayApp ? Math.random() > 0.5 : false,
       isArchived: false,
-      notes: i % 3 === 0 ? `Cliente muy interesado en ${products[i % products.length]}. Requiere crédito alto.` : '',
-      prospectorName: i % 4 === 0 ? `Agente Externo ${i}` : undefined,
-      prospectorPhone: i % 4 === 0 ? formatPhoneNumber(getPhone(i + 100)) : undefined
+      notes: i % 4 === 0 ? `Cliente con perfil para ${products[i % products.length]}. Interesado en zona norte.` : '',
     });
   }
 
-  // 30 Citas Pasadas
-  for (let i = 0; i < 30; i++) {
-    const pastDate = i < 5 ? subDays(now, 1) : i < 15 ? subDays(now, (i % 14) + 2) : subMonths(now, 1);
-    const globalIndex = i + 30;
-    const status = statuses[i % statuses.length];
+  // 35 Citas Pasadas (Historial con cierres variados)
+  for (let i = 0; i < 35; i++) {
+    const pastDate = subDays(now, (i % 20) + 1);
+    const globalIndex = i + 25;
+    
+    // Distribuir resultados realistas
+    let status: AppointmentStatus = 'Asistencia';
+    if (i % 5 === 0) status = 'Cierre';
+    else if (i % 7 === 0) status = 'Apartado';
+    else if (i % 10 === 0) status = 'No asistencia';
+    else if (i % 12 === 0) status = 'Reagendó';
+
     const isSale = status === 'Cierre' || status === 'Apartado';
     
     data.push({
@@ -189,17 +186,15 @@ export const generateSeedData = (): Appointment[] => {
       phone: formatPhoneNumber(getPhone(globalIndex)),
       date: pastDate.toISOString(),
       time: hours[i % hours.length],
-      type: types[i % types.length],
+      type: i % 4 === 0 ? 'Seguimiento' : '1ra consulta',
       status: status,
       product: products[i % products.length],
       isConfirmed: true,
       isArchived: false,
-      notes: isSale ? `Venta exitosa. Expediente completo enviado a notaría.` : `Seguimiento de ${products[i % products.length]}.`,
+      notes: isSale ? `Operación exitosa por ${products[i % products.length]}.` : '',
       commissionStatus: isSale ? (i % 2 === 0 ? 'Pagada' : 'Pendiente') : undefined,
       commissionPercent: isSale ? (i % 3 === 0 ? 50 : 100) : undefined,
-      finalCreditAmount: isSale ? Math.floor(300000 + Math.random() * 1700000) : undefined,
-      prospectorName: i % 5 === 0 ? `Prospectador Senior ${i}` : undefined,
-      prospectorPhone: i % 5 === 0 ? formatPhoneNumber(getPhone(globalIndex + 50)) : undefined
+      finalCreditAmount: isSale ? Math.floor(800000 + Math.random() * 2500000) : undefined,
     });
   }
   
@@ -216,7 +211,6 @@ export const calculateStats = (appointments: Appointment[]) => {
   const todayStart = startOfDay(now);
   const lastMonth = subMonths(now, 1);
 
-  // Prospectos y Ventas se basan en la fecha de la cita/venta
   const currentMonthProspects = activeApps.filter(a => isSameMonth(parseISO(a.date), now)).length;
   const lastMonthProspects = activeApps.filter(a => isSameMonth(parseISO(a.date), lastMonth)).length;
 
@@ -290,7 +284,7 @@ export const calculateStats = (appointments: Appointment[]) => {
   const lastMonthConversionRate = lastMonthProspects > 0 ? (lastMonthSales / lastMonthProspects) * 100 : 0;
 
   // DATA PARA GRÁFICAS
-  // 1. Actividad últimos 7 días
+  // 1. Actividad Semana Actual
   const last7Days = eachDayOfInterval({
     start: subDays(now, 6),
     end: now
@@ -303,19 +297,18 @@ export const calculateStats = (appointments: Appointment[]) => {
     return { day: dayStr, prospects, sales };
   });
 
-  // 2. Distribución por Etapa (Tipos de Cita - Mes actual)
-  const typeDistribution = activeApps
-    .filter(a => isSameMonth(parseISO(a.date), now))
-    .reduce((acc: any[], app) => {
-      const type = app.type || '1ra consulta';
-      const existing = acc.find(item => item.type === type);
-      if (existing) {
-        existing.count += 1;
-      } else {
-        acc.push({ type: type, count: 1 });
-      }
-      return acc;
-    }, []);
+  // 2. Actividad Semana Anterior
+  const prevWeekInterval = eachDayOfInterval({
+    start: subDays(now, 13),
+    end: subDays(now, 7)
+  });
+
+  const lastWeekActivity = prevWeekInterval.map(day => {
+    const dayStr = format(day, 'eee', { locale: es });
+    const prospects = activeApps.filter(a => isSameDay(parseISO(a.date), day)).length;
+    const sales = activeApps.filter(a => isSameDay(parseISO(a.date), day) && (a.status === 'Cierre' || a.status === 'Apartado')).length;
+    return { day: dayStr, prospects, sales };
+  });
 
   return {
     todayCount: todayTotal,
@@ -342,7 +335,7 @@ export const calculateStats = (appointments: Appointment[]) => {
     lastMonthConversionRate: parseFloat(lastMonthConversionRate.toFixed(1)),
     charts: {
       dailyActivity,
-      typeDistribution
+      lastWeekActivity
     }
   };
 };

@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -84,7 +83,6 @@ export default function UpcomingAppointments({
   const [confirmingApp, setConfirmingApp] = useState<Appointment | null>(null);
   const [finalizingApp, setFinalizingApp] = useState<Appointment | null>(null);
   
-  // States for Finalize Assistant
   const [finalStatus, setFinalStatus] = useState<AppointmentStatus>('Asistencia');
   const [finalNotes, setFinalNotes] = useState('');
 
@@ -102,15 +100,6 @@ export default function UpcomingAppointments({
       });
       setArchiveConfirmId(null);
     }
-  };
-
-  const handleRestoreAction = (e: React.MouseEvent, app: Appointment) => {
-    e.stopPropagation();
-    unarchiveAppointment(app.id);
-    toast({
-      title: "Cita restaurada",
-      description: `${app.name} ha vuelto a activas.`,
-    });
   };
 
   const processConfirmation = () => {
@@ -354,7 +343,7 @@ export default function UpcomingAppointments({
       </div>
 
       <AlertDialog open={!!archiveConfirmId} onOpenChange={(o) => !o && setArchiveConfirmId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="z-[100]">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Archivar cita?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -371,38 +360,37 @@ export default function UpcomingAppointments({
       </AlertDialog>
 
       <AlertDialog open={!!confirmingApp} onOpenChange={(o) => !o && setConfirmingApp(null)}>
-        <AlertDialogContent className="border-orange-200">
+        <AlertDialogContent className="z-[100] border-border">
           <AlertDialogHeader>
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-orange-100 rounded-full">
-                <AlertCircle className="w-6 h-6 text-orange-600" />
+              <div className="p-2 bg-primary/10 rounded-full">
+                <AlertCircle className="w-6 h-6 text-primary" />
               </div>
-              <AlertDialogTitle className="text-orange-950">Confirmar Asistencia</AlertDialogTitle>
+              <AlertDialogTitle className="text-foreground">Confirmar Asistencia</AlertDialogTitle>
             </div>
-            <AlertDialogDescription className="text-orange-900/70">
+            <AlertDialogDescription className="text-muted-foreground">
               ¿Confirmas que el cliente <strong>{confirmingApp?.name}</strong> asistirá a su cita el día de hoy? Esta acción se reflejará en tus estadísticas de cierre.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-orange-200 text-orange-700 hover:bg-orange-50">Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={processConfirmation} className="bg-orange-600 hover:bg-orange-700 text-white">
+            <AlertDialogCancel className="border-border text-foreground hover:bg-muted">Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={processConfirmation} className="bg-primary hover:bg-primary/90 text-white">
               Sí, confirmar asistencia
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Finalize Assistant Dialog */}
       <Dialog open={!!finalizingApp} onOpenChange={(o) => !o && setFinalizingApp(null)}>
-        <DialogContent className="sm:max-w-[450px] border-green-200 bg-card shadow-2xl z-[80]">
+        <DialogContent className="sm:max-w-[450px] border-green-200 bg-card shadow-2xl z-[100]">
           <DialogHeader className="bg-green-500/5 p-4 -m-6 mb-4 border-b border-green-500/20">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-green-500/20 rounded-xl">
                 <CheckIcon className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <DialogTitle className="text-green-950">Finalizar Consulta</DialogTitle>
-                <DialogDescription className="text-green-800/60">Registrando resultado para {finalizingApp?.name}</DialogDescription>
+                <DialogTitle className="text-foreground">Finalizar Consulta</DialogTitle>
+                <DialogDescription className="text-muted-foreground text-xs">Registrando resultado para {finalizingApp?.name}</DialogDescription>
               </div>
             </div>
           </DialogHeader>

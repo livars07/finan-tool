@@ -6,32 +6,22 @@ import { Button } from "@/components/ui/button";
 import { 
   TrendingUp, 
   BarChart3, 
-  PieChart, 
   Target, 
   Lightbulb, 
   Maximize2, 
   X,
   Info,
-  ArrowUpRight,
-  Zap,
-  LayoutDashboard,
-  Users,
-  CalendarCheck,
-  Trophy,
   Activity,
-  Layers
+  CalendarDays,
+  Trophy,
+  Users,
+  History
 } from "lucide-react";
 import { 
   Bar, 
   BarChart, 
   CartesianGrid, 
   XAxis, 
-  ResponsiveContainer, 
-  Tooltip as RechartsTooltip,
-  Cell,
-  Pie,
-  PieChart as RechartsPieChart,
-  LabelList
 } from "recharts";
 import { 
   ChartContainer, 
@@ -64,7 +54,7 @@ interface AdvancedStatsProps {
 
 const chartConfig = {
   prospects: {
-    label: "Prospectos",
+    label: "Citas",
     color: "hsl(var(--primary))",
   },
   sales: {
@@ -85,278 +75,92 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
     }
   }, [isExpanded, onExpandedChange]);
 
-  const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444'];
-
-  // Cálculos de Rendimiento Operativo (Funnel)
   const totalMonth = stats.currentMonthProspects || 0;
-  
-  // Tasa de Asistencia: Citas que NO son "No asistencia" / Total
   const attendanceRate = totalMonth > 0 ? Math.min(95, 75 + (stats.todayConfirmed / (stats.todayCount || 1) * 10)) : 0;
-  
-  // Tasa de Cierre: Cierres / Citas que asistieron
   const closingRate = attendanceRate > 0 ? (stats.conversionRate / (attendanceRate / 100)) : 0;
-  
-  // Eficiencia Global (Score)
   const productivityScore = Math.min(100, (stats.conversionRate * 3) + (attendanceRate * 0.4));
 
   const getAdvice = () => {
-    if (stats.conversionRate > 20) {
-      return "Sugerencia: Tu tasa de cierre es excepcional. Es el momento de ser más selectivo: enfócate en captar prospectos de perfil más alto para maximizar tu retorno por cada hora invertida.";
-    }
-    if (stats.conversionRate < 8) {
-      return "Sugerencia: La conversión está por debajo del promedio. Revisa urgentemente la calificación de prospectos en la primera llamada; necesitas filtrar mejor antes de agendar citas presenciales.";
-    }
-    if (stats.pendingCount > 12) {
-      return "Sugerencia: Acumulación crítica de prospectos sin estatus. Realiza una jornada intensiva de seguimiento hoy mismo para evitar que estos cierres se enfríen definitivamente.";
-    }
-    if (stats.todayCount > 0 && (stats.todayConfirmed / stats.todayCount) < 0.6) {
-      return "Sugerencia: Baja tasa de asistencia hoy. Implementa recordatorios por WhatsApp personalizados al menos 2 horas antes de cada cita para asegurar la puntualidad y el compromiso del cliente.";
-    }
-    const topType = stats.charts.typeDistribution[0];
-    if (topType && topType.count > (stats.currentMonthProspects * 0.7)) {
-      return `Sugerencia: La mayoría de tus citas son ${topType.type}. Considera mover más prospectos a la fase de Seguimiento o Cierre para evitar el estancamiento del embudo.`;
-    }
-    if (stats.currentMonthCommission > 15000) {
-      return "Sugerencia: Resultados financieros sobresalientes. Te sugerimos reinvertir un porcentaje de estas ganancias en pauta digital para escalar tu volumen de prospectos calificados el próximo mes.";
-    }
-    return "Sugerencia: Tu ritmo operativo es estable y saludable. Mantén el hábito estricto de registrar cada acuerdo en el área de notas para asegurar una transición impecable hacia el cierre final.";
+    if (stats.conversionRate > 20) return "Sugerencia: Tu tasa de cierre es excepcional. Es el momento de ser más selectivo: enfócate en captar perfiles de crédito más alto para maximizar tu retorno.";
+    if (stats.conversionRate < 8) return "Sugerencia: La conversión está por debajo del promedio. Revisa la calificación de prospectos en la primera llamada; necesitas filtrar mejor antes de agendar.";
+    if (stats.pendingCount > 12) return "Sugerencia: Acumulación crítica de prospectos sin estatus. Realiza una jornada de seguimiento intensivo hoy para evitar que estos cierres se enfríen.";
+    if (stats.todayCount > 0 && (stats.todayConfirmed / stats.todayCount) < 0.6) return "Sugerencia: Baja tasa de asistencia hoy. Implementa recordatorios por WhatsApp 2 horas antes de cada cita para asegurar el compromiso.";
+    if (stats.currentMonthCommission > 15000) return "Sugerencia: Resultados financieros sobresalientes. Te sugerimos reinvertir un porcentaje en pauta digital para escalar tu volumen el próximo mes.";
+    return "Sugerencia: Tu ritmo operativo es estable. Mantén el hábito estricto de registrar cada acuerdo en notas para asegurar una transición impecable hacia el cierre.";
   };
 
-  const StatsContent = ({ expanded = false }) => (
-    <div className={cn("space-y-6", expanded && "grid grid-cols-1 xl:grid-cols-2 gap-8 items-start space-y-0")}>
-      <div className="space-y-6">
-        <Card className="border-border/40 bg-card/30 backdrop-blur-md shadow-sm overflow-hidden">
-          <CardHeader className="p-4 pb-2 border-b border-border/10 flex flex-row items-center justify-between">
-            <div className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-primary" />
-              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Flujo Semanal de Citas</CardTitle>
-            </div>
-            <TooltipProvider>
-              <Tooltip delayDuration={0}>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-6 w-6"><Info className="w-3.5 h-3.5 text-muted-foreground/60" /></Button>
-                </TooltipTrigger>
-                <TooltipContent className="text-[10px] max-w-[200px] bg-card border-border shadow-xl p-3 z-[100]" side="top">
-                  <p className="font-bold mb-1 uppercase text-primary">¿Cómo se calcula?</p>
-                  Muestra el volumen total de citas registradas frente a los cierres (Cierre/Apartado) logrados en los últimos 7 días calendario.
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </CardHeader>
-          <CardContent className="p-4 h-[200px] sm:h-[250px]">
-            <ChartContainer config={chartConfig} className="h-full w-full">
-              <BarChart data={stats.charts.dailyActivity}>
-                <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                <XAxis 
-                  dataKey="day" 
-                  tickLine={false} 
-                  tickMargin={10} 
-                  axisLine={false} 
-                  className="text-[10px] font-bold uppercase text-muted-foreground/60" 
-                />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="prospects" fill="var(--color-prospects)" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="sales" fill="var(--color-sales)" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+  const WeeklyChart = ({ data, title, icon: Icon }: { data: any, title: string, icon: any }) => (
+    <Card className="border-border/40 bg-card/30 backdrop-blur-md shadow-sm overflow-hidden">
+      <CardHeader className="p-4 pb-2 border-b border-border/10 flex flex-row items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Icon className="w-4 h-4 text-primary" />
+          <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">{title}</CardTitle>
+        </div>
+        <TooltipProvider>
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-6 w-6"><Info className="w-3.5 h-3.5 text-muted-foreground/60" /></Button>
+            </TooltipTrigger>
+            <TooltipContent className="text-[10px] max-w-[200px] bg-card border-border shadow-xl p-3 z-[100]" side="top">
+              <p className="font-bold mb-1 uppercase text-primary">Flujo de Citas</p>
+              Muestra el volumen de citas agendadas frente a cierres efectivos en el periodo seleccionado.
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </CardHeader>
+      <CardContent className="p-4 h-[180px]">
+        <ChartContainer config={chartConfig} className="h-full w-full">
+          <BarChart data={data}>
+            <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+            <XAxis 
+              dataKey="day" 
+              tickLine={false} 
+              tickMargin={10} 
+              axisLine={false} 
+              className="text-[10px] font-bold uppercase text-muted-foreground/60" 
+            />
+            <ChartTooltip content={<ChartTooltipContent />} />
+            <Bar dataKey="prospects" name="Citas" fill="var(--color-prospects)" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="sales" name="Ventas" fill="var(--color-sales)" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
+  );
 
-        <Card className="border-border/40 bg-card/30 backdrop-blur-md shadow-sm">
-          <CardHeader className="p-4 pb-2 border-b border-border/10 flex flex-row items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Layers className="w-4 h-4 text-accent" />
-              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Distribución por Etapa (Mes)</CardTitle>
-            </div>
-            <TooltipProvider>
-              <Tooltip delayDuration={0}>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-6 w-6"><Info className="w-3.5 h-3.5 text-muted-foreground/60" /></Button>
-                </TooltipTrigger>
-                <TooltipContent className="text-[10px] max-w-[200px] bg-card border-border shadow-xl p-3 z-[100]" side="top">
-                  <p className="font-bold mb-1 uppercase text-accent">Análisis del Pipeline</p>
-                  Muestra el volumen de citas según su tipo (1ra, 2da consulta, Seguimiento). Ideal para ver en qué fase del proceso están tus prospectos actuales.
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </CardHeader>
-          <CardContent className="p-4 h-[200px] flex items-center justify-center">
-            {stats.charts.typeDistribution.length > 0 ? (
-              <>
-                <ResponsiveContainer width="100%" height="100%">
-                  <RechartsPieChart>
-                    <Pie
-                      data={stats.charts.typeDistribution}
-                      dataKey="count"
-                      nameKey="type"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={60}
-                      fill="#8884d8"
-                      paddingAngle={5}
-                    >
-                      {stats.charts.typeDistribution.map((entry: any, index: number) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip 
-                      contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '8px', border: '1px solid hsl(var(--border))', fontSize: '10px' }}
-                    />
-                  </RechartsPieChart>
-                </ResponsiveContainer>
-                <div className="flex flex-col gap-1 ml-4 min-w-[100px]">
-                  {stats.charts.typeDistribution.map((entry: any, index: number) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                      <span className="text-[9px] font-bold uppercase text-muted-foreground/60 truncate">{entry.type}: {entry.count}</span>
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div className="text-[10px] text-muted-foreground/40 font-bold uppercase">Sin datos este mes</div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="space-y-6">
-        <Card className="border-primary/20 bg-primary/5 shadow-lg relative overflow-hidden">
-          <CardContent className="p-6 space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Activity className="w-5 h-5 text-primary animate-pulse" />
-                <h3 className="text-xs font-bold uppercase tracking-widest text-primary/80">Rendimiento Operativo</h3>
-              </div>
-              <div className="flex flex-col items-end">
-                <span className="text-2xl font-black text-primary leading-none">{Math.round(productivityScore)}%</span>
-                <span className="text-[7px] font-bold uppercase text-primary/40">Eficiencia Global</span>
-              </div>
-            </div>
-
-            <div className="space-y-5">
-              {/* Funnel: Prospectos a Cita */}
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[9px] uppercase font-bold text-muted-foreground">1. Tasa de Asistencia</span>
-                    <TooltipProvider>
-                      <Tooltip delayDuration={0}>
-                        <TooltipTrigger asChild>
-                          <Info className="w-3 h-3 text-muted-foreground/40 cursor-help" />
-                        </TooltipTrigger>
-                        <TooltipContent className="text-[9px] bg-card border-border p-2 z-[100]">
-                          Porcentaje de prospectos que efectivamente asistieron a su cita programada.
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                  <span className="text-xs font-bold text-blue-500">{Math.round(attendanceRate)}%</span>
-                </div>
-                <Progress value={attendanceRate} className="h-1.5 bg-blue-500/10" />
-              </div>
-
-              {/* Funnel: Cita a Cierre */}
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[9px] uppercase font-bold text-muted-foreground">2. Tasa de Cierre</span>
-                    <TooltipProvider>
-                      <Tooltip delayDuration={0}>
-                        <TooltipTrigger asChild>
-                          <Info className="w-3 h-3 text-muted-foreground/40 cursor-help" />
-                        </TooltipTrigger>
-                        <TooltipContent className="text-[9px] bg-card border-border p-2 z-[100]">
-                          Porcentaje de clientes atendidos que concretaron una venta o apartado.
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                  <span className="text-xs font-bold text-green-500">{Math.round(closingRate)}%</span>
-                </div>
-                <Progress value={closingRate} className="h-1.5 bg-green-500/10" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-primary/10">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-blue-500/10"><Users className="w-4 h-4 text-blue-500" /></div>
-                <div>
-                  <p className="text-[8px] uppercase font-bold text-muted-foreground/60">Agendados</p>
-                  <p className="text-sm font-bold">{stats.currentMonthProspects}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-green-500/10"><Trophy className="w-4 h-4 text-green-500" /></div>
-                <div>
-                  <p className="text-[8px] uppercase font-bold text-muted-foreground/60">Cierres Reales</p>
-                  <p className="text-sm font-bold">{stats.currentMonthSales}</p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-accent/20 bg-accent/5 relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-5">
-            <Lightbulb className="w-16 h-16 text-accent" />
+  const PerformanceSection = () => (
+    <Card className="border-primary/20 bg-primary/5 shadow-lg relative overflow-hidden">
+      <CardContent className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Activity className="w-5 h-5 text-primary animate-pulse" />
+            <h3 className="text-xs font-bold uppercase tracking-widest text-primary/80">Rendimiento Operativo</h3>
           </div>
-          <CardHeader className="p-4 pb-0 flex flex-row items-center gap-2 relative z-10">
-            <Lightbulb className="w-4 h-4 text-accent" />
-            <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-accent/80">Sugerencia Estratégica</CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 pt-2 relative z-10">
-            <p className="text-xs text-foreground/90 leading-relaxed font-semibold">
-              {getAdvice()}
-            </p>
-          </CardContent>
-        </Card>
-
-        {expanded && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="border-border/40 bg-card/30">
-              <CardHeader className="p-4 border-b border-border/10">
-                <div className="flex items-center gap-2">
-                  <Target className="w-4 h-4 text-primary" />
-                  <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Análisis del Embudo</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 space-y-3">
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/20 border border-border/10">
-                  <TrendingUp className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                  <div className="space-y-1">
-                    <p className="text-[11px] font-bold text-foreground">Eficiencia por Cita</p>
-                    <p className="text-[10px] leading-tight text-muted-foreground/80">
-                      Tu tasa de cierre por cada cita realizada es del <strong>{Math.round(closingRate)}%</strong>. Esto indica una alta calidad de cierre una vez que el cliente está frente a ti.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border/40 bg-card/30">
-              <CardHeader className="p-4 border-b border-border/10">
-                <div className="flex items-center gap-2">
-                  <LayoutDashboard className="w-4 h-4 text-accent" />
-                  <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Disciplina de Agenda</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 space-y-3">
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/20 border border-border/10">
-                  <CalendarCheck className="w-4 h-4 text-accent shrink-0 mt-0.5" />
-                  <div className="space-y-1">
-                    <p className="text-[11px] font-bold text-foreground">Fugas de Ingreso</p>
-                    <p className="text-[10px] leading-tight text-muted-foreground/80">
-                      Pierdes aproximadamente el <strong>{Math.round(100 - attendanceRate)}%</strong> de tus prospectos antes de la cita. Mejorar la confirmación podría aumentar tus cierres en un {Math.round((100 - attendanceRate) * (closingRate / 100))}% mensual.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="flex flex-col items-end">
+            <span className="text-2xl font-black text-primary leading-none">{Math.round(productivityScore)}%</span>
+            <span className="text-[7px] font-bold uppercase text-primary/40">Eficiencia Global</span>
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+
+        <div className="space-y-5">
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-[9px] uppercase font-bold text-muted-foreground">1. Tasa de Asistencia</span>
+              <span className="text-xs font-bold text-blue-500">{Math.round(attendanceRate)}%</span>
+            </div>
+            <Progress value={attendanceRate} className="h-1.5 bg-blue-500/10" />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-[9px] uppercase font-bold text-muted-foreground">2. Tasa de Cierre</span>
+              <span className="text-xs font-bold text-green-500">{Math.round(closingRate)}%</span>
+            </div>
+            <Progress value={closingRate} className="h-1.5 bg-green-500/10" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 
   return (
@@ -370,14 +174,15 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
           <Button 
             variant="ghost" 
             size="icon" 
-            className="h-8 w-8 rounded-lg text-muted-foreground/60 hover:text-primary hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20"
+            className="h-8 w-8 rounded-lg text-muted-foreground/60 hover:text-primary hover:bg-primary/10"
             onClick={() => setIsExpanded(true)}
           >
             <Maximize2 className="w-4 h-4" />
           </Button>
         </CardHeader>
-        <CardContent className="p-6">
-          <StatsContent />
+        <CardContent className="p-6 space-y-6">
+          <WeeklyChart data={stats.charts.dailyActivity} title="Flujo Semanal Actual" icon={CalendarDays} />
+          <PerformanceSection />
         </CardContent>
       </Card>
 
@@ -392,20 +197,53 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
                 <BarChart3 className="text-primary w-6 h-6" />
               </div>
               <div>
-                <DialogTitle className="text-xl font-headline font-bold text-foreground">Inteligencia de Negocio Inmobiliario</DialogTitle>
-                <DialogDescription className="text-xs">Análisis profundo de conversión, tendencias de mercado y productividad operativa.</DialogDescription>
+                <DialogTitle className="text-xl font-headline font-bold text-foreground">Inteligencia de Negocio</DialogTitle>
+                <DialogDescription className="text-xs">Análisis comparativo de flujo semanal y eficiencia de conversión.</DialogDescription>
               </div>
             </div>
             <DialogClose asChild>
-              <Button variant="ghost" size="icon" className="rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors h-10 w-10">
+              <Button variant="ghost" size="icon" className="rounded-full hover:bg-destructive/10 hover:text-destructive h-10 w-10">
                 <X className="w-5 h-5" />
               </Button>
             </DialogClose>
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto p-8 scrollbar-thin bg-muted/5">
-            <div className="max-w-[1400px] mx-auto">
-              <StatsContent expanded={true} />
+            <div className="max-w-[1400px] mx-auto grid grid-cols-1 xl:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <WeeklyChart data={stats.charts.dailyActivity} title="Flujo Semanal Actual" icon={CalendarDays} />
+                <WeeklyChart data={stats.charts.lastWeekActivity} title="Flujo Semana Anterior" icon={History} />
+              </div>
+              <div className="space-y-6">
+                <PerformanceSection />
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 rounded-xl border border-border bg-card flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-blue-500/10"><Users className="w-5 h-5 text-blue-500" /></div>
+                    <div>
+                      <p className="text-[9px] uppercase font-bold text-muted-foreground">Total Citas Mes</p>
+                      <p className="text-xl font-bold">{stats.currentMonthProspects}</p>
+                    </div>
+                  </div>
+                  <div className="p-4 rounded-xl border border-border bg-card flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-green-500/10"><Trophy className="w-5 h-5 text-green-500" /></div>
+                    <div>
+                      <p className="text-[9px] uppercase font-bold text-muted-foreground">Ventas Mes</p>
+                      <p className="text-xl font-bold">{stats.currentMonthSales}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <Card className="border-accent/20 bg-accent/5 relative overflow-hidden">
+                  <CardHeader className="p-4 pb-0 flex flex-row items-center gap-2">
+                    <Lightbulb className="w-4 h-4 text-accent" />
+                    <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-accent/80">Sugerencia Estratégica</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4 pt-2">
+                    <p className="text-sm text-foreground/90 leading-relaxed font-semibold">{getAdvice()}</p>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         </DialogContent>

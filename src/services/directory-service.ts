@@ -4,6 +4,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
+import { subDays } from 'date-fns';
 
 export interface DirectoryEntry {
   id: string;
@@ -30,4 +31,24 @@ export const getDirectoryFromDisk = (): DirectoryEntry[] => {
   } catch (e) {
     return [];
   }
+};
+
+/**
+ * Genera prospectos seed para el directorio.
+ */
+export const generateDirectorySeeds = (): DirectoryEntry[] => {
+  const names = ['Pedro Mercado', 'Lucia Marketplace', 'Inversionista FB', 'Interesado Depa', 'Roberto Casas'];
+  const phones = ['6641234567', '6649876543', '6645551212', '6640001122', '6648887766'];
+  
+  const entries: DirectoryEntry[] = names.map((name, i) => ({
+    id: uuidv4(),
+    phone: phones[i],
+    name: name,
+    createdAt: subDays(new Date(), i).toISOString(),
+    isProcessed: i % 2 === 0,
+    messageSent: i === 0
+  }));
+
+  saveDirectoryToDisk(entries);
+  return entries;
 };

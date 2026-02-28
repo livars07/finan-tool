@@ -9,7 +9,14 @@ export function useDirectory() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    setEntries(Service.getDirectoryFromDisk());
+    const data = Service.getDirectoryFromDisk();
+    if (data.length === 0 && !localStorage.getItem('FINANTO_DIRECTORY_SEEDED')) {
+      const seeds = Service.generateDirectorySeeds();
+      setEntries(seeds);
+      localStorage.setItem('FINANTO_DIRECTORY_SEEDED', 'true');
+    } else {
+      setEntries(data);
+    }
     setIsLoaded(true);
   }, []);
 
