@@ -183,7 +183,8 @@ Hora: ${timeBold}${confirmedBold}`;
   };
 
   const showCommissionPanel = appointment.status === 'Cierre' || appointment.status === 'Apartado';
-  const commissionValue = (editData.finalCreditAmount || 0) * 0.007 * ((editData.commissionPercent || 0) / 100);
+  // Cálculo con retención del 9% de impuesto
+  const commissionValue = ((editData.finalCreditAmount || 0) * 0.007 * ((editData.commissionPercent || 0) / 100)) * 0.91;
 
   const calculatePaymentDateText = (dateStr: string) => {
     const paymentDate = getCommissionPaymentDate(dateStr);
@@ -196,7 +197,7 @@ Hora: ${timeBold}${confirmedBold}`;
       style: 'currency',
       currency: 'MXN',
       maximumFractionDigits: 0
-    }).format(val);
+    }).format(Math.round(val));
   };
 
   const formatWithCommas = (val: string) => {
@@ -596,7 +597,19 @@ Hora: ${timeBold}${confirmedBold}`;
 
                 <div className="grid grid-cols-2 gap-4 pt-2 border-t border-border/10">
                   <div className="space-y-1">
-                    <span className="text-[9px] font-bold uppercase text-muted-foreground block">Valor Comisión</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-[9px] font-bold uppercase text-muted-foreground block">Valor Comisión (Neto)</span>
+                      <TooltipProvider>
+                        <Tooltip delayDuration={0}>
+                          <TooltipTrigger asChild>
+                            <Info className="w-3 h-3 text-muted-foreground/40 cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent className="text-[10px] p-2 bg-card border-border shadow-xl z-[100]" side="top">
+                            Incluye retención del 9% de impuesto al monto ganado.
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
                     <p className="text-sm font-bold text-accent">{formatCurrency(commissionValue)}</p>
                   </div>
                   <div className="space-y-1">

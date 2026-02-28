@@ -229,14 +229,14 @@ export const calculateStats = (appointments: Appointment[]) => {
   const currentMonthApartados = activeApps.filter(a => a.status === 'Apartado' && isSameMonth(parseISO(a.date), now)).length;
   const lastMonthApartados = activeApps.filter(a => a.status === 'Apartado' && isSameMonth(parseISO(a.date), lastMonth)).length;
 
-  // COMISIONES
+  // COMISIONES (Con retención del 9%)
   const currentMonthCommission = activeApps
     .filter(a => {
       if (a.status !== 'Cierre' && a.status !== 'Apartado') return false;
       const payDate = getCommissionPaymentDate(a.date);
       return isSameMonth(payDate, now);
     })
-    .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
+    .reduce((sum, a) => sum + ((a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100)) * 0.91, 0);
 
   const currentMonthPaidCommission = activeApps
     .filter(a => {
@@ -245,7 +245,7 @@ export const calculateStats = (appointments: Appointment[]) => {
       const payDate = getCommissionPaymentDate(a.date);
       return isSameMonth(payDate, now);
     })
-    .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
+    .reduce((sum, a) => sum + ((a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100)) * 0.91, 0);
 
   const lastMonthCommission = activeApps
     .filter(a => {
@@ -253,7 +253,7 @@ export const calculateStats = (appointments: Appointment[]) => {
       const payDate = getCommissionPaymentDate(a.date);
       return isSameMonth(payDate, lastMonth);
     })
-    .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
+    .reduce((sum, a) => sum + ((a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100)) * 0.91, 0);
 
   // Proyecciones semanales
   const dayOfWeek = getDay(todayStart);
@@ -267,7 +267,7 @@ export const calculateStats = (appointments: Appointment[]) => {
       const payDate = startOfDay(getCommissionPaymentDate(a.date));
       return payDate.getTime() === targetFriday.getTime();
     })
-    .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
+    .reduce((sum, a) => sum + ((a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100)) * 0.91, 0);
 
   const overdueCommission = activeApps
     .filter(a => {
@@ -276,7 +276,7 @@ export const calculateStats = (appointments: Appointment[]) => {
       const payDate = startOfDay(getCommissionPaymentDate(a.date));
       return isBefore(payDate, todayStart);
     })
-    .reduce((sum, a) => sum + (a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100), 0);
+    .reduce((sum, a) => sum + ((a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100)) * 0.91, 0);
 
   const todayTotal = activeApps.filter(a => isToday(parseISO(a.date))).length;
   const todayConfirmed = activeApps.filter(a => isToday(parseISO(a.date)) && a.isConfirmed).length;

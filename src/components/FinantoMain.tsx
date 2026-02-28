@@ -428,7 +428,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       tooltip: (
         <div className="flex flex-col gap-1 text-[10px] leading-tight">
           <div className="flex justify-between items-center gap-4">
-            <span className="text-muted-foreground uppercase font-medium">Dinero recibido:</span>
+            <span className="text-muted-foreground uppercase font-medium">Ingreso Neto Recibido:</span>
             <span className="text-primary font-bold">{formatCurrency(stats.currentMonthPaidCommission)}</span>
           </div>
           <div className="flex justify-between items-center gap-4">
@@ -436,7 +436,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
             <span className="text-yellow-500 font-bold">{formatCurrency(stats.thisFridayCommission)}</span>
           </div>
           <div className="flex justify-between items-center gap-4 border-t border-border/10 pt-1">
-            <span className="text-muted-foreground uppercase font-medium">Pendiente:</span>
+            <span className="text-muted-foreground uppercase font-medium">Pendiente neto:</span>
             <span className="text-destructive font-bold">{formatCurrency(stats.overdueCommission)}</span>
           </div>
         </div>
@@ -845,9 +845,9 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                     <span className="text-base font-bold text-white">{pendingCommissionApp.name}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-bold uppercase text-blue-200 tracking-widest">Comisión Neta</span>
+                    <span className="text-[10px] font-bold uppercase text-blue-200 tracking-widest">Comisión Neta (9% Tax Inc.)</span>
                     <span className="text-xl font-black text-blue-300">
-                      {formatCurrency(Math.round((pendingCommissionApp.finalCreditAmount || 0) * 0.007 * ((pendingCommissionApp.commissionPercent || 0) / 100)))}
+                      {formatCurrency(Math.round(((pendingCommissionApp.finalCreditAmount || 0) * 0.007 * ((pendingCommissionApp.commissionPercent || 0) / 100)) * 0.91))}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
@@ -857,7 +857,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                     </span>
                   </div>
                 </div>
-                <p className="text-xs text-center text-blue-100/60 font-medium px-4 leading-relaxed">¿Confirmas que esta comisión ya fue liquidada y el monto está disponible en tu cuenta bancaria?</p>
+                <p className="text-xs text-center text-blue-100/60 font-medium px-4 leading-relaxed">¿Confirmas que esta comisión ya fue liquidada y el monto neto está disponible en tu cuenta?</p>
               </div>
             )}
             <div className="flex gap-3">

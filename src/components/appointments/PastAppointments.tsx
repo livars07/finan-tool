@@ -132,7 +132,7 @@ export default function PastAppointments({
       style: 'currency',
       currency: 'MXN',
       maximumFractionDigits: 0
-    }).format(val);
+    }).format(Math.round(val));
   };
 
   const visibleAppointments = appointments.slice(0, visibleCount);
@@ -168,8 +168,9 @@ export default function PastAppointments({
                 const paymentDate = getCommissionPaymentDate(app.date);
                 const isCommissionOverdue = isPending && isBefore(paymentDate, new Date());
 
+                // Cálculo con retención del 9% de impuesto
                 const commissionValue = isCierre 
-                  ? (app.finalCreditAmount || 0) * 0.007 * ((app.commissionPercent || 0) / 100) 
+                  ? ((app.finalCreditAmount || 0) * 0.007 * ((app.commissionPercent || 0) / 100)) * 0.91
                   : 0;
                 
                 return (
@@ -262,10 +263,10 @@ export default function PastAppointments({
                             </div>
                           </TooltipTrigger>
                           {isCierre && (
-                            <TooltipContent side="top" className="bg-card border-border shadow-2xl p-3 min-w-[180px] z-[100]">
+                            <TooltipContent side="top" className="bg-card border-border shadow-xl p-3 min-w-[180px] z-[100]">
                               <div className="space-y-2">
                                 <div className="flex items-center justify-between border-b border-border/10 pb-1">
-                                  <span className="text-[8px] uppercase font-bold text-muted-foreground tracking-widest">Detalle Financiero</span>
+                                  <span className="text-[8px] uppercase font-bold text-muted-foreground tracking-widest">Detalle Financiero (Neto)</span>
                                   <span className={cn(
                                     "text-[8px] font-bold px-1.5 py-0.5 rounded-full border",
                                     isCommissionPaid ? "bg-green-500/10 text-green-500 border-green-500/20" : "bg-yellow-500/10 text-yellow-600 border-yellow-500/20"
@@ -355,7 +356,7 @@ export default function PastAppointments({
       )}
 
       <AlertDialog open={!!archiveConfirmId} onOpenChange={(o) => !o && setArchiveConfirmId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="z-[85]">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Archivar registro?</AlertDialogTitle>
             <AlertDialogDescription>
