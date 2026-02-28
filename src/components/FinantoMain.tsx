@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -11,7 +12,8 @@ import {
   ClipboardList, Copy, Crown, Snowflake, MessageSquare, 
   CalendarClock, HandCoins, CheckCircle, Search, BadgeAlert, 
   MoreHorizontal, ArrowUpRight, ArrowDownRight, Coins, Star, Trophy, PartyPopper,
-  TrendingUp, Trash2
+  TrendingUp, Trash2, Target, History as HistoryIcon, User, CalendarPlus,
+  Receipt, Landmark
 } from 'lucide-react';
 import { useAppointments } from '@/hooks/use-appointments';
 import { Button } from '@/components/ui/button';
@@ -445,6 +447,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
           {statsCards.map((stat, i) => {
             const cardContent = (
               <Card 
+                key={i}
                 className="bg-card/30 backdrop-blur-md border-border/40 animate-periodic-glow hover:border-primary/50 transition-all cursor-default h-full"
                 style={{ animationDelay: `${i * 0.15}s` }}
               >
@@ -538,6 +541,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
               addAppointment={appointmentState.addAppointment} 
               editAppointment={appointmentState.editAppointment} 
               archiveAppointment={appointmentState.archiveAppointment}
+              unarchiveAppointment={appointmentState.unarchiveAppointment}
               formatFriendlyDate={appointmentState.formatFriendlyDate} 
               format12hTime={appointmentState.format12hTime} 
               stats={appointmentState.stats}
@@ -623,67 +627,118 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
       />
 
       <Dialog open={showHelp} onOpenChange={setShowHelp}>
-        <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 overflow-hidden bg-card shadow-2xl z-[70]">
+        <DialogContent className="sm:max-w-[750px] h-[85vh] flex flex-col p-0 overflow-hidden bg-card shadow-2xl z-[70]">
           <DialogHeader className="p-6 border-b bg-primary/5 shrink-0">
             <div className="flex items-center gap-3">
               <div className="p-3 border border-primary/30 rounded-xl bg-primary/10">
                 <Sparkles className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <DialogTitle className="text-2xl font-bold font-headline">Guía de Inicio Rápido</DialogTitle>
-                <DialogDescription className="text-xs">Aprende a usar Finanto en 3 simples pasos</DialogDescription>
+                <DialogTitle className="text-2xl font-bold font-headline">Guía de Inicio Rápido v1.1</DialogTitle>
+                <DialogDescription className="text-xs">Domina Finanto y maximiza tus cierres inmobiliarios</DialogDescription>
               </div>
             </div>
           </DialogHeader>
           <ScrollArea className="flex-1">
-            <div className="p-6 space-y-10 pb-20">
+            <div className="p-6 space-y-12 pb-20">
+              {/* CALCULADORA Y SIMULADOR */}
               <section className="space-y-4">
                 <div className="flex items-center gap-2 text-primary">
                   <Calculator className="w-5 h-5" />
-                  <h3 className="text-lg font-bold">Paso 1: Proyecta un Crédito</h3>
+                  <h3 className="text-lg font-bold">1. Calculadora y Simulador Profesional</h3>
                 </div>
                 <div className="pl-7 space-y-3 text-sm text-muted-foreground border-l-2 border-primary/20">
-                  <p>Cuando un cliente te pregunte montos, usa la <strong>Calculadora Rápida</strong>:</p>
+                  <p>Finanto ofrece dos niveles de análisis para tus clientes:</p>
                   <ul className="list-disc pl-4 space-y-2">
-                    <li>Ingresa el monto del crédito para obtener mensualidad e ingreso mínimo al instante.</li>
-                    <li>Usa el <strong>Icono de Expansión</strong> <Maximize2 className="inline w-3 h-3" /> para mostrar una vista profesional al cliente sin distracciones.</li>
-                    <li>Haz clic en <strong>Copiar Resumen</strong> para mandar una ficha técnica por WhatsApp.</li>
+                    <li><strong>Calculadora Rápida:</strong> Ideal para llamadas telefónicas. Ingresa solo el monto del crédito para obtener mensualidad e ingreso requerido al instante.</li>
+                    <li><strong>Simulador Expandido:</strong> Usa el icono <Maximize2 className="inline w-3 h-3" /> para entrar en modo profesional. Aquí podrás ajustar:
+                      <ul className="pl-4 mt-1 list-circle space-y-1">
+                        <li><strong>Enganche adicional:</strong> Para clientes que desean abonar más del 3% base.</li>
+                        <li><strong>Plazos personalizados:</strong> Ajusta de 192 meses a lo que el cliente necesite.</li>
+                        <li><strong>Gastos Operativos:</strong> Proyecta automáticamente escrituración (5%) y avalúos.</li>
+                      </ul>
+                    </li>
+                    <li><strong>Cotizaciones:</strong> Usa el botón <strong>"Copiar Resumen"</strong> para generar una ficha técnica impecable lista para enviar por WhatsApp.</li>
                   </ul>
                 </div>
               </section>
+
+              {/* AGENDA */}
+              <section className="space-y-4">
+                <div className="flex items-center gap-2 text-blue-500">
+                  <CalendarClock className="w-5 h-5" />
+                  <h3 className="text-lg font-bold">2. Gestión de Agenda Dinámica</h3>
+                </div>
+                <div className="pl-7 space-y-3 text-sm text-muted-foreground border-l-2 border-blue-500/20">
+                  <p>Organiza tus prospectos mediante las pestañas de navegación:</p>
+                  <ul className="list-disc pl-4 space-y-2">
+                    <li><strong>Pestaña Próximas:</strong> Tu centro de operaciones. Aquí verás tus citas de hoy y futuros días.
+                      <ul className="pl-4 mt-1 list-circle space-y-1">
+                        <li><strong>Confirmación:</strong> Usa el indicador de hoy para validar la asistencia del cliente.</li>
+                        <li><strong>Reporte Diario:</strong> Un solo clic para copiar tus métricas de éxito del día y enviarlas a tu grupo de equipo.</li>
+                      </ul>
+                    </li>
+                    <li><strong>Pestaña Historial:</strong> Tu CRM histórico. Consulta todos los resultados anteriores, cierres logrados y motivos de no asistencia para campañas de re-contacto.</li>
+                  </ul>
+                </div>
+              </section>
+
+              {/* DETALLES Y FEATURES */}
               <section className="space-y-4">
                 <div className="flex items-center gap-2 text-accent">
-                  <CalendarClock className="w-5 h-5" />
-                  <h3 className="text-lg font-bold">Paso 2: Gestiona tu Agenda</h3>
+                  <User className="w-5 h-5" />
+                  <h3 className="text-lg font-bold">3. Expediente del Cliente y Productividad</h3>
                 </div>
                 <div className="pl-7 space-y-3 text-sm text-muted-foreground border-l-2 border-accent/20">
-                  <p>Registra a cada interesado para no perder su contacto:</p>
+                  <p>Cada registro es un expediente completo con herramientas de copiado rápido:</p>
                   <ul className="list-disc pl-4 space-y-2">
-                    <li>Usa el formulario de <strong>Nueva Cita</strong> para anotar nombre, teléfono y fecha.</li>
-                    <li>En las citas de "Hoy", usa el botón <strong>Confirmar</strong> para validar si el cliente asistirá.</li>
-                    <li>Usa el botón <strong>Reporte Diario</strong> para enviar tus estadísticas del día a tu equipo.</li>
+                    <li><strong>Copiado Inteligente:</strong> Botones rápidos para copiar el número del cliente o la ficha completa de la cita formateada para WhatsApp.</li>
+                    <li><strong>Re-agendado:</strong> ¿El cliente no asistió o necesita otra cita? Usa el botón "Agendar 2da cita" para crear un nuevo registro vinculando las notas anteriores automáticamente.</li>
+                    <li><strong>Prospectadores Externos:</strong> Registra si la cita viene de un ejecutivo externo. Incluye su nombre y teléfono con opción de copiado rápido para coordinar pagos.</li>
                   </ul>
                 </div>
               </section>
+
+              {/* COMISIONES */}
               <section className="space-y-4">
                 <div className="flex items-center gap-2 text-green-500">
-                  <Star className="w-5 h-5" />
-                  <h3 className="text-lg font-bold">Paso 3: Registra tus Cierres</h3>
+                  <Coins className="w-5 h-5" />
+                  <h3 className="text-lg font-bold">4. Ciclo de Cierres y Comisiones</h3>
                 </div>
                 <div className="pl-7 space-y-3 text-sm text-muted-foreground border-l-2 border-green-500/20">
-                  <p>Al concretar una venta, marca la cita como <strong>✨ Cierre ✨</strong>:</p>
+                  <p>Control financiero total de tus ventas:</p>
                   <ul className="list-disc pl-4 space-y-2">
-                    <li>Verás una celebración y recomendaciones para tu expediente.</li>
-                    <li>Usa las <strong>Notas del cliente</strong> para registrar montos finales y comisiones.</li>
-                    <li>Consulta tu historial en cualquier momento para dar seguimiento.</li>
+                    <li><strong>Apartado vs Cierre:</strong> Marca como "Apartado" mientras se formaliza y "Cierre" al finalizar.</li>
+                    <li><strong>Regla de Pago:</strong> Finanto calcula automáticamente tu fecha de pago:
+                      <ul className="pl-4 mt-1 list-circle space-y-1">
+                        <li>Ventas Dom-Mar {"→"} Cobras el viernes de la siguiente semana.</li>
+                        <li>Ventas Mié-Sáb {"→"} Cobras el viernes de la subsiguiente semana.</li>
+                      </ul>
+                    </li>
+                    <li><strong>Verificación de Pago:</strong> El sistema te alertará automáticamente cuando una comisión esté vencida para que la concilies mediante el popup de verificación azul.</li>
+                  </ul>
+                </div>
+              </section>
+
+              {/* STATS */}
+              <section className="space-y-4">
+                <div className="flex items-center gap-2 text-primary">
+                  <Target className="w-5 h-5" />
+                  <h3 className="text-lg font-bold">5. Monitor de Rendimiento (Stats)</h3>
+                </div>
+                <div className="pl-7 space-y-3 text-sm text-muted-foreground border-l-2 border-primary/20">
+                  <p>Usa los indicadores superiores para medir tu éxito en tiempo real:</p>
+                  <ul className="list-disc pl-4 space-y-2">
+                    <li><strong>Tooltips Inteligentes:</strong> Pasa el mouse sobre cualquier estadística para ver desgloses avanzados (ej. Proyección de cobro de este viernes, comparación con el mes anterior, tasa de conversión).</li>
+                    <li><strong>Indicadores de Tendencia:</strong> Visualiza iconos <TrendingUp className="inline w-3 h-3 text-green-500" /> que te indican si estás superando tus números del mes pasado.</li>
                   </ul>
                 </div>
               </section>
             </div>
           </ScrollArea>
           <DialogFooter className="p-4 border-t bg-muted/20">
-            <Button onClick={() => setShowHelp(false)} className="w-full h-10 font-bold rounded-xl shadow-lg" type="button">
-              ¡Entendido, comencemos!
+            <Button onClick={() => setShowHelp(false)} className="w-full h-11 font-bold rounded-xl shadow-lg" type="button">
+              ¡Entendido, a cerrar ventas!
             </Button>
           </DialogFooter>
         </DialogContent>
