@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -647,7 +646,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   <Calculator className="w-5 h-5" />
                   <h3 className="text-lg font-bold">1. Calculadora y Simulador Profesional</h3>
                 </div>
-                <div className="pl-7 space-y-3 text-sm text-muted-foreground border-l-2 border-primary/20">
+                <div className="pl-7 space-y-3 text-sm text-muted-foreground border-l-4 border-primary/40 bg-primary/5 p-4 rounded-r-xl">
                   <p>Finanto ofrece dos niveles de análisis para tus clientes:</p>
                   <ul className="list-disc pl-4 space-y-2">
                     <li><strong>Calculadora Rápida:</strong> Ideal para llamadas telefónicas. Ingresa solo el monto del crédito para obtener mensualidad e ingreso requerido al instante.</li>
@@ -658,7 +657,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                         <li><strong>Gastos Operativos:</strong> Proyecta automáticamente escrituración (5%) y avalúos.</li>
                       </ul>
                     </li>
-                    <li><strong>Cotizaciones:</strong> Usa el botón <strong>"Copiar Resumen"</strong> para generar una ficha técnica impecable lista para enviar por WhatsApp.</li>
+                    <li><strong>Cotizaciones:</strong> Usa el botón <strong>"Copiar Resumen"</strong> para generar una ficha técnica súper simple, impecable y lista para enviar por WhatsApp. Se recomienda pegarla también en las notas de la cita para tener el respaldo del cálculo.</li>
                   </ul>
                 </div>
               </section>
@@ -669,7 +668,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   <CalendarClock className="w-5 h-5" />
                   <h3 className="text-lg font-bold">2. Gestión de Agenda Dinámica</h3>
                 </div>
-                <div className="pl-7 space-y-3 text-sm text-muted-foreground border-l-2 border-blue-500/20">
+                <div className="pl-7 space-y-3 text-sm text-muted-foreground border-l-4 border-blue-500/40 bg-blue-500/5 p-4 rounded-r-xl">
                   <p>Organiza tus prospectos mediante las pestañas de navegación:</p>
                   <ul className="list-disc pl-4 space-y-2">
                     <li><strong>Pestaña Próximas:</strong> Tu centro de operaciones. Aquí verás tus citas de hoy y futuros días.
@@ -689,7 +688,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   <User className="w-5 h-5" />
                   <h3 className="text-lg font-bold">3. Expediente del Cliente y Productividad</h3>
                 </div>
-                <div className="pl-7 space-y-3 text-sm text-muted-foreground border-l-2 border-accent/20">
+                <div className="pl-7 space-y-3 text-sm text-muted-foreground border-l-4 border-accent/40 bg-accent/5 p-4 rounded-r-xl">
                   <p>Cada registro es un expediente completo con herramientas de copiado rápido:</p>
                   <ul className="list-disc pl-4 space-y-2">
                     <li><strong>Copiado Inteligente:</strong> Botones rápidos para copiar el número del cliente o la ficha completa de la cita formateada para WhatsApp.</li>
@@ -705,7 +704,7 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   <Coins className="w-5 h-5" />
                   <h3 className="text-lg font-bold">4. Ciclo de Cierres y Comisiones</h3>
                 </div>
-                <div className="pl-7 space-y-3 text-sm text-muted-foreground border-l-2 border-green-500/20">
+                <div className="pl-7 space-y-3 text-sm text-muted-foreground border-l-4 border-green-500/40 bg-green-500/5 p-4 rounded-r-xl">
                   <p>Control financiero total de tus ventas:</p>
                   <ul className="list-disc pl-4 space-y-2">
                     <li><strong>Apartado vs Cierre:</strong> Marca como "Apartado" mientras se formaliza y "Cierre" al finalizar.</li>
@@ -726,8 +725,8 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                   <Target className="w-5 h-5" />
                   <h3 className="text-lg font-bold">5. Monitor de Rendimiento (Stats)</h3>
                 </div>
-                <div className="pl-7 space-y-3 text-sm text-muted-foreground border-l-2 border-primary/20">
-                  <p>Usa los indicadores superiores para medir tu éxito en tiempo real:</p>
+                <div className="pl-7 space-y-3 text-sm text-muted-foreground border-l-4 border-primary/40 bg-primary/5 p-4 rounded-r-xl">
+                  <p>Indicadores superiores para medir tu éxito en tiempo real:</p>
                   <ul className="list-disc pl-4 space-y-2">
                     <li><strong>Tooltips Inteligentes:</strong> Pasa el mouse sobre cualquier estadística para ver desgloses avanzados (ej. Proyección de cobro de este viernes, comparación con el mes anterior, tasa de conversión).</li>
                     <li><strong>Indicadores de Tendencia:</strong> Visualiza iconos <TrendingUp className="inline w-3 h-3 text-green-500" /> que te indican si estás superando tus números del mes pasado.</li>
