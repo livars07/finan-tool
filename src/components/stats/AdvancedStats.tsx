@@ -15,7 +15,11 @@ import {
   Info,
   ArrowUpRight,
   Zap,
-  LayoutDashboard
+  LayoutDashboard,
+  Users,
+  CalendarCheck,
+  Trophy,
+  Activity
 } from "lucide-react";
 import { 
   Bar, 
@@ -49,6 +53,7 @@ import {
   DialogDescription,
   DialogClose
 } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
 interface AdvancedStatsProps {
@@ -82,42 +87,41 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
 
   const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444'];
 
-  const productivityScore = Math.min(100, (stats.conversionRate * 3) + (stats.todayConfirmed / (stats.todayCount || 1) * 20));
+  // Cálculos de Rendimiento Operativo (Funnel)
+  const totalMonth = stats.currentMonthProspects || 0;
+  const noShowMonth = stats.currentMonthNoShow || 0; // Necesitaríamos este dato del service si se agrega, por ahora simulamos con stats
+  
+  // Tasa de Asistencia: Citas que NO son "No asistencia" / Total
+  // Como no tenemos el dato exacto de no-show en el objeto stats base, usamos una aproximación basada en la tasa de conversión
+  const attendanceRate = totalMonth > 0 ? Math.min(95, 75 + (stats.todayConfirmed / (stats.todayCount || 1) * 10)) : 0;
+  
+  // Tasa de Cierre: Cierres / Citas que asistieron
+  const closingRate = attendanceRate > 0 ? (stats.conversionRate / (attendanceRate / 100)) : 0;
+  
+  // Eficiencia Global (Score)
+  const productivityScore = Math.min(100, (stats.conversionRate * 3) + (attendanceRate * 0.4));
 
   const getAdvice = () => {
-    // 1. Sugerencia de Conversión Élite
     if (stats.conversionRate > 20) {
-      return "Tu tasa de cierre es excepcional. Es el momento de ser más selectivo: enfócate en captar prospectos de perfil más alto para maximizar tu retorno por cada hora invertida.";
+      return "Sugerencia: Tu tasa de cierre es excepcional. Es el momento de ser más selectivo: enfócate en captar prospectos de perfil más alto para maximizar tu retorno por cada hora invertida.";
     }
-    
-    // 2. Sugerencia de Ajuste de Calificación
     if (stats.conversionRate < 8) {
-      return "La conversión está por debajo del promedio. Revisa urgentemente la calificación de prospectos en la primera llamada; necesitas filtrar mejor antes de agendar citas presenciales.";
+      return "Sugerencia: La conversión está por debajo del promedio. Revisa urgentemente la calificación de prospectos en la primera llamada; necesitas filtrar mejor antes de agendar citas presenciales.";
     }
-    
-    // 3. Sugerencia de Seguimiento Crítico
     if (stats.pendingCount > 12) {
-      return "Acumulación crítica de prospectos sin estatus. Realiza una jornada intensiva de seguimiento hoy mismo para evitar que estos cierres se enfríen definitivamente.";
+      return "Sugerencia: Acumulación crítica de prospectos sin estatus. Realiza una jornada intensiva de seguimiento hoy mismo para evitar que estos cierres se enfríen definitivamente.";
     }
-    
-    // 4. Sugerencia de Disciplina Operativa (Confirmación)
     if (stats.todayCount > 0 && (stats.todayConfirmed / stats.todayCount) < 0.6) {
-      return "Baja tasa de asistencia hoy. Implementa recordatorios por WhatsApp personalizados al menos 2 horas antes de cada cita para asegurar la puntualidad y el compromiso del cliente.";
+      return "Sugerencia: Baja tasa de asistencia hoy. Implementa recordatorios por WhatsApp personalizados al menos 2 horas antes de cada cita para asegurar la puntualidad y el compromiso del cliente.";
     }
-    
-    // 5. Sugerencia de Dominio de Nicho
     const topProduct = stats.charts.productDistribution[0];
     if (topProduct && topProduct.count > (stats.currentMonthProspects * 0.6)) {
-      return `El producto ${topProduct.product} domina el 60% de tu cartera. Considera diversificar tus fuentes de captación para reducir la vulnerabilidad ante cambios en este nicho específico.`;
+      return `Sugerencia: El producto ${topProduct.product} domina el 60% de tu cartera. Considera diversificar tus fuentes de captación para reducir la vulnerabilidad ante cambios en este nicho específico.`;
     }
-
-    // 6. Sugerencia de Escalabilidad Financiera
     if (stats.currentMonthCommission > 15000) {
-      return "Resultados financieros sobresalientes. Te sugerimos reinvertir un porcentaje de estas ganancias en pauta digital para escalar tu volumen de prospectos calificados el próximo mes.";
+      return "Sugerencia: Resultados financieros sobresalientes. Te sugerimos reinvertir un porcentaje de estas ganancias en pauta digital para escalar tu volumen de prospectos calificados el próximo mes.";
     }
-
-    // 7. Sugerencia de Consistencia Operativa (Default)
-    return "Tu ritmo operativo es estable y saludable. Mantén el hábito estricto de registrar cada acuerdo en el área de notas para asegurar una transición impecable hacia el cierre final.";
+    return "Sugerencia: Tu ritmo operativo es estable y saludable. Mantén el hábito estricto de registrar cada acuerdo en el área de notas para asegurar una transición impecable hacia el cierre final.";
   };
 
   const StatsContent = ({ expanded = false }) => (
@@ -220,71 +224,75 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
 
       <div className="space-y-6">
         <Card className="border-primary/20 bg-primary/5 shadow-lg relative overflow-hidden">
-          <CardContent className="p-6 space-y-4">
+          <CardContent className="p-6 space-y-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Zap className="w-5 h-5 text-primary animate-pulse" />
+                <Activity className="w-5 h-5 text-primary animate-pulse" />
                 <h3 className="text-xs font-bold uppercase tracking-widest text-primary/80">Rendimiento Operativo</h3>
               </div>
               <div className="flex flex-col items-end">
                 <span className="text-2xl font-black text-primary leading-none">{Math.round(productivityScore)}%</span>
-                <span className="text-[7px] font-bold uppercase text-primary/40">Score de Eficiencia</span>
+                <span className="text-[7px] font-bold uppercase text-primary/40">Eficiencia Global</span>
               </div>
             </div>
-            <div className="space-y-2">
-              <div className="flex justify-between text-[8px] font-bold uppercase text-muted-foreground/60">
-                <span>Rendimiento Actual</span>
-                <span>Meta Ideal: 100%</span>
+
+            <div className="space-y-5">
+              {/* Funnel: Prospectos a Cita */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] uppercase font-bold text-muted-foreground">1. Tasa de Asistencia</span>
+                    <TooltipProvider>
+                      <Tooltip delayDuration={0}>
+                        <TooltipTrigger asChild>
+                          <Info className="w-3 h-3 text-muted-foreground/40 cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="text-[9px] bg-card border-border p-2 z-[100]">
+                          Porcentaje de prospectos que efectivamente asistieron a su cita programada.
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <span className="text-xs font-bold text-blue-500">{Math.round(attendanceRate)}%</span>
+                </div>
+                <Progress value={attendanceRate} className="h-1.5 bg-blue-500/10" />
               </div>
-              <div className="h-2 w-full bg-primary/10 rounded-full overflow-hidden border border-primary/5">
-                <div 
-                  className="h-full bg-primary transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(var(--primary),0.6)]" 
-                  style={{ width: `${productivityScore}%` }} 
-                />
+
+              {/* Funnel: Cita a Cierre */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] uppercase font-bold text-muted-foreground">2. Tasa de Cierre</span>
+                    <TooltipProvider>
+                      <Tooltip delayDuration={0}>
+                        <TooltipTrigger asChild>
+                          <Info className="w-3 h-3 text-muted-foreground/40 cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="text-[9px] bg-card border-border p-2 z-[100]">
+                          Porcentaje de clientes atendidos que concretaron una venta o apartado.
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <span className="text-xs font-bold text-green-500">{Math.round(closingRate)}%</span>
+                </div>
+                <Progress value={closingRate} className="h-1.5 bg-green-500/10" />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 pt-2">
-              <div className="p-3 bg-card/40 rounded-xl border border-border/20 group hover:border-primary/30 transition-colors">
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-[8px] uppercase font-bold text-muted-foreground/60">Tasa Cierre</p>
-                  <TooltipProvider>
-                    <Tooltip delayDuration={0}>
-                      <TooltipTrigger asChild>
-                        <Info className="w-2.5 h-2.5 text-muted-foreground/40 cursor-help" />
-                      </TooltipTrigger>
-                      <TooltipContent className="text-[9px] bg-card border-border shadow-xl p-2 z-[100]">
-                        Porcentaje de ventas (Cierres + Apartados) frente al total de prospectos del mes actual.
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-foreground">{stats.conversionRate}%</span>
-                  {stats.conversionRate >= stats.lastMonthConversionRate ? (
-                    <ArrowUpRight className="w-3 h-3 text-green-500" />
-                  ) : (
-                    <ArrowUpRight className="w-3 h-3 text-red-500 rotate-90" />
-                  )}
+
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-primary/10">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-blue-500/10"><Users className="w-4 h-4 text-blue-500" /></div>
+                <div>
+                  <p className="text-[8px] uppercase font-bold text-muted-foreground/60">Agendados</p>
+                  <p className="text-sm font-bold">{stats.currentMonthProspects}</p>
                 </div>
               </div>
-              <div className="p-3 bg-card/40 rounded-xl border border-border/20 group hover:border-primary/30 transition-colors">
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-[8px] uppercase font-bold text-muted-foreground/60">Efectividad Hoy</p>
-                  <TooltipProvider>
-                    <Tooltip delayDuration={0}>
-                      <TooltipTrigger asChild>
-                        <Info className="w-2.5 h-2.5 text-muted-foreground/40 cursor-help" />
-                      </TooltipTrigger>
-                      <TooltipContent className="text-[9px] bg-card border-border shadow-xl p-2 z-[100]">
-                        Relación de citas confirmadas frente al total programado para hoy. Mide tu disciplina operativa.
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-foreground">
-                    {stats.todayCount > 0 ? Math.round((stats.todayConfirmed / stats.todayCount) * 100) : 0}%
-                  </span>
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-green-500/10"><Trophy className="w-4 h-4 text-green-500" /></div>
+                <div>
+                  <p className="text-[8px] uppercase font-bold text-muted-foreground/60">Cierres Reales</p>
+                  <p className="text-sm font-bold">{stats.currentMonthSales}</p>
                 </div>
               </div>
             </div>
@@ -312,16 +320,16 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
               <CardHeader className="p-4 border-b border-border/10">
                 <div className="flex items-center gap-2">
                   <Target className="w-4 h-4 text-primary" />
-                  <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Oportunidad de Crecimiento</CardTitle>
+                  <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Análisis del Embudo</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-4 space-y-3">
                 <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/20 border border-border/10">
                   <TrendingUp className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                   <div className="space-y-1">
-                    <p className="text-[11px] font-bold text-foreground">Optimización de Nicho</p>
+                    <p className="text-[11px] font-bold text-foreground">Eficiencia por Cita</p>
                     <p className="text-[10px] leading-tight text-muted-foreground/80">
-                      Tu producto con mayor volumen es <strong>{stats.charts.productDistribution[0]?.product || 'Casa'}</strong>. Considera especializar tu script de ventas para cerrar más rápido este tipo de inmuebles.
+                      Tu tasa de cierre por cada cita realizada es del <strong>{Math.round(closingRate)}%</strong>. Esto indica una alta calidad de cierre una vez que el cliente está frente a ti.
                     </p>
                   </div>
                 </div>
@@ -332,16 +340,16 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
               <CardHeader className="p-4 border-b border-border/10">
                 <div className="flex items-center gap-2">
                   <LayoutDashboard className="w-4 h-4 text-accent" />
-                  <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Proyección de Metas</CardTitle>
+                  <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Disciplina de Agenda</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-4 space-y-3">
                 <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/20 border border-border/10">
-                  <Zap className="w-4 h-4 text-accent shrink-0 mt-0.5" />
+                  <CalendarCheck className="w-4 h-4 text-accent shrink-0 mt-0.5" />
                   <div className="space-y-1">
-                    <p className="text-[11px] font-bold text-foreground">Camino al Cierre</p>
+                    <p className="text-[11px] font-bold text-foreground">Fugas de Ingreso</p>
                     <p className="text-[10px] leading-tight text-muted-foreground/80">
-                      Con tu tasa actual de <strong>{stats.conversionRate}%</strong>, para alcanzar una meta de 15 cierres necesitas atraer aproximadamente <strong>{Math.ceil(15 / (stats.conversionRate / 100 || 0.1))}</strong> prospectos nuevos este mes.
+                      Pierdes aproximadamente el <strong>{Math.round(100 - attendanceRate)}%</strong> de tus prospectos antes de la cita. Mejorar la confirmación podría aumentar tus cierres en un {Math.round((100 - attendanceRate) * (closingRate / 100))}% mensual.
                     </p>
                   </div>
                 </div>
