@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -15,7 +16,15 @@ import {
   CalendarDays,
   Trophy,
   Users,
-  History
+  History,
+  Coins,
+  Wallet,
+  ArrowUpRight,
+  ArrowDownRight,
+  Receipt,
+  PieChart,
+  Zap,
+  TrendingDown
 } from "lucide-react";
 import { 
   Bar, 
@@ -80,12 +89,26 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
   const closingRate = attendanceRate > 0 ? (stats.conversionRate / (attendanceRate / 100)) : 0;
   const productivityScore = Math.min(100, (stats.conversionRate * 3) + (attendanceRate * 0.4));
 
+  // Datos Derivados
+  const avgCommission = stats.currentMonthSales > 0 ? stats.currentMonthCommission / stats.currentMonthSales : 0;
+  const monthlyGrowth = stats.lastMonthProspects > 0 ? ((stats.currentMonthProspects - stats.lastMonthProspects) / stats.lastMonthProspects) * 100 : 0;
+  const taxImpact = stats.currentMonthCommission / 0.91 * 0.09; // Estimación del 9% retenido
+
+  const formatCurrency = (val: number) => {
+    return new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency: 'MXN',
+      maximumFractionDigits: 0
+    }).format(Math.round(val));
+  };
+
   const getAdvice = () => {
     if (stats.conversionRate > 20) return "Sugerencia: Tu tasa de cierre es excepcional. Es el momento de ser más selectivo: enfócate en captar perfiles de crédito más alto para maximizar tu retorno.";
     if (stats.conversionRate < 8) return "Sugerencia: La conversión está por debajo del promedio. Revisa la calificación de prospectos en la primera llamada; necesitas filtrar mejor antes de agendar.";
     if (stats.pendingCount > 12) return "Sugerencia: Acumulación crítica de prospectos sin estatus. Realiza una jornada de seguimiento intensivo hoy para evitar que estos cierres se enfríen.";
     if (stats.todayCount > 0 && (stats.todayConfirmed / stats.todayCount) < 0.6) return "Sugerencia: Baja tasa de asistencia hoy. Implementa recordatorios por WhatsApp 2 horas antes de cada cita para asegurar el compromiso.";
     if (stats.currentMonthCommission > 15000) return "Sugerencia: Resultados financieros sobresalientes. Te sugerimos reinvertir un porcentaje en pauta digital para escalar tu volumen el próximo mes.";
+    if (stats.currentMonthApartados > stats.currentMonthOnlyCierre * 2) return "Sugerencia: Tienes muchos apartados pendientes de formalizar. Enfoca tu semana en el área operativa para empujar esas firmas y liberar flujo de efectivo.";
     return "Sugerencia: Tu ritmo operativo es estable. Mantén el hábito estricto de registrar cada acuerdo en notas para asegurar una transición impecable hacia el cierre.";
   };
 
@@ -102,8 +125,8 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
               <Button variant="ghost" size="icon" className="h-6 w-6"><Info className="w-3.5 h-3.5 text-muted-foreground/60" /></Button>
             </TooltipTrigger>
             <TooltipContent className="text-[10px] max-w-[200px] bg-card border-border shadow-xl p-3 z-[100]" side="top">
-              <p className="font-bold mb-1 uppercase text-primary">Flujo de Citas</p>
-              Muestra el volumen de citas agendadas frente a cierres efectivos en el periodo seleccionado.
+              <p className="font-bold mb-1 uppercase text-primary">Volumen de Operación</p>
+              Compara las citas registradas contra las ventas efectivas (Cierres + Apartados) en el periodo.
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -134,18 +157,21 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Activity className="w-5 h-5 text-primary animate-pulse" />
-            <h3 className="text-xs font-bold uppercase tracking-widest text-primary/80">Rendimiento Operativo</h3>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-primary/80">Funnel de Conversión Técnica</h3>
           </div>
           <div className="flex flex-col items-end">
             <span className="text-2xl font-black text-primary leading-none">{Math.round(productivityScore)}%</span>
-            <span className="text-[7px] font-bold uppercase text-primary/40">Eficiencia Global</span>
+            <span className="text-[7px] font-bold uppercase text-primary/40">Salud Operativa</span>
           </div>
         </div>
 
         <div className="space-y-5">
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-[9px] uppercase font-bold text-muted-foreground">1. Tasa de Asistencia</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[9px] uppercase font-bold text-muted-foreground">1. Tasa de Asistencia</span>
+                <TooltipProvider><Tooltip><TooltipTrigger><Info className="w-2.5 h-2.5 opacity-40"/></TooltipTrigger><TooltipContent className="text-[10px] z-[110]">Porcentaje de citas que confirmaron asistencia hoy.</TooltipContent></Tooltip></TooltipProvider>
+              </div>
               <span className="text-xs font-bold text-blue-500">{Math.round(attendanceRate)}%</span>
             </div>
             <Progress value={attendanceRate} className="h-1.5 bg-blue-500/10" />
@@ -153,7 +179,10 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
 
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-[9px] uppercase font-bold text-muted-foreground">2. Tasa de Cierre</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[9px] uppercase font-bold text-muted-foreground">2. Efectividad de Cierre</span>
+                <TooltipProvider><Tooltip><TooltipTrigger><Info className="w-2.5 h-2.5 opacity-40"/></TooltipTrigger><TooltipContent className="text-[10px] z-[110]">Ventas logradas divididas entre prospectos atendidos.</TooltipContent></Tooltip></TooltipProvider>
+              </div>
               <span className="text-xs font-bold text-green-500">{Math.round(closingRate)}%</span>
             </div>
             <Progress value={closingRate} className="h-1.5 bg-green-500/10" />
@@ -181,7 +210,7 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
           </Button>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
-          <WeeklyChart data={stats.charts.dailyActivity} title="Flujo Semanal Actual" icon={CalendarDays} />
+          <WeeklyChart data={stats.charts.dailyActivity} title="Flujo Semanal de Citas" icon={CalendarDays} />
           <PerformanceSection />
         </CardContent>
       </Card>
@@ -197,8 +226,8 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
                 <BarChart3 className="text-primary w-6 h-6" />
               </div>
               <div>
-                <DialogTitle className="text-xl font-headline font-bold text-foreground">Inteligencia de Negocio</DialogTitle>
-                <DialogDescription className="text-xs">Análisis comparativo de flujo semanal y eficiencia de conversión.</DialogDescription>
+                <DialogTitle className="text-xl font-headline font-bold text-foreground">Inteligencia de Negocio Finanto</DialogTitle>
+                <DialogDescription className="text-xs">Análisis profundo de rendimiento, flujo financiero y tendencias operativas.</DialogDescription>
               </div>
             </div>
             <DialogClose asChild>
@@ -209,40 +238,186 @@ export default function AdvancedStats({ stats, initialExpanded = false, onExpand
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto p-8 scrollbar-thin bg-muted/5">
-            <div className="max-w-[1400px] mx-auto grid grid-cols-1 xl:grid-cols-2 gap-8">
-              <div className="space-y-6">
-                <WeeklyChart data={stats.charts.dailyActivity} title="Flujo Semanal Actual" icon={CalendarDays} />
-                <WeeklyChart data={stats.charts.lastWeekActivity} title="Flujo Semana Anterior" icon={History} />
+            <div className="max-w-[1400px] mx-auto space-y-8">
+              
+              {/* SECCIÓN 1: LOS 5 GRANDES (EXTENDIDOS) */}
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <Card className="bg-card/40 border-primary/20 p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div className="p-2 bg-primary/10 rounded-lg"><CalendarDays className="w-4 h-4 text-primary" /></div>
+                    <span className="text-[10px] font-bold text-primary bg-primary/5 px-2 py-0.5 rounded-full border border-primary/10">HOY</span>
+                  </div>
+                  <div>
+                    <p className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest">Citas Agendadas</p>
+                    <p className="text-3xl font-black">{stats.todayCount}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border/10">
+                    <div>
+                      <p className="text-[8px] font-bold text-muted-foreground uppercase">Confirmadas</p>
+                      <p className="text-xs font-bold text-green-500">{stats.todayConfirmed}</p>
+                    </div>
+                    <div>
+                      <p className="text-[8px] font-bold text-muted-foreground uppercase">Mañana</p>
+                      <p className="text-xs font-bold text-primary">{stats.tomorrowTotal}</p>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="bg-card/40 border-primary/20 p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div className="p-2 bg-primary/10 rounded-lg"><Wallet className="w-4 h-4 text-primary" /></div>
+                  </div>
+                  <div>
+                    <p className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest">Pipeline Activo</p>
+                    <p className="text-3xl font-black">{stats.pendingCount}</p>
+                  </div>
+                  <div className="pt-2 border-t border-border/10">
+                    <p className="text-[8px] font-bold text-muted-foreground uppercase">Total Próximos</p>
+                    <p className="text-xs font-bold text-primary">Prospectos sin resultado</p>
+                  </div>
+                </Card>
+
+                <Card className="bg-card/40 border-accent/20 p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div className="p-2 bg-accent/10 rounded-lg"><Users className="w-4 h-4 text-accent" /></div>
+                    <div className="flex items-center gap-1">
+                      {monthlyGrowth >= 0 ? <ArrowUpRight className="w-3 h-3 text-green-500"/> : <ArrowDownRight className="w-3 h-3 text-destructive"/>}
+                      <span className={cn("text-[10px] font-bold", monthlyGrowth >= 0 ? "text-green-500" : "text-destructive")}>{Math.abs(Math.round(monthlyGrowth))}%</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest">Prospectos Mes</p>
+                    <p className="text-3xl font-black">{stats.currentMonthProspects}</p>
+                  </div>
+                  <div className="pt-2 border-t border-border/10">
+                    <p className="text-[8px] font-bold text-muted-foreground uppercase">Mes Pasado</p>
+                    <p className="text-xs font-bold">{stats.lastMonthProspects}</p>
+                  </div>
+                </Card>
+
+                <Card className="bg-card/40 border-green-500/20 p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div className="p-2 bg-green-500/10 rounded-lg"><Trophy className="w-4 h-4 text-green-500" /></div>
+                  </div>
+                  <div>
+                    <p className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest">Cierres de Mes</p>
+                    <p className="text-3xl font-black text-green-500">{stats.currentMonthSales}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border/10">
+                    <div>
+                      <p className="text-[8px] font-bold text-muted-foreground uppercase">Formalizados</p>
+                      <p className="text-xs font-bold text-green-600">{stats.currentMonthOnlyCierre}</p>
+                    </div>
+                    <div>
+                      <p className="text-[8px] font-bold text-muted-foreground uppercase">Apartados</p>
+                      <p className="text-xs font-bold text-blue-500">{stats.currentMonthApartados}</p>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="bg-card/40 border-yellow-500/20 p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div className="p-2 bg-yellow-500/10 rounded-lg"><Coins className="w-4 h-4 text-yellow-600" /></div>
+                  </div>
+                  <div>
+                    <p className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest">Ingresos Totales (Neto)</p>
+                    <p className="text-xl font-black truncate">{formatCurrency(stats.currentMonthCommission)}</p>
+                  </div>
+                  <div className="grid grid-cols-1 gap-1 pt-2 border-t border-border/10">
+                    <div className="flex justify-between">
+                      <span className="text-[8px] font-bold text-muted-foreground uppercase">Cobrado Neto</span>
+                      <span className="text-xs font-bold text-green-500">{formatCurrency(stats.currentMonthPaidCommission)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[8px] font-bold text-muted-foreground uppercase">Este Viernes</span>
+                      <span className="text-xs font-bold text-yellow-600">{formatCurrency(stats.thisFridayCommission)}</span>
+                    </div>
+                  </div>
+                </Card>
               </div>
-              <div className="space-y-6">
-                <PerformanceSection />
+
+              {/* SECCIÓN 2: INSIGHTS DERIVADOS Y GRÁFICAS */}
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
                 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 rounded-xl border border-border bg-card flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-blue-500/10"><Users className="w-5 h-5 text-blue-500" /></div>
-                    <div>
-                      <p className="text-[9px] uppercase font-bold text-muted-foreground">Total Citas Mes</p>
-                      <p className="text-xl font-bold">{stats.currentMonthProspects}</p>
-                    </div>
+                {/* Lado Izquierdo: Gráficas Comparativas */}
+                <div className="xl:col-span-8 space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <WeeklyChart data={stats.charts.dailyActivity} title="Flujo Semana Actual" icon={CalendarDays} />
+                    <WeeklyChart data={stats.charts.lastWeekActivity} title="Flujo Semana Anterior" icon={History} />
                   </div>
-                  <div className="p-4 rounded-xl border border-border bg-card flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-green-500/10"><Trophy className="w-5 h-5 text-green-500" /></div>
-                    <div>
-                      <p className="text-[9px] uppercase font-bold text-muted-foreground">Ventas Mes</p>
-                      <p className="text-xl font-bold">{stats.currentMonthSales}</p>
-                    </div>
-                  </div>
+                  
+                  <Card className="bg-card border-border/40 overflow-hidden">
+                    <CardHeader className="bg-muted/30 p-4 border-b">
+                      <div className="flex items-center gap-2">
+                        <Zap className="w-4 h-4 text-yellow-500" />
+                        <CardTitle className="text-xs font-bold uppercase tracking-wider">Insights Operativos Avanzados</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Target className="w-4 h-4" />
+                          <span className="text-[10px] font-bold uppercase">Ticket Promedio Comisión</span>
+                        </div>
+                        <p className="text-2xl font-black text-foreground">{formatCurrency(avgCommission)}</p>
+                        <p className="text-[9px] text-muted-foreground">Valor neto promedio de cada cierre logrado este mes.</p>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Receipt className="w-4 h-4" />
+                          <span className="text-[10px] font-bold uppercase">Impacto Fiscal Estimado</span>
+                        </div>
+                        <p className="text-2xl font-black text-destructive">{formatCurrency(taxImpact)}</p>
+                        <p className="text-[9px] text-muted-foreground">Monto aproximado retenido por el impuesto del 9%.</p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <PieChart className="w-4 h-4" />
+                          <span className="text-[10px] font-bold uppercase">Conversión de Seguimiento</span>
+                        </div>
+                        <p className="text-2xl font-black text-primary">{Math.round(closingRate * 1.2)}%</p>
+                        <p className="text-[9px] text-muted-foreground">Efectividad proyectada tras segundas consultas.</p>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
 
-                <Card className="border-accent/20 bg-accent/5 relative overflow-hidden">
-                  <CardHeader className="p-4 pb-0 flex flex-row items-center gap-2">
-                    <Lightbulb className="w-4 h-4 text-accent" />
-                    <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-accent/80">Sugerencia Estratégica</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 pt-2">
-                    <p className="text-sm text-foreground/90 leading-relaxed font-semibold">{getAdvice()}</p>
-                  </CardContent>
-                </Card>
+                {/* Lado Derecho: Rendimiento y Sugerencias */}
+                <div className="xl:col-span-4 space-y-6">
+                  <PerformanceSection />
+                  
+                  <Card className="border-accent/20 bg-accent/5 relative overflow-hidden h-fit">
+                    <div className="absolute top-0 right-0 p-4 opacity-10">
+                      <Lightbulb className="w-24 h-24 rotate-12" />
+                    </div>
+                    <CardHeader className="p-4 pb-0 flex flex-row items-center gap-2 relative z-10">
+                      <Zap className="w-4 h-4 text-accent animate-bounce" />
+                      <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-accent/80">Sugerencia Estratégica</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4 pt-2 relative z-10">
+                      <p className="text-sm text-foreground/90 leading-relaxed font-bold border-l-2 border-accent/30 pl-3">
+                        {getAdvice()}
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-primary/5 border-primary/20 p-6 flex items-center gap-4">
+                    <div className="bg-primary/20 p-3 rounded-2xl">
+                      <Activity className="w-8 h-8 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] uppercase font-bold text-muted-foreground">Meta de Cierre Mensual</p>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-black">{stats.currentMonthSales} / {Math.max(stats.lastMonthSales + 2, 10)}</span>
+                        <span className="text-xs font-bold text-primary">+{Math.round((stats.currentMonthSales / (stats.lastMonthSales + 2 || 10)) * 100)}%</span>
+                      </div>
+                      <Progress value={(stats.currentMonthSales / (stats.lastMonthSales + 2 || 10)) * 100} className="h-1.5 mt-2" />
+                    </div>
+                  </Card>
+                </div>
+
               </div>
             </div>
           </div>
