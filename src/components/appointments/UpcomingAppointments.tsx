@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -145,6 +146,9 @@ export default function UpcomingAppointments({
         title: "Consulta Finalizada",
         description: `Se ha registrado el resultado "${finalStatus}" para ${finalizingApp.name}.`,
       });
+      
+      // Abrimos los detalles de la cita independientemente del resultado
+      onSelect(finalizingApp);
       setFinalizingApp(null);
     }
   };

@@ -624,27 +624,27 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
         </div>
       </footer>
 
-      <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
+      <AlertDialog open={showResetConfirm} onOpenChange={showResetConfirm ? () => setShowResetConfirm(false) : undefined}>
         <AlertDialogContent className="z-[85]">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Confirmar reinicio?</AlertDialogTitle>
             <AlertDialogDescription>Se borrará tu información actual para restaurar los datos de prueba iniciales.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel type="button">Cancelar</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setShowResetConfirm(false)} type="button">Cancelar</AlertDialogCancel>
             <AlertDialogAction onClick={() => { resetData(); setShowResetConfirm(false); toast({ title: "Datos restaurados" }); }} type="button">Sí, reiniciar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
+      <AlertDialog open={showClearConfirm} onOpenChange={showClearConfirm ? () => setShowClearConfirm(false) : undefined}>
         <AlertDialogContent className="z-[85]">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar todo?</AlertDialogTitle>
             <AlertDialogDescription>Esta acción borrará todas tus citas permanentemente. No se puede deshacer.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel type="button">Cancelar</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setShowClearConfirm(false)} type="button">Cancelar</AlertDialogCancel>
             <AlertDialogAction onClick={() => { clearAll(); setShowClearConfirm(false); toast({ title: "Base de datos limpia", variant: "destructive" }); }} className="bg-destructive hover:bg-destructive/90 text-white" type="button">
               Eliminar Permanentemente
             </AlertDialogAction>
@@ -856,10 +856,10 @@ export default function FinantoMain({ initialSection }: FinantoMainProps) {
                 </div>
                 <ul className="space-y-3">
                   {[
-                    "Asegura que el expediente físico esté en notaría hoy mismo.",
-                    "Registra los datos de comisión en tu reporte semanal.",
-                    "Envía el mensaje de felicitación por WhatsApp al cliente.",
-                    "Programa una cita de firma de escrituras en tu agenda."
+                    "Asegúrate de que el contrato esté completo y llegue a gerencia hoy mismo.",
+                    "Registra todos los datos útiles en las notas de la cita para el seguimiento.",
+                    "¡Cuidado con el manejo del dinero! Verifica siempre los comprobantes de depósito.",
+                    "Registra las comisiones pactadas en el área financiera del expediente."
                   ].map((tip, i) => (
                     <li key={i} className="flex items-start gap-3 group">
                       <div className="mt-1 bg-green-400 rounded-full p-0.5 group-hover:scale-110 transition-transform">
