@@ -157,9 +157,11 @@ export default function UpcomingAppointments({
     if (finalizingApp) {
       const isCierre = finalStatus === 'Cierre';
       
+      // Al finalizar una cita, se marca automáticamente como confirmada
       editAppointment(finalizingApp.id, { 
         status: finalStatus, 
         notes: finalNotes,
+        isConfirmed: true, 
         finalCreditAmount: isCierre ? finalCreditAmount : undefined,
         commissionPercent: isCierre ? finalCommissionPercent : undefined,
         commissionStatus: isCierre ? 'Pendiente' : undefined
@@ -365,7 +367,7 @@ export default function UpcomingAppointments({
                                     <CheckIcon className="w-4 h-4" />
                                   </Button>
                                 </TooltipTrigger>
-                                <TooltipContent className="bg-card border-border shadow-xl z-[100] text-[10px] font-bold">
+                                <TooltipContent className="bg-card border-border shadow-xl z-[160] text-[10px] font-bold">
                                   FINALIZAR CONSULTA
                                 </TooltipContent>
                               </Tooltip>

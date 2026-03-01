@@ -162,7 +162,7 @@ export const generateSeedData = (): Appointment[] => {
       product: products[i % products.length],
       isConfirmed: isTodayApp ? Math.random() > 0.5 : false,
       isArchived: false,
-      notes: i % 4 === 0 ? `Cliente con perfil para ${products[i % products.length]}. Interesado en zona norte.` : '',
+      notes: i % 4 === 0 ? `Interés en ${products[i % products.length]} zona centro.` : '',
     });
   }
 
@@ -273,7 +273,8 @@ export const calculateStats = (appointments: Appointment[]) => {
     .reduce((sum, a) => sum + ((a.finalCreditAmount || 0) * 0.007 * ((a.commissionPercent || 0) / 100)) * 0.91, 0);
 
   const todayTotal = activeApps.filter(a => isToday(parseISO(a.date))).length;
-  const todayConfirmed = activeApps.filter(a => isToday(parseISO(a.date)) && a.isConfirmed).length;
+  // Consideramos confirmada si tiene el check manual O si ya tiene un estatus asignado
+  const todayConfirmed = activeApps.filter(a => isToday(parseISO(a.date)) && (a.isConfirmed || a.status)).length;
   const tomorrowTotal = activeApps.filter(a => {
     const d = parseISO(a.date);
     const tomorrow = addDays(now, 1);
