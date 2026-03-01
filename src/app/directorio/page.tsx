@@ -1,7 +1,14 @@
 "use client"
 
-import FinantoMain from '@/components/FinantoMain';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function DirectoryPage() {
-  return <FinantoMain initialSection="directorio" />;
+  const router = useRouter();
+  
+  useEffect(() => {
+    router.replace('/');
+  }, [router]);
+
+  return null;
 }

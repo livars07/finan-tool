@@ -52,7 +52,7 @@ Esta sección describe la arquitectura y capacidades técnicas de **Finanto v1.1
 - **Soft Delete**: Implementación de un campo `isArchived` para ocultar registros sin eliminarlos físicamente de la memoria del navegador.
 
 ### 2. Motor Financiero e Inteligencia de Negocio
-- **Cálculo de Comisiones**: Lógica automatizada basada en el 0.7% del monto de crédito neto.
+- **Cálculo de Comisiones**: Lógica automatizada basada en el 0.7% del monto de crédito neto, restando el 9% de retención fiscal automáticamente.
 - **Algoritmo de Ciclos de Pago**: Proyecta fechas de liquidación basadas en cortes administrativos:
     - Ventas de Domingo a Martes -> Liquidación el viernes de la siguiente semana.
     - Ventas de Miércoles a Sábado -> Liquidación el viernes de la subsiguiente semana.
